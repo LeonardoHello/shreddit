@@ -7,15 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "introspect": "drizzle-kit introspect:pg",
     "generate": "drizzle-kit generate:pg",
     "push": "drizzle-kit push:pg"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.12.13",
     "@clerk/nextjs": "^4.25.3",
+    "@clerk/themes": "^1.7.7",
     "@neondatabase/serverless": "^0.6.0",
     "clsx": "^2.0.0",
     "drizzle-orm": "^0.28.6",
-    "next": "13.5.4",
+    "next": "13.5.5",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -27,7 +30,7 @@
     "dotenv": "^16.3.1",
     "drizzle-kit": "^0.19.13",
     "eslint": "^8",
-    "eslint-config-next": "13.5.4",
+    "eslint-config-next": "13.5.5",
     "postcss": "^8",
     "prettier-plugin-tailwindcss": "^0.5.5",
     "tailwindcss": "^3",
