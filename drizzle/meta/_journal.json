@@ -8,6 +8,48 @@
       "when": 1697621530665,
       "tag": "0000_rich_stone_men",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1697656084970,
+      "tag": "0001_magenta_shard",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1697835916708,
+      "tag": "0002_broken_mephistopheles",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1697871776779,
+      "tag": "0003_bizarre_ezekiel_stane",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1697884589190,
+      "tag": "0004_dark_nebula",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1698086269261,
+      "tag": "0005_confused_angel",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1698086843842,
+      "tag": "0006_left_warhawk",
+      "breakpoints": true
     }
   ]
 }
