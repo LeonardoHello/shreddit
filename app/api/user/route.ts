@@ -1,25 +1,30 @@
-import type { NextRequest } from "next/server";
 import type { WebhookEvent } from "@clerk/clerk-sdk-node";
-import { db } from "@/lib/db";
-import { users } from "@/lib/schema";
+import db from "@/db";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   const { data, type }: WebhookEvent = await req.json();
 
   switch (type) {
     case "user.created":
       await db.insert(users).values({
         id: data.id,
-        username: data.username ?? data.first_name,
+        name: data.username as string,
+        imageUrl: data.image_url,
       });
+
       break;
 
     case "user.updated":
       await db
         .update(users)
-        .set({ username: data.username ?? data.first_name })
+        .set({
+          name: data.username as string,
+          imageUrl: data.image_url,
+        })
         .where(eq(users.id, data.id));
+
       break;
 
     default:
