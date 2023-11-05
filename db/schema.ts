@@ -8,14 +8,22 @@ import {
   timestamp,
   boolean,
   primaryKey,
+  uniqueIndex,
+  index,
 } from "drizzle-orm/pg-core";
 
-export const users = pgTable("users", {
-  id: varchar("id", { length: 256 }).primaryKey(), // clerk user id
-  username: varchar("username", { length: 256 }).notNull(),
-  imageUrl: varchar("image_url", { length: 256 }).notNull(),
-  onions: integer("onions").default(0).notNull(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: varchar("id", { length: 256 }).primaryKey(), // clerk user id
+    name: varchar("name", { length: 256 }).unique().notNull(),
+    imageUrl: varchar("image_url", { length: 256 }).notNull(),
+    onions: integer("onions").default(0).notNull(),
+  },
+  (t) => ({
+    nameIdx: uniqueIndex("name_idx").on(t.name),
+  }),
+);
 
 export const usersRelations = relations(users, ({ many }) => ({
   usersToCommunities: many(usersToCommunities),
@@ -23,22 +31,22 @@ export const usersRelations = relations(users, ({ many }) => ({
   comments: many(comments),
 }));
 
-export const communities = pgTable("communities", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  name: varchar("name", { length: 256 }).notNull().unique(),
-  about: text("about"),
-  nsfw: boolean("nsfw").default(false).notNull(),
-  authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
-    onDelete: "set null",
+export const communities = pgTable(
+  "communities",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    name: varchar("name", { length: 256 }).unique().notNull(),
+    imageUrl: varchar("image_url", { length: 256 }),
+    about: text("about"),
+    nsfw: boolean("nsfw").default(false).notNull(),
+  },
+  (t) => ({
+    nameIdx: uniqueIndex("name_idx").on(t.name),
   }),
-});
+);
 
-export const communitiesRelations = relations(communities, ({ one, many }) => ({
-  author: one(users, {
-    fields: [communities.authorId],
-    references: [users.id],
-  }),
+export const communitiesRelations = relations(communities, ({ many }) => ({
   usersToCommunities: many(usersToCommunities),
   posts: many(posts),
 }));
@@ -46,7 +54,7 @@ export const communitiesRelations = relations(communities, ({ one, many }) => ({
 export const usersToCommunities = pgTable(
   "users_to_communities",
   {
-    memberId: varchar("author_id")
+    userId: varchar("user_id", { length: 256 })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     communityId: uuid("community_id")
@@ -54,17 +62,20 @@ export const usersToCommunities = pgTable(
       .references(() => communities.id, { onDelete: "cascade" }),
     muted: boolean("muted").default(false).notNull(),
     favorite: boolean("favorite").default(false).notNull(),
+    member: boolean("member").default(true).notNull(),
+    author: boolean("author").default(false).notNull(),
   },
   (t) => ({
-    pk: primaryKey(t.memberId, t.communityId),
+    pk: primaryKey(t.userId, t.communityId),
+    userIdIdx: index("user_id_idx").on(t.userId),
   }),
 );
 
 export const usersToCommunitiesRelations = relations(
   usersToCommunities,
   ({ one }) => ({
-    author: one(users, {
-      fields: [usersToCommunities.memberId],
+    user: one(users, {
+      fields: [usersToCommunities.userId],
       references: [users.id],
     }),
     community: one(communities, {
@@ -85,6 +96,7 @@ export const posts = pgTable("posts", {
   nsfw: boolean("nsfw").notNull(),
   spoiler: boolean("spoiler").notNull(),
   upvoted: varchar("upvoted", { length: 256 }).array().notNull(),
+  downvoted: varchar("downvoted", { length: 256 }).array().notNull(),
   authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
     onDelete: "set null",
   }),
@@ -111,6 +123,7 @@ export const comments = pgTable("comments", {
   updatedAt: timestamp("updated_at"),
   text: text("text").notNull(),
   upvoted: varchar("upvoted", { length: 256 }).array().notNull(),
+  downvoted: varchar("downvoted", { length: 256 }).array().notNull(),
   authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
     onDelete: "set null",
   }),
