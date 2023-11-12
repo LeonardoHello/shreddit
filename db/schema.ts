@@ -149,3 +149,9 @@ export type Community = typeof communities.$inferSelect;
 export type UserToCommunity = typeof usersToCommunities.$inferSelect;
 export type Post = typeof posts.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
+
+export const UserSchema = createSelectSchema(users);
+export const CommunitySchema = createSelectSchema(communities);
+export const UserToCommunitySchema = createSelectSchema(usersToCommunities);
+export const PostSchema = createSelectSchema(posts);
+export const CommentSchema = createSelectSchema(comments);
