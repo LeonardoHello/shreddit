@@ -34,6 +34,7 @@ export default async function HomePage() {
 
   return (
     <main>
+      <Sort />
       <Posts
         // @ts-expect-error --> cannot read DATE property "createdAt" as STRING
         initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }}
