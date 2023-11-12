@@ -1,7 +1,7 @@
-import { and, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 
 import db from "@/db";
-import { communities, users, usersToCommunities } from "@/db/schema";
+import { communities, posts, users, usersToCommunities } from "@/db/schema";
 
 export const getFavoriteCommunities = (userId: string) => {
   return db.query.usersToCommunities.findMany({
@@ -71,6 +71,31 @@ export const getSearchedCommunities = db.query.communities
     },
   })
   .prepare("getSearchedCommunities");
+
+export const getJoinedCommunitiesIds = (userId: string) => {
+  return db.query.usersToCommunities.findMany({
+    columns: { communityId: true },
+    where: and(
+      eq(usersToCommunities.userId, userId),
+      eq(usersToCommunities.member, true),
+    ),
+  });
+};
+
+export const getJoinedCommunitiesPosts = (communityIds: string[]) => {
+  return db.query.posts
+    .findMany({
+      limit: 10,
+      where: inArray(posts.communityId, communityIds),
+      offset: sql.placeholder("offset"),
+      with: {
+        community: { columns: { name: true, imageUrl: true } },
+        comments: {},
+      },
+      orderBy: [desc(posts.createdAt)],
+    })
+    .prepare("getJoinedCommunitiesPosts");
+};
 
 export const toggleFavorite = (
   userId: string,

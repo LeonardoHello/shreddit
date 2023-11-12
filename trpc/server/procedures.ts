@@ -7,6 +7,7 @@ import {
 } from "@/db/schema";
 import {
   getCommunityImageUrl,
+  getJoinedCommunitiesPosts,
   getSearchedCommunities,
   getSearchedUsers,
   getUserImageUrl,
@@ -47,6 +48,29 @@ export const appRouter = router({
   searchCommunities: procedure.input(z.string()).query(({ input }) => {
     return getSearchedCommunities.execute({ search: `%${input}%` });
   }),
+  joinedCommunitiesPosts: protectedProcedure
+    .input(
+      z.object({
+        // "cursor" input needed to expose useInfiniteQuery hook
+        cursor: z.number().nullable(),
+        communityIds: z.string().uuid().array(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const posts = await getJoinedCommunitiesPosts(input.communityIds).execute(
+        {
+          offset: input.cursor,
+        },
+      );
+
+      // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts
+      let nextCursor: typeof input.cursor = null;
+      if (posts.length === 10) {
+        nextCursor = input.cursor! + 10;
+      }
+
+      return { posts, nextCursor };
+    }),
 });
 
 export type AppRouter = typeof appRouter;
