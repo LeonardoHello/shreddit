@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   CommunitySchema,
   UserSchema,
@@ -5,11 +7,13 @@ import {
 } from "@/db/schema";
 import {
   getCommunityImageUrl,
+  getSearchedCommunities,
+  getSearchedUsers,
   getUserImageUrl,
   toggleFavorite,
 } from "@/lib/api";
 
-import { protectedProcedure, router } from "./";
+import { procedure, protectedProcedure, router } from "./";
 
 import type { inferRouterOutputs, inferRouterInputs } from "@trpc/server";
 
@@ -37,6 +41,12 @@ export const appRouter = router({
       if (input === undefined) return null;
       return getUserImageUrl.execute({ name: input });
     }),
+  searchUsers: procedure.input(z.string()).query(({ input }) => {
+    return getSearchedUsers.execute({ search: `%${input}%` });
+  }),
+  searchCommunities: procedure.input(z.string()).query(({ input }) => {
+    return getSearchedCommunities.execute({ search: `%${input}%` });
+  }),
 });
 
 export type AppRouter = typeof appRouter;

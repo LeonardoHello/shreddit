@@ -2,6 +2,7 @@ import clsx from "clsx";
 import Link from "next/link";
 
 import Logo from "@/components/Logo";
+import Search from "@/components/Search";
 import UserInfo from "@/components/UserInfo";
 import { auth } from "@clerk/nextjs";
 
@@ -21,6 +22,7 @@ export default function FeedLayout({
         )}
       >
         <Logo />
+        <Search />
 
         {userId ? (
           <UserInfo userId={userId} />
