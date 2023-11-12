@@ -1,16 +1,17 @@
 import { relations } from "drizzle-orm";
 import {
-  text,
-  pgTable,
-  uuid,
-  integer,
-  varchar,
-  timestamp,
   boolean,
-  primaryKey,
-  uniqueIndex,
   index,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable(
   "users",
@@ -95,8 +96,8 @@ export const posts = pgTable("posts", {
   link: varchar("link", { length: 256 }),
   nsfw: boolean("nsfw").notNull(),
   spoiler: boolean("spoiler").notNull(),
-  upvoted: varchar("upvoted", { length: 256 }).array().notNull(),
-  downvoted: varchar("downvoted", { length: 256 }).array().notNull(),
+  upvoted: varchar("upvoted", { length: 256 }).array(),
+  downvoted: varchar("downvoted", { length: 256 }).array(),
   authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
     onDelete: "set null",
   }),
@@ -122,8 +123,8 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at"),
   text: text("text").notNull(),
-  upvoted: varchar("upvoted", { length: 256 }).array().notNull(),
-  downvoted: varchar("downvoted", { length: 256 }).array().notNull(),
+  upvoted: varchar("upvoted", { length: 256 }).array(),
+  downvoted: varchar("downvoted", { length: 256 }).array(),
   authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
     onDelete: "set null",
   }),
