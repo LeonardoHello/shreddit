@@ -1,6 +1,8 @@
 import { toast } from "sonner";
 
-const handleErrorToast = (errorMessage: string) => {
+const handleErrorToast = (
+  errorMessage: string = "Something unexpected happened. Please try again or contact support.",
+) => {
   switch (true) {
     case errorMessage.includes("relation") &&
       errorMessage.includes("does not exist"):
