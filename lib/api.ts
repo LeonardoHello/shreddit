@@ -49,6 +49,7 @@ export const getFavoriteCommunities = (userId: string) => {
       eq(usersToCommunities.userId, userId),
       eq(usersToCommunities.favorite, true),
     ),
+    columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { name: true, imageUrl: true } } },
   });
 };
@@ -59,6 +60,7 @@ export const getOwnedCommunities = (userId: string) => {
       eq(usersToCommunities.userId, userId),
       eq(usersToCommunities.author, true),
     ),
+    columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { name: true, imageUrl: true } } },
   });
 };
@@ -69,6 +71,7 @@ export const getJoinedCommunities = (userId: string) => {
       eq(usersToCommunities.userId, userId),
       eq(usersToCommunities.member, true),
     ),
+    columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { name: true, imageUrl: true } } },
   });
 };

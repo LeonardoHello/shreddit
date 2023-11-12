@@ -1,11 +1,30 @@
-import { CommunitySchema, UserSchema } from "@/db/schema";
-import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api";
+import {
+  CommunitySchema,
+  UserSchema,
+  UserToCommunitySchema,
+} from "@/db/schema";
+import {
+  getCommunityImageUrl,
+  getUserImageUrl,
+  toggleFavorite,
+} from "@/lib/api";
 
 import { protectedProcedure, router } from "./";
 
 import type { inferRouterOutputs, inferRouterInputs } from "@trpc/server";
 
 export const appRouter = router({
+  favorite: protectedProcedure
+    .input(
+      UserToCommunitySchema.pick({
+        userId: true,
+        communityId: true,
+        favorite: true,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      await toggleFavorite(input.userId, input.communityId, input.favorite);
+    }),
   communityImage: protectedProcedure
     .input(CommunitySchema.shape.name.optional())
     .query(({ input }) => {

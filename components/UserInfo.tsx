@@ -1,14 +1,35 @@
 import CurrentFeed from "@/components/CurrentFeed";
+import {
+  getFavoriteCommunities,
+  getJoinedCommunities,
+  getOwnedCommunities,
+} from "@/lib/api";
 
+import Menu from "./Menu";
 import UserProfile from "./UserProfile";
 
 export default async function UserInfo({ userId }: { userId: string }) {
-  if (userId === null) throw new Error("Couldn't load user information");
+  const favoriteCommunitiesData = getFavoriteCommunities(userId);
+  const ownedCommunitiesData = getOwnedCommunities(userId);
+  const joinedCommunitiesData = getJoinedCommunities(userId);
+
+  const [favoriteCommunities, ownedCommunities, joinedCommunities] =
+    await Promise.all([
+      favoriteCommunitiesData,
+      ownedCommunitiesData,
+      joinedCommunitiesData,
+    ]).catch(() => {
+      throw new Error("Could not load users information.");
+    });
 
   return (
     <>
       <CurrentFeed>
-        <div>UserInfo</div>
+        <Menu
+          favoriteCommunities={favoriteCommunities}
+          ownedCommunities={ownedCommunities}
+          joinedCommunities={joinedCommunities}
+        />
       </CurrentFeed>
       <UserProfile />
     </>
