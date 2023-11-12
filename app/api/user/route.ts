@@ -1,7 +1,9 @@
-import type { WebhookEvent } from "@clerk/clerk-sdk-node";
+import { eq } from "drizzle-orm";
+
 import db from "@/db";
 import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+
+import type { WebhookEvent } from "@clerk/clerk-sdk-node";
 
 export async function POST(req: Request) {
   const { data, type }: WebhookEvent = await req.json();
@@ -13,7 +15,6 @@ export async function POST(req: Request) {
         name: data.username as string,
         imageUrl: data.image_url,
       });
-
       break;
 
     case "user.updated":
@@ -24,7 +25,6 @@ export async function POST(req: Request) {
           imageUrl: data.image_url,
         })
         .where(eq(users.id, data.id));
-
       break;
 
     default:
