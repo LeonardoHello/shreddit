@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
-import handleErrorToast from "@/lib/handleErrorToast";
+import handleErrorToast from "@/lib/utils/setToastError";
 import { trpc } from "@/trpc/client";
 import { StarIcon } from "@heroicons/react/24/outline";
 
-import type { Community, UserToCommunity } from "@/db/schema";
+import type { Community, UserToCommunity } from "@/lib/db/schema";
 
 type Prop = {
   communityRelation: Pick<

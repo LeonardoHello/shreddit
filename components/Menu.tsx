@@ -10,7 +10,7 @@ import { ChartBarIcon, HomeIcon, UserIcon } from "@heroicons/react/24/solid";
 
 import MenuNavigation from "./MenuNavigation";
 
-import type { Community, UserToCommunity } from "@/db/schema";
+import type { Community, UserToCommunity } from "@/lib/db/schema";
 
 type communityRelation = (Pick<
   UserToCommunity,

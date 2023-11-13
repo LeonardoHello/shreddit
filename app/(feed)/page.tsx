@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 
 import Posts from "@/components/Posts";
 import Sort from "@/components/Sort";
-import { getJoinedCommunitiesIds, getJoinedCommunitiesPosts } from "@/lib/api";
+import {
+  getJoinedCommunitiesIds,
+  getJoinedCommunitiesPosts,
+} from "@/lib/api/getJoinedCommunitiesPosts";
 import { auth } from "@clerk/nextjs";
 
 export default async function HomePage() {
@@ -27,7 +30,7 @@ export default async function HomePage() {
 
   let nextCursor = null;
 
-  // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts
+  // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts after first 10 initially fetched posts
   if (joinedCommunitiesPosts.length === 10) {
     nextCursor = 10;
   }
@@ -36,7 +39,7 @@ export default async function HomePage() {
     <main>
       <Sort />
       <Posts
-        // @ts-expect-error --> cannot read DATE property "createdAt" as STRING
+        // @ts-expect-error -> createdAt's type 'Date' is not assignable to type 'string'
         initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }}
         communityIds={communityIdList}
       />

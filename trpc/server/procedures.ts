@@ -1,23 +1,18 @@
 import { z } from "zod";
 
+import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api/getImageUrl";
+import { getJoinedCommunitiesPosts } from "@/lib/api/getJoinedCommunitiesPosts";
+import { searchCommunities, searchUsers } from "@/lib/api/searchShreddit";
+import toggleFavoriteCommunity from "@/lib/api/toggleFavoriteCommunity";
 import {
   CommunitySchema,
   UserSchema,
   UserToCommunitySchema,
-} from "@/db/schema";
-import {
-  getCommunityImageUrl,
-  getJoinedCommunitiesPosts,
-  getSearchedCommunities,
-  getSearchedUsers,
-  getUserImageUrl,
-  toggleFavorite,
-} from "@/lib/api";
+} from "@/lib/db/schema";
 
 import { procedure, protectedProcedure, router } from "./";
 
 import type { inferRouterOutputs, inferRouterInputs } from "@trpc/server";
-
 export const appRouter = router({
   favorite: protectedProcedure
     .input(
@@ -28,7 +23,11 @@ export const appRouter = router({
       }),
     )
     .mutation(async ({ input }) => {
-      await toggleFavorite(input.userId, input.communityId, input.favorite);
+      await toggleFavoriteCommunity(
+        input.userId,
+        input.communityId,
+        input.favorite,
+      );
     }),
   communityImage: protectedProcedure
     .input(CommunitySchema.shape.name.optional())
@@ -43,10 +42,10 @@ export const appRouter = router({
       return getUserImageUrl.execute({ name: input });
     }),
   searchUsers: procedure.input(z.string()).query(({ input }) => {
-    return getSearchedUsers.execute({ search: `%${input}%` });
+    return searchUsers.execute({ search: `%${input}%` });
   }),
   searchCommunities: procedure.input(z.string()).query(({ input }) => {
-    return getSearchedCommunities.execute({ search: `%${input}%` });
+    return searchCommunities.execute({ search: `%${input}%` });
   }),
   joinedCommunitiesPosts: protectedProcedure
     .input(

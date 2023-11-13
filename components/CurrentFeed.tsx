@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-import useDropdownClose from "@/hooks/useDropdownClose";
+import useDropdownClose from "@/lib/hooks/useDropdownClose";
 import communityImage from "@/public/community-logo.svg";
 import { trpc } from "@/trpc/client";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";

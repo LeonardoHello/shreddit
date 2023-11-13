@@ -4,8 +4,8 @@ import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import useDropdownClose from "@/hooks/useDropdownClose";
-import handleErrorToast from "@/lib/handleErrorToast";
+import useDropdownClose from "@/lib/hooks/useDropdownClose";
+import setToastError from "@/lib/utils/setToastError";
 import { trpc } from "@/trpc/client";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
@@ -47,9 +47,9 @@ export default function Search() {
 
   useEffect(() => {
     if (searchedCommunities.error) {
-      handleErrorToast(searchedCommunities.error.message);
+      setToastError(searchedCommunities.error.message);
     } else if (searchedUsers.error) {
-      handleErrorToast(searchedUsers.error.message);
+      setToastError(searchedUsers.error.message);
     } else if (searchedValue.length > 0) {
       setCommunities(searchedCommunities.data || []);
       setUsers(searchedUsers.data || []);

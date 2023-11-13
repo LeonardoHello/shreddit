@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-const handleErrorToast = (
+const setToastError = (
   errorMessage: string = "Something unexpected happened. Please try again or contact support.",
 ) => {
   switch (true) {
@@ -74,4 +74,4 @@ const handleErrorToast = (
   toast.error(errorMessage);
 };
 
-export default handleErrorToast;
+export default setToastError;

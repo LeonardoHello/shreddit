@@ -3,7 +3,7 @@ import {
   getFavoriteCommunities,
   getJoinedCommunities,
   getOwnedCommunities,
-} from "@/lib/api";
+} from "@/lib/api/getUsersCommunities";
 
 import Menu from "./Menu";
 import UserProfile from "./UserProfile";
