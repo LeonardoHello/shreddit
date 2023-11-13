@@ -1,77 +1,42 @@
 import { toast } from "sonner";
 
-const setToastError = (
-  errorMessage: string = "Something unexpected happened. Please try again or contact support.",
-) => {
-  switch (true) {
-    case errorMessage.includes("relation") &&
-      errorMessage.includes("does not exist"):
-      errorMessage =
-        "Oops! The resource you're looking for doesn't seem to exist. It might have vanished into thin air.";
-      break;
+export default function setToastError(errorMessage: string) {
+  let toastError =
+    "Something unexpected happened. Please try again or contact support.";
 
-    case errorMessage.includes("syntax error at or near"):
-      errorMessage =
-        "Whoops! There's a little hiccup in your SQL query. Please double-check the syntax.";
-      break;
-
-    case errorMessage.includes(
-      "duplicate key value violates unique constraint",
-    ):
-      errorMessage = "Oops! This entry already exists. No need to double up!";
-      break;
-
-    case errorMessage.includes("null value in column"):
-      errorMessage =
-        "Hold on! You can't leave this field empty. It's required.";
-      break;
-
-    case errorMessage.includes("division by zero"):
-      errorMessage =
-        "Uh-oh! Dividing by zero is a no-go. Please use a non-zero divisor.";
-      break;
-
-    case errorMessage.includes("could not connect to server"):
-      errorMessage =
-        "Houston, we have a problem! We can't reach the database right now. Please check your connection.";
-      break;
-
-    case errorMessage.includes("deadlock detected"):
-      errorMessage =
-        "It seems we have a little traffic jam in our system. Please try your request again shortly.";
-      break;
-
-    case errorMessage.includes("permission denied for table"):
-      errorMessage =
-        "Sorry, you don't have permission to do that. It's like trying to enter a restricted area without access.";
-      break;
-
-    case errorMessage.includes("already exists"):
-      errorMessage =
-        "Oops! This resource is already in the database. No need to add it again.";
-      break;
-
-    case errorMessage.includes("specified more than once"):
-      errorMessage =
-        "Hold on! You mentioned this column multiple times. Once is enough!";
-      break;
-
-    case errorMessage.includes("value too long for type"):
-      errorMessage =
-        "This value is too lengthy for the database to handle. Please shorten it.";
-      break;
-
-    case errorMessage.includes("invalid input syntax for type"):
-      errorMessage =
-        "Sorry, the format of this data doesn't fit the bill. Please provide it in the expected format.";
-      break;
-
-    default:
-      errorMessage =
-        "Something unexpected happened. Please try again or contact support.";
+  if (
+    errorMessage.includes("relation") &&
+    errorMessage.includes("does not exist")
+  ) {
+    toastError = "The requested resource does not exist.";
+  } else if (errorMessage.includes("syntax error at or near")) {
+    toastError = "There is a syntax error in your SQL query.";
+  } else if (
+    errorMessage.includes("duplicate key value violates unique constraint")
+  ) {
+    toastError = "A record with the same key already exists.";
+  } else if (errorMessage.includes("null value in column")) {
+    toastError = "You cannot insert a NULL value in a required field.";
+  } else if (errorMessage.includes("division by zero")) {
+    toastError = "Cannot divide by zero.";
+  } else if (errorMessage.includes("could not connect to server")) {
+    toastError = "Failed to connect to the database server.";
+  } else if (errorMessage.includes("deadlock detected")) {
+    toastError = "A deadlock situation occurred. Please try again later.";
+  } else if (errorMessage.includes("permission denied for table")) {
+    toastError =
+      "You do not have permission to perform this operation on the table.";
+  } else if (errorMessage.includes("already exists")) {
+    toastError = "The resource you are trying to create already exists.";
+  } else if (errorMessage.includes("specified more than once")) {
+    toastError = "The column is specified more than once in the query.";
+  } else if (errorMessage.includes("value too long for type")) {
+    toastError = "The value provided is too long for the specified data type.";
+  } else if (errorMessage.includes("invalid input syntax for type")) {
+    toastError = "Invalid data format for the specified data type.";
+  } else {
+    toastError = "An error occurred. Please try again or contact support.";
   }
 
-  toast.error(errorMessage);
-};
-
-export default setToastError;
+  toast.error(toastError);
+}
