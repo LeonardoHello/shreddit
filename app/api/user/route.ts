@@ -1,10 +1,9 @@
 import { eq } from "drizzle-orm";
 
-import db from "@/db";
-import { users } from "@/db/schema";
+import db from "@/lib/db";
+import { users } from "@/lib/db/schema";
 
 import type { WebhookEvent } from "@clerk/clerk-sdk-node";
-
 export async function POST(req: Request) {
   const { data, type }: WebhookEvent = await req.json();
 
