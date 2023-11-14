@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 import Posts from "@/components/Posts";
 import Sort from "@/components/Sort";
 import {
@@ -11,9 +9,7 @@ import { auth } from "@clerk/nextjs";
 export default async function HomePage() {
   const { userId } = auth();
 
-  if (userId === null) {
-    redirect("/all");
-  }
+  if (userId === null) throw new Error("Could not load users information.");
 
   const joinedCommunitiesIds = await getJoinedCommunitiesIds(userId);
 

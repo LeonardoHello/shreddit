@@ -6,6 +6,8 @@ import Search from "@/components/Search";
 import UserInfo from "@/components/UserInfo";
 import { auth } from "@clerk/nextjs";
 
+export const runtime = "edge";
+
 export default function FeedLayout({
   children,
 }: {
