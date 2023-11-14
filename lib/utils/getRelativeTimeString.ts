@@ -1,12 +1,12 @@
 /**
- * snippet from https://www.builder.io/blog/relative-time
+ * snippet from https://gist.github.com/steve8708/ada9bff2600228789fce2fcc95427e39
  * Convert a date to a relative time string, such as
  * "a minute ago", "in 2 hours", "yesterday", "3 months ago", etc.
  * using Intl.RelativeTimeFormat
  */
 export default function getRelativeTimeString(
   date: Date | number,
-  lang = navigator.language,
+  lang = "en-US",
 ): string {
   // Allow dates or times to be passed
   const timeMs = typeof date === "number" ? date : date.getTime();
