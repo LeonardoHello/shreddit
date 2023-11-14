@@ -39,7 +39,7 @@ export default function RootLayout({
         variables: { colorPrimary: "#f43f5e" },
       }}
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${nunito_sans.className} bg-zinc-950 text-zinc-300`}>
           <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
           <Provider>{children}</Provider>
