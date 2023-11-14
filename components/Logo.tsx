@@ -6,7 +6,7 @@ import logo from "@/public/logo.svg";
 
 export default function Logo() {
   return (
-    <Link href="/" className="flex select-none items-center gap-1.5">
+    <Link href="/" as="/all" className="flex select-none items-center gap-1.5">
       <Image src={logo} alt="logo" width={32} priority />
       <Image
         src={logoText}
