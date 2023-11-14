@@ -92,8 +92,8 @@ export const posts = pgTable("posts", {
   title: text("title").notNull(),
   text: text("text"),
   link: text("link"),
-  nsfw: boolean("nsfw").notNull(),
-  spoiler: boolean("spoiler").notNull(),
+  nsfw: boolean("nsfw").notNull().default(false),
+  spoiler: boolean("spoiler").notNull().default(false),
   upvoted: text("upvoted").array(),
   downvoted: text("downvoted").array(),
   authorId: text("author_id").references(() => users.id, {
