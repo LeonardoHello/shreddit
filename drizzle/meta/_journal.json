@@ -64,6 +64,20 @@
       "when": 1699567916542,
       "tag": "0008_petite_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1699947828242,
+      "tag": "0009_overjoyed_tombstone",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1699952787698,
+      "tag": "0010_gigantic_pixie",
+      "breakpoints": true
     }
   ]
 }

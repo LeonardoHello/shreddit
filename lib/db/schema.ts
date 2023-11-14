@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -9,17 +9,16 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
-  varchar,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
 export const users = pgTable(
   "users",
   {
-    id: varchar("id", { length: 256 }).primaryKey(), // clerk user id
-    name: varchar("name", { length: 256 }).unique().notNull(),
-    imageUrl: varchar("image_url", { length: 256 }).notNull(),
-    onions: integer("onions").default(0).notNull(),
+    id: text("id").primaryKey(), // clerk user id
+    name: text("name").unique().notNull(),
+    imageUrl: text("image_url").notNull(),
+    onions: integer("onions").notNull().default(0),
   },
   (t) => ({
     nameIdx: uniqueIndex("name_idx").on(t.name),
@@ -36,11 +35,11 @@ export const communities = pgTable(
   "communities",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    name: varchar("name", { length: 256 }).unique().notNull(),
-    imageUrl: varchar("image_url", { length: 256 }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    name: text("name").unique().notNull(),
+    imageUrl: text("image_url"),
     about: text("about"),
-    nsfw: boolean("nsfw").default(false).notNull(),
+    nsfw: boolean("nsfw").notNull().default(false),
   },
   (t) => ({
     nameIdx: uniqueIndex("name_idx").on(t.name),
@@ -55,16 +54,16 @@ export const communitiesRelations = relations(communities, ({ many }) => ({
 export const usersToCommunities = pgTable(
   "users_to_communities",
   {
-    userId: varchar("user_id", { length: 256 })
+    userId: text("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     communityId: uuid("community_id")
       .notNull()
       .references(() => communities.id, { onDelete: "cascade" }),
-    muted: boolean("muted").default(false).notNull(),
-    favorite: boolean("favorite").default(false).notNull(),
-    member: boolean("member").default(true).notNull(),
-    author: boolean("author").default(false).notNull(),
+    muted: boolean("muted").notNull().default(false),
+    favorite: boolean("favorite").notNull().default(false),
+    member: boolean("member").notNull().default(true),
+    author: boolean("author").notNull().default(false),
   },
   (t) => ({
     pk: primaryKey(t.userId, t.communityId),
@@ -88,17 +87,16 @@ export const usersToCommunitiesRelations = relations(
 
 export const posts = pgTable("posts", {
   id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at"),
-  title: varchar("title", { length: 256 }).notNull(),
+  title: text("title").notNull(),
   text: text("text"),
-  media: varchar("media", { length: 256 }),
-  link: varchar("link", { length: 256 }),
+  link: text("link"),
   nsfw: boolean("nsfw").notNull(),
   spoiler: boolean("spoiler").notNull(),
-  upvoted: varchar("upvoted", { length: 256 }).array(),
-  downvoted: varchar("downvoted", { length: 256 }).array(),
-  authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
+  upvoted: text("upvoted").array(),
+  downvoted: text("downvoted").array(),
+  authorId: text("author_id").references(() => users.id, {
     onDelete: "set null",
   }),
   communityId: uuid("community_id")
@@ -115,17 +113,35 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     fields: [posts.communityId],
     references: [communities.id],
   }),
+  files: many(files),
   comments: many(comments),
+}));
+
+export const files = pgTable("files", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  key: text("key").notNull(),
+  url: text("url").notNull(),
+  postId: uuid("post_id")
+    .references(() => posts.id, { onDelete: "cascade" })
+    .notNull(),
+});
+
+export const filesRelations = relations(files, ({ one }) => ({
+  post: one(posts, {
+    fields: [files.postId],
+    references: [posts.id],
+  }),
 }));
 
 export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at"),
   text: text("text").notNull(),
-  upvoted: varchar("upvoted", { length: 256 }).array(),
-  downvoted: varchar("downvoted", { length: 256 }).array(),
-  authorId: varchar("author_id", { length: 256 }).references(() => users.id, {
+  upvoted: text("upvoted").array(),
+  downvoted: text("downvoted").array(),
+  authorId: text("author_id").references(() => users.id, {
     onDelete: "set null",
   }),
   postId: uuid("post_id")
@@ -144,14 +160,16 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   }),
 }));
 
-export type User = typeof users.$inferSelect;
-export type Community = typeof communities.$inferSelect;
-export type UserToCommunity = typeof usersToCommunities.$inferSelect;
-export type Post = typeof posts.$inferSelect;
-export type Comment = typeof comments.$inferSelect;
+export type User = InferSelectModel<typeof users>;
+export type Community = InferSelectModel<typeof communities>;
+export type UserToCommunity = InferSelectModel<typeof usersToCommunities>;
+export type Post = InferSelectModel<typeof posts>;
+export type File = InferSelectModel<typeof files>;
+export type Comment = InferSelectModel<typeof comments>;
 
 export const UserSchema = createSelectSchema(users);
 export const CommunitySchema = createSelectSchema(communities);
 export const UserToCommunitySchema = createSelectSchema(usersToCommunities);
 export const PostSchema = createSelectSchema(posts);
+export const FileSchema = createSelectSchema(files);
 export const CommentSchema = createSelectSchema(comments);
