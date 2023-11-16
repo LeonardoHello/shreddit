@@ -1,29 +1,44 @@
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 
+import getOnions from "@/lib/utils/getOnions";
+import setToastError from "@/lib/utils/setToastError";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
+import { trpc } from "@/trpc/client";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-
-import type { RouterOutput } from "@/trpc/server/procedures";
-type Prop = {
-  searchedValue: string;
-  communities: RouterOutput["searchCommunities"];
-  users: RouterOutput["searchUsers"];
-};
 
 export default function SearchDropdown({
   searchedValue,
-  users,
-  communities,
-}: Prop) {
+}: {
+  searchedValue: string;
+}) {
+  const searchedCommunities = trpc.searchCommunities.useQuery(searchedValue, {
+    initialData: [],
+    refetchOnWindowFocus: false,
+  });
+
+  const searchedUsers = trpc.searchUsers.useQuery(searchedValue, {
+    initialData: [],
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (searchedCommunities.error) {
+      setToastError(searchedCommunities.error.message);
+    } else if (searchedUsers.error) {
+      setToastError(searchedUsers.error.message);
+    }
+  }, [searchedCommunities.error, searchedUsers.error]);
+
   return (
     <div className="absolute top-full w-full rounded-sm border border-zinc-700 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
-      {communities.length > 0 ? (
+      {searchedCommunities.data.length > 0 ? (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>
-          {communities.map((community) => (
+          {searchedCommunities.data.map((community) => (
             <Link
               href={`/r/${community.name}`}
               key={community.name}
@@ -41,7 +56,7 @@ export default function SearchDropdown({
                 <div className="text-sm font-medium">r/{community.name}</div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500">
                   <span>Community</span>
-                  <Image src={dot} alt="dot" height={5} width={5} />
+                  <Image src={dot} alt="dot" height={4} width={4} />
                   <span className="lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
@@ -53,7 +68,7 @@ export default function SearchDropdown({
                   </span>
                   {community.nsfw ? (
                     <>
-                      <Image src={dot} alt="dot" height={5} width={5} />
+                      <Image src={dot} alt="dot" height={4} width={4} />
                       <span className="text-rose-500">NSFW</span>
                     </>
                   ) : null}
@@ -64,14 +79,14 @@ export default function SearchDropdown({
         </div>
       ) : null}
 
-      {users.length > 0 ? (
+      {searchedUsers.data.length > 0 ? (
         <div
           className={clsx("py-3", {
-            "border-t border-zinc-700": communities.length > 0,
+            "border-t border-zinc-700": searchedCommunities.data.length > 0,
           })}
         >
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Users</h2>
-          {users.map((user) => (
+          {searchedUsers.data.map((user) => (
             <Link
               href={`/u/${user.name}`}
               key={user.name}
@@ -88,13 +103,13 @@ export default function SearchDropdown({
                 <div className="text-sm font-medium">u/{user.name}</div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500">
                   <span>User</span>
-                  <Image src={dot} alt="dot" height={5} width={5} />
+                  <Image src={dot} alt="dot" height={4} width={4} />
                   <span className="lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
-                    }).format(user.onions)}{" "}
-                    {user.onions === 1 ? "onion" : "onions"}
+                    }).format(getOnions(user))}{" "}
+                    {getOnions(user) === 1 ? "onion" : "onions"}
                   </span>
                 </div>
               </div>

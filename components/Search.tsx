@@ -5,38 +5,17 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import useDropdownClose from "@/lib/hooks/useDropdownClose";
-import setToastError from "@/lib/utils/setToastError";
-import { trpc } from "@/trpc/client";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import SearchDropdown from "./SearchDropdown";
 
 import type { ChangeEvent, FocusEvent } from "react";
 
-import type { RouterOutput } from "@/trpc/server/procedures";
-
 export default function Search() {
   const pathname = usePathname();
   const [searchedValue, setSearchedValue] = useState("");
-  const [users, setUsers] = useState<RouterOutput["searchUsers"]>([]);
-  const [communities, setCommunities] = useState<
-    RouterOutput["searchCommunities"]
-  >([]);
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdownClose();
-
-  const searchedCommunities = trpc.searchCommunities.useQuery(searchedValue, {
-    initialData: [],
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
-  const searchedUsers = trpc.searchUsers.useQuery(searchedValue, {
-    initialData: [],
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-  });
 
   useEffect(() => {
     setIsOpen(false);
@@ -44,26 +23,6 @@ export default function Search() {
       setIsOpen(false);
     };
   }, [pathname, setIsOpen]);
-
-  useEffect(() => {
-    if (searchedCommunities.error) {
-      setToastError(searchedCommunities.error.message);
-    } else if (searchedUsers.error) {
-      setToastError(searchedUsers.error.message);
-    } else if (searchedValue.length > 0) {
-      setCommunities(searchedCommunities.data || []);
-      setUsers(searchedUsers.data || []);
-    } else {
-      setCommunities([]);
-      setUsers([]);
-    }
-  }, [
-    searchedCommunities.data,
-    searchedCommunities.error,
-    searchedUsers.data,
-    searchedUsers.error,
-    searchedValue.length,
-  ]);
 
   const onInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
@@ -73,7 +32,7 @@ export default function Search() {
     );
     setSearchedValue(searchedValue);
 
-    if (searchedValue.length === 0) {
+    if (searchedValue.length === 0 && isOpen === true) {
       setIsOpen(false);
     } else if (searchedValue.length > 0 && isOpen === false) {
       setIsOpen(true);
@@ -110,13 +69,7 @@ export default function Search() {
         />
       </div>
 
-      {isOpen ? (
-        <SearchDropdown
-          searchedValue={searchedValue}
-          communities={communities}
-          users={users}
-        />
-      ) : null}
+      {isOpen ? <SearchDropdown searchedValue={searchedValue} /> : null}
     </div>
   );
 }

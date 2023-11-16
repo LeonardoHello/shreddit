@@ -9,6 +9,29 @@ export const searchUsers = db.query.users
     where: ilike(users.name, sql.placeholder("search")),
     columns: { id: false },
     limit: 4,
+    with: {
+      comments: {
+        columns: { updatedAt: true, downvoted: true },
+      },
+      posts: {
+        columns: { updatedAt: true, downvoted: true },
+      },
+      usersToCommunities: {
+        where: eq(usersToCommunities.author, true),
+        columns: {},
+        with: {
+          community: {
+            columns: {},
+            with: {
+              usersToCommunities: {
+                columns: { communityId: true },
+                where: eq(usersToCommunities.member, true),
+              },
+            },
+          },
+        },
+      },
+    },
   })
   .prepare("getSearchedUsers");
 
