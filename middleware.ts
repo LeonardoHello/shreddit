@@ -3,9 +3,15 @@ import { NextResponse } from "next/server";
 import { authMiddleware, redirectToSignIn } from "@clerk/nextjs";
 
 export default authMiddleware({
-  publicRoutes: ["/(.*)"],
+  publicRoutes: [
+    "/all",
+    "/api/uploadthing",
+    "/u/:userName",
+    "/r/:communityName",
+    "/r/:communityName/post/:postId",
+  ],
   afterAuth(auth, req) {
-    if (!auth.userId) {
+    if (!auth.userId && !auth.isPublicRoute) {
       if (req.nextUrl.pathname === "/") {
         const unauthenticatedHomePage = new URL("/all", req.nextUrl.origin);
         return NextResponse.redirect(unauthenticatedHomePage);
