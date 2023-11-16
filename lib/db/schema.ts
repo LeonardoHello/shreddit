@@ -2,7 +2,6 @@ import { InferSelectModel, relations } from "drizzle-orm";
 import {
   boolean,
   index,
-  integer,
   pgTable,
   primaryKey,
   text,
@@ -18,7 +17,6 @@ export const users = pgTable(
     id: text("id").primaryKey(), // clerk user id
     name: text("name").unique().notNull(),
     imageUrl: text("image_url").notNull(),
-    onions: integer("onions").notNull().default(0),
   },
   (t) => ({
     nameIdx: uniqueIndex("name_idx").on(t.name),
@@ -55,11 +53,11 @@ export const usersToCommunities = pgTable(
   "users_to_communities",
   {
     userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+      .references(() => users.id, { onDelete: "cascade" })
+      .notNull(),
     communityId: uuid("community_id")
-      .notNull()
-      .references(() => communities.id, { onDelete: "cascade" }),
+      .references(() => communities.id, { onDelete: "cascade" })
+      .notNull(),
     muted: boolean("muted").notNull().default(false),
     favorite: boolean("favorite").notNull().default(false),
     member: boolean("member").notNull().default(true),
@@ -96,9 +94,11 @@ export const posts = pgTable("posts", {
   spoiler: boolean("spoiler").notNull().default(false),
   upvoted: text("upvoted").array(),
   downvoted: text("downvoted").array(),
-  authorId: text("author_id").references(() => users.id, {
-    onDelete: "set null",
-  }),
+  authorId: text("author_id")
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   communityId: uuid("community_id")
     .references(() => communities.id, { onDelete: "cascade" })
     .notNull(),
@@ -141,9 +141,11 @@ export const comments = pgTable("comments", {
   text: text("text").notNull(),
   upvoted: text("upvoted").array(),
   downvoted: text("downvoted").array(),
-  authorId: text("author_id").references(() => users.id, {
-    onDelete: "set null",
-  }),
+  authorId: text("author_id")
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   postId: uuid("post_id")
     .references(() => posts.id, { onDelete: "cascade" })
     .notNull(),

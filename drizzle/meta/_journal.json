@@ -85,6 +85,20 @@
       "when": 1699955452718,
       "tag": "0011_odd_riptide",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1700118937124,
+      "tag": "0012_curious_red_ghost",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1700119744503,
+      "tag": "0013_right_xorn",
+      "breakpoints": true
     }
   ]
 }
