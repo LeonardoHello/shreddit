@@ -1,8 +1,8 @@
-import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 
+import cn from "@/lib/utils/cn";
 import getOnions from "@/lib/utils/getOnions";
 import setToastError from "@/lib/utils/setToastError";
 import communityImage from "@/public/community-logo.svg";
@@ -34,7 +34,7 @@ export default function SearchDropdown({
   }, [searchedCommunities.error, searchedUsers.error]);
 
   return (
-    <div className="absolute top-full w-full rounded-sm border border-zinc-700 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
+    <div className="absolute top-full w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
       {searchedCommunities.data.length > 0 ? (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>
@@ -47,7 +47,7 @@ export default function SearchDropdown({
               <Image
                 src={community.imageUrl ?? communityImage}
                 alt="community image"
-                className={clsx("h-6 w-6  rounded-full", {
+                className={cn("h-6 w-6  rounded-full", {
                   "border border-zinc-300 bg-zinc-300":
                     community.imageUrl === null,
                 })}
@@ -81,8 +81,8 @@ export default function SearchDropdown({
 
       {searchedUsers.data.length > 0 ? (
         <div
-          className={clsx("py-3", {
-            "border-t border-zinc-700": searchedCommunities.data.length > 0,
+          className={cn("py-3", {
+            "border-t border-zinc-700/70": searchedCommunities.data.length > 0,
           })}
         >
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Users</h2>
@@ -118,7 +118,7 @@ export default function SearchDropdown({
         </div>
       ) : null}
 
-      <div className="flex items-center gap-2 border-t border-zinc-700 px-3.5 py-2 text-sm">
+      <div className="flex items-center gap-2 border-t border-zinc-700/70 px-3.5 py-2 text-sm">
         <MagnifyingGlassIcon className="h-6 w-6 text-zinc-300" />
         <p>Search for &ldquo;{searchedValue}&rdquo;</p>
       </div>

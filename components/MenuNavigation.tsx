@@ -1,15 +1,14 @@
-import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
+import cn from "@/lib/utils/cn";
 import handleErrorToast from "@/lib/utils/setToastError";
 import { trpc } from "@/trpc/client";
 import { StarIcon } from "@heroicons/react/24/outline";
 
 import type { Community, UserToCommunity } from "@/lib/db/schema";
-
 type Prop = {
   communityRelation: Pick<
     UserToCommunity,
@@ -64,7 +63,7 @@ export default function MenuNavigation({ communityRelation }: Prop) {
         <h2>r/{communityRelation.community.name}</h2>
 
         <StarIcon
-          className={clsx("ml-auto h-6 w-6", {
+          className={cn("ml-auto h-6 w-6", {
             "fill-[#0079d3] text-[#0079d3]": communityRelation.favorite,
             "text-zinc-500": communityRelation.favorite === false,
             "opacity-60": isMutating,

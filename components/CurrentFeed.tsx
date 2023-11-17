@@ -1,11 +1,11 @@
 "use client";
 
-import { clsx } from "clsx";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import useDropdownClose from "@/lib/hooks/useDropdownClose";
+import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
 import { trpc } from "@/trpc/client";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -63,7 +63,7 @@ export default function CurrentFeed({
           alt="community icon"
           width={20}
           height={20}
-          className={clsx("rounded-full", {
+          className={cn("rounded-full", {
             "border border-zinc-300 bg-zinc-300":
               communityImageUrl.data.imageUrl === null,
           })}
@@ -82,14 +82,14 @@ export default function CurrentFeed({
     }
 
     feedTitle = "r/" + communityName;
-  } else if (pathname === "/") {
-    feedImg = <HomeIcon className="h-5 w-5" />;
-    feedTitle = "Home";
-  } else {
+  } else if (pathname === "/all") {
     feedImg = (
       <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
     );
     feedTitle = "All";
+  } else {
+    feedImg = <HomeIcon className="h-5 w-5" />;
+    feedTitle = "Home";
   }
 
   return (
@@ -99,18 +99,18 @@ export default function CurrentFeed({
     >
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={clsx(
+        className={cn(
           "flex basis-full select-none items-center gap-2 rounded border border-transparent px-2.5",
           {
-            "rounded-b-none border-zinc-700 border-b-transparent": isOpen,
-            "hover:border-zinc-700": !isOpen,
+            "rounded-b-none border-zinc-700/70 border-b-transparent": isOpen,
+            "hover:border-zinc-700/70": !isOpen,
           },
         )}
       >
         {feedImg}
 
         <h1
-          className={clsx(
+          className={cn(
             "hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium md:block",
             { hidden: !isOpen },
           )}

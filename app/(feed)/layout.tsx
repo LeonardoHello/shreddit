@@ -1,9 +1,10 @@
-import clsx from "clsx";
 import Link from "next/link";
 
 import Logo from "@/components/Logo";
 import Search from "@/components/Search";
+import Sort from "@/components/Sort";
 import UserInfo from "@/components/UserInfo";
+import cn from "@/lib/utils/cn";
 import { auth } from "@clerk/nextjs";
 
 export const runtime = "edge";
@@ -18,7 +19,7 @@ export default function FeedLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <header
-        className={clsx(
+        className={cn(
           "flex h-12 gap-5 border-b border-zinc-700/70 bg-zinc-900 px-5 py-1",
           { "justify-between": userId === null },
         )}

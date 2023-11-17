@@ -1,16 +1,15 @@
 "use client";
 
-import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import useDropdownClose from "@/lib/hooks/useDropdownClose";
+import cn from "@/lib/utils/cn";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import SearchDropdown from "./SearchDropdown";
 
 import type { ChangeEvent, FocusEvent } from "react";
-
 export default function Search() {
   const pathname = usePathname();
   const [searchedValue, setSearchedValue] = useState("");
@@ -58,8 +57,8 @@ export default function Search() {
           id="search"
           placeholder="Search Shreddit"
           autoComplete="off"
-          className={clsx(
-            "w-full min-w-0 rounded-full bg-zinc-400/10 pl-12 pr-6 text-sm text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700 placeholder:text-zinc-500 hover:bg-inherit hover:ring-zinc-300 focus:rounded-b-none focus:rounded-t-[1.25rem] focus:bg-inherit focus:ring-zinc-300",
+          className={cn(
+            "w-full min-w-0 rounded-full bg-zinc-400/10 pl-12 pr-6 text-sm text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 placeholder:text-zinc-500 hover:bg-inherit hover:ring-zinc-300 focus:rounded-b-none focus:rounded-t-[1.25rem] focus:bg-inherit focus:ring-zinc-300",
             {
               "rounded-b-none rounded-t-[1.25rem] bg-zinc-400/10": isOpen,
             },
