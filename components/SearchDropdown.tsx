@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 
+import calculateOnions from "@/lib/utils/calculateOnions";
 import cn from "@/lib/utils/cn";
-import getOnions from "@/lib/utils/getOnions";
 import setToastError from "@/lib/utils/setToastError";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
@@ -108,8 +108,8 @@ export default function SearchDropdown({
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
-                    }).format(getOnions(user))}{" "}
-                    {getOnions(user) === 1 ? "onion" : "onions"}
+                    }).format(calculateOnions(user))}{" "}
+                    {calculateOnions(user) === 1 ? "onion" : "onions"}
                   </span>
                 </div>
               </div>
