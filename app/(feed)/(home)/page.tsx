@@ -1,5 +1,4 @@
 import Posts from "@/components/Posts";
-import Sort from "@/components/Sort";
 import {
   getJoinedCommunitiesIds,
   getJoinedCommunitiesPosts,
@@ -26,19 +25,16 @@ export default async function HomePage() {
 
   let nextCursor = null;
 
-  // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts after first 10 initially fetched posts
+  // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts
   if (joinedCommunitiesPosts.length === 10) {
     nextCursor = 10;
   }
 
   return (
-    <main>
-      <Sort />
-      <Posts
-        // @ts-expect-error -> createdAt's type 'Date' is not assignable to type 'string'
-        initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }}
-        communityIds={communityIdList}
-      />
-    </main>
+    <Posts
+      // @ts-expect-error -> createdAt's type 'Date' is not assignable to type 'string'
+      initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }}
+      communityIds={communityIdList}
+    />
   );
 }
