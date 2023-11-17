@@ -14,7 +14,7 @@ export default authMiddleware({
     if (!auth.userId && !auth.isPublicRoute) {
       if (req.nextUrl.pathname === "/") {
         const unauthenticatedHomePage = new URL("/all", req.nextUrl.origin);
-        return NextResponse.redirect(unauthenticatedHomePage);
+        return NextResponse.redirect(unauthenticatedHomePage, { status: 301 });
       } else if (req.nextUrl.pathname.endsWith("/submit")) {
         return redirectToSignIn({ returnBackUrl: req.url });
       }
