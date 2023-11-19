@@ -1,10 +1,22 @@
+import { ZodError } from "zod";
+
 import { initTRPC, TRPCError } from "@trpc/server";
 
 import type { Context } from "./context";
 
 const t = initTRPC.context<Context>().create({
-  errorFormatter({ shape }) {
-    return shape;
+  errorFormatter(opts) {
+    const { shape, error } = opts;
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        zodError:
+          error.code === "BAD_REQUEST" && error.cause instanceof ZodError
+            ? error.cause.flatten()
+            : null,
+      },
+    };
   },
 });
 
@@ -15,6 +27,7 @@ const isAuthed = t.middleware(({ next, ctx }) => {
   }
   return next({
     ctx: {
+      ...ctx,
       auth: ctx.auth,
     },
   });
