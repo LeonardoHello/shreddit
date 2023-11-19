@@ -30,11 +30,11 @@ export default function Sort({ path }: { path: string }) {
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  pathname.endsWith("/best"),
+                  pathname.endsWith("/best") || pathname === path,
               },
             )}
           >
-            {pathname.endsWith("/best") ? (
+            {pathname.endsWith("/best") || pathname === path ? (
               <SolidRocketLaunchIcon className="h-6 w-6" />
             ) : (
               <RocketLaunchIcon className="h-6 w-6" />
