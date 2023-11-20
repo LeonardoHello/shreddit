@@ -3,6 +3,16 @@ import { and, eq } from "drizzle-orm";
 import db from "../db";
 import { usersToCommunities } from "../db/schema";
 
+export const getJoinedCommunitiesIds = (userId: string) => {
+  return db.query.usersToCommunities.findMany({
+    columns: { communityId: true },
+    where: and(
+      eq(usersToCommunities.userId, userId),
+      eq(usersToCommunities.member, true),
+    ),
+  });
+};
+
 export const getFavoriteCommunities = (userId: string) => {
   return db.query.usersToCommunities.findMany({
     where: and(
