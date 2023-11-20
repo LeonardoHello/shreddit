@@ -9,7 +9,8 @@
     "lint": "next lint",
     "introspect": "drizzle-kit introspect:pg",
     "generate": "drizzle-kit generate:pg",
-    "push": "drizzle-kit push:pg"
+    "push": "drizzle-kit push:pg",
+    "studio": "npx drizzle-kit studio"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.12.18",
