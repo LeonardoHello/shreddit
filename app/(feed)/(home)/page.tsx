@@ -1,8 +1,6 @@
 import Posts from "@/components/Posts";
-import {
-  getJoinedCommunitiesIds,
-  getJoinedCommunitiesPosts,
-} from "@/lib/api/getJoinedCommunitiesPosts";
+import { getJoinedCommunitiesIds } from "@/lib/api/getCommunities";
+import { getJoinedCommunitiesPosts } from "@/lib/api/getPosts";
 import { auth } from "@clerk/nextjs";
 
 export default async function HomePage() {
