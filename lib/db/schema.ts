@@ -89,7 +89,6 @@ export const posts = pgTable("posts", {
   updatedAt: timestamp("updated_at"),
   title: text("title").notNull(),
   text: text("text"),
-  link: text("link"),
   nsfw: boolean("nsfw").notNull().default(false),
   spoiler: boolean("spoiler").notNull().default(false),
   upvoted: text("upvoted").array(),
@@ -141,6 +140,7 @@ export const comments = pgTable("comments", {
   text: text("text").notNull(),
   upvoted: text("upvoted").array(),
   downvoted: text("downvoted").array(),
+  replyId: uuid("reply_id"),
   authorId: text("author_id")
     .references(() => users.id, {
       onDelete: "cascade",
@@ -159,6 +159,10 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   author: one(users, {
     fields: [comments.authorId],
     references: [users.id],
+  }),
+  reply: one(comments, {
+    fields: [comments.replyId],
+    references: [comments.id],
   }),
 }));
 
