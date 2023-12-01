@@ -1,42 +1,27 @@
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
+import { updateFavoriteCommunity } from "@/lib/api/communities";
 import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api/getImageUrl";
-import { getJoinedCommunitiesPosts } from "@/lib/api/getJoinedCommunitiesPosts";
-import { searchCommunities, searchUsers } from "@/lib/api/searchShreddit";
-import toggleFavoriteCommunity from "@/lib/api/toggleFavoriteCommunity";
+import { getJoinedCommunitiesPosts } from "@/lib/api/posts";
+import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommunitySchema,
   UserSchema,
   UserToCommunitySchema,
 } from "@/lib/db/schema";
 
-import { procedure, protectedProcedure, router } from "./";
+import { procedure, protectedProcedure, router } from ".";
 
-import type { inferRouterOutputs, inferRouterInputs } from "@trpc/server";
 export const appRouter = router({
-  favorite: protectedProcedure
-    .input(
-      UserToCommunitySchema.pick({
-        userId: true,
-        communityId: true,
-        favorite: true,
-      }),
-    )
-    .mutation(async ({ input }) => {
-      await toggleFavoriteCommunity(
-        input.userId,
-        input.communityId,
-        input.favorite,
-      );
-    }),
   communityImage: protectedProcedure
-    .input(CommunitySchema.shape.name.optional())
+    .input(CommunitySchema.shape.name)
     .query(({ input }) => {
       if (input === undefined) return null;
       return getCommunityImageUrl.execute({ name: input });
     }),
   userImage: protectedProcedure
-    .input(UserSchema.shape.name.optional())
+    .input(UserSchema.shape.name)
     .query(({ input }) => {
       if (input === undefined) return null;
       return getUserImageUrl.execute({ name: input });
@@ -50,19 +35,17 @@ export const appRouter = router({
   joinedCommunitiesPosts: protectedProcedure
     .input(
       z.object({
-        // "cursor" input needed to expose useInfiniteQuery hook
-        cursor: z.number().nullable(),
-        communityIds: z.string().uuid().array(),
+        // cursor input needed to expose useInfiniteQuery hook
+        // value of the cursor is what's returned from getNextPageParam
+        cursor: z.number().nullish(),
       }),
     )
-    .query(async ({ input }) => {
-      const posts = await getJoinedCommunitiesPosts(input.communityIds).execute(
-        {
-          offset: input.cursor,
-        },
-      );
+    .query(async ({ input, ctx }) => {
+      const posts = await getJoinedCommunitiesPosts(ctx.auth.userId).execute({
+        offset: input.cursor,
+      });
 
-      // since limit is set to 10, setting nextCursor (offset) to 10 to fetch next 10 posts
+      // since limit is set to 10, checking if the new batch of posts is equal to it's limit which would indicate that there are possibly more posts to fetch, then incrementing cursor (offset) by 10
       let nextCursor: typeof input.cursor = null;
       if (posts.length === 10) {
         nextCursor = input.cursor! + 10;
@@ -70,8 +53,20 @@ export const appRouter = router({
 
       return { posts, nextCursor };
     }),
+  favoriteCommunity: protectedProcedure
+    .input(
+      UserToCommunitySchema.pick({
+        userId: true,
+        communityId: true,
+        favorite: true,
+      }),
+    )
+    .mutation(({ input }) => {
+      return updateFavoriteCommunity(input);
+    }),
 });
 
 export type AppRouter = typeof appRouter;
+
 export type RouterOutput = inferRouterOutputs<AppRouter>;
 export type RouterInput = inferRouterInputs<AppRouter>;

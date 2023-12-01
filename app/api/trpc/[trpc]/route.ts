@@ -1,8 +1,9 @@
-import { createContext } from "@/trpc/server/context";
-import { appRouter } from "@/trpc/server/procedures";
+import type { NextRequest } from "next/server";
+
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
-import type { NextRequest } from "next/server";
+import { createContext } from "@/trpc/context";
+import { appRouter } from "@/trpc/procedures";
 
 export const runtime = "edge";
 
