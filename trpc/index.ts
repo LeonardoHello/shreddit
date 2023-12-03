@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
@@ -24,7 +26,8 @@ const t = initTRPC.context<Context>().create({
 // check if the user is signed in, otherwise throw a UNAUTHORIZED CODE
 const isAuthed = t.middleware(({ next, ctx }) => {
   if (!ctx.auth.userId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    // throw new TRPCError({ code: "UNAUTHORIZED" });
+    redirect("/sign-in");
   }
   return next({
     ctx: {
