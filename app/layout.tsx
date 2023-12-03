@@ -1,16 +1,17 @@
-import "./globals.css";
-
+import type { Metadata } from "next";
 import { Roboto_Flex } from "next/font/google";
-import { Toaster } from "sonner";
-import { extractRouterConfig } from "uploadthing/server";
 
-import { ourFileRouter } from "@/app/api/uploadthing/core";
-import { Provider } from "@/trpc/client/Provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { Toaster } from "sonner";
+import { extractRouterConfig } from "uploadthing/server";
 
-import type { Metadata } from "next";
+import cn from "@/lib/utils/cn";
+import { TRPCReactProvider } from "@/trpc/react";
+import { uploadRouter } from "@/uploadthing/server";
+
+import "./globals.css";
 
 const nunito_sans = Roboto_Flex({
   subsets: ["latin"],
@@ -40,9 +41,11 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <body className={`${nunito_sans.className} bg-zinc-950 text-zinc-300`}>
-          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-          <Provider>{children}</Provider>
+        <body
+          className={cn(nunito_sans.className, "bg-zinc-950 text-zinc-300")}
+        >
+          <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
+          <TRPCReactProvider>{children}</TRPCReactProvider>
           <Toaster theme="dark" richColors closeButton />
         </body>
       </html>
