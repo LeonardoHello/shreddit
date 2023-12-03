@@ -1,32 +1,25 @@
 "use client";
 
-import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
-import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
-import communityImage from "@/public/community-logo.svg";
-import dot from "@/public/dot.svg";
-import { trpc } from "@/trpc/client";
-import { RouterOutput } from "@/trpc/server/procedures";
+import type { RouterOutput } from "@/trpc/procedures";
+import { trpc } from "@/trpc/react";
 
-import Vote from "./Vote";
+import Post from "./Post";
 
-type Prop = {
+export default function Posts({
+  initialPosts,
+}: {
   initialPosts: RouterOutput["joinedCommunitiesPosts"];
-  communityIds: string[];
-};
-
-export default function Posts({ initialPosts, communityIds }: Prop) {
-  const root = useRef<HTMLDivElement>(null);
-  const [imgUrls, setImgUrls] = useState(null);
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const { data, fetchNextPage, isFetchingNextPage, hasNextPage } =
     trpc.joinedCommunitiesPosts.useInfiniteQuery(
-      { communityIds },
+      {},
       {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         initialData: { pages: [initialPosts], pageParams: [0] },
-        initialCursor: initialPosts.nextCursor,
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
@@ -46,44 +39,22 @@ export default function Posts({ initialPosts, communityIds }: Prop) {
   }
 
   return (
-    <div className="bg-zinc-900">
-      {data.pages.map((page) =>
-        page.posts.map((post) => (
-          <div key={post.communityId} className="flex items-center gap-1">
-            <Vote />
-            <div className="text-xs">
-              <div className="flex items-center gap-0.5">
-                {post.community.imageUrl ? (
-                  <Image
-                    src={post.community.imageUrl}
-                    alt="community image"
-                    width={20}
-                    height={20}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <Image
-                    src={communityImage}
-                    alt="community image"
-                    width={20}
-                    height={20}
-                    className="rounded-full border border-zinc-300 bg-zinc-300"
-                  />
-                )}
-                <div className="font-bold">r/{post.community.name}</div>
-              </div>
-              <Image src={dot} alt="dot" height={2} width={2} />
-              <div className="text-zinc-500">
-                Posted by {post.author ? post.author.name : "[deleted]"}{" "}
-                {getRelativeTimeString(post.createdAt as unknown as Date)}
-              </div>
-            </div>
-            <h2>{post.title}</h2>
-            <input
-              type="file"
-              accept="image/jpeg, image/png, image/jpg, video/*"
-              multiple
-            />
+    <div className="flex flex-col gap-2.5">
+      {data.pages.map((page, pageIndex, pageArray) =>
+        page.posts.map((post, postIndex, postArray) => (
+          <div
+            key={post.id}
+            onClick={() => {
+              if (
+                hasNextPage &&
+                pageIndex + 1 === pageArray.length &&
+                postIndex + 1 === postArray.length
+              ) {
+                fetchNextPage();
+              }
+            }}
+          >
+            <Post post={post} />
           </div>
         )),
       )}

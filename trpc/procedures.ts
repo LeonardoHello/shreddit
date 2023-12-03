@@ -3,12 +3,21 @@ import { z } from "zod";
 
 import { updateFavoriteCommunity } from "@/lib/api/communities";
 import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api/getImageUrl";
-import { getJoinedCommunitiesPosts } from "@/lib/api/posts";
+import {
+  deletePost,
+  downvotePost,
+  getJoinedCommunitiesPosts,
+  updatePostNSFWTag,
+  updatePostSpoilerTag,
+  upvotePost,
+} from "@/lib/api/posts";
 import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommunitySchema,
+  PostSchema,
   UserSchema,
   UserToCommunitySchema,
+  UserToPostSchema,
 } from "@/lib/db/schema";
 
 import { procedure, protectedProcedure, router } from ".";
@@ -63,6 +72,43 @@ export const appRouter = router({
     )
     .mutation(({ input }) => {
       return updateFavoriteCommunity(input);
+    }),
+  spoilerTag: protectedProcedure
+    .input(
+      PostSchema.pick({
+        authorId: true,
+        id: true,
+        spoiler: true,
+      }),
+    )
+    .mutation(({ input }) => {
+      return updatePostSpoilerTag(input);
+    }),
+  nsfwTag: protectedProcedure
+    .input(
+      PostSchema.pick({
+        authorId: true,
+        id: true,
+        nsfw: true,
+      }),
+    )
+    .mutation(({ input }) => {
+      return updatePostNSFWTag(input);
+    }),
+  deletePost: protectedProcedure
+    .input(PostSchema.shape.id)
+    .mutation(({ input }) => {
+      return deletePost(input);
+    }),
+  upvotePost: protectedProcedure
+    .input(UserToPostSchema.pick({ postId: true, upvoted: true }))
+    .mutation(({ input, ctx }) => {
+      return upvotePost({ ...input, userId: ctx.auth.userId });
+    }),
+  downvotePost: protectedProcedure
+    .input(UserToPostSchema.pick({ postId: true, downvoted: true }))
+    .mutation(({ input, ctx }) => {
+      return downvotePost({ ...input, userId: ctx.auth.userId });
     }),
 });
 

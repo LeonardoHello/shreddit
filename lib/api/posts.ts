@@ -38,3 +38,42 @@ export const getJoinedCommunitiesPosts = (userId: UserToPost["userId"]) => {
     })
     .prepare("getJoinedCommunitiesPosts");
 };
+
+export const updatePostSpoilerTag = ({
+  authorId,
+  id,
+  spoiler,
+}: {
+  authorId: Post["authorId"];
+  id: Post["id"];
+  spoiler: Post["spoiler"];
+}) => {
+  return db
+    .update(posts)
+    .set({ spoiler })
+    .where(and(eq(posts.authorId, authorId), eq(posts.id, id)))
+    .returning({ id: posts.id, updatedSpoilerTag: posts.spoiler });
+};
+
+export const updatePostNSFWTag = ({
+  authorId,
+  id,
+  nsfw,
+}: {
+  authorId: Post["authorId"];
+  id: Post["id"];
+  nsfw: Post["nsfw"];
+}) => {
+  return db
+    .update(posts)
+    .set({ nsfw })
+    .where(and(eq(posts.authorId, authorId), eq(posts.id, id)))
+    .returning({ id: posts.id, updatedNSFWTag: posts.nsfw });
+};
+
+export const deletePost = (postId: string) => {
+  return db
+    .delete(posts)
+    .where(eq(posts.id, postId))
+    .returning({ id: posts.id });
+};
