@@ -4,8 +4,9 @@ import { authMiddleware, redirectToSignIn } from "@clerk/nextjs";
 
 export default authMiddleware({
   publicRoutes: [
-    "/all",
+    "/api/webhooks/(.*)",
     "/api/uploadthing",
+    "/all",
     "/u/:userName",
     "/r/:communityName",
     "/r/:communityName/post/:postId",
