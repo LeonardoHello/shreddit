@@ -1,20 +1,22 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { ChangeEvent, FocusEvent } from "react";
 
-import useDropdownClose from "@/lib/hooks/useDropdownClose";
-import cn from "@/lib/utils/cn";
+import { usePathname } from "next/navigation";
+
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+
+import useDropdown from "@/lib/hooks/useDropdown";
+import cn from "@/lib/utils/cn";
 
 import SearchDropdown from "./SearchDropdown";
 
-import type { ChangeEvent, FocusEvent } from "react";
 export default function Search() {
   const pathname = usePathname();
   const [searchedValue, setSearchedValue] = useState("");
 
-  const { dropdownRef, isOpen, setIsOpen } = useDropdownClose();
+  const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   useEffect(() => {
     setIsOpen(false);

@@ -1,14 +1,16 @@
+import { useEffect } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import calculateOnions from "@/lib/utils/calculateOnions";
 import cn from "@/lib/utils/cn";
 import setToastError from "@/lib/utils/setToastError";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
-import { trpc } from "@/trpc/client";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { trpc } from "@/trpc/react";
 
 export default function SearchDropdown({
   searchedValue,
@@ -52,12 +54,14 @@ export default function SearchDropdown({
                     community.imageUrl === null,
                 })}
               />
-              <div>
-                <div className="text-sm font-medium">r/{community.name}</div>
+              <div className="min-w-0">
+                <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-medium">
+                  r/{community.name}
+                </div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500">
                   <span>Community</span>
                   <Image src={dot} alt="dot" height={4} width={4} />
-                  <span className="lowercase">
+                  <span className="overflow-hidden overflow-ellipsis whitespace-nowrap lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
@@ -99,12 +103,14 @@ export default function SearchDropdown({
                 width={24}
                 className="rounded-full"
               />
-              <div>
-                <div className="text-sm font-medium">u/{user.name}</div>
-                <div className="flex items-center gap-1 text-xs text-zinc-500">
+              <div className="min-w-0">
+                <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-medium">
+                  u/{user.name}
+                </div>
+                <div className="flex items-center gap-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-xs text-zinc-500">
                   <span>User</span>
                   <Image src={dot} alt="dot" height={4} width={4} />
-                  <span className="lowercase">
+                  <span className="overflow-hidden overflow-ellipsis whitespace-nowrap lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
