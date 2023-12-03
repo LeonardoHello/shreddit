@@ -1,7 +1,7 @@
 import Link from "next/link";
 
+import InputSubmit from "@/components/InputSubmit";
 import Sort from "@/components/Sort";
-import SubmitInput from "@/components/SubmitInput";
 
 export default function HomeLayout({
   children,
@@ -11,7 +11,7 @@ export default function HomeLayout({
   return (
     <main className="flex grow justify-center gap-2 px-6 py-5">
       <div className="flex w-full flex-col gap-4 lg:max-w-2xl">
-        <SubmitInput />
+        <InputSubmit />
         <Sort path="/" />
         {children}
       </div>

@@ -77,3 +77,41 @@ export const deletePost = (postId: string) => {
     .where(eq(posts.id, postId))
     .returning({ id: posts.id });
 };
+
+export const upvotePost = ({
+  userId,
+  postId,
+  upvoted,
+}: {
+  userId: UserToPost["userId"];
+  postId: UserToPost["postId"];
+  upvoted: UserToPost["upvoted"];
+}) => {
+  return db
+    .insert(usersToPosts)
+    .values({ postId, userId, upvoted })
+    .onConflictDoUpdate({
+      target: [usersToPosts.userId, usersToPosts.postId],
+      set: { upvoted, downvoted: false },
+    })
+    .returning();
+};
+
+export const downvotePost = ({
+  userId,
+  postId,
+  downvoted,
+}: {
+  userId: UserToPost["userId"];
+  postId: UserToPost["postId"];
+  downvoted: UserToPost["downvoted"];
+}) => {
+  return db
+    .insert(usersToPosts)
+    .values({ postId, userId, downvoted })
+    .onConflictDoUpdate({
+      target: [usersToPosts.userId, usersToPosts.postId],
+      set: { downvoted, upvoted: false },
+    })
+    .returning();
+};
