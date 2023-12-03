@@ -1,34 +1,26 @@
-import { RouterOutput } from "@/trpc/server/procedures";
+import { RouterOutput } from "@/trpc/procedures";
 
-export default function getOnions(user: RouterOutput["searchUsers"][0]) {
-  let onions = 0;
+type ArrElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
+export default function getOnions(
+  user: ArrElement<RouterOutput["searchUsers"]>,
+) {
   // +1 onion for each upvoted comment
-  user.comments.forEach((comment) => {
-    let upvotes = 0;
-    upvotes += comment.downvoted?.length ?? 0;
-    upvotes -= comment.downvoted?.length ?? 0;
-
-    if (upvotes > 0) {
-      onions += upvotes;
-    }
-  });
+  const commentUpvotes = user.usersToComments.reduce((a, b) => {
+    return b.upvoted ? a + 1 : b.downvoted ? a - 1 : a;
+  }, 0);
 
   // +1 onion for each upvoted post
-  user.posts.forEach((post) => {
-    let upvotes = 0;
-    upvotes += post.downvoted?.length ?? 0;
-    upvotes -= post.downvoted?.length ?? 0;
+  const commentAndPostUpvotes = user.usersToPosts.reduce((a, b) => {
+    return b.upvoted ? a + 1 : b.downvoted ? a - 1 : a;
+  }, commentUpvotes);
 
-    if (upvotes > 0) {
-      onions += upvotes;
-    }
-  });
+  // +1 onion for each community member
+  const totalUpvotesAndMembers = user.communities.reduce((a, b) => {
+    // length is the count of members from my communities
+    return a + b.usersToCommunities.length;
+  }, commentAndPostUpvotes);
 
-  user.usersToCommunities.forEach((moderatedCommunities) => {
-    // +1 onion for each community member
-    onions += moderatedCommunities.community.usersToCommunities.length;
-  });
-
-  return onions;
+  return totalUpvotesAndMembers || 0;
 }
