@@ -1,3 +1,5 @@
+import dynamic from "next/dynamic";
+
 import {
   getFavoriteCommunities,
   getJoinedCommunities,
@@ -5,8 +7,9 @@ import {
 } from "@/lib/api/communities";
 
 import Menu from "./Menu";
-import MenuDropdown from "./MenuDropdown";
 import UserProfile from "./UserProfile";
+
+const MenuDropdown = dynamic(() => import("./MenuDropdown"));
 
 export default async function HeaderAuthenticated({
   userId,

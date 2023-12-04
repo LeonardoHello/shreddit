@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { ChangeEvent, FocusEvent } from "react";
+import { type ChangeEvent, type FocusEvent, useEffect, useState } from "react";
 
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -10,7 +10,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
 
-import SearchDropdown from "./SearchDropdown";
+const SearchDropdown = dynamic(() => import("./SearchDropdown"));
 
 export default function Search() {
   const pathname = usePathname();
