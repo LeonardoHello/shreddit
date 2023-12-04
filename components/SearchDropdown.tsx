@@ -1,13 +1,11 @@
-import { useEffect } from "react";
-
 import Image from "next/image";
 import Link from "next/link";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { toast } from "sonner";
 
 import calculateOnions from "@/lib/utils/calculateOnions";
 import cn from "@/lib/utils/cn";
-import setToastError from "@/lib/utils/setToastError";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 import { trpc } from "@/trpc/react";
@@ -20,20 +18,22 @@ export default function SearchDropdown({
   const searchedCommunities = trpc.searchCommunities.useQuery(searchedValue, {
     initialData: [],
     refetchOnWindowFocus: false,
+    retry: 2,
+    useErrorBoundary: () => {
+      toast.error("There was a problem with fetching the communities");
+      return false;
+    },
   });
 
   const searchedUsers = trpc.searchUsers.useQuery(searchedValue, {
     initialData: [],
     refetchOnWindowFocus: false,
+    retry: 2,
+    useErrorBoundary: () => {
+      toast.error("There was a problem with fetching the users");
+      return false;
+    },
   });
-
-  useEffect(() => {
-    if (searchedCommunities.error) {
-      setToastError(searchedCommunities.error.message);
-    } else if (searchedUsers.error) {
-      setToastError(searchedUsers.error.message);
-    }
-  }, [searchedCommunities.error, searchedUsers.error]);
 
   return (
     <div className="absolute top-full w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
