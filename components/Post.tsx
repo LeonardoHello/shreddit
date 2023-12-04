@@ -14,13 +14,11 @@ import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 import type { RouterOutput } from "@/trpc/procedures";
+import type { ArrElement } from "@/types";
 
 import PostContent from "./PostContent";
 import PostOptions from "./PostOptions";
 import Vote from "./Vote";
-
-type ArrElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 export default function Post({
   post,

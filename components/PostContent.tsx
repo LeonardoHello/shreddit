@@ -5,11 +5,9 @@ import { generateHTML } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 import type { RouterOutput } from "@/trpc/procedures";
+import type { ArrElement } from "@/types";
 
 import ImageSlider from "./ImageSlider";
-
-type ArrElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 export default memo(function PostContent({
   post,

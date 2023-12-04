@@ -65,5 +65,9 @@ export const updateFavoriteCommunity = ({
         eq(usersToCommunities.userId, userId),
         eq(usersToCommunities.communityId, communityId),
       ),
-    );
+    )
+    .returning({
+      communityId: usersToCommunities.communityId,
+      favorite: usersToCommunities.favorite,
+    });
 };

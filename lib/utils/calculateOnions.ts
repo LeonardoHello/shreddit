@@ -1,7 +1,5 @@
 import { RouterOutput } from "@/trpc/procedures";
-
-type ArrElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+import type { ArrElement } from "@/types";
 
 export default function getOnions(
   user: ArrElement<RouterOutput["searchUsers"]>,

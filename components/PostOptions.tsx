@@ -8,11 +8,9 @@ import {
 import { toast } from "sonner";
 
 import cn from "@/lib/utils/cn";
-import { type RouterOutput } from "@/trpc/procedures";
+import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-
-type ArrElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+import type { ArrElement } from "@/types";
 
 export default function PostOptions({
   post,

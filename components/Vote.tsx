@@ -8,9 +8,7 @@ import { UserToPost } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-
-type ArrElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+import type { ArrElement } from "@/types";
 
 type Props = {
   post: ArrElement<RouterOutput["joinedCommunitiesPosts"]["posts"]>;
