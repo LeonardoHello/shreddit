@@ -24,19 +24,26 @@ export default function PostOptions({
       toast.error(message);
     },
 
-    onSuccess: async (returnedData) => {
+    onSuccess: async (_data) => {
       await utils.joinedCommunitiesPosts.cancel();
+
+      const returnedData = _data[0];
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
-          throw new Error("OH NEIN!");
+          toast.error("Oops, it seemes that data can't be loaded.");
+
+          return {
+            pages: [],
+            pageParams: [],
+          };
         }
 
         return {
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
-            posts: page.posts.filter((post) => post.id !== returnedData[0].id),
+            posts: page.posts.filter((post) => post.id !== returnedData.id),
           })),
         };
       });
@@ -49,20 +56,27 @@ export default function PostOptions({
     onError: ({ message }) => {
       toast.error(message);
     },
-    onSuccess: async (returnedData) => {
+    onSuccess: async (_data) => {
       await utils.joinedCommunitiesPosts.cancel();
+
+      const returnedData = _data[0];
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
-          throw new Error("OH NEIN!");
+          toast.error("Oops, it seemes that data can't be loaded.");
+
+          return {
+            pages: [],
+            pageParams: [],
+          };
         }
         return {
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
             posts: page.posts.map((post) => {
-              if (post.id === returnedData[0].id) {
-                return { ...post, spoiler: returnedData[0].updatedSpoilerTag };
+              if (post.id === returnedData.id) {
+                return { ...post, spoiler: returnedData.updatedSpoilerTag };
               }
               return post;
             }),
@@ -70,7 +84,7 @@ export default function PostOptions({
         };
       });
 
-      if (returnedData[0].updatedSpoilerTag) {
+      if (returnedData.updatedSpoilerTag) {
         toast.success("Post has been marked as spoiler");
       } else {
         toast.success("Post has been un-marked as a spoiler");
@@ -83,27 +97,34 @@ export default function PostOptions({
       toast.error(message);
     },
 
-    onSuccess: async (returnedData) => {
+    onSuccess: async (_data) => {
       await utils.joinedCommunitiesPosts.cancel();
+
+      const returnedData = _data[0];
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
-          throw new Error("OH NEIN!");
+          toast.error("Oops, it seemes that data can't be loaded.");
+
+          return {
+            pages: [],
+            pageParams: [],
+          };
         }
         return {
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
             posts: page.posts.map((post) => {
-              if (post.id === returnedData[0].id) {
-                return { ...post, nsfw: returnedData[0].updatedNSFWTag };
+              if (post.id === returnedData.id) {
+                return { ...post, nsfw: returnedData.updatedNSFWTag };
               }
               return post;
             }),
           })),
         };
       });
-      if (returnedData[0].updatedNSFWTag) {
+      if (returnedData.updatedNSFWTag) {
         toast.success("Post has been marked NSFW");
       } else {
         toast.success("Post has been un-marked NSFW");

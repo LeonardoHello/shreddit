@@ -27,7 +27,12 @@ export default function Vote({ post, userId }: Props) {
 
     utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
       if (!data) {
-        throw new Error("OH NEIN!");
+        toast.error("Oops, it seemes that data can't be loaded.");
+
+        return {
+          pages: [],
+          pageParams: [],
+        };
       }
 
       return {

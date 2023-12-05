@@ -18,7 +18,7 @@ export default function Posts({
     trpc.joinedCommunitiesPosts.useInfiniteQuery(
       {},
       {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        getNextPageParam: (lastPage) => lastPage?.nextCursor,
         initialData: { pages: [initialPosts], pageParams: [0] },
         refetchOnMount: false,
         refetchOnReconnect: false,
