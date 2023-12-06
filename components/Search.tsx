@@ -9,6 +9,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
+import { trpc } from "@/trpc/react";
 
 const SearchDropdown = dynamic(() => import("./SearchDropdown"));
 
@@ -25,12 +26,20 @@ export default function Search() {
     };
   }, [pathname, setIsOpen]);
 
+  const utils = trpc.useUtils();
+
   const onInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
     const searchedValue = e.currentTarget.value.replaceAll(
       /[^a-zA-Z0-9_-]/g,
       "",
     );
+
+    await Promise.all([
+      utils.searchCommunities.cancel(),
+      utils.searchUsers.cancel(),
+    ]);
+
     setSearchedValue(searchedValue);
 
     if (searchedValue.length === 0 && isOpen === true) {
