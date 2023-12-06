@@ -79,7 +79,7 @@ export default function Search() {
         />
       </div>
 
-      {isOpen ? <SearchDropdown searchedValue={searchedValue} /> : null}
+      {isOpen && <SearchDropdown searchedValue={searchedValue} />}
     </div>
   );
 }

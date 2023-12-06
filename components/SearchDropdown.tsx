@@ -37,7 +37,7 @@ export default function SearchDropdown({
 
   return (
     <div className="absolute top-full w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
-      {searchedCommunities.data.length > 0 ? (
+      {searchedCommunities.data.length > 0 && (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>
           {searchedCommunities.data.map((community) => (
@@ -70,20 +70,20 @@ export default function SearchDropdown({
                       ? "member"
                       : "members"}
                   </span>
-                  {community.nsfw ? (
+                  {community.nsfw && (
                     <>
                       <Image src={dot} alt="dot" height={4} width={4} />
                       <span className="text-rose-500">NSFW</span>
                     </>
-                  ) : null}
+                  )}
                 </div>
               </div>
             </Link>
           ))}
         </div>
-      ) : null}
+      )}
 
-      {searchedUsers.data.length > 0 ? (
+      {searchedUsers.data.length > 0 && (
         <div
           className={cn("py-3", {
             "border-t border-zinc-700/70": searchedCommunities.data.length > 0,
@@ -122,7 +122,7 @@ export default function SearchDropdown({
             </Link>
           ))}
         </div>
-      ) : null}
+      )}
 
       <div className="flex items-center gap-2 border-t border-zinc-700/70 px-3.5 py-2 text-sm">
         <MagnifyingGlassIcon className="h-6 w-6 text-zinc-300" />

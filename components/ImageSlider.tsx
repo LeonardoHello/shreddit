@@ -1,13 +1,14 @@
-import Image from "next/image";
 import { useState } from "react";
 
-import cn from "@/lib/utils/cn";
+import Image from "next/image";
+
 import {
   ArrowLeftCircleIcon,
   ArrowRightCircleIcon,
 } from "@heroicons/react/24/solid";
 
 import type { File } from "@/lib/db/schema";
+import cn from "@/lib/utils/cn";
 
 export default function ImageSlider({
   images,
@@ -59,7 +60,7 @@ export default function ImageSlider({
           </div>
         ))}
       </div>
-      {!nsfw && !spoiler ? (
+      {!nsfw && !spoiler && (
         <>
           <div className="absolute right-2 top-4 rounded-full bg-zinc-950/70 px-2 py-1 text-xs font-semibold tracking-[0.075em]">
             {currentIndex}/{images.length}
@@ -89,7 +90,7 @@ export default function ImageSlider({
             }}
           />
         </>
-      ) : null}
+      )}
     </div>
   );
 }

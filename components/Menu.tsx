@@ -40,18 +40,20 @@ export default function Menu({ children }: { children: React.ReactNode }) {
           },
         )}
       >
-        {typeof userName === "string" ? (
+        {typeof userName === "string" && (
           <CurrentUserFeed userName={userName} />
-        ) : typeof communityName === "string" ? (
-          <CurrentCommunityFeed communityName={communityName} />
-        ) : (
-          <HomeFeed pathname={pathname} />
         )}
+
+        {typeof communityName === "string" && (
+          <CurrentCommunityFeed communityName={communityName} />
+        )}
+
+        {!userName && !communityName && <HomeFeed pathname={pathname} />}
 
         <ChevronDownIcon className="ml-auto h-4 w-4 stroke-2" />
       </button>
 
-      {isOpen ? children : null}
+      {isOpen && children}
     </div>
   );
 }
