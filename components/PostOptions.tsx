@@ -24,10 +24,8 @@ export default function PostOptions({
       toast.error(message);
     },
 
-    onSuccess: async (_data) => {
+    onSuccess: async () => {
       await utils.joinedCommunitiesPosts.cancel();
-
-      const returnedData = _data[0];
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
@@ -43,7 +41,7 @@ export default function PostOptions({
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
-            posts: page.posts.filter((post) => post.id !== returnedData.id),
+            posts: page.posts.filter((_post) => _post.id !== post.id),
           })),
         };
       });
@@ -59,7 +57,7 @@ export default function PostOptions({
     onSuccess: async (_data) => {
       await utils.joinedCommunitiesPosts.cancel();
 
-      const returnedData = _data[0];
+      const spoiler = _data[0].spoiler;
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
@@ -70,21 +68,21 @@ export default function PostOptions({
             pageParams: [],
           };
         }
+
         return {
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
-            posts: page.posts.map((post) => {
-              if (post.id === returnedData.id) {
-                return { ...post, spoiler: returnedData.updatedSpoilerTag };
-              }
-              return post;
+            posts: page.posts.map((_post) => {
+              if (_post.id !== post.id) return _post;
+
+              return { ..._post, spoiler };
             }),
           })),
         };
       });
 
-      if (returnedData.updatedSpoilerTag) {
+      if (spoiler) {
         toast.success("Post has been marked as spoiler");
       } else {
         toast.success("Post has been un-marked as a spoiler");
@@ -100,7 +98,7 @@ export default function PostOptions({
     onSuccess: async (_data) => {
       await utils.joinedCommunitiesPosts.cancel();
 
-      const returnedData = _data[0];
+      const nsfw = _data[0].nsfw;
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
         if (!data) {
@@ -115,16 +113,16 @@ export default function PostOptions({
           ...data,
           pages: data.pages.map((page) => ({
             ...page,
-            posts: page.posts.map((post) => {
-              if (post.id === returnedData.id) {
-                return { ...post, nsfw: returnedData.updatedNSFWTag };
-              }
-              return post;
+            posts: page.posts.map((_post) => {
+              if (_post.id !== post.id) return _post;
+
+              return { ..._post, nsfw };
             }),
           })),
         };
       });
-      if (returnedData.updatedNSFWTag) {
+
+      if (nsfw) {
         toast.success("Post has been marked NSFW");
       } else {
         toast.success("Post has been un-marked NSFW");
@@ -134,14 +132,14 @@ export default function PostOptions({
 
   return (
     <div className="absolute z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20">
-      {post.files.length === 0 ? (
+      {post.files.length === 0 && (
         <Link
           href={`/r/${post.community.name}/comments/${post.id}/edit`}
           className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         >
           <PencilSquareIcon className="h-5 w-5" /> Edit
         </Link>
-      ) : null}
+      )}
 
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"

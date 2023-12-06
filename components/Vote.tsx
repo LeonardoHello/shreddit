@@ -18,12 +18,10 @@ type Props = {
 export default function Vote({ post, userId }: Props) {
   const utils = trpc.useUtils();
 
-  const userToPost = post.usersToPosts.find(
-    (userToPost) => userToPost.userId === userId,
-  );
-
-  const onSuccess = async (updatedData: UserToPost[]) => {
+  const onSuccess = async (_data: UserToPost[]) => {
     await utils.joinedCommunitiesPosts.cancel();
+
+    const userToPost = _data[0];
 
     utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
       if (!data) {
@@ -39,21 +37,25 @@ export default function Vote({ post, userId }: Props) {
         ...data,
         pages: data.pages.map((page) => ({
           ...page,
-          posts: page.posts.map((currentPost) => {
-            if (currentPost.id === post.id) {
-              return {
-                ...currentPost,
-                usersToPosts: userToPost
-                  ? currentPost.usersToPosts.map((userToPost) => {
-                      if (userToPost.userId === userId) {
-                        return updatedData[0];
-                      }
-                      return userToPost;
-                    })
-                  : [...currentPost.usersToPosts, updatedData[0]],
-              };
+          posts: page.posts.map((_post) => {
+            if (_post.id !== post.id) return _post;
+
+            let usersToPosts = structuredClone(_post.usersToPosts);
+
+            const index = usersToPosts.findLastIndex(
+              (userToPost) => userToPost.userId === userId,
+            );
+
+            if (index === -1) {
+              usersToPosts.push(userToPost);
+            } else {
+              usersToPosts = usersToPosts.with(index, userToPost);
             }
-            return post;
+
+            return {
+              ..._post,
+              usersToPosts,
+            };
           }),
         })),
       };
@@ -66,7 +68,6 @@ export default function Vote({ post, userId }: Props) {
     },
     onSuccess,
   });
-
   const downvote = trpc.downvotePost.useMutation({
     onError: ({ message }) => {
       toast.error(message);
@@ -74,7 +75,11 @@ export default function Vote({ post, userId }: Props) {
     onSuccess,
   });
 
-  const upvotes = post.usersToPosts.reduce((a, b) => {
+  const userToPost = post.usersToPosts.find(
+    (userToPost) => userToPost.userId === userId,
+  );
+
+  const upvoteCount = post.usersToPosts.reduce((a, b) => {
     return b.upvoted ? a + 1 : b.downvoted ? a - 1 : a;
   }, 0);
 
@@ -99,7 +104,7 @@ export default function Vote({ post, userId }: Props) {
           "text-blue-500": userToPost?.downvoted,
         })}
       >
-        {upvotes}
+        {upvoteCount}
       </div>
       <ArrowDownCircleIcon
         className={cn("h-8 w-8 hover:bg-zinc-700/50 rounded ", {

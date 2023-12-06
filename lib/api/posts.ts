@@ -52,7 +52,7 @@ export const updatePostSpoilerTag = ({
     .update(posts)
     .set({ spoiler })
     .where(and(eq(posts.authorId, authorId), eq(posts.id, id)))
-    .returning({ id: posts.id, updatedSpoilerTag: posts.spoiler });
+    .returning({ spoiler: posts.spoiler });
 };
 
 export const updatePostNSFWTag = ({
@@ -68,14 +68,11 @@ export const updatePostNSFWTag = ({
     .update(posts)
     .set({ nsfw })
     .where(and(eq(posts.authorId, authorId), eq(posts.id, id)))
-    .returning({ id: posts.id, updatedNSFWTag: posts.nsfw });
+    .returning({ nsfw: posts.nsfw });
 };
 
 export const deletePost = (postId: string) => {
-  return db
-    .delete(posts)
-    .where(eq(posts.id, postId))
-    .returning({ id: posts.id });
+  return db.delete(posts).where(eq(posts.id, postId));
 };
 
 export const upvotePost = ({
