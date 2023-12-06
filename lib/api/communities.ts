@@ -66,8 +66,5 @@ export const updateFavoriteCommunity = ({
         eq(usersToCommunities.communityId, communityId),
       ),
     )
-    .returning({
-      communityId: usersToCommunities.communityId,
-      favorite: usersToCommunities.favorite,
-    });
+    .returning({ favorite: usersToCommunities.favorite });
 };

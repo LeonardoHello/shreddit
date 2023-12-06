@@ -1,7 +1,12 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 
-import { updateFavoriteCommunity } from "@/lib/api/communities";
+import {
+  getFavoriteCommunities,
+  getJoinedCommunities,
+  getModeratedCommunities,
+  updateFavoriteCommunity,
+} from "@/lib/api/communities";
 import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api/getImageUrl";
 import {
   deletePost,
@@ -41,6 +46,21 @@ export const appRouter = router({
   searchCommunities: procedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
+  favoriteCommunities: protectedProcedure
+    .input(UserToCommunitySchema.shape.userId)
+    .query(({ input }) => {
+      return getFavoriteCommunities(input);
+    }),
+  moderatedCommunities: protectedProcedure
+    .input(UserToCommunitySchema.shape.userId)
+    .query(({ input }) => {
+      return getModeratedCommunities(input);
+    }),
+  joinedCommunities: protectedProcedure
+    .input(UserToCommunitySchema.shape.userId)
+    .query(({ input }) => {
+      return getJoinedCommunities(input);
+    }),
   joinedCommunitiesPosts: protectedProcedure
     .input(
       z.object({

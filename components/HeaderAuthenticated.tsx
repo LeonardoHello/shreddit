@@ -7,23 +7,24 @@ import {
 } from "@/lib/api/communities";
 
 import Menu from "./Menu";
+import MenuDropdown from "./MenuDropdown";
 import UserProfile from "./UserProfile";
 
-const MenuDropdown = dynamic(() => import("./MenuDropdown"));
+const YourCommunities = dynamic(() => import("./YourCommunities"));
 
 export default async function HeaderAuthenticated({
   userId,
 }: {
   userId: string;
 }) {
-  const moderatedCommunitiesData = getModeratedCommunities(userId);
   const favoriteCommunitiesData = getFavoriteCommunities(userId);
+  const moderatedCommunitiesData = getModeratedCommunities(userId);
   const joinedCommunitiesData = getJoinedCommunities(userId);
 
-  const [moderatedCommunities, favoriteCommunities, joinedCommunities] =
+  const [favoriteCommunities, moderatedCommunities, joinedCommunities] =
     await Promise.all([
-      moderatedCommunitiesData,
       favoriteCommunitiesData,
+      moderatedCommunitiesData,
       joinedCommunitiesData,
     ]).catch(() => {
       throw new Error("Could not load users information.");
@@ -32,11 +33,14 @@ export default async function HeaderAuthenticated({
   return (
     <>
       <Menu>
-        <MenuDropdown
-          moderatedCommunityList={moderatedCommunities}
-          favoriteCommunityList={favoriteCommunities}
-          joinedCommunityList={joinedCommunities}
-        />
+        <MenuDropdown>
+          <YourCommunities
+            userId={userId}
+            favoriteCommunities={favoriteCommunities}
+            moderatedCommunities={moderatedCommunities}
+            joinedCommunities={joinedCommunities}
+          />
+        </MenuDropdown>
       </Menu>
       <UserProfile />
     </>
