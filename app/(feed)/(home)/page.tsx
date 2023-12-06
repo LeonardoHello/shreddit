@@ -18,5 +18,10 @@ export default async function HomePage() {
     nextCursor = 10;
   }
 
-  return <Posts initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }} />;
+  return (
+    <Posts
+      initialPosts={{ posts: joinedCommunitiesPosts, nextCursor }}
+      userId={userId}
+    />
+  );
 }

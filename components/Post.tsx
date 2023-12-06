@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { useAuth } from "@clerk/nextjs";
 import {
   ChatBubbleLeftIcon,
   EllipsisHorizontalIcon,
@@ -10,6 +9,7 @@ import {
 import { toast } from "sonner";
 
 import useDropdown from "@/lib/hooks/useDropdown";
+import useHydration from "@/lib/hooks/useHydration";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
@@ -22,11 +22,12 @@ import Vote from "./Vote";
 
 export default function Post({
   post,
+  userId,
 }: {
   post: ArrElement<RouterOutput["joinedCommunitiesPosts"]["posts"]>;
+  userId: string;
 }) {
-  const { userId } = useAuth();
-
+  const hydrated = useHydration();
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   const copyLink = async (communityName: string, postId: string) => {
@@ -75,22 +76,31 @@ export default function Post({
           <div className="text-zinc-500">
             Posted by{" "}
             <Link href={`u/${post.author.name}`}>u/{post.author.name}</Link>{" "}
-            {getRelativeTimeString(post.createdAt)}
+            {hydrated ? (
+              <time
+                dateTime={post.createdAt.toISOString()}
+                title={post.createdAt.toLocaleDateString("hr-HR")}
+              >
+                {getRelativeTimeString(post.createdAt)}
+              </time>
+            ) : (
+              "Time in progress..."
+            )}
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-medium">{post.title}</h2>
-          {post.spoiler ? (
+          {post.spoiler && (
             <div className="border border-zinc-400 px-1 text-xs text-zinc-400">
               spoiler
             </div>
-          ) : null}
-          {post.nsfw ? (
+          )}
+          {post.nsfw && (
             <div className="border border-rose-500 px-1 text-xs text-rose-500">
               nsfw
             </div>
-          ) : null}
+          )}
         </div>
 
         <PostContent post={post} />
@@ -107,15 +117,15 @@ export default function Post({
             <LinkIcon className="h-6 w-6" />
             Copy Link
           </div>
-          {post.authorId === userId ? (
+          {post.authorId === userId && (
             <div ref={dropdownRef} className="relative">
               <EllipsisHorizontalIcon
                 className="h-6 w-6 rounded hover:bg-zinc-700/50"
                 onClick={() => setIsOpen((prev) => !prev)}
               />
-              {isOpen ? <PostOptions post={post} /> : null}
+              {isOpen && <PostOptions post={post} />}
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

@@ -9,8 +9,10 @@ import Post from "./Post";
 
 export default function Posts({
   initialPosts,
+  userId,
 }: {
   initialPosts: RouterOutput["joinedCommunitiesPosts"];
+  userId: string;
 }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +56,7 @@ export default function Posts({
               }
             }}
           >
-            <Post post={post} />
+            <Post post={post} userId={userId} />
           </div>
         )),
       )}
