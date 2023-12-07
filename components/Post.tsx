@@ -46,7 +46,7 @@ export default function Post({
       key={post.id}
       className="flex cursor-pointer gap-4 rounded border border-zinc-700/70 bg-zinc-900 p-2 hover:border-zinc-500"
     >
-      <Vote post={post} userId={userId} />
+      <Vote usersToPosts={post.usersToPosts} postId={post.id} userId={userId} />
       <div className="flex grow flex-col gap-1.5">
         <div className="flex items-center gap-1 text-xs">
           <Link

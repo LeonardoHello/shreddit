@@ -8,7 +8,7 @@ import {
 import { toast } from "sonner";
 
 import cn from "@/lib/utils/cn";
-import type { RouterOutput } from "@/trpc/procedures";
+import type { RouterInput, RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 import type { ArrElement } from "@/types";
 
@@ -19,12 +19,65 @@ export default function PostOptions({
 }) {
   const utils = trpc.useUtils();
 
-  const deletedPost = trpc.deletePost.useMutation({
-    onError: ({ message }) => {
-      toast.error(message);
-    },
+  const onError = async ({ message }: { message: string }) => {
+    toast.error(message);
+    await utils.joinedCommunitiesPosts.refetch({}, {}, { throwOnError: true });
+  };
 
-    onSuccess: async () => {
+  const onMutate = async (variables: RouterInput["spoilerTag" | "nsfwTag"]) => {
+    await utils.joinedCommunitiesPosts.cancel();
+
+    utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
+      if (!data) {
+        toast.error("Oops, it seemes that data can't be loaded.");
+
+        return {
+          pages: [],
+          pageParams: [],
+        };
+      }
+
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          posts: page.posts.map((_post) => {
+            if (_post.id !== variables.id) return _post;
+
+            return { ..._post, ...variables };
+          }),
+        })),
+      };
+    });
+
+    if ("spoiler" in variables) {
+      if (variables.spoiler) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    } else {
+      if (variables.nsfw) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    }
+  };
+
+  const updateSpoilerTag = trpc.spoilerTag.useMutation({
+    onError,
+    onMutate,
+  });
+
+  const updateNSFWTag = trpc.nsfwTag.useMutation({
+    onError,
+    onMutate,
+  });
+
+  const deletedPost = trpc.deletePost.useMutation({
+    onError,
+    onMutate: async () => {
       await utils.joinedCommunitiesPosts.cancel();
 
       utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
@@ -47,86 +100,6 @@ export default function PostOptions({
       });
 
       toast.success("Post deleted successfully.");
-    },
-  });
-
-  const updateSpoilerTag = trpc.spoilerTag.useMutation({
-    onError: ({ message }) => {
-      toast.error(message);
-    },
-    onSuccess: async (_data) => {
-      await utils.joinedCommunitiesPosts.cancel();
-
-      const spoiler = _data[0].spoiler;
-
-      utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return {
-            pages: [],
-            pageParams: [],
-          };
-        }
-
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((_post) => {
-              if (_post.id !== post.id) return _post;
-
-              return { ..._post, spoiler };
-            }),
-          })),
-        };
-      });
-
-      if (spoiler) {
-        toast.success("Post has been marked as spoiler");
-      } else {
-        toast.success("Post has been un-marked as a spoiler");
-      }
-    },
-  });
-
-  const updateNSFWTag = trpc.nsfwTag.useMutation({
-    onError: ({ message }) => {
-      toast.error(message);
-    },
-
-    onSuccess: async (_data) => {
-      await utils.joinedCommunitiesPosts.cancel();
-
-      const nsfw = _data[0].nsfw;
-
-      utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return {
-            pages: [],
-            pageParams: [],
-          };
-        }
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((_post) => {
-              if (_post.id !== post.id) return _post;
-
-              return { ..._post, nsfw };
-            }),
-          })),
-        };
-      });
-
-      if (nsfw) {
-        toast.success("Post has been marked NSFW");
-      } else {
-        toast.success("Post has been un-marked NSFW");
-      }
     },
   });
 
@@ -159,7 +132,6 @@ export default function PostOptions({
           if (updateSpoilerTag.isLoading) return;
 
           updateSpoilerTag.mutate({
-            authorId: post.authorId,
             id: post.id,
             spoiler: !post.spoiler,
           });
@@ -181,7 +153,6 @@ export default function PostOptions({
           if (updateNSFWTag.isLoading) return;
 
           updateNSFWTag.mutate({
-            authorId: post.authorId,
             id: post.id,
             nsfw: !post.nsfw,
           });
