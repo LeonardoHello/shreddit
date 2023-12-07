@@ -52,11 +52,7 @@ export const updateFavoriteCommunity = ({
   userId,
   communityId,
   favorite,
-}: {
-  userId: UserToCommunity["userId"];
-  communityId: UserToCommunity["communityId"];
-  favorite: UserToCommunity["favorite"];
-}) => {
+}: Omit<UserToCommunity, "muted" | "member">) => {
   return db
     .update(usersToCommunities)
     .set({ favorite })

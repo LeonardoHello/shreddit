@@ -36,7 +36,7 @@ export default function SearchDropdown({
   });
 
   return (
-    <div className="absolute top-full w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
+    <div className="absolute top-full z-10 w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
       {searchedCommunities.data.length > 0 && (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>

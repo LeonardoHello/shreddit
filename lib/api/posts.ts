@@ -43,11 +43,7 @@ export const updatePostSpoilerTag = ({
   authorId,
   id,
   spoiler,
-}: {
-  authorId: Post["authorId"];
-  id: Post["id"];
-  spoiler: Post["spoiler"];
-}) => {
+}: Pick<Post, "authorId" | "id" | "spoiler">) => {
   return db
     .update(posts)
     .set({ spoiler })
@@ -59,11 +55,7 @@ export const updatePostNSFWTag = ({
   authorId,
   id,
   nsfw,
-}: {
-  authorId: Post["authorId"];
-  id: Post["id"];
-  nsfw: Post["nsfw"];
-}) => {
+}: Pick<Post, "authorId" | "id" | "nsfw">) => {
   return db
     .update(posts)
     .set({ nsfw })
@@ -75,40 +67,28 @@ export const deletePost = (postId: string) => {
   return db.delete(posts).where(eq(posts.id, postId));
 };
 
-export const upvotePost = ({
-  userId,
-  postId,
-  upvoted,
-}: {
-  userId: UserToPost["userId"];
-  postId: UserToPost["postId"];
-  upvoted: UserToPost["upvoted"];
-}) => {
+export const upvotePost = (
+  input: Pick<UserToPost, "userId" | "postId" | "upvoted">,
+) => {
   return db
     .insert(usersToPosts)
-    .values({ postId, userId, upvoted })
+    .values(input)
     .onConflictDoUpdate({
       target: [usersToPosts.userId, usersToPosts.postId],
-      set: { upvoted, downvoted: false },
+      set: { upvoted: input.upvoted, downvoted: false },
     })
     .returning();
 };
 
-export const downvotePost = ({
-  userId,
-  postId,
-  downvoted,
-}: {
-  userId: UserToPost["userId"];
-  postId: UserToPost["postId"];
-  downvoted: UserToPost["downvoted"];
-}) => {
+export const downvotePost = (
+  input: Pick<UserToPost, "userId" | "postId" | "downvoted">,
+) => {
   return db
     .insert(usersToPosts)
-    .values({ postId, userId, downvoted })
+    .values(input)
     .onConflictDoUpdate({
       target: [usersToPosts.userId, usersToPosts.postId],
-      set: { downvoted, upvoted: false },
+      set: { upvoted: false, downvoted: input.downvoted },
     })
     .returning();
 };
