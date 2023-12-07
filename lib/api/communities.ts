@@ -48,7 +48,7 @@ export const getJoinedCommunities = (userId: UserToCommunity["userId"]) => {
   });
 };
 
-export const updateFavoriteCommunity = ({
+export const setFavoriteCommunity = ({
   userId,
   communityId,
   favorite,

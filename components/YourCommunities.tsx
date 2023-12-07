@@ -13,7 +13,6 @@ import type { ArrElement } from "@/types";
 import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
 
 type Props = {
-  userId: string;
   favoriteCommunities: RouterOutput["favoriteCommunities"];
   moderatedCommunities: RouterOutput["moderatedCommunities"];
   joinedCommunities: RouterOutput["joinedCommunities"];
@@ -25,7 +24,6 @@ type CommunityRelations = Props[
   | "joinedCommunities"];
 
 export default function YourCommunities({
-  userId,
   favoriteCommunities,
   moderatedCommunities,
   joinedCommunities,
@@ -44,15 +42,21 @@ export default function YourCommunities({
     select,
   };
 
-  const favoriteCommunitiesQuery = trpc.favoriteCommunities.useQuery(userId, {
-    initialData: favoriteCommunities,
-    ...queryOptions,
-  });
-  const moderatedCommunitiesQuery = trpc.moderatedCommunities.useQuery(userId, {
-    initialData: moderatedCommunities,
-    ...queryOptions,
-  });
-  const joinedCommunitiesQuery = trpc.joinedCommunities.useQuery(userId, {
+  const favoriteCommunitiesQuery = trpc.favoriteCommunities.useQuery(
+    undefined,
+    {
+      initialData: favoriteCommunities,
+      ...queryOptions,
+    },
+  );
+  const moderatedCommunitiesQuery = trpc.moderatedCommunities.useQuery(
+    undefined,
+    {
+      initialData: moderatedCommunities,
+      ...queryOptions,
+    },
+  );
+  const joinedCommunitiesQuery = trpc.joinedCommunities.useQuery(undefined, {
     initialData: joinedCommunities,
     ...queryOptions,
   });
@@ -81,7 +85,7 @@ export default function YourCommunities({
 
       {favoriteCommunitiesQuery.data.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <h2 className="px-6 text-2xs text-zinc-300/60 uppercase">
+          <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             favorites
           </h2>
           <menu className="w-full self-center">
@@ -98,7 +102,7 @@ export default function YourCommunities({
       )}
 
       <div className="flex flex-col gap-2.5">
-        <h2 className="px-6 text-2xs text-zinc-300/60 uppercase">moderating</h2>
+        <h2 className="px-6 text-2xs uppercase text-zinc-300/60">moderating</h2>
         <menu className="w-full self-center">
           <li>
             <Link
@@ -122,7 +126,7 @@ export default function YourCommunities({
 
       {joinedCommunitiesQuery.data.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <h2 className="px-6 text-2xs text-zinc-300/60 uppercase">
+          <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             joined communities
           </h2>
           <menu className="w-full self-center">

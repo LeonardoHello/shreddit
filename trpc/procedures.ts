@@ -5,7 +5,7 @@ import {
   getFavoriteCommunities,
   getJoinedCommunities,
   getModeratedCommunities,
-  updateFavoriteCommunity,
+  setFavoriteCommunity,
 } from "@/lib/api/communities";
 import { getCommunityImageUrl, getUserImageUrl } from "@/lib/api/getImageUrl";
 import {
@@ -46,21 +46,15 @@ export const appRouter = router({
   searchCommunities: procedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
-  favoriteCommunities: protectedProcedure
-    .input(UserToCommunitySchema.shape.userId)
-    .query(({ input }) => {
-      return getFavoriteCommunities(input);
-    }),
-  moderatedCommunities: protectedProcedure
-    .input(UserToCommunitySchema.shape.userId)
-    .query(({ input }) => {
-      return getModeratedCommunities(input);
-    }),
-  joinedCommunities: protectedProcedure
-    .input(UserToCommunitySchema.shape.userId)
-    .query(({ input }) => {
-      return getJoinedCommunities(input);
-    }),
+  favoriteCommunities: protectedProcedure.query(({ ctx }) => {
+    return getFavoriteCommunities(ctx.auth.userId);
+  }),
+  moderatedCommunities: protectedProcedure.query(({ ctx }) => {
+    return getModeratedCommunities(ctx.auth.userId);
+  }),
+  joinedCommunities: protectedProcedure.query(({ ctx }) => {
+    return getJoinedCommunities(ctx.auth.userId);
+  }),
   joinedCommunitiesPosts: protectedProcedure
     .input(
       z.object({
@@ -85,35 +79,32 @@ export const appRouter = router({
   favoriteCommunity: protectedProcedure
     .input(
       UserToCommunitySchema.pick({
-        userId: true,
         communityId: true,
         favorite: true,
       }),
     )
-    .mutation(({ input }) => {
-      return updateFavoriteCommunity(input);
+    .mutation(({ input, ctx }) => {
+      return setFavoriteCommunity({ ...input, userId: ctx.auth.userId });
     }),
   spoilerTag: protectedProcedure
     .input(
       PostSchema.pick({
-        authorId: true,
         id: true,
         spoiler: true,
       }),
     )
-    .mutation(({ input }) => {
-      return updatePostSpoilerTag(input);
+    .mutation(({ input, ctx }) => {
+      return updatePostSpoilerTag({ ...input, authorId: ctx.auth.userId });
     }),
   nsfwTag: protectedProcedure
     .input(
       PostSchema.pick({
-        authorId: true,
         id: true,
         nsfw: true,
       }),
     )
-    .mutation(({ input }) => {
-      return updatePostNSFWTag(input);
+    .mutation(({ input, ctx }) => {
+      return updatePostNSFWTag({ ...input, authorId: ctx.auth.userId });
     }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)

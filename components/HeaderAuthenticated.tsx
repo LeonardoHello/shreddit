@@ -35,7 +35,6 @@ export default async function HeaderAuthenticated({
       <Menu>
         <MenuDropdown>
           <YourCommunities
-            userId={userId}
             favoriteCommunities={favoriteCommunities}
             moderatedCommunities={moderatedCommunities}
             joinedCommunities={joinedCommunities}

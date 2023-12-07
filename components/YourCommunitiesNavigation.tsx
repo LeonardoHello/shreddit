@@ -14,7 +14,6 @@ import type {
   getModeratedCommunities,
 } from "@/lib/api/communities";
 import cn from "@/lib/utils/cn";
-import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 import type { ArrElement } from "@/types";
 
@@ -47,10 +46,11 @@ export default function YourCommunitiesNavigation({
 
       toast.error(message);
     },
-    onMutate: (_data) => {
-      const favorite = _data.favorite;
 
-      utils.favoriteCommunities.setData(communityRelation.userId, (data) => {
+    onMutate: (variables) => {
+      const { communityId, favorite } = variables;
+
+      utils.favoriteCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -60,37 +60,36 @@ export default function YourCommunitiesNavigation({
           return [...data, { ...communityRelation, favorite }];
         } else {
           return data.filter(
-            (_communityRelation) =>
-              _communityRelation.communityId !== communityRelation.communityId,
+            (userToCommunity) => userToCommunity.communityId !== communityId,
           );
         }
       });
 
-      utils.moderatedCommunities.setData(communityRelation.userId, (data) => {
+      utils.moderatedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
         }
 
-        return data.map((_communityRelation) => {
-          if (_communityRelation.communityId !== communityRelation.communityId)
-            return _communityRelation;
+        return data.map((userToCommunity) => {
+          if (userToCommunity.communityId !== communityId)
+            return userToCommunity;
 
-          return { ..._communityRelation, favorite };
+          return { ...userToCommunity, favorite };
         });
       });
 
-      utils.joinedCommunities.setData(communityRelation.userId, (data) => {
+      utils.joinedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
         }
 
-        return data.map((_communityRelation) => {
-          if (_communityRelation.communityId !== communityRelation.communityId)
-            return _communityRelation;
+        return data.map((userToCommunity) => {
+          if (userToCommunity.communityId !== communityId)
+            return userToCommunity;
 
-          return { ..._communityRelation, favorite };
+          return { ...userToCommunity, favorite };
         });
       });
     },
@@ -103,7 +102,6 @@ export default function YourCommunitiesNavigation({
     e.preventDefault();
 
     setFavorite.mutate({
-      userId: communityRelation.userId,
       communityId: communityRelation.communityId,
       favorite: !communityRelation.favorite,
     });
