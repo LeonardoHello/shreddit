@@ -1,23 +1,30 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getAllBestPosts } from "@/lib/api/posts/getAllPosts";
+import { getCommunityHotPosts } from "@/lib/api/posts/getCommunityPosts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
-export default async function AllPage() {
+export default async function CommunityPageHot({
+  params: { communityName },
+}: {
+  params: { communityName: string };
+}) {
   const { userId } = auth();
 
-  const posts = await getAllBestPosts.execute({ offset: 0 });
+  const posts = await getCommunityHotPosts.execute({
+    offset: 0,
+    communityName,
+  });
 
   const nextCursor = getInfiniteQueryCursor({
     postsLength: posts.length,
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"allBest"> = {
-    procedure: "allBest",
-    input: {},
+  const queryInfo: InfinteQueryInfo<"communityHot"> = {
+    procedure: "communityHot",
+    input: { communityName },
   };
 
   return (

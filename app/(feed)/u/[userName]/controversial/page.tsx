@@ -1,23 +1,30 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getAllBestPosts } from "@/lib/api/posts/getAllPosts";
+import { getUserControversialPosts } from "@/lib/api/posts/getUserPosts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
-export default async function AllPage() {
+export default async function UserPageControversial({
+  params: { userName },
+}: {
+  params: { userName: string };
+}) {
   const { userId } = auth();
 
-  const posts = await getAllBestPosts.execute({ offset: 0 });
+  const posts = await getUserControversialPosts.execute({
+    offset: 0,
+    userName,
+  });
 
   const nextCursor = getInfiniteQueryCursor({
     postsLength: posts.length,
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"allBest"> = {
-    procedure: "allBest",
-    input: {},
+  const queryInfo: InfinteQueryInfo<"userControversial"> = {
+    procedure: "userControversial",
+    input: { userName },
   };
 
   return (

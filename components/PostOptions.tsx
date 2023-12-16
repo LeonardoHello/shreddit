@@ -8,47 +8,64 @@ import {
 import { toast } from "sonner";
 
 import cn from "@/lib/utils/cn";
-import type { RouterInput, RouterOutput } from "@/trpc/procedures";
+import type { RouterInput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-import type { ArrElement } from "@/types";
+import type {
+  InfinteQueryInfo,
+  InfinteQueryPost,
+  InfinteQueryPostsProcedure,
+} from "@/types";
 
-export default function PostOptions({
+type Props<T extends InfinteQueryPostsProcedure> = {
+  post: InfinteQueryPost;
+  queryInfo: InfinteQueryInfo<T>;
+};
+
+export default function PostOptions<T extends InfinteQueryPostsProcedure>({
   post,
-}: {
-  post: ArrElement<RouterOutput["joinedCommunitiesPosts"]["posts"]>;
-}) {
+  queryInfo,
+}: Props<T>) {
   const utils = trpc.useUtils();
 
   const onError = async ({ message }: { message: string }) => {
     toast.error(message);
-    await utils.joinedCommunitiesPosts.refetch({}, {}, { throwOnError: true });
+    await utils["posts"][queryInfo.procedure].refetch(
+      queryInfo.input,
+      {},
+      { throwOnError: true },
+    );
   };
 
-  const onMutate = async (variables: RouterInput["spoilerTag" | "nsfwTag"]) => {
-    await utils.joinedCommunitiesPosts.cancel();
+  const onMutate = async (
+    variables: RouterInput["post"]["tagSpoiler" | "tagNsfw"],
+  ) => {
+    await utils["posts"][queryInfo.procedure].cancel();
 
-    utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
-      if (!data) {
-        toast.error("Oops, it seemes that data can't be loaded.");
+    utils["posts"][queryInfo.procedure].setInfiniteData(
+      queryInfo.input,
+      (data) => {
+        if (!data) {
+          toast.error("Oops, it seemes that data can't be loaded.");
+
+          return {
+            pages: [],
+            pageParams: [],
+          };
+        }
 
         return {
-          pages: [],
-          pageParams: [],
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            posts: page.posts.map((_post) => {
+              if (_post.id !== variables.id) return _post;
+
+              return { ..._post, ...variables };
+            }),
+          })),
         };
-      }
-
-      return {
-        ...data,
-        pages: data.pages.map((page) => ({
-          ...page,
-          posts: page.posts.map((_post) => {
-            if (_post.id !== variables.id) return _post;
-
-            return { ..._post, ...variables };
-          }),
-        })),
-      };
-    });
+      },
+    );
 
     if ("spoiler" in variables) {
       if (variables.spoiler) {
@@ -65,39 +82,42 @@ export default function PostOptions({
     }
   };
 
-  const updateSpoilerTag = trpc.spoilerTag.useMutation({
+  const updateSpoilerTag = trpc.post.tagSpoiler.useMutation({
     onError,
     onMutate,
   });
 
-  const updateNSFWTag = trpc.nsfwTag.useMutation({
+  const updateNSFWTag = trpc.post.tagNsfw.useMutation({
     onError,
     onMutate,
   });
 
-  const deletedPost = trpc.deletePost.useMutation({
+  const deletedPost = trpc.post.delete.useMutation({
     onError,
     onMutate: async () => {
-      await utils.joinedCommunitiesPosts.cancel();
+      await utils["posts"][queryInfo.procedure].cancel();
 
-      utils.joinedCommunitiesPosts.setInfiniteData({}, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
+      utils["posts"][queryInfo.procedure].setInfiniteData(
+        queryInfo.input,
+        (data) => {
+          if (!data) {
+            toast.error("Oops, it seemes that data can't be loaded.");
+
+            return {
+              pages: [],
+              pageParams: [],
+            };
+          }
 
           return {
-            pages: [],
-            pageParams: [],
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              posts: page.posts.filter((_post) => _post.id !== post.id),
+            })),
           };
-        }
-
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.filter((_post) => _post.id !== post.id),
-          })),
-        };
-      });
+        },
+      );
 
       toast.success("Post deleted successfully.");
     },

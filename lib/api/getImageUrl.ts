@@ -5,7 +5,7 @@ export const getUserImageUrl = db.query.users
     where: (user, { eq, sql }) => eq(user.name, sql.placeholder("name")),
     columns: { imageUrl: true },
   })
-  .prepare("getUserImageUrl");
+  .prepare("get_user_image_url");
 
 export const getCommunityImageUrl = db.query.communities
   .findFirst({
@@ -13,4 +13,4 @@ export const getCommunityImageUrl = db.query.communities
       eq(community.name, sql.placeholder("name")),
     columns: { imageUrl: true },
   })
-  .prepare("getCommunityImageUrl");
+  .prepare("get_community_imageUrl");

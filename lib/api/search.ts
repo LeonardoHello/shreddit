@@ -7,8 +7,8 @@ export const searchUsers = db.query.users
     columns: { id: false },
     limit: 4,
     with: {
-      usersToComments: { columns: { upvoted: true, downvoted: true } },
-      usersToPosts: { columns: { upvoted: true, downvoted: true } },
+      usersToComments: { columns: { voteStatus: true } },
+      usersToPosts: { columns: { voteStatus: true } },
       communities: {
         columns: {},
         with: {
@@ -21,7 +21,7 @@ export const searchUsers = db.query.users
       },
     },
   })
-  .prepare("getSearchedUsers");
+  .prepare("get_searched_users");
 
 export const searchCommunities = db.query.communities
   .findMany({
@@ -36,4 +36,4 @@ export const searchCommunities = db.query.communities
       },
     },
   })
-  .prepare("getSearchedCommunities");
+  .prepare("get_searched_communities");
