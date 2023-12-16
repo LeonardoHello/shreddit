@@ -5,7 +5,7 @@ import { currentUser } from "@clerk/nextjs";
 export default async function InputSubmit() {
   const user = await currentUser();
 
-  if (user === null) throw new Error("Could not load users information.");
+  if (user === null) return null;
 
   return (
     <div>
