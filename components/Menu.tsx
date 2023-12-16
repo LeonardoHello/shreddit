@@ -59,7 +59,7 @@ export default function Menu({ children }: { children: React.ReactNode }) {
 }
 
 function CurrentUserFeed({ userName }: { userName: string }) {
-  const userImageUrl = trpc.userImage.useQuery(userName, {
+  const userImageUrl = trpc.image.user.useQuery(userName, {
     refetchOnWindowFocus: false,
   });
 
@@ -84,7 +84,7 @@ function CurrentUserFeed({ userName }: { userName: string }) {
 }
 
 function CurrentCommunityFeed({ communityName }: { communityName: string }) {
-  const communityImageUrl = trpc.communityImage.useQuery(communityName, {
+  const communityImageUrl = trpc.image.community.useQuery(communityName, {
     refetchOnWindowFocus: false,
   });
 
@@ -119,7 +119,7 @@ function CurrentCommunityFeed({ communityName }: { communityName: string }) {
 }
 
 function HomeFeed({ pathname }: { pathname: string }) {
-  if (pathname === "all") {
+  if (pathname.startsWith("/all")) {
     return (
       <>
         <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />

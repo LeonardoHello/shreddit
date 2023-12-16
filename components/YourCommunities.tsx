@@ -13,9 +13,9 @@ import type { ArrElement } from "@/types";
 import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
 
 type Props = {
-  favoriteCommunities: RouterOutput["favoriteCommunities"];
-  moderatedCommunities: RouterOutput["moderatedCommunities"];
-  joinedCommunities: RouterOutput["joinedCommunities"];
+  favoriteCommunities: RouterOutput["communities"]["favorite"];
+  moderatedCommunities: RouterOutput["communities"]["moderated"];
+  joinedCommunities: RouterOutput["communities"]["joined"];
 };
 
 type CommunityRelations = Props[
@@ -42,21 +42,21 @@ export default function YourCommunities({
     select,
   };
 
-  const favoriteCommunitiesQuery = trpc.favoriteCommunities.useQuery(
+  const favoriteCommunitiesQuery = trpc.communities.favorite.useQuery(
     undefined,
     {
       initialData: favoriteCommunities,
       ...queryOptions,
     },
   );
-  const moderatedCommunitiesQuery = trpc.moderatedCommunities.useQuery(
+  const moderatedCommunitiesQuery = trpc.communities.moderated.useQuery(
     undefined,
     {
       initialData: moderatedCommunities,
       ...queryOptions,
     },
   );
-  const joinedCommunitiesQuery = trpc.joinedCommunities.useQuery(undefined, {
+  const joinedCommunitiesQuery = trpc.communities.joined.useQuery(undefined, {
     initialData: joinedCommunities,
     ...queryOptions,
   });
@@ -65,7 +65,7 @@ export default function YourCommunities({
     setFilter(e.currentTarget.value);
   };
 
-  const alphabeticalSorting = (
+  const alphabetically = (
     a: ArrElement<CommunityRelations>,
     b: ArrElement<CommunityRelations>,
   ) => (a.community.name < b.community.name ? -1 : 1);
@@ -90,7 +90,7 @@ export default function YourCommunities({
           </h2>
           <menu className="w-full self-center">
             {favoriteCommunitiesQuery.data
-              .sort(alphabeticalSorting)
+              .toSorted(alphabetically)
               .map((communityRelation) => (
                 <YourCommunitiesNavigation
                   key={communityRelation.communityId}
@@ -114,7 +114,7 @@ export default function YourCommunities({
             </Link>
           </li>
           {moderatedCommunitiesQuery.data
-            .sort(alphabeticalSorting)
+            .toSorted(alphabetically)
             .map((communityRelation) => (
               <YourCommunitiesNavigation
                 key={communityRelation.communityId}
@@ -131,7 +131,7 @@ export default function YourCommunities({
           </h2>
           <menu className="w-full self-center">
             {joinedCommunitiesQuery.data
-              .sort(alphabeticalSorting)
+              .toSorted(alphabetically)
               .map((communityRelation) => (
                 <YourCommunitiesNavigation
                   key={communityRelation.communityId}
