@@ -11,7 +11,14 @@ export default authMiddleware({
     "/r/:communityName",
     "/r/:communityName/post/:postId",
   ],
-  afterAuth(auth, req) {
+  beforeAuth: (req) => {
+    if (req.nextUrl.pathname.endsWith("/best")) {
+      const newPathname = req.nextUrl.pathname.replace("/best", "");
+      const url = new URL(newPathname, req.nextUrl.origin);
+      return NextResponse.rewrite(url, { status: 301 });
+    }
+  },
+  afterAuth: (auth, req) => {
     if (!auth.userId && !auth.isPublicRoute) {
       if (req.nextUrl.pathname === "/") {
         const unauthenticatedHomePage = new URL("/all", req.nextUrl.origin);
