@@ -1,9 +1,23 @@
-import { ClerkLoaded, ClerkLoading, SignInButton, auth } from "@clerk/nextjs";
+import dynamic from "next/dynamic";
 
-import HeaderAuthenticated from "@/components/HeaderAuthenticated";
+import { auth } from "@clerk/nextjs";
+
 import Logo from "@/components/Logo";
 import Search from "@/components/Search";
+import {
+  getFavoriteCommunities,
+  getJoinedCommunities,
+  getModeratedCommunities,
+} from "@/lib/api/communities";
+import { User } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
+
+import Menu from "./Menu";
+import MenuDropdown from "./MenuDropdown";
+import SignInButton from "./SignInButton";
+import UserProfile from "./UserProfile";
+
+const YourCommunities = dynamic(() => import("./YourCommunities"));
 
 export default function Header() {
   const { userId } = auth();
@@ -19,23 +33,44 @@ export default function Header() {
       <Search />
 
       {userId ? (
-        <HeaderAuthenticated userId={userId} />
+        <HeaderAuthenticated currentUserId={userId} />
       ) : (
-        <>
-          <ClerkLoading>
-            <button className="order-2 rounded-full bg-rose-500 px-4 py-2 font-medium text-white transition-colors hover:bg-red-500/80">
-              Sign in
-            </button>
-          </ClerkLoading>
-          <ClerkLoaded>
-            <SignInButton mode="modal">
-              <button className="order-2 rounded-full bg-rose-500 px-4 py-2 font-medium text-white transition-colors hover:bg-red-500/80">
-                Sign in
-              </button>
-            </SignInButton>
-          </ClerkLoaded>
-        </>
+        <SignInButton />
       )}
     </header>
+  );
+}
+
+async function HeaderAuthenticated({
+  currentUserId,
+}: {
+  currentUserId: User["id"];
+}) {
+  const favoriteCommunitiesData = getFavoriteCommunities(currentUserId);
+  const moderatedCommunitiesData = getModeratedCommunities(currentUserId);
+  const joinedCommunitiesData = getJoinedCommunities(currentUserId);
+
+  const [favoriteCommunities, moderatedCommunities, joinedCommunities] =
+    await Promise.all([
+      favoriteCommunitiesData,
+      moderatedCommunitiesData,
+      joinedCommunitiesData,
+    ]).catch(() => {
+      throw new Error("Could not load users information.");
+    });
+
+  return (
+    <>
+      <Menu>
+        <MenuDropdown>
+          <YourCommunities
+            favoriteCommunities={favoriteCommunities}
+            moderatedCommunities={moderatedCommunities}
+            joinedCommunities={joinedCommunities}
+          />
+        </MenuDropdown>
+      </Menu>
+      <UserProfile />
+    </>
   );
 }
