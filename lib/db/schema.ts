@@ -3,6 +3,7 @@ import {
   type AnyPgColumn,
   boolean,
   index,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -11,6 +12,12 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
+
+export const voteStatusEnum = pgEnum("vote_status", [
+  "upvoted",
+  "downvoted",
+  "none",
+]);
 
 export const users = pgTable(
   "users",
@@ -136,8 +143,7 @@ export const usersToPosts = pgTable(
     postId: uuid("post_id")
       .references(() => posts.id, { onDelete: "cascade" })
       .notNull(),
-    upvoted: boolean("upvoted").notNull().default(false),
-    downvoted: boolean("downvoted").notNull().default(false),
+    voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
     saved: boolean("saved").notNull().default(false),
     hidden: boolean("hidden").notNull().default(false),
   },
@@ -222,8 +228,7 @@ export const usersToComments = pgTable(
     commentId: uuid("comment_id")
       .references(() => comments.id, { onDelete: "cascade" })
       .notNull(),
-    upvoted: boolean("upvoted").notNull().default(false),
-    downvoted: boolean("downvoted").notNull().default(false),
+    voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
     saved: boolean("saved").notNull().default(false),
     hidden: boolean("hidden").notNull().default(false),
   },
