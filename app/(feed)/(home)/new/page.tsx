@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getHomeNewPosts } from "@/lib/api/posts/getHomePosts";
+import { getHomeNewPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { RouterOutput } from "@/trpc/procedures";
 import type { InfinteQueryInfo } from "@/types";
@@ -21,8 +21,8 @@ export default async function HomePageNew() {
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"homeNew"> = {
-    procedure: "homeNew",
+  const queryInfo: InfinteQueryInfo<"getHomeNewPosts"> = {
+    procedure: "getHomeNewPosts",
     input: {},
   };
 

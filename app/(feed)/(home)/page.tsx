@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getHomeBestPosts } from "@/lib/api/posts/getHomePosts";
+import { getHomeBestPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -20,8 +20,8 @@ export default async function HomePage() {
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"homeBest"> = {
-    procedure: "homeBest",
+  const queryInfo: InfinteQueryInfo<"getHomeBestPosts"> = {
+    procedure: "getHomeBestPosts",
     input: {},
   };
 

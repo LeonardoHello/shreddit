@@ -34,12 +34,12 @@ export default function YourCommunitiesNavigation({
 }: Props) {
   const utils = trpc.useUtils();
 
-  const setFavorite = trpc.community.setFavorite.useMutation({
+  const setFavorite = trpc.setFavoriteCommunity.useMutation({
     onError: async ({ message }) => {
       await Promise.all([
-        utils.communities.favorite.refetch(),
-        utils.communities.moderated.refetch(),
-        utils.communities.joined.refetch(),
+        utils.getFavoriteCommunities.refetch(),
+        utils.getModeratedCommunities.refetch(),
+        utils.getJoinedCommunities.refetch(),
       ]).catch(() => {
         throw new Error("Could not load users information.");
       });
@@ -50,7 +50,7 @@ export default function YourCommunitiesNavigation({
     onMutate: (variables) => {
       const { communityId, favorite } = variables;
 
-      utils.communities.favorite.setData(undefined, (data) => {
+      utils.getFavoriteCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -65,7 +65,7 @@ export default function YourCommunitiesNavigation({
         }
       });
 
-      utils.communities.moderated.setData(undefined, (data) => {
+      utils.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -79,7 +79,7 @@ export default function YourCommunitiesNavigation({
         });
       });
 
-      utils.communities.joined.setData(undefined, (data) => {
+      utils.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];

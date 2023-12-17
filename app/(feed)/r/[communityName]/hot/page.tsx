@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getCommunityHotPosts } from "@/lib/api/posts/getCommunityPosts";
+import { getCommunityHotPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -22,8 +22,8 @@ export default async function CommunityPageHot({
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"communityHot"> = {
-    procedure: "communityHot",
+  const queryInfo: InfinteQueryInfo<"getCommunityHotPosts"> = {
+    procedure: "getCommunityHotPosts",
     input: { communityName },
   };
 

@@ -2,7 +2,7 @@ import { RouterOutput } from "@/trpc/procedures";
 import type { ArrElement } from "@/types";
 
 export default function getOnions(
-  user: ArrElement<RouterOutput["search"]["users"]>,
+  user: ArrElement<RouterOutput["searchUsers"]>,
 ) {
   // +1 onion for each upvoted comment
   const commentUpvotes = user.usersToComments.reduce(

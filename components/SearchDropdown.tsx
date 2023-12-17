@@ -15,7 +15,7 @@ export default function SearchDropdown({
 }: {
   searchedValue: string;
 }) {
-  const searchedCommunities = trpc.search.communities.useQuery(searchedValue, {
+  const searchedCommunities = trpc.searchCommunities.useQuery(searchedValue, {
     initialData: [],
     refetchOnWindowFocus: false,
     retry: 2,
@@ -25,7 +25,7 @@ export default function SearchDropdown({
     },
   });
 
-  const searchedUsers = trpc.search.users.useQuery(searchedValue, {
+  const searchedUsers = trpc.searchUsers.useQuery(searchedValue, {
     initialData: [],
     refetchOnWindowFocus: false,
     retry: 2,

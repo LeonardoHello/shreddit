@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getAllBestPosts } from "@/lib/api/posts/getAllPosts";
+import { getAllBestPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -15,8 +15,8 @@ export default async function AllPage() {
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"allBest"> = {
-    procedure: "allBest",
+  const queryInfo: InfinteQueryInfo<"getAllBestPosts"> = {
+    procedure: "getAllBestPosts",
     input: {},
   };
 

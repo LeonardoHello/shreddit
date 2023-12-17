@@ -29,7 +29,7 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
 
   const onError = async ({ message }: { message: string }) => {
     toast.error(message);
-    await utils["posts"][queryInfo.procedure].refetch(
+    await utils[queryInfo.procedure].refetch(
       queryInfo.input,
       {},
       { throwOnError: true },
@@ -37,35 +37,32 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
   };
 
   const onMutate = async (
-    variables: RouterInput["post"]["tagSpoiler" | "tagNsfw"],
+    variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
   ) => {
-    await utils["posts"][queryInfo.procedure].cancel();
+    await utils[queryInfo.procedure].cancel();
 
-    utils["posts"][queryInfo.procedure].setInfiniteData(
-      queryInfo.input,
-      (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return {
-            pages: [],
-            pageParams: [],
-          };
-        }
+    utils[queryInfo.procedure].setInfiniteData(queryInfo.input, (data) => {
+      if (!data) {
+        toast.error("Oops, it seemes that data can't be loaded.");
 
         return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((_post) => {
-              if (_post.id !== variables.id) return _post;
-
-              return { ..._post, ...variables };
-            }),
-          })),
+          pages: [],
+          pageParams: [],
         };
-      },
-    );
+      }
+
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          posts: page.posts.map((_post) => {
+            if (_post.id !== variables.id) return _post;
+
+            return { ..._post, ...variables };
+          }),
+        })),
+      };
+    });
 
     if ("spoiler" in variables) {
       if (variables.spoiler) {
@@ -82,42 +79,39 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
     }
   };
 
-  const updateSpoilerTag = trpc.post.tagSpoiler.useMutation({
+  const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
     onError,
     onMutate,
   });
 
-  const updateNSFWTag = trpc.post.tagNsfw.useMutation({
+  const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
     onError,
     onMutate,
   });
 
-  const deletedPost = trpc.post.delete.useMutation({
+  const deletedPost = trpc.deletePost.useMutation({
     onError,
     onMutate: async () => {
-      await utils["posts"][queryInfo.procedure].cancel();
+      await utils[queryInfo.procedure].cancel();
 
-      utils["posts"][queryInfo.procedure].setInfiniteData(
-        queryInfo.input,
-        (data) => {
-          if (!data) {
-            toast.error("Oops, it seemes that data can't be loaded.");
-
-            return {
-              pages: [],
-              pageParams: [],
-            };
-          }
+      utils[queryInfo.procedure].setInfiniteData(queryInfo.input, (data) => {
+        if (!data) {
+          toast.error("Oops, it seemes that data can't be loaded.");
 
           return {
-            ...data,
-            pages: data.pages.map((page) => ({
-              ...page,
-              posts: page.posts.filter((_post) => _post.id !== post.id),
-            })),
+            pages: [],
+            pageParams: [],
           };
-        },
-      );
+        }
+
+        return {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            posts: page.posts.filter((_post) => _post.id !== post.id),
+          })),
+        };
+      });
 
       toast.success("Post deleted successfully.");
     },

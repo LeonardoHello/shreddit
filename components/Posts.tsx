@@ -13,7 +13,7 @@ import PostVote from "./PostVote";
 
 type Props<T extends InfinteQueryPostsProcedure> = {
   currentUserId: User["id"] | null;
-  initialPosts: RouterOutput["posts"][T];
+  initialPosts: RouterOutput[T];
   queryInfo: InfinteQueryInfo<T>;
 };
 
@@ -23,8 +23,8 @@ export default function Posts<T extends InfinteQueryPostsProcedure>({
   queryInfo,
 }: Props<T>) {
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = trpc[
-    "posts"
-  ][queryInfo.procedure].useInfiniteQuery(queryInfo.input, {
+    queryInfo.procedure
+  ].useInfiniteQuery(queryInfo.input, {
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
     initialDataUpdatedAt: Date.now() + 50,

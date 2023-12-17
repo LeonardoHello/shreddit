@@ -13,9 +13,9 @@ import type { ArrElement } from "@/types";
 import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
 
 type Props = {
-  favoriteCommunities: RouterOutput["communities"]["favorite"];
-  moderatedCommunities: RouterOutput["communities"]["moderated"];
-  joinedCommunities: RouterOutput["communities"]["joined"];
+  favoriteCommunities: RouterOutput["getFavoriteCommunities"];
+  moderatedCommunities: RouterOutput["getModeratedCommunities"];
+  joinedCommunities: RouterOutput["getJoinedCommunities"];
 };
 
 type CommunityRelations = Props[
@@ -42,21 +42,21 @@ export default function YourCommunities({
     select,
   };
 
-  const favoriteCommunitiesQuery = trpc.communities.favorite.useQuery(
+  const favoriteCommunitiesQuery = trpc.getFavoriteCommunities.useQuery(
     undefined,
     {
       initialData: favoriteCommunities,
       ...queryOptions,
     },
   );
-  const moderatedCommunitiesQuery = trpc.communities.moderated.useQuery(
+  const moderatedCommunitiesQuery = trpc.getModeratedCommunities.useQuery(
     undefined,
     {
       initialData: moderatedCommunities,
       ...queryOptions,
     },
   );
-  const joinedCommunitiesQuery = trpc.communities.joined.useQuery(undefined, {
+  const joinedCommunitiesQuery = trpc.getJoinedCommunities.useQuery(undefined, {
     initialData: joinedCommunities,
     ...queryOptions,
   });

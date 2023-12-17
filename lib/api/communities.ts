@@ -1,11 +1,7 @@
 import { and, eq } from "drizzle-orm";
 
 import db from "../db";
-import {
-  type UserToCommunity,
-  communities,
-  usersToCommunities,
-} from "../db/schema";
+import { type UserToCommunity, communities } from "../db/schema";
 
 export const getModeratedCommunities = (userId: UserToCommunity["userId"]) => {
   return db.query.usersToCommunities.findMany({
@@ -46,21 +42,4 @@ export const getJoinedCommunities = (userId: UserToCommunity["userId"]) => {
     columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { name: true, imageUrl: true } } },
   });
-};
-
-export const setFavoriteCommunity = ({
-  userId,
-  communityId,
-  favorite,
-}: Omit<UserToCommunity, "muted" | "member">) => {
-  return db
-    .update(usersToCommunities)
-    .set({ favorite })
-    .where(
-      and(
-        eq(usersToCommunities.userId, userId),
-        eq(usersToCommunities.communityId, communityId),
-      ),
-    )
-    .returning({ favorite: usersToCommunities.favorite });
 };

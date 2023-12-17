@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getAllControversialPosts } from "@/lib/api/posts/getAllPosts";
+import { getAllControversialPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -15,8 +15,8 @@ export default async function AllPageControversial() {
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"allControversial"> = {
-    procedure: "allControversial",
+  const queryInfo: InfinteQueryInfo<"getAllControversialPosts"> = {
+    procedure: "getAllControversialPosts",
     input: {},
   };
 

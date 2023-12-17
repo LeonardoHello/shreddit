@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getUserBestPosts } from "@/lib/api/posts/getUserPosts";
+import { getUserBestPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -22,8 +22,8 @@ export default async function UserPage({
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"userBest"> = {
-    procedure: "userBest",
+  const queryInfo: InfinteQueryInfo<"getUserBestPosts"> = {
+    procedure: "getUserBestPosts",
     input: { userName },
   };
 

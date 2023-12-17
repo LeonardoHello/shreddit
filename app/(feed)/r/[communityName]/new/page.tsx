@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getCommunityNewPosts } from "@/lib/api/posts/getCommunityPosts";
+import { getCommunityNewPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -22,8 +22,8 @@ export default async function CommunityPageNew({
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"communityNew"> = {
-    procedure: "communityNew",
+  const queryInfo: InfinteQueryInfo<"getCommunityNewPosts"> = {
+    procedure: "getCommunityNewPosts",
     input: { communityName },
   };
 

@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getUserHotPosts } from "@/lib/api/posts/getUserPosts";
+import { getUserHotPosts } from "@/lib/api/posts";
 import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
 import type { InfinteQueryInfo } from "@/types";
 
@@ -22,8 +22,8 @@ export default async function UserPageHot({
     cursor: 0,
   });
 
-  const queryInfo: InfinteQueryInfo<"userHot"> = {
-    procedure: "userHot",
+  const queryInfo: InfinteQueryInfo<"getUserHotPosts"> = {
+    procedure: "getUserHotPosts",
     input: { userName },
   };
 

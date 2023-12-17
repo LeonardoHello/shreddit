@@ -47,7 +47,7 @@ const PostVote = memo(function PostVote<T extends InfinteQueryPostsProcedure>({
   }, 0);
 
   const onError = async ({ message }: { message: string }) => {
-    await utils["posts"][queryInfo.procedure].refetch(
+    await utils[queryInfo.procedure].refetch(
       queryInfo.input,
       {},
       { throwOnError: true },
@@ -57,63 +57,60 @@ const PostVote = memo(function PostVote<T extends InfinteQueryPostsProcedure>({
   };
 
   const onMutate = async (
-    variables: RouterInput["post"]["upvote" | "downvote"],
+    variables: RouterInput["upvotePost" | "downvotePost"],
   ) => {
     if (!currentUserId) return;
-    await utils["posts"][queryInfo.procedure].cancel();
+    await utils[queryInfo.procedure].cancel();
 
-    utils["posts"][queryInfo.procedure].setInfiniteData(
-      queryInfo.input,
-      (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return {
-            pages: [],
-            pageParams: [],
-          };
-        }
+    utils[queryInfo.procedure].setInfiniteData(queryInfo.input, (data) => {
+      if (!data) {
+        toast.error("Oops, it seemes that data can't be loaded.");
 
         return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((_post) => {
-              if (_post.id !== variables.postId) return _post;
-
-              let usersToPosts = structuredClone(_post.usersToPosts);
-
-              if (!userToPost) {
-                usersToPosts.push({
-                  hidden: false,
-                  saved: false,
-                  userId: currentUserId,
-                  ...variables,
-                });
-              } else {
-                const index = usersToPosts.findLastIndex(
-                  (_userToPost) => _userToPost.userId === currentUserId,
-                );
-
-                usersToPosts = usersToPosts.with(index, {
-                  ...userToPost,
-                  ...variables,
-                });
-              }
-
-              return {
-                ..._post,
-                usersToPosts,
-              };
-            }),
-          })),
+          pages: [],
+          pageParams: [],
         };
-      },
-    );
+      }
+
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          posts: page.posts.map((_post) => {
+            if (_post.id !== variables.postId) return _post;
+
+            let usersToPosts = structuredClone(_post.usersToPosts);
+
+            if (!userToPost) {
+              usersToPosts.push({
+                hidden: false,
+                saved: false,
+                userId: currentUserId,
+                ...variables,
+              });
+            } else {
+              const index = usersToPosts.findLastIndex(
+                (_userToPost) => _userToPost.userId === currentUserId,
+              );
+
+              usersToPosts = usersToPosts.with(index, {
+                ...userToPost,
+                ...variables,
+              });
+            }
+
+            return {
+              ..._post,
+              usersToPosts,
+            };
+          }),
+        })),
+      };
+    });
   };
 
-  const upvote = trpc.post.upvote.useMutation({ onError, onMutate });
-  const downvote = trpc.post.downvote.useMutation({ onError, onMutate });
+  const upvotePost = trpc.upvotePost.useMutation({ onError, onMutate });
+  const downvotePost = trpc.downvotePost.useMutation({ onError, onMutate });
 
   return (
     <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
@@ -127,7 +124,7 @@ const PostVote = memo(function PostVote<T extends InfinteQueryPostsProcedure>({
         onClick={(e) => {
           e.preventDefault();
 
-          upvote.mutate({
+          upvotePost.mutate({
             postId,
             voteStatus:
               userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
@@ -152,7 +149,7 @@ const PostVote = memo(function PostVote<T extends InfinteQueryPostsProcedure>({
         onClick={(e) => {
           e.preventDefault();
 
-          downvote.mutate({
+          downvotePost.mutate({
             postId,
             voteStatus:
               userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
