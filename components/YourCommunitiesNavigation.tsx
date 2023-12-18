@@ -8,30 +8,22 @@ import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import type {
-  getFavoriteCommunities,
-  getJoinedCommunities,
-  getModeratedCommunities,
-} from "@/lib/api/communities";
+import type * as communityRelations from "@/lib/api/communities";
+import type { ArrElement } from "@/lib/types";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
-import type { ArrElement } from "@/types";
 
-type Props = {
-  communityRelation: ArrElement<
-    Awaited<
-      ReturnType<
-        | typeof getFavoriteCommunities
-        | typeof getModeratedCommunities
-        | typeof getJoinedCommunities
-      >
-    >
-  >;
-};
+type CommunityRelation = ArrElement<
+  Awaited<
+    ReturnType<(typeof communityRelations)[keyof typeof communityRelations]>
+  >
+>;
 
 export default function YourCommunitiesNavigation({
   communityRelation,
-}: Props) {
+}: {
+  communityRelation: CommunityRelation;
+}) {
   const utils = trpc.useUtils();
 
   const setFavorite = trpc.setFavoriteCommunity.useMutation({
@@ -97,7 +89,7 @@ export default function YourCommunitiesNavigation({
 
   const toggleFavorite = (
     e: MouseEvent<SVGSVGElement>,
-    communityRelation: Props["communityRelation"],
+    communityRelation: CommunityRelation,
   ) => {
     e.preventDefault();
 

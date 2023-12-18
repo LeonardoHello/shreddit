@@ -1,5 +1,5 @@
+import type { ArrElement } from "@/lib/types";
 import { RouterOutput } from "@/trpc/procedures";
-import type { ArrElement } from "@/types";
 
 export default function getOnions(
   user: ArrElement<RouterOutput["searchUsers"]>,

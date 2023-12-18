@@ -59,7 +59,7 @@ export default function Menu({ children }: { children: React.ReactNode }) {
 }
 
 function CurrentUserFeed({ userName }: { userName: string }) {
-  const userImageUrl = trpc.image.user.useQuery(userName, {
+  const userImageUrl = trpc.getUserImage.useQuery(userName, {
     refetchOnWindowFocus: false,
   });
 
@@ -84,7 +84,7 @@ function CurrentUserFeed({ userName }: { userName: string }) {
 }
 
 function CurrentCommunityFeed({ communityName }: { communityName: string }) {
-  const communityImageUrl = trpc.image.community.useQuery(communityName, {
+  const communityImageUrl = trpc.getCommunityImage.useQuery(communityName, {
     refetchOnWindowFocus: false,
   });
 

@@ -7,17 +7,15 @@ import { toast } from "sonner";
 
 import type { User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
-import type { InfinteQueryPost } from "@/types";
+import type { InfiniteQueryPost } from "@/lib/types";
 
-export default function PostActions({
-  post,
-  currentUserId,
-  children,
-}: {
-  post: InfinteQueryPost;
+type Props = {
+  post: InfiniteQueryPost;
   currentUserId: User["id"] | null;
   children: React.ReactNode;
-}) {
+};
+
+export default function PostActions({ post, currentUserId, children }: Props) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   const copyLink = async (communityName: string, postId: string) => {

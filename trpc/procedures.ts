@@ -41,7 +41,7 @@ import {
   UserToCommunitySchema,
   UserToPostSchema,
 } from "@/lib/db/schema";
-import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
+import { PostSortBy } from "@/lib/types";
 
 import { procedure, protectedProcedure, router } from ".";
 
@@ -52,316 +52,192 @@ export const appRouter = router({
   searchCommunities: procedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
-  getAllBestPosts: procedure
-    .input(
-      z.object({
-        // cursor input needed to expose useInfiniteQuery hook
-        // value of the cursor is what's returned from getNextPageParam
-        cursor: z.number().nullish(),
+  infiniteQueryPosts: router({
+    getAllPosts: procedure
+      .input(
+        z.object({
+          // cursor input needed to expose useInfiniteQuery hook
+          // value of the cursor is what's returned from getNextPageParam
+          cursor: z.number().nullish(),
+          sortBy: z.nativeEnum(PostSortBy),
+        }),
+      )
+      .query(async ({ input }) => {
+        let posts;
+        switch (input.sortBy) {
+          case PostSortBy.HOT:
+            posts = await getAllHotPosts.execute({
+              offset: input.cursor,
+            });
+            break;
+
+          case PostSortBy.NEW:
+            posts = await getAllNewPosts.execute({
+              offset: input.cursor,
+            });
+            break;
+
+          case PostSortBy.CONTROVERSIAL:
+            posts = await getAllControversialPosts.execute({
+              offset: input.cursor,
+            });
+            break;
+
+          default:
+            posts = await getAllBestPosts.execute({
+              offset: input.cursor,
+            });
+            break;
+        }
+
+        let nextCursor: typeof input.cursor = null;
+        if (posts.length === 10) {
+          nextCursor = input.cursor! + 10;
+        }
+
+        return { posts, nextCursor };
       }),
-    )
-    .query(async ({ input: { cursor } }) => {
-      const posts = await getAllBestPosts.execute({
-        offset: cursor,
-      });
+    getHomePosts: protectedProcedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sortBy: z.nativeEnum(PostSortBy),
+        }),
+      )
+      .query(async ({ input, ctx }) => {
+        let posts;
+        switch (input.sortBy) {
+          case PostSortBy.BEST:
+            posts = await getHomeBestPosts.execute({
+              offset: input.cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
 
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
+          case PostSortBy.HOT:
+            posts = await getHomeHotPosts.execute({
+              offset: input.cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
 
-      return { posts, nextCursor };
-    }),
-  getAllHotPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
+          case PostSortBy.NEW:
+            posts = await getHomeNewPosts.execute({
+              offset: input.cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          default:
+            posts = await getHomeControversialPosts.execute({
+              offset: input.cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+        }
+
+        let nextCursor: typeof input.cursor = null;
+        if (posts.length === 10) {
+          nextCursor = input.cursor! + 10;
+        }
+
+        return { posts, nextCursor };
       }),
-    )
-    .query(async ({ input: { cursor } }) => {
-      const posts = await getAllHotPosts.execute({
-        offset: cursor,
-      });
+    getUserPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sortBy: z.nativeEnum(PostSortBy),
+          userName: z.string(),
+        }),
+      )
+      .query(async ({ input: { cursor, sortBy, userName } }) => {
+        let posts;
+        switch (sortBy) {
+          case PostSortBy.BEST:
+            posts = await getUserBestPosts.execute({
+              offset: cursor,
+              userName,
+            });
+            break;
 
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
+          case PostSortBy.HOT:
+            posts = await getUserHotPosts.execute({
+              offset: cursor,
+              userName,
+            });
+            break;
 
-      return { posts, nextCursor };
-    }),
-  getAllNewPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
+          case PostSortBy.NEW:
+            posts = await getUserNewPosts.execute({
+              offset: cursor,
+              userName,
+            });
+            break;
+
+          default:
+            posts = await getUserControversialPosts.execute({
+              offset: cursor,
+              userName,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
       }),
-    )
-    .query(async ({ input: { cursor } }) => {
-      const posts = await getAllNewPosts.execute({
-        offset: cursor,
-      });
+    getCommunityPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sortBy: z.nativeEnum(PostSortBy),
+          communityName: z.string(),
+        }),
+      )
+      .query(async ({ input: { cursor, sortBy, communityName } }) => {
+        let posts;
+        switch (sortBy) {
+          case PostSortBy.BEST:
+            posts = await getCommunityBestPosts.execute({
+              offset: cursor,
+              communityName,
+            });
+            break;
 
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
+          case PostSortBy.HOT:
+            posts = await getCommunityHotPosts.execute({
+              offset: cursor,
+              communityName,
+            });
+            break;
 
-      return { posts, nextCursor };
-    }),
-  getAllControversialPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
+          case PostSortBy.NEW:
+            posts = await getCommunityNewPosts.execute({
+              offset: cursor,
+              communityName,
+            });
+            break;
+
+          default:
+            posts = await getCommunityControversialPosts.execute({
+              offset: cursor,
+              communityName,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
       }),
-    )
-    .query(async ({ input: { cursor } }) => {
-      const posts = await getAllControversialPosts.execute({
-        offset: cursor,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getHomeBestPosts: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-      }),
-    )
-    .query(async ({ input: { cursor }, ctx }) => {
-      const posts = await getHomeBestPosts.execute({
-        userId: ctx.auth.userId,
-        offset: cursor,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getHomeHotPosts: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-      }),
-    )
-    .query(async ({ input: { cursor }, ctx }) => {
-      const posts = await getHomeHotPosts.execute({
-        userId: ctx.auth.userId,
-        offset: cursor,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getHomeNewPosts: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-      }),
-    )
-    .query(async ({ input: { cursor }, ctx }) => {
-      const posts = await getHomeNewPosts.execute({
-        userId: ctx.auth.userId,
-        offset: cursor,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getHomeControversialPosts: protectedProcedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-      }),
-    )
-    .query(async ({ input: { cursor }, ctx }) => {
-      const posts = await getHomeControversialPosts.execute({
-        userId: ctx.auth.userId,
-        offset: cursor,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getUserBestPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        userName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, userName } }) => {
-      const posts = await getUserBestPosts.execute({
-        offset: cursor,
-        userName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getUserHotPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        userName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, userName } }) => {
-      const posts = await getUserHotPosts.execute({
-        offset: cursor,
-        userName: userName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getUserNewPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        userName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, userName } }) => {
-      const posts = await getUserNewPosts.execute({
-        offset: cursor,
-        userName: userName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getUserControversialPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        userName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, userName } }) => {
-      const posts = await getUserControversialPosts.execute({
-        offset: cursor,
-        userName: userName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getCommunityBestPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        communityName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, communityName } }) => {
-      const posts = await getCommunityBestPosts.execute({
-        offset: cursor,
-        communityName: communityName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getCommunityHotPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        communityName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, communityName } }) => {
-      const posts = await getCommunityHotPosts.execute({
-        offset: cursor,
-        communityName: communityName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getCommunityNewPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        communityName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, communityName } }) => {
-      const posts = await getCommunityNewPosts.execute({
-        offset: cursor,
-        communityName: communityName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
-  getCommunityControversialPosts: procedure
-    .input(
-      z.object({
-        cursor: z.number().nullish(),
-        communityName: z.string(),
-      }),
-    )
-    .query(async ({ input: { cursor, communityName } }) => {
-      const posts = await getCommunityControversialPosts.execute({
-        offset: cursor,
-        communityName: communityName,
-      });
-
-      const nextCursor = getInfiniteQueryCursor({
-        postsLength: posts.length,
-        cursor,
-      });
-
-      return { posts, nextCursor };
-    }),
+  }),
   getUserImage: protectedProcedure
     .input(UserSchema.shape.name)
     .query(({ input }) => {
@@ -393,7 +269,6 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return setFavoriteCommunity({ ...input, userId: ctx.auth.userId });
     }),
-
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input }) => {
@@ -432,6 +307,5 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
-
 export type RouterOutput = inferRouterOutputs<AppRouter>;
 export type RouterInput = inferRouterInputs<AppRouter>;

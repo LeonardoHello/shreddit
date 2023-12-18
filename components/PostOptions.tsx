@@ -7,21 +7,21 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
+import type {
+  InfiniteQueryPost,
+  InfiniteQueryPostProcedure,
+  QueryInfo,
+} from "@/lib/types";
 import cn from "@/lib/utils/cn";
 import type { RouterInput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-import type {
-  InfinteQueryInfo,
-  InfinteQueryPost,
-  InfinteQueryPostsProcedure,
-} from "@/types";
 
-type Props<T extends InfinteQueryPostsProcedure> = {
-  post: InfinteQueryPost;
-  queryInfo: InfinteQueryInfo<T>;
+type Props<T extends InfiniteQueryPostProcedure> = {
+  post: InfiniteQueryPost;
+  queryInfo: QueryInfo<T>;
 };
 
-export default function PostOptions<T extends InfinteQueryPostsProcedure>({
+export default function PostOptions<T extends InfiniteQueryPostProcedure>({
   post,
   queryInfo,
 }: Props<T>) {
@@ -29,7 +29,7 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
 
   const onError = async ({ message }: { message: string }) => {
     toast.error(message);
-    await utils[queryInfo.procedure].refetch(
+    await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
       queryInfo.input,
       {},
       { throwOnError: true },
@@ -39,30 +39,33 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
   const onMutate = async (
     variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
   ) => {
-    await utils[queryInfo.procedure].cancel();
+    await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
-    utils[queryInfo.procedure].setInfiniteData(queryInfo.input, (data) => {
-      if (!data) {
-        toast.error("Oops, it seemes that data can't be loaded.");
+    utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
+      queryInfo.input,
+      (data) => {
+        if (!data) {
+          toast.error("Oops, it seemes that data can't be loaded.");
+
+          return {
+            pages: [],
+            pageParams: [],
+          };
+        }
 
         return {
-          pages: [],
-          pageParams: [],
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            posts: page.posts.map((_post) => {
+              if (_post.id !== variables.id) return _post;
+
+              return { ..._post, ...variables };
+            }),
+          })),
         };
-      }
-
-      return {
-        ...data,
-        pages: data.pages.map((page) => ({
-          ...page,
-          posts: page.posts.map((_post) => {
-            if (_post.id !== variables.id) return _post;
-
-            return { ..._post, ...variables };
-          }),
-        })),
-      };
-    });
+      },
+    );
 
     if ("spoiler" in variables) {
       if (variables.spoiler) {
@@ -92,26 +95,29 @@ export default function PostOptions<T extends InfinteQueryPostsProcedure>({
   const deletedPost = trpc.deletePost.useMutation({
     onError,
     onMutate: async () => {
-      await utils[queryInfo.procedure].cancel();
+      await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
-      utils[queryInfo.procedure].setInfiniteData(queryInfo.input, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
+      utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
+        queryInfo.input,
+        (data) => {
+          if (!data) {
+            toast.error("Oops, it seemes that data can't be loaded.");
+
+            return {
+              pages: [],
+              pageParams: [],
+            };
+          }
 
           return {
-            pages: [],
-            pageParams: [],
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              posts: page.posts.filter((_post) => _post.id !== post.id),
+            })),
           };
-        }
-
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.filter((_post) => _post.id !== post.id),
-          })),
-        };
-      });
+        },
+      );
 
       toast.success("Post deleted successfully.");
     },

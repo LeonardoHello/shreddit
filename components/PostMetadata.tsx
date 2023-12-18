@@ -2,12 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import useHydration from "@/lib/hooks/useHydration";
+import type { InfiniteQueryPost } from "@/lib/types";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
-import type { InfinteQueryPost } from "@/types";
 
-export default function PostMetadata({ post }: { post: InfinteQueryPost }) {
+export default function PostMetadata({ post }: { post: InfiniteQueryPost }) {
   const hydrated = useHydration();
 
   return (
@@ -34,7 +34,9 @@ export default function PostMetadata({ post }: { post: InfinteQueryPost }) {
               className="select-none rounded-full border border-zinc-300 bg-zinc-300"
             />
           )}
-          <div className="font-bold">r/{post.community.name}</div>
+          <div className="font-bold hover:underline">
+            r/{post.community.name}
+          </div>
         </Link>
         <Image src={dot} alt="dot" height={2} width={2} />
         <div className="text-zinc-500">

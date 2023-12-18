@@ -10,11 +10,15 @@ import { Image as ImageExtension } from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
-import type { File } from "@/lib/db/schema";
+import type { File, Post } from "@/lib/db/schema";
+import type { InfiniteQueryPost } from "@/lib/types";
 import cn from "@/lib/utils/cn";
-import type { InfinteQueryPost } from "@/types";
 
-export default memo(function PostContent({ post }: { post: InfinteQueryPost }) {
+export default memo(function PostContent({
+  post,
+}: {
+  post: InfiniteQueryPost;
+}) {
   if (post.text === null && post.files.length === 0) return null;
 
   if (post.text) {
@@ -51,8 +55,8 @@ function PostImageContent({
   nsfw,
 }: {
   images: File[];
-  spoiler: boolean;
-  nsfw: boolean;
+  spoiler: Post["spoiler"];
+  nsfw: Post["nsfw"];
 }) {
   const [currentIndex, setCurrentIndex] = useState(1);
 

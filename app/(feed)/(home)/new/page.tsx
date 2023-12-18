@@ -2,9 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getHomeNewPosts } from "@/lib/api/posts";
-import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
-import type { RouterOutput } from "@/trpc/procedures";
-import type { InfinteQueryInfo } from "@/types";
+import { PostSortBy, type QueryInfo } from "@/lib/types";
 
 export default async function HomePageNew() {
   const { userId } = auth();
@@ -16,18 +14,18 @@ export default async function HomePageNew() {
     offset: 0,
   });
 
-  const nextCursor = getInfiniteQueryCursor({
-    postsLength: posts.length,
-    cursor: 0,
-  });
+  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
 
-  const queryInfo: InfinteQueryInfo<"getHomeNewPosts"> = {
-    procedure: "getHomeNewPosts",
-    input: {},
+  const queryInfo: QueryInfo<"getHomePosts"> = {
+    procedure: "getHomePosts",
+    input: { sortBy: PostSortBy.NEW },
   };
 
   return (
-    <Posts
+    <Posts<"getHomePosts">
       currentUserId={userId}
       initialPosts={{ posts, nextCursor }}
       queryInfo={queryInfo}

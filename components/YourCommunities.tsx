@@ -6,9 +6,9 @@ import Link from "next/link";
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 
+import type { ArrElement } from "@/lib/types";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-import type { ArrElement } from "@/types";
 
 import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
 
@@ -18,11 +18,6 @@ type Props = {
   joinedCommunities: RouterOutput["getJoinedCommunities"];
 };
 
-type CommunityRelations = Props[
-  | "favoriteCommunities"
-  | "moderatedCommunities"
-  | "joinedCommunities"];
-
 export default function YourCommunities({
   favoriteCommunities,
   moderatedCommunities,
@@ -30,7 +25,7 @@ export default function YourCommunities({
 }: Props) {
   const [filter, setFilter] = useState("");
 
-  const select = (data: CommunityRelations) =>
+  const select = (data: Props[keyof Props]) =>
     data.filter((communityRelation) =>
       communityRelation.community.name.includes(filter),
     );
@@ -66,8 +61,8 @@ export default function YourCommunities({
   };
 
   const alphabetically = (
-    a: ArrElement<CommunityRelations>,
-    b: ArrElement<CommunityRelations>,
+    a: ArrElement<Props[keyof Props]>,
+    b: ArrElement<Props[keyof Props]>,
   ) => (a.community.name < b.community.name ? -1 : 1);
 
   return (

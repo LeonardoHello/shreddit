@@ -2,26 +2,25 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getAllControversialPosts } from "@/lib/api/posts";
-import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
-import type { InfinteQueryInfo } from "@/types";
+import { PostSortBy, type QueryInfo } from "@/lib/types";
 
 export default async function AllPageControversial() {
   const { userId } = auth();
 
   const posts = await getAllControversialPosts.execute({ offset: 0 });
 
-  const nextCursor = getInfiniteQueryCursor({
-    postsLength: posts.length,
-    cursor: 0,
-  });
+  let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
 
-  const queryInfo: InfinteQueryInfo<"getAllControversialPosts"> = {
-    procedure: "getAllControversialPosts",
-    input: {},
+  const queryInfo: QueryInfo<"getAllPosts"> = {
+    procedure: "getAllPosts",
+    input: { sortBy: PostSortBy.CONTROVERSIAL },
   };
 
   return (
-    <Posts
+    <Posts<"getAllPosts">
       currentUserId={userId}
       initialPosts={{ posts, nextCursor }}
       queryInfo={queryInfo}

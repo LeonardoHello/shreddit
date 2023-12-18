@@ -2,8 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getHomeHotPosts } from "@/lib/api/posts";
-import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
-import type { InfinteQueryInfo } from "@/types";
+import { PostSortBy, type QueryInfo } from "@/lib/types";
 
 export default async function HomePageHot() {
   const { userId } = auth();
@@ -15,18 +14,18 @@ export default async function HomePageHot() {
     offset: 0,
   });
 
-  const nextCursor = getInfiniteQueryCursor({
-    postsLength: posts.length,
-    cursor: 0,
-  });
+  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
 
-  const queryInfo: InfinteQueryInfo<"getHomeHotPosts"> = {
-    procedure: "getHomeHotPosts",
-    input: {},
+  const queryInfo: QueryInfo<"getHomePosts"> = {
+    procedure: "getHomePosts",
+    input: { sortBy: PostSortBy.HOT },
   };
 
   return (
-    <Posts
+    <Posts<"getHomePosts">
       currentUserId={userId}
       initialPosts={{ posts, nextCursor }}
       queryInfo={queryInfo}

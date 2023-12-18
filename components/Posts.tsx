@@ -1,9 +1,9 @@
 "use client";
 
 import type { User } from "@/lib/db/schema";
+import type { InfiniteQueryPostProcedure, QueryInfo } from "@/lib/types";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
-import type { InfinteQueryInfo, InfinteQueryPostsProcedure } from "@/types";
 
 import PostActions from "./PostActions";
 import PostContent from "./PostContent";
@@ -11,39 +11,39 @@ import PostMetadata from "./PostMetadata";
 import PostOptions from "./PostOptions";
 import PostVote from "./PostVote";
 
-type Props<T extends InfinteQueryPostsProcedure> = {
+type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
-  initialPosts: RouterOutput[T];
-  queryInfo: InfinteQueryInfo<T>;
+  initialPosts: RouterOutput["infiniteQueryPosts"][T];
+  queryInfo: QueryInfo<T>;
 };
 
-export default function Posts<T extends InfinteQueryPostsProcedure>({
+export default function Posts<T extends InfiniteQueryPostProcedure>({
   currentUserId,
   initialPosts,
   queryInfo,
 }: Props<T>) {
-  const { data, hasNextPage, fetchNextPage, isFetchingNextPage } = trpc[
+  const infiniteQuery = trpc.infiniteQueryPosts[
     queryInfo.procedure
   ].useInfiniteQuery(queryInfo.input, {
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
-    initialDataUpdatedAt: Date.now() + 50,
+    initialDataUpdatedAt: Date.now() + 500,
     refetchOnWindowFocus: false,
   });
 
-  if (data === undefined) {
+  if (infiniteQuery.data === undefined) {
     throw new Error("Couldn't fetch posts");
   }
 
   const onClick = () => {
-    if (hasNextPage) {
-      fetchNextPage();
+    if (infiniteQuery.hasNextPage) {
+      infiniteQuery.fetchNextPage();
     }
   };
 
   return (
     <div className="flex flex-col gap-2.5">
-      {data.pages.map((page) =>
+      {infiniteQuery.data.pages.map((page) =>
         page.posts.map((post) => (
           <div
             key={post.id}

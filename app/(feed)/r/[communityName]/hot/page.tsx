@@ -2,8 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getCommunityHotPosts } from "@/lib/api/posts";
-import getInfiniteQueryCursor from "@/lib/utils/getInfiniteQueryCursor";
-import type { InfinteQueryInfo } from "@/types";
+import { PostSortBy, type QueryInfo } from "@/lib/types";
 
 export default async function CommunityPageHot({
   params: { communityName },
@@ -17,18 +16,18 @@ export default async function CommunityPageHot({
     communityName,
   });
 
-  const nextCursor = getInfiniteQueryCursor({
-    postsLength: posts.length,
-    cursor: 0,
-  });
+  let nextCursor: QueryInfo<"getCommunityPosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
 
-  const queryInfo: InfinteQueryInfo<"getCommunityHotPosts"> = {
-    procedure: "getCommunityHotPosts",
-    input: { communityName },
+  const queryInfo: QueryInfo<"getCommunityPosts"> = {
+    procedure: "getCommunityPosts",
+    input: { sortBy: PostSortBy.HOT, communityName },
   };
 
   return (
-    <Posts
+    <Posts<"getCommunityPosts">
       currentUserId={userId}
       initialPosts={{ posts, nextCursor }}
       queryInfo={queryInfo}
