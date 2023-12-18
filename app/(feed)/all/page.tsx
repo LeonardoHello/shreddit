@@ -16,7 +16,7 @@ export default async function AllPage() {
 
   const queryInfo: QueryInfo<"getAllPosts"> = {
     procedure: "getAllPosts",
-    input: { sortBy: PostSortBy.NEW },
+    input: { sortBy: PostSortBy.BEST },
   };
 
   return (

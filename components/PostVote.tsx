@@ -60,6 +60,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     variables: RouterInput["upvotePost" | "downvotePost"],
   ) => {
     if (!currentUserId) return;
+
     await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
     utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
