@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getUserBestPosts } from "@/lib/api/posts";
-import { PostSortBy, type QueryInfo } from "@/lib/types";
+import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function UserPage({
   params: { userName },
@@ -23,7 +23,7 @@ export default async function UserPage({
 
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
-    input: { sortBy: PostSortBy.BEST, userName },
+    input: { sortBy: SortPostsBy.BEST, userName },
   };
 
   return (

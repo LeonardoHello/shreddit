@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getCommunityControversialPosts } from "@/lib/api/posts";
-import { PostSortBy, type QueryInfo } from "@/lib/types";
+import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function CommunityPageControversial({
   params: { communityName },
@@ -23,7 +23,7 @@ export default async function CommunityPageControversial({
 
   const queryInfo: QueryInfo<"getCommunityPosts"> = {
     procedure: "getCommunityPosts",
-    input: { sortBy: PostSortBy.CONTROVERSIAL, communityName },
+    input: { sortBy: SortPostsBy.CONTROVERSIAL, communityName },
   };
 
   return (

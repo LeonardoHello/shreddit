@@ -41,7 +41,7 @@ import {
   UserToCommunitySchema,
   UserToPostSchema,
 } from "@/lib/db/schema";
-import { PostSortBy } from "@/lib/types";
+import { SortPostsBy } from "@/lib/types";
 
 import { procedure, protectedProcedure, router } from ".";
 
@@ -59,25 +59,25 @@ export const appRouter = router({
           // cursor input needed to expose useInfiniteQuery hook
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
-          sortBy: z.nativeEnum(PostSortBy),
+          sortBy: z.nativeEnum(SortPostsBy),
         }),
       )
       .query(async ({ input }) => {
         let posts;
         switch (input.sortBy) {
-          case PostSortBy.HOT:
+          case SortPostsBy.HOT:
             posts = await getAllHotPosts.execute({
               offset: input.cursor,
             });
             break;
 
-          case PostSortBy.NEW:
+          case SortPostsBy.NEW:
             posts = await getAllNewPosts.execute({
               offset: input.cursor,
             });
             break;
 
-          case PostSortBy.CONTROVERSIAL:
+          case SortPostsBy.CONTROVERSIAL:
             posts = await getAllControversialPosts.execute({
               offset: input.cursor,
             });
@@ -101,27 +101,27 @@ export const appRouter = router({
       .input(
         z.object({
           cursor: z.number().nullish(),
-          sortBy: z.nativeEnum(PostSortBy),
+          sortBy: z.nativeEnum(SortPostsBy),
         }),
       )
       .query(async ({ input, ctx }) => {
         let posts;
         switch (input.sortBy) {
-          case PostSortBy.BEST:
+          case SortPostsBy.BEST:
             posts = await getHomeBestPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
-          case PostSortBy.HOT:
+          case SortPostsBy.HOT:
             posts = await getHomeHotPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
-          case PostSortBy.NEW:
+          case SortPostsBy.NEW:
             posts = await getHomeNewPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
@@ -147,28 +147,28 @@ export const appRouter = router({
       .input(
         z.object({
           cursor: z.number().nullish(),
-          sortBy: z.nativeEnum(PostSortBy),
+          sortBy: z.nativeEnum(SortPostsBy),
           userName: z.string(),
         }),
       )
       .query(async ({ input: { cursor, sortBy, userName } }) => {
         let posts;
         switch (sortBy) {
-          case PostSortBy.BEST:
+          case SortPostsBy.BEST:
             posts = await getUserBestPosts.execute({
               offset: cursor,
               userName,
             });
             break;
 
-          case PostSortBy.HOT:
+          case SortPostsBy.HOT:
             posts = await getUserHotPosts.execute({
               offset: cursor,
               userName,
             });
             break;
 
-          case PostSortBy.NEW:
+          case SortPostsBy.NEW:
             posts = await getUserNewPosts.execute({
               offset: cursor,
               userName,
@@ -194,28 +194,28 @@ export const appRouter = router({
       .input(
         z.object({
           cursor: z.number().nullish(),
-          sortBy: z.nativeEnum(PostSortBy),
+          sortBy: z.nativeEnum(SortPostsBy),
           communityName: z.string(),
         }),
       )
       .query(async ({ input: { cursor, sortBy, communityName } }) => {
         let posts;
         switch (sortBy) {
-          case PostSortBy.BEST:
+          case SortPostsBy.BEST:
             posts = await getCommunityBestPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
-          case PostSortBy.HOT:
+          case SortPostsBy.HOT:
             posts = await getCommunityHotPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
-          case PostSortBy.NEW:
+          case SortPostsBy.NEW:
             posts = await getCommunityNewPosts.execute({
               offset: cursor,
               communityName,

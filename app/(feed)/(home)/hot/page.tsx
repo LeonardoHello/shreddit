@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getHomeHotPosts } from "@/lib/api/posts";
-import { PostSortBy, type QueryInfo } from "@/lib/types";
+import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function HomePageHot() {
   const { userId } = auth();
@@ -21,7 +21,7 @@ export default async function HomePageHot() {
 
   const queryInfo: QueryInfo<"getHomePosts"> = {
     procedure: "getHomePosts",
-    input: { sortBy: PostSortBy.HOT },
+    input: { sortBy: SortPostsBy.HOT },
   };
 
   return (

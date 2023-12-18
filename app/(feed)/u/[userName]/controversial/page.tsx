@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getUserControversialPosts } from "@/lib/api/posts";
-import { PostSortBy, type QueryInfo } from "@/lib/types";
+import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function UserPageControversial({
   params: { userName },
@@ -23,7 +23,7 @@ export default async function UserPageControversial({
 
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
-    input: { sortBy: PostSortBy.CONTROVERSIAL, userName },
+    input: { sortBy: SortPostsBy.CONTROVERSIAL, userName },
   };
 
   return (

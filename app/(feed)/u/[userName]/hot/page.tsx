@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import { getUserHotPosts } from "@/lib/api/posts";
-import { PostSortBy, type QueryInfo } from "@/lib/types";
+import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function UserPageHot({
   params: { userName },
@@ -23,7 +23,7 @@ export default async function UserPageHot({
 
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
-    input: { sortBy: PostSortBy.HOT, userName },
+    input: { sortBy: SortPostsBy.HOT, userName },
   };
 
   return (
