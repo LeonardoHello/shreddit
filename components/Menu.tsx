@@ -27,7 +27,7 @@ export default function Menu({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="relative flex flex-col bg-inherit md:my-0.5 md:w-72"
+      className="relative flex flex-col bg-inherit lg:my-0.5 lg:w-72"
       ref={dropdownRef}
     >
       <button
@@ -76,7 +76,7 @@ function CurrentUserFeed({ userName }: { userName: string }) {
       ) : (
         <UserIcon className="h-5 w-5 animate-pulse rounded-full bg-zinc-300 p-0.5 text-zinc-800 opacity-80" />
       )}
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium md:block">
+      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
         u/{userName}
       </h1>
     </>
@@ -111,7 +111,7 @@ function CurrentCommunityFeed({ communityName }: { communityName: string }) {
         />
       )}
 
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium md:block">
+      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
         u/{communityName}
       </h1>
     </>
@@ -123,7 +123,7 @@ function HomeFeed({ pathname }: { pathname: string }) {
     return (
       <>
         <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
-        <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium md:block">
+        <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
           All
         </h1>
       </>
@@ -133,7 +133,7 @@ function HomeFeed({ pathname }: { pathname: string }) {
   return (
     <>
       <HomeIcon className="h-5 w-5" />
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium md:block">
+      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
         Home
       </h1>
     </>
