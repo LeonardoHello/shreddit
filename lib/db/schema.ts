@@ -48,7 +48,6 @@ export const communities = pgTable(
     name: text("name").unique().notNull(),
     imageUrl: text("image_url"),
     about: text("about"),
-    nsfw: boolean("nsfw").notNull().default(false),
     moderatorId: text("moderator_id")
       .references(() => users.id, {
         onDelete: "cascade",

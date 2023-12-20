@@ -127,6 +127,13 @@
       "when": 1703056289711,
       "tag": "0017_productive_shadow_king",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1703081378803,
+      "tag": "0018_aspiring_magdalene",
+      "breakpoints": true
     }
   ]
 }
