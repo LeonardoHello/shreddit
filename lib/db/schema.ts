@@ -72,6 +72,7 @@ export const communitiesRelations = relations(communities, ({ one, many }) => ({
 export const usersToCommunities = pgTable(
   "users_to_communities",
   {
+    createdAt: timestamp("created_at").notNull().defaultNow(),
     userId: text("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
@@ -137,6 +138,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 export const usersToPosts = pgTable(
   "users_to_posts",
   {
+    createdAt: timestamp("created_at").notNull().defaultNow(),
     userId: text("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
@@ -222,6 +224,7 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 export const usersToComments = pgTable(
   "users_to_comments",
   {
+    createdAt: timestamp("created_at").notNull().defaultNow(),
     userId: text("user_id")
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
