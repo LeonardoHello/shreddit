@@ -70,12 +70,6 @@ export default function SearchDropdown({
                       ? "member"
                       : "members"}
                   </span>
-                  {community.nsfw && (
-                    <>
-                      <Image src={dot} alt="dot" height={4} width={4} />
-                      <span className="text-rose-500">NSFW</span>
-                    </>
-                  )}
                 </div>
               </div>
             </Link>

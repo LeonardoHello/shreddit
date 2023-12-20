@@ -27,7 +27,7 @@ export const searchCommunities = db.query.communities
   .findMany({
     where: (community, { ilike, sql }) =>
       ilike(community.name, sql.placeholder("search")),
-    columns: { name: true, imageUrl: true, nsfw: true },
+    columns: { name: true, imageUrl: true },
     limit: 4,
     with: {
       usersToCommunities: {

@@ -65,6 +65,12 @@ export const appRouter = router({
       .query(async ({ input }) => {
         let posts;
         switch (input.sortBy) {
+          case SortPostsBy.BEST:
+            posts = await getAllBestPosts.execute({
+              offset: input.cursor,
+            });
+            break;
+
           case SortPostsBy.HOT:
             posts = await getAllHotPosts.execute({
               offset: input.cursor,
@@ -77,14 +83,8 @@ export const appRouter = router({
             });
             break;
 
-          case SortPostsBy.CONTROVERSIAL:
-            posts = await getAllControversialPosts.execute({
-              offset: input.cursor,
-            });
-            break;
-
           default:
-            posts = await getAllBestPosts.execute({
+            posts = await getAllControversialPosts.execute({
               offset: input.cursor,
             });
             break;

@@ -7,7 +7,7 @@ export const setFavoriteCommunity = ({
   userId,
   communityId,
   favorite,
-}: Omit<UserToCommunity, "muted" | "member">) => {
+}: Pick<UserToCommunity, "userId" | "communityId" | "favorite">) => {
   return db
     .update(usersToCommunities)
     .set({ favorite })
@@ -19,3 +19,15 @@ export const setFavoriteCommunity = ({
     )
     .returning({ favorite: usersToCommunities.favorite });
 };
+
+export const getCommunity = db.query.communities
+  .findFirst({
+    where: (community, { sql, eq }) =>
+      eq(community.name, sql.placeholder("communityName")),
+    with: {
+      usersToCommunities: {
+        columns: { createdAt: true },
+      },
+    },
+  })
+  .prepare("get_community");
