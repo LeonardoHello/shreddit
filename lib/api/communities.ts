@@ -1,11 +1,9 @@
-import { and, eq } from "drizzle-orm";
-
 import db from "../db";
 import { type UserToCommunity, communities } from "../db/schema";
 
 export const getModeratedCommunities = (userId: UserToCommunity["userId"]) => {
   return db.query.usersToCommunities.findMany({
-    where: (userToCommunity, { exists }) =>
+    where: (userToCommunity, { exists, and, eq }) =>
       exists(
         db
           .select()

@@ -41,8 +41,8 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
       (currentValue.voteStatus === "upvoted"
         ? 1
         : currentValue.voteStatus === "downvoted"
-          ? -1
-          : 0)
+        ? -1
+        : 0)
     );
   }, 0);
 
@@ -56,9 +56,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     toast.error(message);
   };
 
-  const onMutate = async (
-    variables: RouterInput["upvotePost" | "downvotePost"],
-  ) => {
+  const onMutate = async (variables: RouterInput["votePost"]) => {
     if (!currentUserId) return;
 
     await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
@@ -89,6 +87,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
                   hidden: false,
                   saved: false,
                   userId: currentUserId,
+                  createdAt: new Date(),
                   ...variables,
                 });
               } else {
@@ -113,8 +112,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     );
   };
 
-  const upvotePost = trpc.upvotePost.useMutation({ onError, onMutate });
-  const downvotePost = trpc.downvotePost.useMutation({ onError, onMutate });
+  const votePost = trpc.votePost.useMutation({ onError, onMutate });
 
   return (
     <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
@@ -128,7 +126,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
         onClick={(e) => {
           e.preventDefault();
 
-          upvotePost.mutate({
+          votePost.mutate({
             postId,
             voteStatus:
               userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
@@ -141,7 +139,10 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
           "text-blue-500": userToPost?.voteStatus === "downvoted",
         })}
       >
-        {votes}
+        {new Intl.NumberFormat("en-US", {
+          notation: "compact",
+          maximumFractionDigits: 1,
+        }).format(votes)}
       </div>
       <ArrowDownCircleIcon
         className={cn(
@@ -153,7 +154,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
         onClick={(e) => {
           e.preventDefault();
 
-          downvotePost.mutate({
+          votePost.mutate({
             postId,
             voteStatus:
               userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",

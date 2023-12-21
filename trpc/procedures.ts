@@ -1,4 +1,5 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -6,15 +7,8 @@ import {
   getJoinedCommunities,
   getModeratedCommunities,
 } from "@/lib/api/communities";
-import { setFavoriteCommunity } from "@/lib/api/community";
+import { getUserToCommunity } from "@/lib/api/community";
 import { getCommunityImage, getUserImage } from "@/lib/api/image";
-import {
-  deletePost,
-  downvotePost,
-  setPostNSFWTag,
-  setPostSpoilerTag,
-  upvotePost,
-} from "@/lib/api/post";
 import {
   getAllBestPosts,
   getAllControversialPosts,
@@ -40,18 +34,15 @@ import {
   UserSchema,
   UserToCommunitySchema,
   UserToPostSchema,
+  posts,
+  usersToCommunities,
+  usersToPosts,
 } from "@/lib/db/schema";
 import { SortPostsBy } from "@/lib/types";
 
 import { procedure, protectedProcedure, router } from ".";
 
 export const appRouter = router({
-  searchUsers: procedure.input(z.string()).query(({ input }) => {
-    return searchUsers.execute({ search: `%${input}%` });
-  }),
-  searchCommunities: procedure.input(z.string()).query(({ input }) => {
-    return searchCommunities.execute({ search: `%${input}%` });
-  }),
   infiniteQueryPosts: router({
     getAllPosts: procedure
       .input(
@@ -238,6 +229,12 @@ export const appRouter = router({
         return { posts, nextCursor };
       }),
   }),
+  searchUsers: procedure.input(z.string()).query(({ input }) => {
+    return searchUsers.execute({ search: `%${input}%` });
+  }),
+  searchCommunities: procedure.input(z.string()).query(({ input }) => {
+    return searchCommunities.execute({ search: `%${input}%` });
+  }),
   getUserImage: protectedProcedure
     .input(UserSchema.shape.name)
     .query(({ input }) => {
@@ -267,22 +264,71 @@ export const appRouter = router({
       }),
     )
     .mutation(({ input, ctx }) => {
-      return setFavoriteCommunity({ ...input, userId: ctx.auth.userId });
+      return ctx.db
+        .update(usersToCommunities)
+        .set({ favorite: input.favorite })
+        .where(
+          and(
+            eq(usersToCommunities.userId, ctx.auth.userId),
+            eq(usersToCommunities.communityId, input.communityId),
+          ),
+        )
+        .returning({ favorite: usersToCommunities.favorite });
+    }),
+  joinCommunity: protectedProcedure
+    .input(
+      UserToCommunitySchema.pick({
+        communityId: true,
+        member: true,
+      }),
+    )
+    .query(({ input, ctx }) => {
+      return ctx.db
+        .update(usersToCommunities)
+        .set({ member: input.member })
+        .where(
+          and(
+            eq(usersToCommunities.userId, ctx.auth.userId),
+            eq(usersToCommunities.communityId, input.communityId),
+          ),
+        )
+        .returning({ member: usersToCommunities.member });
+    }),
+  muteCommunity: protectedProcedure
+    .input(
+      UserToCommunitySchema.pick({
+        communityId: true,
+        muted: true,
+      }),
+    )
+    .query(({ input, ctx }) => {
+      return ctx.db
+        .update(usersToCommunities)
+        .set({ muted: input.muted })
+        .where(
+          and(
+            eq(usersToCommunities.userId, ctx.auth.userId),
+            eq(usersToCommunities.communityId, input.communityId),
+          ),
+        )
+        .returning({ muted: usersToCommunities.muted });
     }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
-    .mutation(({ input }) => {
-      return deletePost(input);
+    .mutation(({ input, ctx }) => {
+      return ctx.db.delete(posts).where(eq(posts.id, input));
     }),
-  upvotePost: protectedProcedure
+  votePost: protectedProcedure
     .input(UserToPostSchema.pick({ postId: true, voteStatus: true }))
     .mutation(({ input, ctx }) => {
-      return upvotePost({ ...input, userId: ctx.auth.userId });
-    }),
-  downvotePost: protectedProcedure
-    .input(UserToPostSchema.pick({ postId: true, voteStatus: true }))
-    .mutation(({ input, ctx }) => {
-      return downvotePost({ ...input, userId: ctx.auth.userId });
+      return ctx.db
+        .insert(usersToPosts)
+        .values({ ...input, userId: ctx.auth.userId })
+        .onConflictDoUpdate({
+          target: [usersToPosts.userId, usersToPosts.postId],
+          set: { voteStatus: input.voteStatus },
+        })
+        .returning();
     }),
   setPostSpoilerTag: protectedProcedure
     .input(
@@ -292,7 +338,11 @@ export const appRouter = router({
       }),
     )
     .mutation(({ input, ctx }) => {
-      return setPostSpoilerTag({ ...input, authorId: ctx.auth.userId });
+      return ctx.db
+        .update(posts)
+        .set({ spoiler: input.spoiler })
+        .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
+        .returning({ spoiler: posts.spoiler });
     }),
   setPostNSFWTag: protectedProcedure
     .input(
@@ -302,7 +352,19 @@ export const appRouter = router({
       }),
     )
     .mutation(({ input, ctx }) => {
-      return setPostNSFWTag({ ...input, authorId: ctx.auth.userId });
+      return ctx.db
+        .update(posts)
+        .set({ nsfw: input.nsfw })
+        .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
+        .returning({ nsfw: posts.nsfw });
+    }),
+  getUserToCommunity: procedure
+    .input(UserToCommunitySchema.shape.communityId)
+    .query(({ input, ctx }) => {
+      return getUserToCommunity.execute({
+        userId: ctx.auth.userId,
+        communityId: input,
+      });
     }),
 });
 

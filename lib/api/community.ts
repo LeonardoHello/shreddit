@@ -1,24 +1,4 @@
-import { and, eq } from "drizzle-orm";
-
 import db from "../db";
-import { type UserToCommunity, usersToCommunities } from "../db/schema";
-
-export const setFavoriteCommunity = ({
-  userId,
-  communityId,
-  favorite,
-}: Pick<UserToCommunity, "userId" | "communityId" | "favorite">) => {
-  return db
-    .update(usersToCommunities)
-    .set({ favorite })
-    .where(
-      and(
-        eq(usersToCommunities.userId, userId),
-        eq(usersToCommunities.communityId, communityId),
-      ),
-    )
-    .returning({ favorite: usersToCommunities.favorite });
-};
 
 export const getCommunity = db.query.communities
   .findFirst({
@@ -31,3 +11,14 @@ export const getCommunity = db.query.communities
     },
   })
   .prepare("get_community");
+
+export const getUserToCommunity = db.query.usersToCommunities
+  .findFirst({
+    where: (community, { sql, and, eq }) =>
+      and(
+        eq(community.communityId, sql.placeholder("communityId")),
+        eq(community.userId, sql.placeholder("userId")),
+      ),
+    columns: { favorite: true, muted: true, member: true },
+  })
+  .prepare("get_user_to_community");
