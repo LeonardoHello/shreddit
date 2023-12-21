@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { type MouseEvent, memo } from "react";
 
 import {
   ArrowDownCircleIcon,
@@ -114,6 +114,24 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
 
   const votePost = trpc.votePost.useMutation({ onError, onMutate });
 
+  const upvote = (e: MouseEvent<SVGSVGElement>) => {
+    e.preventDefault();
+
+    votePost.mutate({
+      postId,
+      voteStatus: userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
+    });
+  };
+
+  const downvote = (e: MouseEvent<SVGSVGElement>) => {
+    e.preventDefault();
+
+    votePost.mutate({
+      postId,
+      voteStatus: userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
+    });
+  };
+
   return (
     <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
       <ArrowUpCircleIcon
@@ -123,15 +141,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
             "text-rose-500": userToPost?.voteStatus === "upvoted",
           },
         )}
-        onClick={(e) => {
-          e.preventDefault();
-
-          votePost.mutate({
-            postId,
-            voteStatus:
-              userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
-          });
-        }}
+        onClick={upvote}
       />
       <div
         className={cn("text-xs font-bold text-zinc-300 transition-colors", {
@@ -151,15 +161,7 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
             "text-blue-500": userToPost?.voteStatus === "downvoted",
           },
         )}
-        onClick={(e) => {
-          e.preventDefault();
-
-          votePost.mutate({
-            postId,
-            voteStatus:
-              userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
-          });
-        }}
+        onClick={downvote}
       />
     </div>
   );
