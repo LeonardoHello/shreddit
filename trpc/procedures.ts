@@ -256,6 +256,14 @@ export const appRouter = router({
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
     return getJoinedCommunities(ctx.auth.userId);
   }),
+  getUserToCommunity: procedure
+    .input(UserToCommunitySchema.shape.communityId)
+    .query(({ input, ctx }) => {
+      return getUserToCommunity.execute({
+        userId: ctx.auth.userId,
+        communityId: input,
+      });
+    }),
   setFavoriteCommunity: protectedProcedure
     .input(
       UserToCommunitySchema.pick({
@@ -282,7 +290,7 @@ export const appRouter = router({
         member: true,
       }),
     )
-    .query(({ input, ctx }) => {
+    .mutation(({ input, ctx }) => {
       return ctx.db
         .update(usersToCommunities)
         .set({ member: input.member })
@@ -301,7 +309,7 @@ export const appRouter = router({
         muted: true,
       }),
     )
-    .query(({ input, ctx }) => {
+    .mutation(({ input, ctx }) => {
       return ctx.db
         .update(usersToCommunities)
         .set({ muted: input.muted })
@@ -357,14 +365,6 @@ export const appRouter = router({
         .set({ nsfw: input.nsfw })
         .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
         .returning({ nsfw: posts.nsfw });
-    }),
-  getUserToCommunity: procedure
-    .input(UserToCommunitySchema.shape.communityId)
-    .query(({ input, ctx }) => {
-      return getUserToCommunity.execute({
-        userId: ctx.auth.userId,
-        communityId: input,
-      });
     }),
 });
 
