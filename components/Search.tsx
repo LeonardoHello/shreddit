@@ -60,7 +60,7 @@ export default function Search() {
       className="relative order-1 flex max-w-4xl grow flex-col bg-inherit"
       ref={dropdownRef}
     >
-      <div className="relative flex basis-full">
+      <div className="flex basis-full">
         <label htmlFor="search" className="absolute left-4 self-center">
           <MagnifyingGlassIcon className="h-6 w-6 text-zinc-500" />
         </label>

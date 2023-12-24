@@ -15,7 +15,7 @@ export default function SignInButton() {
     pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
 
   const button = (
-    <button className="order-2 rounded-full bg-rose-500 px-4 py-2 font-medium text-white transition-colors hover:bg-red-500/80">
+    <button className="order-2 whitespace-nowrap rounded-full bg-rose-500 px-4 py-2 font-medium text-white transition-colors hover:bg-red-500/80">
       Sign in
     </button>
   );

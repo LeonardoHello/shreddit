@@ -50,7 +50,7 @@ export default function Menu({ children }: { children: React.ReactNode }) {
 
         {!userName && !communityName && <HomeFeed pathname={pathname} />}
 
-        <ChevronDownIcon className="ml-auto h-4 w-4 stroke-2" />
+        <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2" />
       </button>
 
       {isOpen && children}

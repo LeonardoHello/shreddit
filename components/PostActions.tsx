@@ -33,7 +33,11 @@ export default function PostActions({ post, currentUserId, children }: Props) {
     <div className="flex select-none items-center gap-2 text-xs font-bold text-zinc-500">
       <div className="flex items-center gap-1">
         <ChatBubbleLeftIcon className="h-6 w-6" />
-        {post.commentCount} comments
+        {new Intl.NumberFormat("en-US", {
+          notation: "compact",
+          maximumFractionDigits: 1,
+        }).format(post.commentCount)}{" "}
+        comments
       </div>
       <div
         className="flex items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"

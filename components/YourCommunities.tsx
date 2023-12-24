@@ -32,29 +32,26 @@ export default function YourCommunities({
 
   const queryOptions = {
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
     select,
   };
 
-  const favoriteCommunitiesQuery = trpc.getFavoriteCommunities.useQuery(
-    undefined,
-    {
+  const { data: favoriteCommunitiesQuery } =
+    trpc.getFavoriteCommunities.useQuery(undefined, {
       initialData: favoriteCommunities,
       ...queryOptions,
-    },
-  );
-  const moderatedCommunitiesQuery = trpc.getModeratedCommunities.useQuery(
+    });
+  const { data: moderatedCommunitiesQuery } =
+    trpc.getModeratedCommunities.useQuery(undefined, {
+      initialData: moderatedCommunities,
+      ...queryOptions,
+    });
+  const { data: joinedCommunitiesQuery } = trpc.getJoinedCommunities.useQuery(
     undefined,
     {
-      initialData: moderatedCommunities,
+      initialData: joinedCommunities,
       ...queryOptions,
     },
   );
-  const joinedCommunitiesQuery = trpc.getJoinedCommunities.useQuery(undefined, {
-    initialData: joinedCommunities,
-    ...queryOptions,
-  });
 
   const onFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.currentTarget.value);
@@ -78,13 +75,13 @@ export default function YourCommunities({
         onChange={onFilterChange}
       />
 
-      {favoriteCommunitiesQuery.data.length > 0 && (
+      {favoriteCommunitiesQuery.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             favorites
           </h2>
           <menu className="w-full self-center">
-            {favoriteCommunitiesQuery.data
+            {favoriteCommunitiesQuery
               .toSorted(alphabetically)
               .map((communityRelation) => (
                 <YourCommunitiesNavigation
@@ -99,6 +96,14 @@ export default function YourCommunities({
       <div className="flex flex-col gap-2.5">
         <h2 className="px-6 text-2xs uppercase text-zinc-300/60">moderating</h2>
         <menu className="w-full self-center">
+          {moderatedCommunitiesQuery
+            .toSorted(alphabetically)
+            .map((communityRelation) => (
+              <YourCommunitiesNavigation
+                key={communityRelation.communityId}
+                communityRelation={communityRelation}
+              />
+            ))}
           <li>
             <Link
               href="/submit"
@@ -108,24 +113,16 @@ export default function YourCommunities({
               <h2>Create Community</h2>
             </Link>
           </li>
-          {moderatedCommunitiesQuery.data
-            .toSorted(alphabetically)
-            .map((communityRelation) => (
-              <YourCommunitiesNavigation
-                key={communityRelation.communityId}
-                communityRelation={communityRelation}
-              />
-            ))}
         </menu>
       </div>
 
-      {joinedCommunitiesQuery.data.length > 0 && (
+      {joinedCommunitiesQuery.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             joined communities
           </h2>
           <menu className="w-full self-center">
-            {joinedCommunitiesQuery.data
+            {joinedCommunitiesQuery
               .toSorted(alphabetically)
               .map((communityRelation) => (
                 <YourCommunitiesNavigation
