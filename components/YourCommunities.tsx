@@ -13,54 +13,53 @@ import { trpc } from "@/trpc/react";
 import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
 
 type Props = {
-  favoriteCommunities: RouterOutput["getFavoriteCommunities"];
-  moderatedCommunities: RouterOutput["getModeratedCommunities"];
-  joinedCommunities: RouterOutput["getJoinedCommunities"];
+  initialFavoriteCommunities: RouterOutput["getFavoriteCommunities"];
+  initialModeratedCommunities: RouterOutput["getModeratedCommunities"];
+  initialJoinedCommunities: RouterOutput["getJoinedCommunities"];
 };
 
 export default function YourCommunities({
-  favoriteCommunities,
-  moderatedCommunities,
-  joinedCommunities,
+  initialFavoriteCommunities,
+  initialModeratedCommunities,
+  initialJoinedCommunities,
 }: Props) {
   const [filter, setFilter] = useState("");
 
-  const select = (data: Props[keyof Props]) =>
-    data.filter((communityRelation) =>
-      communityRelation.community.name.includes(filter),
-    );
-
   const queryOptions = {
     refetchOnWindowFocus: false,
-    select,
+    select: (data: Props[keyof Props]) =>
+      data
+        .filter((communityRelation) =>
+          communityRelation.community.name.includes(filter),
+        )
+        .toSorted((a, b) => (a.community.name < b.community.name ? -1 : 1)),
   };
 
-  const { data: favoriteCommunitiesQuery } =
-    trpc.getFavoriteCommunities.useQuery(undefined, {
-      initialData: favoriteCommunities,
-      ...queryOptions,
-    });
-  const { data: moderatedCommunitiesQuery } =
-    trpc.getModeratedCommunities.useQuery(undefined, {
-      initialData: moderatedCommunities,
-      ...queryOptions,
-    });
-  const { data: joinedCommunitiesQuery } = trpc.getJoinedCommunities.useQuery(
+  const { data: favoriteCommunities } = trpc.getFavoriteCommunities.useQuery(
     undefined,
     {
-      initialData: joinedCommunities,
       ...queryOptions,
+      initialData: initialFavoriteCommunities,
+    },
+  );
+  const { data: moderatedCommunities } = trpc.getModeratedCommunities.useQuery(
+    undefined,
+    {
+      ...queryOptions,
+      initialData: initialModeratedCommunities,
+    },
+  );
+  const { data: joinedCommunities } = trpc.getJoinedCommunities.useQuery(
+    undefined,
+    {
+      ...queryOptions,
+      initialData: initialJoinedCommunities,
     },
   );
 
   const onFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.currentTarget.value);
   };
-
-  const alphabetically = (
-    a: ArrElement<Props[keyof Props]>,
-    b: ArrElement<Props[keyof Props]>,
-  ) => (a.community.name < b.community.name ? -1 : 1);
 
   return (
     <>
@@ -75,20 +74,18 @@ export default function YourCommunities({
         onChange={onFilterChange}
       />
 
-      {favoriteCommunitiesQuery.length > 0 && (
+      {favoriteCommunities.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             favorites
           </h2>
           <menu className="w-full self-center">
-            {favoriteCommunitiesQuery
-              .toSorted(alphabetically)
-              .map((communityRelation) => (
-                <YourCommunitiesNavigation
-                  key={communityRelation.communityId}
-                  communityRelation={communityRelation}
-                />
-              ))}
+            {favoriteCommunities.map((communityRelation) => (
+              <YourCommunitiesNavigation
+                key={communityRelation.communityId}
+                communityRelation={communityRelation}
+              />
+            ))}
           </menu>
         </div>
       )}
@@ -96,14 +93,12 @@ export default function YourCommunities({
       <div className="flex flex-col gap-2.5">
         <h2 className="px-6 text-2xs uppercase text-zinc-300/60">moderating</h2>
         <menu className="w-full self-center">
-          {moderatedCommunitiesQuery
-            .toSorted(alphabetically)
-            .map((communityRelation) => (
-              <YourCommunitiesNavigation
-                key={communityRelation.communityId}
-                communityRelation={communityRelation}
-              />
-            ))}
+          {moderatedCommunities.map((communityRelation) => (
+            <YourCommunitiesNavigation
+              key={communityRelation.communityId}
+              communityRelation={communityRelation}
+            />
+          ))}
           <li>
             <Link
               href="/submit"
@@ -116,20 +111,18 @@ export default function YourCommunities({
         </menu>
       </div>
 
-      {joinedCommunitiesQuery.length > 0 && (
+      {joinedCommunities.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
             joined communities
           </h2>
           <menu className="w-full self-center">
-            {joinedCommunitiesQuery
-              .toSorted(alphabetically)
-              .map((communityRelation) => (
-                <YourCommunitiesNavigation
-                  key={communityRelation.communityId}
-                  communityRelation={communityRelation}
-                />
-              ))}
+            {joinedCommunities.map((communityRelation) => (
+              <YourCommunitiesNavigation
+                key={communityRelation.communityId}
+                communityRelation={communityRelation}
+              />
+            ))}
           </menu>
         </div>
       )}

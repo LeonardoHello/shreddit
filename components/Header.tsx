@@ -8,7 +8,7 @@ import {
   getFavoriteCommunities,
   getJoinedCommunities,
   getModeratedCommunities,
-} from "@/lib/api/communities";
+} from "@/lib/api/getCommunities";
 import { User } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 
@@ -64,9 +64,9 @@ async function HeaderAuthenticated({
       <Menu>
         <MenuDropdown>
           <YourCommunities
-            favoriteCommunities={favoriteCommunities}
-            moderatedCommunities={moderatedCommunities}
-            joinedCommunities={joinedCommunities}
+            initialJoinedCommunities={favoriteCommunities}
+            initialModeratedCommunities={moderatedCommunities}
+            initialFavoriteCommunities={joinedCommunities}
           />
         </MenuDropdown>
       </Menu>

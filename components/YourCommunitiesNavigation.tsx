@@ -8,15 +8,16 @@ import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import type * as communityRelations from "@/lib/api/communities";
 import type { ArrElement } from "@/lib/types";
 import cn from "@/lib/utils/cn";
+import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type CommunityRelation = ArrElement<
-  Awaited<
-    ReturnType<(typeof communityRelations)[keyof typeof communityRelations]>
-  >
+  RouterOutput[
+    | "getFavoriteCommunities"
+    | "getModeratedCommunities"
+    | "getJoinedCommunities"]
 >;
 
 export default function YourCommunitiesNavigation({

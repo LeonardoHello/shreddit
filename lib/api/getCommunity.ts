@@ -5,9 +5,7 @@ export const getCommunity = db.query.communities
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
     with: {
-      usersToCommunities: {
-        columns: { createdAt: true },
-      },
+      usersToCommunities: true,
     },
   })
   .prepare("get_community");

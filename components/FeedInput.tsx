@@ -1,22 +1,44 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 
-export default async function InputSubmit() {
-  const user = await currentUser();
+import { User } from "@/lib/db/schema";
 
-  if (user === null) return null;
-
+export default function InputSubmit({
+  userImageUrl,
+  userName,
+}: {
+  userImageUrl: User["imageUrl"];
+  userName: User["name"] | null;
+}) {
   return (
-    <div>
-      <Image
-        src={user.imageUrl}
-        alt="user image"
-        width={48}
-        height={48}
-        className="rounded-full"
-        priority
-      />
+    <div className="flex gap-2 rounded border border-zinc-700/70 bg-zinc-900 p-2">
+      <Link href={`/u/${userName}`} className="rounded-full">
+        <Image
+          src={userImageUrl}
+          alt="user image"
+          width={38}
+          height={38}
+          className="rounded-full"
+          priority
+        />
+      </Link>
+
+      <Link href="/submit" className="flex grow rounded">
+        <input
+          readOnly
+          className="min-w-0 grow rounded bg-zinc-400/10 px-4 py-[3px] text-sm outline-none ring-1 ring-inset ring-zinc-700 placeholder:text-zinc-400/70 hover:bg-inherit hover:ring-zinc-300 focus:bg-inherit focus:ring-zinc-300"
+          placeholder="Create Post"
+        />
+      </Link>
+
+      <Link
+        href={{ pathname: "/submit", query: { media: true } }}
+        className="rounded p-1.5 hover:bg-zinc-700/50"
+      >
+        <PhotoIcon className="h-7 w-7 self-center text-zinc-500" />
+      </Link>
     </div>
   );
 }

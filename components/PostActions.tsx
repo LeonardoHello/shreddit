@@ -36,6 +36,7 @@ export default function PostActions({ post, currentUserId, children }: Props) {
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
+          // @ts-expect-error
         }).format(post.commentCount)}{" "}
         comments
       </div>

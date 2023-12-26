@@ -4,8 +4,8 @@ import Link from "next/link";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import calculateOnions from "@/lib/utils/calculateOnions";
 import cn from "@/lib/utils/cn";
+import calculateOnions from "@/lib/utils/getOnions";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 import { trpc } from "@/trpc/react";

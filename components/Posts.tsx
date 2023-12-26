@@ -27,7 +27,6 @@ export default function Posts<T extends InfiniteQueryPostProcedure>({
   ].useInfiniteQuery(queryInfo.input, {
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
-    initialDataUpdatedAt: Date.now() + 500,
     refetchOnWindowFocus: false,
   });
 
