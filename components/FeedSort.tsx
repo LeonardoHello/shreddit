@@ -32,7 +32,7 @@ export default function FeedSort() {
   );
 
   return (
-    <nav className="rounded border border-zinc-700/70 bg-zinc-900 p-3 text-base">
+    <nav className="rounded border border-zinc-700/70 bg-zinc-900 px-3 py-2 text-base">
       <ul className="flex justify-around gap-3 font-bold text-zinc-500">
         <li>
           <Link
