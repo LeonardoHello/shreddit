@@ -23,6 +23,7 @@ export const users = pgTable(
   "users",
   {
     id: text("id").primaryKey(), // clerk user id
+    createdAt: timestamp("created_at").notNull().defaultNow(),
     name: text("name").unique().notNull(),
     imageUrl: text("image_url").notNull(),
   },
