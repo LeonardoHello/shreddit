@@ -14,7 +14,7 @@ export type InfiniteQueryPost = ArrElement<
   RouterOutput["infiniteQueryPosts"][InfiniteQueryPostProcedure]["posts"]
 >;
 
-export enum SortPostsBy {
+export enum SortPosts {
   BEST = "best",
   HOT = "hot",
   NEW = "new",

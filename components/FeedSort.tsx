@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   ChatBubbleBottomCenterTextIcon,
@@ -16,28 +16,27 @@ import {
   TagIcon as SolidTagIcon,
 } from "@heroicons/react/24/solid";
 
+import { SortPosts } from "@/lib/types";
 import cn from "@/lib/utils/cn";
 
 export default function FeedSort() {
   const pathname = usePathname();
+  const searchparams = useSearchParams();
 
-  const path = pathname.replace(/\/(|best|new|hot|controversial)$/, "");
+  const sort = searchparams.get("sort");
 
-  const defaultSort =
-    pathname.endsWith("/best") ||
-    !(
-      pathname.endsWith("/best") ||
-      pathname.endsWith("/hot") ||
-      pathname.endsWith("/new") ||
-      pathname.endsWith("/controversial")
-    );
+  const defaultSort = !(
+    sort === SortPosts.HOT ||
+    sort === SortPosts.NEW ||
+    sort === SortPosts.CONTROVERSIAL
+  );
 
   return (
     <nav className="rounded border border-zinc-700/70 bg-zinc-900 p-3 text-base">
-      <ul className="flex items-center gap-3 font-bold text-zinc-500">
+      <ul className="flex justify-around gap-3 font-bold text-zinc-500">
         <li>
           <Link
-            href={`${path}/best`}
+            href={{ pathname, query: { sort: SortPosts.BEST } }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
@@ -56,16 +55,16 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={`${path}/hot`}
+            href={{ pathname, query: { sort: SortPosts.HOT } }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  pathname.endsWith("/hot"),
+                  sort === SortPosts.HOT,
               },
             )}
           >
-            {pathname.endsWith("/hot") ? (
+            {sort === SortPosts.HOT ? (
               <SolidFireIcon className="h-6 w-6" />
             ) : (
               <FireIcon className="h-6 w-6" />
@@ -75,16 +74,16 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={`${path}/new`}
+            href={{ pathname, query: { sort: SortPosts.NEW } }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  pathname.endsWith("/new"),
+                  sort === SortPosts.NEW,
               },
             )}
           >
-            {pathname.endsWith("/new") ? (
+            {sort === SortPosts.NEW ? (
               <SolidTagIcon className="h-6 w-6" />
             ) : (
               <TagIcon className="h-6 w-6" />
@@ -94,16 +93,16 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={`${path}/controversial`}
+            href={{ pathname, query: { sort: SortPosts.CONTROVERSIAL } }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  pathname.endsWith("/controversial"),
+                  sort === SortPosts.CONTROVERSIAL,
               },
             )}
           >
-            {pathname.endsWith("/controversial") ? (
+            {sort === SortPosts.CONTROVERSIAL ? (
               <SolidChatBubbleBottomCenterTextIcon className="h-6 w-6" />
             ) : (
               <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
