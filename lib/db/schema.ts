@@ -47,7 +47,7 @@ export const communities = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     name: text("name").unique().notNull(),
     imageUrl: text("image_url"),
-    about: text("about"),
+    about: text("about").notNull().default(""),
     moderatorId: text("moderator_id")
       .references(() => users.id, {
         onDelete: "cascade",
@@ -105,7 +105,7 @@ export const usersToCommunitiesRelations = relations(
 export const posts = pgTable("posts", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
   title: text("title").notNull(),
   text: text("text"),
   nsfw: boolean("nsfw").notNull().default(false),
@@ -186,7 +186,7 @@ export const filesRelations = relations(files, ({ one }) => ({
 export const comments = pgTable("comments", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at"),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
   text: text("text").notNull(),
   parentCommentId: uuid("parent_comment_id").references(
     (): AnyPgColumn => comments.id,
