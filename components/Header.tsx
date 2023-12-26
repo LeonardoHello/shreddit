@@ -64,9 +64,9 @@ async function HeaderAuthenticated({
       <Menu>
         <MenuDropdown>
           <YourCommunities
-            initialJoinedCommunities={favoriteCommunities}
+            initialFavoriteCommunities={favoriteCommunities}
             initialModeratedCommunities={moderatedCommunities}
-            initialFavoriteCommunities={joinedCommunities}
+            initialJoinedCommunities={joinedCommunities}
           />
         </MenuDropdown>
       </Menu>
