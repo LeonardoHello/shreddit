@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getUserControversialPosts } from "@/lib/api/posts";
+import { getUserControversialPosts } from "@/lib/api/getPosts";
 import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function UserPageControversial({

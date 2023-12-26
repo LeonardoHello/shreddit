@@ -6,9 +6,9 @@ import {
   getFavoriteCommunities,
   getJoinedCommunities,
   getModeratedCommunities,
-} from "@/lib/api/communities";
-import { getUserToCommunity } from "@/lib/api/community";
-import { getCommunityImage, getUserImage } from "@/lib/api/image";
+} from "@/lib/api/getCommunities";
+import { getUserToCommunity } from "@/lib/api/getCommunity";
+import { getCommunityImage, getUserImage } from "@/lib/api/getImage";
 import {
   getAllBestPosts,
   getAllControversialPosts,
@@ -26,7 +26,7 @@ import {
   getUserControversialPosts,
   getUserHotPosts,
   getUserNewPosts,
-} from "@/lib/api/posts";
+} from "@/lib/api/getPosts";
 import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommunitySchema,
@@ -34,6 +34,7 @@ import {
   UserSchema,
   UserToCommunitySchema,
   UserToPostSchema,
+  communities,
   posts,
   usersToCommunities,
   usersToPosts,
@@ -238,13 +239,11 @@ export const appRouter = router({
   getUserImage: protectedProcedure
     .input(UserSchema.shape.name)
     .query(({ input }) => {
-      if (input === undefined) return null;
       return getUserImage.execute({ name: input });
     }),
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(({ input }) => {
-      if (input === undefined) return null;
       return getCommunityImage.execute({ name: input });
     }),
   getFavoriteCommunities: protectedProcedure.query(({ ctx }) => {
@@ -256,6 +255,19 @@ export const appRouter = router({
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
     return getJoinedCommunities(ctx.auth.userId);
   }),
+  setAboutCommunity: protectedProcedure
+    .input(CommunitySchema.pick({ id: true, about: true }))
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .update(communities)
+        .set({ about: input.about })
+        .where(eq(communities.id, input.id));
+    }),
+  deleteCommunity: protectedProcedure
+    .input(CommunitySchema.shape.id)
+    .mutation(({ input, ctx }) => {
+      return ctx.db.delete(communities).where(eq(communities.id, input));
+    }),
   getUserToCommunity: procedure
     .input(UserToCommunitySchema.shape.communityId)
     .query(({ input, ctx }) => {
@@ -273,14 +285,16 @@ export const appRouter = router({
     )
     .mutation(({ input, ctx }) => {
       return ctx.db
-        .update(usersToCommunities)
-        .set({ favorite: input.favorite })
-        .where(
-          and(
-            eq(usersToCommunities.userId, ctx.auth.userId),
-            eq(usersToCommunities.communityId, input.communityId),
-          ),
-        )
+        .insert(usersToCommunities)
+        .values({
+          favorite: input.favorite,
+          communityId: input.communityId,
+          userId: ctx.auth.userId,
+        })
+        .onConflictDoUpdate({
+          target: [usersToCommunities.userId, usersToCommunities.communityId],
+          set: { favorite: input.favorite },
+        })
         .returning({ favorite: usersToCommunities.favorite });
     }),
   joinCommunity: protectedProcedure
@@ -292,14 +306,16 @@ export const appRouter = router({
     )
     .mutation(({ input, ctx }) => {
       return ctx.db
-        .update(usersToCommunities)
-        .set({ member: input.member })
-        .where(
-          and(
-            eq(usersToCommunities.userId, ctx.auth.userId),
-            eq(usersToCommunities.communityId, input.communityId),
-          ),
-        )
+        .insert(usersToCommunities)
+        .values({
+          member: input.member,
+          communityId: input.communityId,
+          userId: ctx.auth.userId,
+        })
+        .onConflictDoUpdate({
+          target: [usersToCommunities.userId, usersToCommunities.communityId],
+          set: { member: input.member },
+        })
         .returning({ member: usersToCommunities.member });
     }),
   muteCommunity: protectedProcedure
@@ -311,14 +327,16 @@ export const appRouter = router({
     )
     .mutation(({ input, ctx }) => {
       return ctx.db
-        .update(usersToCommunities)
-        .set({ muted: input.muted })
-        .where(
-          and(
-            eq(usersToCommunities.userId, ctx.auth.userId),
-            eq(usersToCommunities.communityId, input.communityId),
-          ),
-        )
+        .insert(usersToCommunities)
+        .values({
+          muted: input.muted,
+          communityId: input.communityId,
+          userId: ctx.auth.userId,
+        })
+        .onConflictDoUpdate({
+          target: [usersToCommunities.userId, usersToCommunities.communityId],
+          set: { muted: input.muted },
+        })
         .returning({ muted: usersToCommunities.muted });
     }),
   deletePost: protectedProcedure
@@ -348,7 +366,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(posts)
-        .set({ spoiler: input.spoiler })
+        .set({ spoiler: input.spoiler, updatedAt: new Date() })
         .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
         .returning({ spoiler: posts.spoiler });
     }),
@@ -362,7 +380,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(posts)
-        .set({ nsfw: input.nsfw })
+        .set({ nsfw: input.nsfw, updatedAt: new Date() })
         .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
         .returning({ nsfw: posts.nsfw });
     }),

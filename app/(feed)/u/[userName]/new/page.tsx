@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
-import { getUserNewPosts } from "@/lib/api/posts";
+import { getUserNewPosts } from "@/lib/api/getPosts";
 import { type QueryInfo, SortPostsBy } from "@/lib/types";
 
 export default async function UserPageNew({

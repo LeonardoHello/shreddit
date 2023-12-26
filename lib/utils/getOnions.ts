@@ -7,14 +7,7 @@ export default function getOnions(
   // +1 onion for each upvoted comment
   const commentUpvotes = user.usersToComments.reduce(
     (accumulator, currentValue) => {
-      return (
-        accumulator +
-        (currentValue.voteStatus === "upvoted"
-          ? 1
-          : currentValue.voteStatus === "downvoted"
-          ? -1
-          : 0)
-      );
+      return accumulator + (currentValue.voteStatus === "upvoted" ? 1 : -1);
     },
     0,
   );
@@ -22,14 +15,7 @@ export default function getOnions(
   // +1 onion for each upvoted post
   const commentAndPostUpvotes = user.usersToPosts.reduce(
     (accumulator, currentValue) => {
-      return (
-        accumulator +
-        (currentValue.voteStatus === "upvoted"
-          ? 1
-          : currentValue.voteStatus === "downvoted"
-          ? -1
-          : 0)
-      );
+      return accumulator + (currentValue.voteStatus === "upvoted" ? 1 : -1);
     },
     commentUpvotes,
   );

@@ -7,8 +7,16 @@ export const searchUsers = db.query.users
     columns: { id: false },
     limit: 4,
     with: {
-      usersToComments: { columns: { voteStatus: true } },
-      usersToPosts: { columns: { voteStatus: true } },
+      usersToComments: {
+        where: (userToCommunity, { ne }) =>
+          ne(userToCommunity.voteStatus, "none"),
+        columns: { voteStatus: true },
+      },
+      usersToPosts: {
+        where: (userToCommunity, { ne }) =>
+          ne(userToCommunity.voteStatus, "none"),
+        columns: { voteStatus: true },
+      },
       communities: {
         columns: {},
         with: {
