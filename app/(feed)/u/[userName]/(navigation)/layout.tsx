@@ -11,7 +11,7 @@ export default async function UserNavigationLayout({
 }) {
   const user = await currentUser();
 
-  if (user?.username !== userName) permanentRedirect;
+  if (user?.username !== userName) permanentRedirect("/");
 
   return <>{children}</>;
 }
