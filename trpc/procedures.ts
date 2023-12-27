@@ -9,24 +9,7 @@ import {
 } from "@/lib/api/getCommunities";
 import { getUserToCommunity } from "@/lib/api/getCommunity";
 import { getCommunityImage, getUserImage } from "@/lib/api/getImage";
-import {
-  getAllBestPosts,
-  getAllControversialPosts,
-  getAllHotPosts,
-  getAllNewPosts,
-  getCommunityBestPosts,
-  getCommunityControversialPosts,
-  getCommunityHotPosts,
-  getCommunityNewPosts,
-  getHomeBestPosts,
-  getHomeControversialPosts,
-  getHomeHotPosts,
-  getHomeNewPosts,
-  getUserBestPosts,
-  getUserControversialPosts,
-  getUserHotPosts,
-  getUserNewPosts,
-} from "@/lib/api/getPosts";
+import * as getPosts from "@/lib/api/getPosts";
 import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommunitySchema,
@@ -58,28 +41,28 @@ export const appRouter = router({
         let posts;
         switch (input.sort) {
           case SortPosts.HOT:
-            posts = await getHomeHotPosts.execute({
+            posts = await getPosts.getHomeHotPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getHomeNewPosts.execute({
+            posts = await getPosts.getHomeNewPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getHomeControversialPosts.execute({
+            posts = await getPosts.getHomeControversialPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           default:
-            posts = await getHomeBestPosts.execute({
+            posts = await getPosts.getHomeBestPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
@@ -104,25 +87,25 @@ export const appRouter = router({
         let posts;
         switch (input.sort) {
           case SortPosts.HOT:
-            posts = await getAllHotPosts.execute({
+            posts = await getPosts.getAllHotPosts.execute({
               offset: input.cursor,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getAllNewPosts.execute({
+            posts = await getPosts.getAllNewPosts.execute({
               offset: input.cursor,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getAllControversialPosts.execute({
+            posts = await getPosts.getAllControversialPosts.execute({
               offset: input.cursor,
             });
             break;
 
           default:
-            posts = await getAllBestPosts.execute({
+            posts = await getPosts.getAllBestPosts.execute({
               offset: input.cursor,
             });
             break;
@@ -148,28 +131,28 @@ export const appRouter = router({
         let posts;
         switch (sort) {
           case SortPosts.HOT:
-            posts = await getCommunityHotPosts.execute({
+            posts = await getPosts.getCommunityHotPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getCommunityNewPosts.execute({
+            posts = await getPosts.getCommunityNewPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getCommunityControversialPosts.execute({
+            posts = await getPosts.getCommunityControversialPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           default:
-            posts = await getCommunityBestPosts.execute({
+            posts = await getPosts.getCommunityBestPosts.execute({
               offset: cursor,
               communityName,
             });
@@ -195,30 +178,214 @@ export const appRouter = router({
         let posts;
         switch (sort) {
           case SortPosts.HOT:
-            posts = await getUserHotPosts.execute({
+            posts = await getPosts.getUserHotPosts.execute({
               offset: cursor,
               userName,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getUserNewPosts.execute({
+            posts = await getPosts.getUserNewPosts.execute({
               offset: cursor,
               userName,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getUserControversialPosts.execute({
+            posts = await getPosts.getUserControversialPosts.execute({
               offset: cursor,
               userName,
             });
             break;
 
           default:
-            posts = await getUserBestPosts.execute({
+            posts = await getPosts.getUserBestPosts.execute({
               offset: cursor,
               userName,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
+      }),
+    getSavedPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sort: z.string().optional(),
+        }),
+      )
+      .query(async ({ input: { cursor, sort }, ctx }) => {
+        let posts;
+        switch (sort) {
+          case SortPosts.HOT:
+            posts = await getPosts.getSavedHotPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.NEW:
+            posts = await getPosts.getSavedNewPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.CONTROVERSIAL:
+            posts = await getPosts.getSavedControversialPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          default:
+            posts = await getPosts.getSavedBestPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
+      }),
+    getHiddenPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sort: z.string().optional(),
+        }),
+      )
+      .query(async ({ input: { cursor, sort }, ctx }) => {
+        let posts;
+        switch (sort) {
+          case SortPosts.HOT:
+            posts = await getPosts.getHiddenHotPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.NEW:
+            posts = await getPosts.getHiddenNewPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.CONTROVERSIAL:
+            posts = await getPosts.getHiddenControversialPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          default:
+            posts = await getPosts.getHiddenBestPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
+      }),
+    getUpvotedPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sort: z.string().optional(),
+        }),
+      )
+      .query(async ({ input: { cursor, sort }, ctx }) => {
+        let posts;
+        switch (sort) {
+          case SortPosts.HOT:
+            posts = await getPosts.getUpvotedHotPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.NEW:
+            posts = await getPosts.getUpvotedNewPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.CONTROVERSIAL:
+            posts = await getPosts.getUpvotedControversialPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          default:
+            posts = await getPosts.getUpvotedBestPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+        }
+
+        let nextCursor: typeof cursor = null;
+        if (posts.length === 10) {
+          nextCursor = cursor! + 10;
+        }
+
+        return { posts, nextCursor };
+      }),
+    getDownvotedPosts: procedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          sort: z.string().optional(),
+        }),
+      )
+      .query(async ({ input: { cursor, sort }, ctx }) => {
+        let posts;
+        switch (sort) {
+          case SortPosts.HOT:
+            posts = await getPosts.getDownvotedHotPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.NEW:
+            posts = await getPosts.getDownvotedNewPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          case SortPosts.CONTROVERSIAL:
+            posts = await getPosts.getDownvotedControversialPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
+            });
+            break;
+
+          default:
+            posts = await getPosts.getDownvotedBestPosts.execute({
+              offset: cursor,
+              userId: ctx.auth.userId,
             });
             break;
         }

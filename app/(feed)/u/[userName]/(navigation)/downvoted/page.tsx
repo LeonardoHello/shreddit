@@ -2,18 +2,16 @@ import { auth } from "@clerk/nextjs";
 
 import Posts from "@/components/Posts";
 import {
-  getUserBestPosts,
-  getUserControversialPosts,
-  getUserHotPosts,
-  getUserNewPosts,
+  getDownvotedBestPosts,
+  getDownvotedControversialPosts,
+  getDownvotedHotPosts,
+  getDownvotedNewPosts,
 } from "@/lib/api/getPosts";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 
-export default async function UserHiddenPage({
-  params: { userName },
+export default async function UserDownvotedPage({
   searchParams: { sort },
 }: {
-  params: { userName: string };
   searchParams: { sort: string | undefined };
 }) {
   const { userId } = auth();
@@ -21,46 +19,46 @@ export default async function UserHiddenPage({
   let posts;
   switch (sort) {
     case SortPosts.HOT:
-      posts = await getUserHotPosts.execute({
+      posts = await getDownvotedHotPosts.execute({
         offset: 0,
-        userName,
+        userId,
       });
       break;
 
     case SortPosts.NEW:
-      posts = await getUserNewPosts.execute({
+      posts = await getDownvotedNewPosts.execute({
         offset: 0,
-        userName,
+        userId,
       });
       break;
 
     case SortPosts.CONTROVERSIAL:
-      posts = await getUserControversialPosts.execute({
+      posts = await getDownvotedControversialPosts.execute({
         offset: 0,
-        userName,
+        userId,
       });
       break;
 
     default:
-      posts = await getUserBestPosts.execute({
+      posts = await getDownvotedBestPosts.execute({
         offset: 0,
-        userName,
+        userId,
       });
       break;
   }
 
-  let nextCursor: QueryInfo<"getUserPosts">["input"]["cursor"] = null;
+  let nextCursor: QueryInfo<"getDownvotedPosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
     nextCursor = 10;
   }
 
-  const queryInfo: QueryInfo<"getUserPosts"> = {
-    procedure: "getUserPosts",
-    input: { userName, sort },
+  const queryInfo: QueryInfo<"getDownvotedPosts"> = {
+    procedure: "getDownvotedPosts",
+    input: { sort },
   };
 
   return (
-    <Posts<"getUserPosts">
+    <Posts<"getDownvotedPosts">
       currentUserId={userId}
       initialPosts={{ posts, nextCursor }}
       queryInfo={queryInfo}

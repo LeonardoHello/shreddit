@@ -455,3 +455,483 @@ export const getUserControversialPosts = db.query.posts
     ],
   })
   .prepare("get_user_controversial_posts");
+
+export const getSavedBestPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.saved, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_saved_best_posts");
+
+export const getSavedHotPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq, gt }) => {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(schema.usersToPosts)
+            .where(
+              and(
+                eq(schema.usersToPosts.postId, post.id),
+                eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+                eq(schema.usersToPosts.saved, true),
+              ),
+            ),
+        ),
+        gt(post.createdAt, monthAgo),
+      );
+    },
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_saved_hot_posts");
+
+export const getSavedNewPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.saved, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { desc }) => [desc(post.createdAt)],
+  })
+  .prepare("get_saved_new_posts");
+
+export const getSavedControversialPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.saved, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`comment_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_saved_controversial_posts");
+
+export const getHiddenBestPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.hidden, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_hidden_best_posts");
+
+export const getHiddenHotPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq, gt }) => {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(schema.usersToPosts)
+            .where(
+              and(
+                eq(schema.usersToPosts.postId, post.id),
+                eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+                eq(schema.usersToPosts.hidden, true),
+              ),
+            ),
+        ),
+        gt(post.createdAt, monthAgo),
+      );
+    },
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_hidden_hot_posts");
+
+export const getHiddenNewPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.hidden, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { desc }) => [desc(post.createdAt)],
+  })
+  .prepare("get_hidden_new_posts");
+
+export const getHiddenControversialPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.hidden, true),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`comment_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_hidden_controversial_posts");
+
+export const getUpvotedBestPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "upvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_upvoted_best_posts");
+
+export const getUpvotedHotPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq, gt }) => {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(schema.usersToPosts)
+            .where(
+              and(
+                eq(schema.usersToPosts.postId, post.id),
+                eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+                eq(schema.usersToPosts.voteStatus, "upvoted"),
+              ),
+            ),
+        ),
+        gt(post.createdAt, monthAgo),
+      );
+    },
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_upvoted_hot_posts");
+
+export const getUpvotedNewPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "upvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { desc }) => [desc(post.createdAt)],
+  })
+  .prepare("get_upvoted_new_posts");
+
+export const getUpvotedControversialPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "upvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`comment_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_upvoted_controversial_posts");
+
+export const getDownvotedBestPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "downvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_downvoted_best_posts");
+
+export const getDownvotedHotPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq, gt }) => {
+      const monthAgo = new Date();
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(schema.usersToPosts)
+            .where(
+              and(
+                eq(schema.usersToPosts.postId, post.id),
+                eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+                eq(schema.usersToPosts.voteStatus, "downvoted"),
+              ),
+            ),
+        ),
+        gt(post.createdAt, monthAgo),
+      );
+    },
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`vote_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_downvoted_hot_posts");
+
+export const getDownvotedNewPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "downvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { desc }) => [desc(post.createdAt)],
+  })
+  .prepare("get_downvoted_new_posts");
+
+export const getDownvotedControversialPosts = db.query.posts
+  .findMany({
+    ...queryConfig,
+    where: (post, { sql, exists, and, eq }) =>
+      exists(
+        db
+          .select()
+          .from(schema.usersToPosts)
+          .where(
+            and(
+              eq(schema.usersToPosts.postId, post.id),
+              eq(schema.usersToPosts.userId, sql.placeholder("userId")),
+              eq(schema.usersToPosts.voteStatus, "downvoted"),
+            ),
+          ),
+      ),
+    with: {
+      usersToPosts: true,
+      community: { columns: { name: true, imageUrl: true } },
+      author: { columns: { name: true } },
+      files: true,
+    },
+    orderBy: (post, { sql, asc, desc }) => [
+      desc(sql`comment_count`),
+      asc(post.createdAt),
+    ],
+  })
+  .prepare("get_downvoted_controversial_posts");

@@ -1,5 +1,7 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect, redirect } from "next/navigation";
+
+import { auth } from "@clerk/nextjs";
 
 import FeedSort from "@/components/FeedSort";
 import UserCommunities from "@/components/UserCommunities";
@@ -25,13 +27,17 @@ export default async function UserLayout({
     userName,
   });
 
-  if (user === undefined) return notFound();
+  if (user === undefined) notFound();
+
+  const { userId } = auth();
 
   return (
     <main className="flex grow flex-col">
-      <div className="flex justify-center border-b border-zinc-700/70 bg-zinc-900">
-        <UserNavigation userName={userName} />
-      </div>
+      {user.id === userId && (
+        <div className="flex justify-center border-b border-zinc-700/70 bg-zinc-900">
+          <UserNavigation userName={userName} />
+        </div>
+      )}
       <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
         <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
           <FeedSort />
