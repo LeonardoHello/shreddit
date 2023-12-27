@@ -43,7 +43,11 @@ export default async function CommunityLayout({
   return (
     <main className="flex grow flex-col">
       <div className="relative -z-10 h-12 bg-sky-600 md:h-20" />
-      <CommunityHeader community={community} initialData={userToCommunity} />
+      <CommunityHeader
+        isAuthenticated={user ? true : false}
+        community={community}
+        initialData={userToCommunity}
+      />
       <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
         <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
           {user && (

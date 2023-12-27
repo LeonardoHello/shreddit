@@ -13,9 +13,11 @@ import type { RouterInput, RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 export default function CommunityHeader({
+  isAuthenticated,
   community,
   initialData,
 }: {
+  isAuthenticated: boolean;
   community: NonNullable<Awaited<ReturnType<typeof getCommunity.execute>>>;
   initialData: RouterOutput["getUserToCommunity"];
 }) {
@@ -36,6 +38,8 @@ export default function CommunityHeader({
 
   const queryConfig = {
     onMutate: (variables: RouterInput["joinCommunity" | "muteCommunity"]) => {
+      if (!isAuthenticated) return;
+
       utils["getUserToCommunity"].setData(community.id, (updater) => {
         if (!updater) {
           toast.error("Oops, it seemes that data can't be loaded.");
