@@ -7,7 +7,9 @@ import UserNavigation from "@/components/UserNavigation";
 import { getUser } from "@/lib/api/getUser";
 import getOnions from "@/lib/utils/getOnions";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
+import cake from "@/public/cake.svg";
 import dot from "@/public/dot.svg";
+import onion from "@/public/onion.svg";
 import userBackground from "@/public/userBackground.jpg";
 
 export const runtime = "edge";
@@ -73,22 +75,28 @@ export default async function UserLayout({
             <hr className="border-zinc-700/70" />
             <div className="flex justify-between">
               <div className="space-y-1">
-                <div className="font-medium">Karma</div>
-                <div className="text-xs text-zinc-500">
-                  {new Intl.NumberFormat("en-US", {
-                    notation: "compact",
-                    maximumFractionDigits: 1,
-                  }).format(getOnions(user))}
+                <div className="font-medium">Onions</div>
+                <div className="flex items-center gap-1">
+                  <Image src={onion} alt="onion" />
+                  <div className="text-xs text-zinc-500">
+                    {new Intl.NumberFormat("en-US", {
+                      notation: "compact",
+                      maximumFractionDigits: 1,
+                    }).format(getOnions(user))}
+                  </div>
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="font-medium">Cake day</div>
-                <div className="text-xs text-zinc-500">
-                  {user.createdAt.toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "2-digit",
-                  })}
+                <div className="flex items-center gap-1">
+                  <Image src={cake} alt="cake" />
+                  <div className="text-xs text-zinc-500">
+                    {user.createdAt.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "2-digit",
+                    })}
+                  </div>
                 </div>
               </div>
               <div />
