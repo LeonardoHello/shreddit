@@ -1,4 +1,4 @@
-import { type MouseEvent, memo } from "react";
+import { memo } from "react";
 
 import {
   ArrowDownCircleIcon,
@@ -13,7 +13,6 @@ import type {
   QueryInfo,
 } from "@/lib/types";
 import cn from "@/lib/utils/cn";
-import type { RouterInput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
@@ -35,6 +34,73 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     (userToPost) => userToPost.userId === currentUserId,
   );
 
+  const votePost = trpc.votePost.useMutation({
+    onMutate: async (variables) => {
+      if (!currentUserId) return;
+
+      await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
+
+      utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
+        queryInfo.input,
+        (data) => {
+          if (!data) {
+            toast.error("Oops, it seemes that data can't be loaded.");
+
+            return {
+              pages: [],
+              pageParams: [],
+            };
+          }
+
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              posts: page.posts.map((_post) => {
+                if (_post.id !== variables.postId) return _post;
+
+                let usersToPosts = structuredClone(_post.usersToPosts);
+
+                if (!userToPost) {
+                  usersToPosts.push({
+                    hidden: false,
+                    saved: false,
+                    userId: currentUserId,
+                    createdAt: new Date(),
+                    ...variables,
+                  });
+                } else {
+                  const index = usersToPosts.findLastIndex(
+                    (_userToPost) => _userToPost.userId === currentUserId,
+                  );
+
+                  usersToPosts = usersToPosts.with(index, {
+                    ...userToPost,
+                    ...variables,
+                  });
+                }
+
+                return {
+                  ..._post,
+                  usersToPosts,
+                };
+              }),
+            })),
+          };
+        },
+      );
+    },
+    onError: async (error) => {
+      await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
+        queryInfo.input,
+        {},
+        { throwOnError: true },
+      );
+
+      toast.error(error.message);
+    },
+  });
+
   const votes = usersToPosts.reduce((accumulator, currentValue) => {
     return (
       accumulator +
@@ -46,92 +112,6 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     );
   }, 0);
 
-  const onError = async ({ message }: { message: string }) => {
-    await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
-      queryInfo.input,
-      {},
-      { throwOnError: true },
-    );
-
-    toast.error(message);
-  };
-
-  const onMutate = async (variables: RouterInput["votePost"]) => {
-    if (!currentUserId) return;
-
-    await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
-
-    utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
-      queryInfo.input,
-      (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return {
-            pages: [],
-            pageParams: [],
-          };
-        }
-
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.map((_post) => {
-              if (_post.id !== variables.postId) return _post;
-
-              let usersToPosts = structuredClone(_post.usersToPosts);
-
-              if (!userToPost) {
-                usersToPosts.push({
-                  hidden: false,
-                  saved: false,
-                  userId: currentUserId,
-                  createdAt: new Date(),
-                  ...variables,
-                });
-              } else {
-                const index = usersToPosts.findLastIndex(
-                  (_userToPost) => _userToPost.userId === currentUserId,
-                );
-
-                usersToPosts = usersToPosts.with(index, {
-                  ...userToPost,
-                  ...variables,
-                });
-              }
-
-              return {
-                ..._post,
-                usersToPosts,
-              };
-            }),
-          })),
-        };
-      },
-    );
-  };
-
-  const votePost = trpc.votePost.useMutation({ onError, onMutate });
-
-  const upvote = (e: MouseEvent<SVGSVGElement>) => {
-    e.preventDefault();
-
-    votePost.mutate({
-      postId,
-      voteStatus: userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
-    });
-  };
-
-  const downvote = (e: MouseEvent<SVGSVGElement>) => {
-    e.preventDefault();
-
-    votePost.mutate({
-      postId,
-      voteStatus: userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
-    });
-  };
-
   return (
     <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
       <ArrowUpCircleIcon
@@ -141,7 +121,15 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
             "text-rose-500": userToPost?.voteStatus === "upvoted",
           },
         )}
-        onClick={upvote}
+        onClick={(e) => {
+          e.preventDefault();
+
+          votePost.mutate({
+            postId,
+            voteStatus:
+              userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
+          });
+        }}
       />
       <div
         className={cn("text-xs font-bold text-zinc-300 transition-colors", {
@@ -161,7 +149,15 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
             "text-blue-500": userToPost?.voteStatus === "downvoted",
           },
         )}
-        onClick={downvote}
+        onClick={(e) => {
+          e.preventDefault();
+
+          votePost.mutate({
+            postId,
+            voteStatus:
+              userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
+          });
+        }}
       />
     </div>
   );

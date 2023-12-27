@@ -16,11 +16,12 @@ export default function CommunityOptions({
   const router = useRouter();
 
   const deleteCommunity = trpc.deleteCommunity.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast.error(`Successfully deleted r/${data[0].name}`);
       router.replace("/");
     },
-    onError: () => {
-      toast.error("Oops, something went wrong.");
+    onError: ({ message }) => {
+      toast.error(message);
     },
   });
 

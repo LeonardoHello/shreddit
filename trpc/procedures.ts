@@ -267,7 +267,10 @@ export const appRouter = router({
   deleteCommunity: protectedProcedure
     .input(CommunitySchema.shape.id)
     .mutation(({ input, ctx }) => {
-      return ctx.db.delete(communities).where(eq(communities.id, input));
+      return ctx.db
+        .delete(communities)
+        .where(eq(communities.id, input))
+        .returning({ name: communities.name });
     }),
   getUserToCommunity: procedure
     .input(UserToCommunitySchema.shape.communityId)

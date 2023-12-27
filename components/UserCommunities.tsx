@@ -42,8 +42,8 @@ export default function UserCommunities({
             )}
             <div className="text-xs">
               <Link
-                href={`r/${community.name}`}
-                className="max-w-[15rem] cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap lowercase hover:underline"
+                href={`/r/${community.name}`}
+                className="max-w-[15rem] cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-medium lowercase hover:underline"
               >
                 r/{community.name}
               </Link>

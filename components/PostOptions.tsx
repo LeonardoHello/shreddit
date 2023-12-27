@@ -27,15 +27,6 @@ export default function PostOptions<T extends InfiniteQueryPostProcedure>({
 }: Props<T>) {
   const utils = trpc.useUtils();
 
-  const onError = async ({ message }: { message: string }) => {
-    toast.error(message);
-    await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
-      queryInfo.input,
-      {},
-      { throwOnError: true },
-    );
-  };
-
   const onMutate = async (
     variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
   ) => {
@@ -46,7 +37,6 @@ export default function PostOptions<T extends InfiniteQueryPostProcedure>({
       (data) => {
         if (!data) {
           toast.error("Oops, it seemes that data can't be loaded.");
-
           return {
             pages: [],
             pageParams: [],
@@ -66,30 +56,39 @@ export default function PostOptions<T extends InfiniteQueryPostProcedure>({
         };
       },
     );
+  };
 
-    if ("spoiler" in variables) {
-      if (variables.spoiler) {
-        toast.success("Post has been marked as spoiler");
-      } else {
-        toast.success("Post has been un-marked as a spoiler");
-      }
-    } else {
-      if (variables.nsfw) {
-        toast.success("Post has been marked as spoiler");
-      } else {
-        toast.success("Post has been un-marked as a spoiler");
-      }
-    }
+  const onError = async ({ message }: { message: string }) => {
+    await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
+      queryInfo.input,
+      {},
+      { throwOnError: true },
+    );
+
+    toast.error(message);
   };
 
   const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
     onError,
     onMutate,
+    onSuccess: (data) => {
+      if (data[0].spoiler) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    },
   });
 
   const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
     onError,
-    onMutate,
+    onSuccess: (data) => {
+      if (data[0].nsfw) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    },
   });
 
   const deletedPost = trpc.deletePost.useMutation({
@@ -118,7 +117,8 @@ export default function PostOptions<T extends InfiniteQueryPostProcedure>({
           };
         },
       );
-
+    },
+    onSuccess: () => {
       toast.success("Post deleted successfully.");
     },
   });

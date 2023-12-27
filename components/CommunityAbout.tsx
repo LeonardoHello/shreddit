@@ -35,8 +35,8 @@ export default function CommunityAbout({
         router.refresh();
       });
     },
-    onError: () => {
-      toast.error("Oops, something went wrong.");
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

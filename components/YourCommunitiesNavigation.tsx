@@ -28,18 +28,6 @@ export default function YourCommunitiesNavigation({
   const utils = trpc.useUtils();
 
   const setFavorite = trpc.setFavoriteCommunity.useMutation({
-    onError: async ({ message }) => {
-      await Promise.all([
-        utils.getFavoriteCommunities.refetch(),
-        utils.getModeratedCommunities.refetch(),
-        utils.getJoinedCommunities.refetch(),
-      ]).catch(() => {
-        throw new Error("Could not load users information.");
-      });
-
-      toast.error(message);
-    },
-
     onMutate: (variables) => {
       const { communityId, favorite } = variables;
 
@@ -86,19 +74,18 @@ export default function YourCommunitiesNavigation({
         });
       });
     },
+    onError: async ({ message }) => {
+      await Promise.all([
+        utils.getFavoriteCommunities.refetch(),
+        utils.getModeratedCommunities.refetch(),
+        utils.getJoinedCommunities.refetch(),
+      ]).catch(() => {
+        throw new Error("Could not load users information.");
+      });
+
+      toast.error(message);
+    },
   });
-
-  const toggleFavorite = (
-    e: MouseEvent<SVGSVGElement>,
-    communityRelation: CommunityRelation,
-  ) => {
-    e.preventDefault();
-
-    setFavorite.mutate({
-      communityId: communityRelation.communityId,
-      favorite: !communityRelation.favorite,
-    });
-  };
 
   return (
     <li key={communityRelation.communityId}>
@@ -134,7 +121,14 @@ export default function YourCommunitiesNavigation({
             "fill-[#0079d3] text-[#0079d3]": communityRelation.favorite,
             "text-zinc-500": communityRelation.favorite === false,
           })}
-          onClick={(e) => toggleFavorite(e, communityRelation)}
+          onClick={(e) => {
+            e.preventDefault();
+
+            setFavorite.mutate({
+              communityId: communityRelation.communityId,
+              favorite: !communityRelation.favorite,
+            });
+          }}
         />
       </Link>
     </li>

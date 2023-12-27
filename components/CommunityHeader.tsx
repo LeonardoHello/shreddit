@@ -34,48 +34,45 @@ export default function CommunityHeader({
 
   const utils = trpc.useUtils();
 
-  const onMutate = (
-    variables: RouterInput["joinCommunity" | "muteCommunity"],
-  ) => {
-    utils["getUserToCommunity"].setData(community.id, (updater) => {
-      if (!updater) {
-        toast.error("Oops, something went wrong.");
-        return userToCommunity;
-      }
+  const queryConfig = {
+    onMutate: (variables: RouterInput["joinCommunity" | "muteCommunity"]) => {
+      utils["getUserToCommunity"].setData(community.id, (updater) => {
+        if (!updater) {
+          toast.error("Oops, it seemes that data can't be loaded.");
+          return userToCommunity;
+        }
 
-      return { ...updater, ...variables };
-    });
+        return { ...updater, ...variables };
+      });
+    },
+    onError: ({ message }: { message: string }) => {
+      toast.error(message);
+      refetch({ throwOnError: true });
+    },
+  };
 
-    if ("member" in variables) {
-      if (variables.member) {
+  const joinCommunity = trpc.joinCommunity.useMutation({
+    ...queryConfig,
+    onSuccess: (data) => {
+      if (data[0].member) {
         toast.success(`Successfully joined r/${community.name}`);
       } else {
         toast.success(`Successfully left r/${community.name}`);
       }
-    } else {
-      if (variables.muted) {
+    },
+  });
+
+  const muteCommunity = trpc.muteCommunity.useMutation({
+    ...queryConfig,
+    onSuccess: (data) => {
+      if (data[0].muted) {
         toast.success(
           "Unfollowed. You won't get updates on new activity anymore.",
         );
       } else {
         toast.success("Followed! Now you'll get updates on new activity.");
       }
-    }
-  };
-
-  const onError = () => {
-    toast.error("Oops, something went wrong.");
-    refetch({ throwOnError: true });
-  };
-
-  const joinCommunity = trpc.joinCommunity.useMutation({
-    onMutate,
-    onError,
-  });
-
-  const muteCommunity = trpc.muteCommunity.useMutation({
-    onMutate,
-    onError,
+    },
   });
 
   return (
