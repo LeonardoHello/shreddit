@@ -1,4 +1,5 @@
 import db from "../db";
+import { User } from "../db/schema";
 
 export const getUser = db.query.users
   .findFirst({

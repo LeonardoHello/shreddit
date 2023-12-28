@@ -20,3 +20,10 @@ export enum SortPosts {
   NEW = "new",
   CONTROVERSIAL = "controversial",
 }
+
+export enum UserPostsFilter {
+  SAVED = "saved",
+  HIDDEN = "hidden",
+  UPVOTED = "upvoted",
+  DOWNVOTED = "downvoted",
+}

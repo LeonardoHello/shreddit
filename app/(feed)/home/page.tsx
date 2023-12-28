@@ -2,21 +2,75 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { currentUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
+import Posts from "@/components/Posts";
 import Premium from "@/components/Premium";
+import {
+  getHomeBestPosts,
+  getHomeControversialPosts,
+  getHomeHotPosts,
+  getHomeNewPosts,
+} from "@/lib/api/getPosts";
+import { type QueryInfo, SortPosts } from "@/lib/types";
 import home from "@/public/home.jpg";
 
 export const runtime = "edge";
 
-export default async function HomeLayout({
-  children,
+export default async function HomePage({
+  searchParams: { sort },
 }: {
-  children: React.ReactNode;
+  searchParams: { sort: string | undefined };
 }) {
+  const { userId } = auth();
+
+  if (userId === null) throw new Error("Could not load users information.");
+
   const user = await currentUser();
+
+  let posts;
+  switch (sort) {
+    case SortPosts.HOT:
+      posts = await getHomeHotPosts.execute({
+        offset: 0,
+        userId,
+      });
+      break;
+
+    case SortPosts.NEW:
+      posts = await getHomeNewPosts.execute({
+        offset: 0,
+        userId,
+      });
+      break;
+
+    case SortPosts.CONTROVERSIAL:
+      posts = await getHomeControversialPosts.execute({
+        offset: 0,
+        userId,
+      });
+      break;
+
+    default:
+      posts = await getHomeBestPosts.execute({
+        offset: 0,
+        userId,
+      });
+      break;
+  }
+
+  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
+
+  const queryInfo: QueryInfo<"getHomePosts"> = {
+    procedure: "getHomePosts",
+    input: { sort },
+  };
 
   return (
     <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
@@ -25,14 +79,18 @@ export default async function HomeLayout({
           <FeedInput userImageUrl={user.imageUrl} userName={user.username} />
         )}
         <FeedSort />
-        {children}
+        <Posts<"getHomePosts">
+          currentUserId={userId}
+          initialPosts={{ posts, nextCursor }}
+          queryInfo={queryInfo}
+        />
       </div>
       <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
         <Premium />
         <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
             src={home}
-            alt="galaxy"
+            alt="home"
             priority
             quality={10}
             className="absolute left-0 top-0 h-8 rounded-t object-cover object-center"

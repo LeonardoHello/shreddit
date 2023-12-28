@@ -1,53 +1,39 @@
+import { notFound, permanentRedirect } from "next/navigation";
+
 import { auth } from "@clerk/nextjs";
 
+import FeedSort from "@/components/FeedSort";
 import Posts from "@/components/Posts";
-import {
-  getUserBestPosts,
-  getUserControversialPosts,
-  getUserHotPosts,
-  getUserNewPosts,
-} from "@/lib/api/getPosts";
-import { type QueryInfo, SortPosts } from "@/lib/types";
+import UserCommunities from "@/components/UserCommunities";
+import UserInfo from "@/components/UserInfo";
+import UserNavigation from "@/components/UserNavigation";
+import { getUser } from "@/lib/api/getUser";
+import type { QueryInfo } from "@/lib/types";
+import getUserPosts from "@/lib/utils/getUserPosts";
+
+export const runtime = "edge";
 
 export default async function UserPage({
   params: { userName },
-  searchParams: { sort },
+  searchParams: { filter, sort },
 }: {
   params: { userName: string };
-  searchParams: { sort: string | undefined };
+  searchParams: { filter: string | undefined; sort: string | undefined };
 }) {
+  const user = await getUser.execute({
+    userName,
+  });
+
+  if (user === undefined) notFound();
+
   const { userId } = auth();
 
-  let posts;
-  switch (sort) {
-    case SortPosts.HOT:
-      posts = await getUserHotPosts.execute({
-        offset: 0,
-        userName,
-      });
-      break;
+  const posts = await getUserPosts({ userId: user.id, userName, filter, sort });
 
-    case SortPosts.NEW:
-      posts = await getUserNewPosts.execute({
-        offset: 0,
-        userName,
-      });
-      break;
+  const isCurrentUser = user.id === userId;
 
-    case SortPosts.CONTROVERSIAL:
-      posts = await getUserControversialPosts.execute({
-        offset: 0,
-        userName,
-      });
-      break;
-
-    default:
-      posts = await getUserBestPosts.execute({
-        offset: 0,
-        userName,
-      });
-      break;
-  }
+  if (!isCurrentUser && filter === "hidden")
+    permanentRedirect(`/u/${userName}`);
 
   let nextCursor: QueryInfo<"getUserPosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
@@ -56,14 +42,31 @@ export default async function UserPage({
 
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
-    input: { userName, sort },
+    input: { userId: user.id, userName, filter, sort },
   };
 
   return (
-    <Posts<"getUserPosts">
-      currentUserId={userId}
-      initialPosts={{ posts, nextCursor }}
-      queryInfo={queryInfo}
-    />
+    <main className="flex grow flex-col">
+      <UserNavigation
+        userName={userName}
+        filter={filter}
+        isCurrentUser={isCurrentUser}
+      />
+
+      <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
+        <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
+          <FeedSort />
+          <Posts<"getUserPosts">
+            currentUserId={userId}
+            initialPosts={{ posts, nextCursor }}
+            queryInfo={queryInfo}
+          />
+        </div>
+        <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+          <UserInfo user={user} />
+          <UserCommunities communities={user.communities} />
+        </div>
+      </div>
+    </main>
   );
 }

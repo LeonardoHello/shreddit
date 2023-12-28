@@ -119,12 +119,12 @@ function CurrentCommunityFeed({ communityName }: { communityName: string }) {
 }
 
 function HomeFeed({ pathname }: { pathname: string }) {
-  if (pathname.startsWith("/all")) {
+  if (pathname === "/home") {
     return (
       <>
-        <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
+        <HomeIcon className="h-5 w-5" />
         <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
-          All
+          Home
         </h1>
       </>
     );
@@ -132,9 +132,9 @@ function HomeFeed({ pathname }: { pathname: string }) {
 
   return (
     <>
-      <HomeIcon className="h-5 w-5" />
+      <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
       <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
-        Home
+        All
       </h1>
     </>
   );

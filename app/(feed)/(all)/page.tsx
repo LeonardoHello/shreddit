@@ -1,20 +1,76 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { auth } from "@clerk/nextjs";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
 import FeedSort from "@/components/FeedSort";
+import Posts from "@/components/Posts";
 import Premium from "@/components/Premium";
+import {
+  getAllBestPosts,
+  getAllControversialPosts,
+  getAllHotPosts,
+  getAllNewPosts,
+} from "@/lib/api/getPosts";
+import { type QueryInfo, SortPosts } from "@/lib/types";
 import galaxy from "@/public/galaxy.jpg";
 
 export const runtime = "edge";
 
-export default function AllLayout({ children }: { children: React.ReactNode }) {
+export default async function AllPage({
+  searchParams: { sort },
+}: {
+  searchParams: { sort: string | undefined };
+}) {
+  const { userId } = auth();
+
+  let posts;
+  switch (sort) {
+    case SortPosts.HOT:
+      posts = await getAllHotPosts.execute({
+        offset: 0,
+      });
+      break;
+
+    case SortPosts.NEW:
+      posts = await getAllNewPosts.execute({
+        offset: 0,
+      });
+      break;
+
+    case SortPosts.CONTROVERSIAL:
+      posts = await getAllControversialPosts.execute({
+        offset: 0,
+      });
+      break;
+
+    default:
+      posts = await getAllBestPosts.execute({
+        offset: 0,
+      });
+      break;
+  }
+
+  let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = null;
+  if (posts.length === 10) {
+    nextCursor = 10;
+  }
+
+  const queryInfo: QueryInfo<"getAllPosts"> = {
+    procedure: "getAllPosts",
+    input: { sort },
+  };
+
   return (
     <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
       <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
         <FeedSort />
-        {children}
+        <Posts<"getAllPosts">
+          currentUserId={userId}
+          initialPosts={{ posts, nextCursor }}
+          queryInfo={queryInfo}
+        />
       </div>
       <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
         <Premium />

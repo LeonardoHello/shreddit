@@ -24,6 +24,7 @@ export default function FeedSort() {
   const searchparams = useSearchParams();
 
   const sort = searchparams.get("sort");
+  const filter = searchparams.get("filter");
 
   const defaultSort = !(
     sort === SortPosts.HOT ||
@@ -55,7 +56,10 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={{ pathname, query: { sort: SortPosts.HOT } }}
+            href={{
+              pathname,
+              query: { sort: SortPosts.HOT, ...(filter && { filter }) },
+            }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
@@ -74,7 +78,10 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={{ pathname, query: { sort: SortPosts.NEW } }}
+            href={{
+              pathname,
+              query: { sort: SortPosts.NEW, ...(filter && { filter }) },
+            }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
@@ -93,7 +100,13 @@ export default function FeedSort() {
         </li>
         <li>
           <Link
-            href={{ pathname, query: { sort: SortPosts.CONTROVERSIAL } }}
+            href={{
+              pathname,
+              query: {
+                sort: SortPosts.CONTROVERSIAL,
+                ...(filter && { filter }),
+              },
+            }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {

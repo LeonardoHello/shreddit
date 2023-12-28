@@ -23,7 +23,7 @@ export default async function MenuDropdown({
         <menu className="w-full self-center">
           <li>
             <Link
-              href="/"
+              href="/home"
               className="flex h-9 items-center gap-2 px-6 text-sm hover:bg-zinc-700/30"
             >
               <HomeIcon className="h-5 w-5" />
@@ -32,7 +32,7 @@ export default async function MenuDropdown({
           </li>
           <li>
             <Link
-              href="/all"
+              href="/"
               className="flex h-9 items-center gap-2 px-6 text-sm hover:bg-zinc-700/30"
             >
               <ChartBarIcon
