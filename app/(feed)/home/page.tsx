@@ -14,7 +14,7 @@ import {
   getHomeControversialPosts,
   getHomeHotPosts,
   getHomeNewPosts,
-} from "@/lib/api/getPosts";
+} from "@/lib/api/getPosts/getHomePosts";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 import home from "@/public/home.jpg";
 

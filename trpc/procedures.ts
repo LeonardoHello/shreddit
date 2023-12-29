@@ -9,7 +9,24 @@ import {
 } from "@/lib/api/getCommunities";
 import { getUserToCommunity } from "@/lib/api/getCommunity";
 import { getCommunityImage, getUserImage } from "@/lib/api/getImage";
-import * as getPosts from "@/lib/api/getPosts";
+import {
+  getAllBestPosts,
+  getAllControversialPosts,
+  getAllHotPosts,
+  getAllNewPosts,
+} from "@/lib/api/getPosts/getAllPosts";
+import {
+  getCommunityBestPosts,
+  getCommunityControversialPosts,
+  getCommunityHotPosts,
+  getCommunityNewPosts,
+} from "@/lib/api/getPosts/getCommunityPosts";
+import {
+  getHomeBestPosts,
+  getHomeControversialPosts,
+  getHomeHotPosts,
+  getHomeNewPosts,
+} from "@/lib/api/getPosts/getHomePosts";
 import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommunitySchema,
@@ -42,28 +59,28 @@ export const appRouter = router({
         let posts;
         switch (input.sort) {
           case SortPosts.HOT:
-            posts = await getPosts.getHomeHotPosts.execute({
+            posts = await getHomeHotPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getPosts.getHomeNewPosts.execute({
+            posts = await getHomeNewPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getPosts.getHomeControversialPosts.execute({
+            posts = await getHomeControversialPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
             break;
 
           default:
-            posts = await getPosts.getHomeBestPosts.execute({
+            posts = await getHomeBestPosts.execute({
               offset: input.cursor,
               userId: ctx.auth.userId,
             });
@@ -88,25 +105,25 @@ export const appRouter = router({
         let posts;
         switch (input.sort) {
           case SortPosts.HOT:
-            posts = await getPosts.getAllHotPosts.execute({
+            posts = await getAllHotPosts.execute({
               offset: input.cursor,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getPosts.getAllNewPosts.execute({
+            posts = await getAllNewPosts.execute({
               offset: input.cursor,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getPosts.getAllControversialPosts.execute({
+            posts = await getAllControversialPosts.execute({
               offset: input.cursor,
             });
             break;
 
           default:
-            posts = await getPosts.getAllBestPosts.execute({
+            posts = await getAllBestPosts.execute({
               offset: input.cursor,
             });
             break;
@@ -132,28 +149,28 @@ export const appRouter = router({
         let posts;
         switch (sort) {
           case SortPosts.HOT:
-            posts = await getPosts.getCommunityHotPosts.execute({
+            posts = await getCommunityHotPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           case SortPosts.NEW:
-            posts = await getPosts.getCommunityNewPosts.execute({
+            posts = await getCommunityNewPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
-            posts = await getPosts.getCommunityControversialPosts.execute({
+            posts = await getCommunityControversialPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
           default:
-            posts = await getPosts.getCommunityBestPosts.execute({
+            posts = await getCommunityBestPosts.execute({
               offset: cursor,
               communityName,
             });

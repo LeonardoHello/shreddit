@@ -15,7 +15,7 @@ import {
   getCommunityControversialPosts,
   getCommunityHotPosts,
   getCommunityNewPosts,
-} from "@/lib/api/getPosts";
+} from "@/lib/api/getPosts/getCommunityPosts";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 
 export const runtime = "edge";

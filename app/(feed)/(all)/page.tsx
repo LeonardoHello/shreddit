@@ -12,7 +12,7 @@ import {
   getAllControversialPosts,
   getAllHotPosts,
   getAllNewPosts,
-} from "@/lib/api/getPosts";
+} from "@/lib/api/getPosts/getAllPosts";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 import galaxy from "@/public/galaxy.jpg";
 
