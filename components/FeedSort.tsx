@@ -37,7 +37,10 @@ export default function FeedSort() {
       <ul className="flex justify-around gap-3 font-bold text-zinc-500">
         <li>
           <Link
-            href={{ pathname, query: { sort: SortPosts.BEST } }}
+            href={{
+              pathname,
+              query: { sort: SortPosts.BEST, ...(filter && { filter }) },
+            }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
