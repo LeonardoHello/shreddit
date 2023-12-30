@@ -5,7 +5,7 @@ import { auth } from "@clerk/nextjs";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
 import FeedSort from "@/components/FeedSort";
-import Posts from "@/components/Posts";
+import InfiniteQueryPosts from "@/components/InfiniteQueryPosts";
 import Premium from "@/components/Premium";
 import {
   getAllBestPosts,
@@ -66,7 +66,7 @@ export default async function AllPage({
     <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
       <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
         <FeedSort />
-        <Posts<"getAllPosts">
+        <InfiniteQueryPosts<"getAllPosts">
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}
