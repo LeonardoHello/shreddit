@@ -7,7 +7,7 @@ import { HomeIcon } from "@heroicons/react/24/solid";
 
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
-import InfiniteQueryPosts from "@/components/InfiniteQueryPosts";
+import Posts from "@/components/Posts";
 import Premium from "@/components/Premium";
 import {
   getHomeBestPosts,
@@ -79,7 +79,7 @@ export default async function HomePage({
           <FeedInput userImageUrl={user.imageUrl} userName={user.username} />
         )}
         <FeedSort />
-        <InfiniteQueryPosts<"getHomePosts">
+        <Posts<"getHomePosts">
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

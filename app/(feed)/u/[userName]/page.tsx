@@ -3,7 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
 
 import FeedSort from "@/components/FeedSort";
-import InfiniteQueryPosts from "@/components/InfiniteQueryPosts";
+import Posts from "@/components/Posts";
 import UserCommunities from "@/components/UserCommunities";
 import UserInfo from "@/components/UserInfo";
 import UserNavigation from "@/components/UserNavigation";
@@ -56,7 +56,7 @@ export default async function UserPage({
       <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
         <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
           <FeedSort />
-          <InfiniteQueryPosts<"getUserPosts">
+          <Posts<"getUserPosts">
             currentUserId={userId}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
