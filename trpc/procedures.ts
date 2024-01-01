@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/getCommunities";
 import { getUserToCommunity } from "@/lib/api/getCommunity";
 import { getCommunityImage, getUserImage } from "@/lib/api/getImage";
+import { getPost } from "@/lib/api/getPost";
 import {
   getAllBestPosts,
   getAllControversialPosts,
@@ -61,28 +62,28 @@ export const appRouter = router({
           case SortPosts.HOT:
             posts = await getHomeHotPosts.execute({
               offset: input.cursor,
-              userId: ctx.auth.userId,
+              currentUserId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.NEW:
             posts = await getHomeNewPosts.execute({
               offset: input.cursor,
-              userId: ctx.auth.userId,
+              currentUserId: ctx.auth.userId,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
             posts = await getHomeControversialPosts.execute({
               offset: input.cursor,
-              userId: ctx.auth.userId,
+              currentUserId: ctx.auth.userId,
             });
             break;
 
           default:
             posts = await getHomeBestPosts.execute({
               offset: input.cursor,
-              userId: ctx.auth.userId,
+              currentUserId: ctx.auth.userId,
             });
             break;
         }
@@ -207,6 +208,9 @@ export const appRouter = router({
         return { posts, nextCursor };
       }),
   }),
+  getPost: procedure.input(PostSchema.shape.id).query(({ input }) => {
+    return getPost.execute({ postId: input });
+  }),
   searchUsers: procedure.input(z.string()).query(({ input }) => {
     return searchUsers.execute({ search: `%${input}%` });
   }),
@@ -323,6 +327,40 @@ export const appRouter = router({
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {
       return ctx.db.delete(posts).where(eq(posts.id, input));
+    }),
+  savePost: protectedProcedure
+    .input(
+      UserToPostSchema.pick({
+        postId: true,
+        saved: true,
+      }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(usersToPosts)
+        .values({ ...input, userId: ctx.auth.userId })
+        .onConflictDoUpdate({
+          target: [usersToPosts.userId, usersToPosts.postId],
+          set: { saved: input.saved },
+        })
+        .returning({ saved: usersToPosts.saved });
+    }),
+  hidePost: protectedProcedure
+    .input(
+      UserToPostSchema.pick({
+        postId: true,
+        hidden: true,
+      }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(usersToPosts)
+        .values({ ...input, userId: ctx.auth.userId })
+        .onConflictDoUpdate({
+          target: [usersToPosts.userId, usersToPosts.postId],
+          set: { hidden: input.hidden },
+        })
+        .returning({ saved: usersToPosts.saved });
     }),
   votePost: protectedProcedure
     .input(UserToPostSchema.pick({ postId: true, voteStatus: true }))

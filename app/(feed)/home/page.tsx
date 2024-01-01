@@ -7,7 +7,7 @@ import { HomeIcon } from "@heroicons/react/24/solid";
 
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
-import Posts from "@/components/Posts";
+import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
 import Premium from "@/components/Premium";
 import {
   getHomeBestPosts,
@@ -36,28 +36,28 @@ export default async function HomePage({
     case SortPosts.HOT:
       posts = await getHomeHotPosts.execute({
         offset: 0,
-        userId,
+        currentUserId: userId,
       });
       break;
 
     case SortPosts.NEW:
       posts = await getHomeNewPosts.execute({
         offset: 0,
-        userId,
+        currentUserId: userId,
       });
       break;
 
     case SortPosts.CONTROVERSIAL:
       posts = await getHomeControversialPosts.execute({
         offset: 0,
-        userId,
+        currentUserId: userId,
       });
       break;
 
     default:
       posts = await getHomeBestPosts.execute({
         offset: 0,
-        userId,
+        currentUserId: userId,
       });
       break;
   }
@@ -79,7 +79,7 @@ export default async function HomePage({
           <FeedInput userImageUrl={user.imageUrl} userName={user.username} />
         )}
         <FeedSort />
-        <Posts<"getHomePosts">
+        <PostsInfiniteQuery<"getHomePosts">
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

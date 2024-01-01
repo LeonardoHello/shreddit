@@ -6,7 +6,7 @@ export const getHiddenBestPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -35,7 +35,7 @@ export const getHiddenHotPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -71,7 +71,7 @@ export const getHiddenNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -97,7 +97,7 @@ export const getHiddenControversialPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,

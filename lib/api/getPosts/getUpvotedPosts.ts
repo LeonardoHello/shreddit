@@ -6,7 +6,7 @@ export const getUpvotedBestPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -35,7 +35,7 @@ export const getUpvotedHotPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -71,7 +71,7 @@ export const getUpvotedNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,
@@ -97,7 +97,7 @@ export const getUpvotedControversialPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
     with: {
-      usersToPosts: true,
+      usersToPosts: { columns: { postId: false, createdAt: false } },
       community: { columns: { name: true, imageUrl: true } },
       author: { columns: { name: true } },
       files: true,

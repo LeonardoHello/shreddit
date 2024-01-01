@@ -7,30 +7,19 @@ import {
 import { toast } from "sonner";
 
 import type { UserToPost } from "@/lib/db/schema";
-import type {
-  InfiniteQueryPost,
-  InfiniteQueryPostProcedure,
-  QueryInfo,
-} from "@/lib/types";
 import cn from "@/lib/utils/cn";
+import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-type Props<T extends InfiniteQueryPostProcedure> = {
+type Props = {
   currentUserId: UserToPost["userId"] | null;
-  postId: UserToPost["postId"];
-  usersToPosts: InfiniteQueryPost["usersToPosts"];
-  queryInfo: QueryInfo<T>;
+  post: NonNullable<RouterOutput["getPost"]>;
 };
 
-const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
-  usersToPosts,
-  currentUserId,
-  postId,
-  queryInfo,
-}: Props<T>) {
+const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
   const utils = trpc.useUtils();
 
-  const userToPost = usersToPosts.findLast(
+  const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,
   );
 
@@ -38,70 +27,51 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
     onMutate: async (variables) => {
       if (!currentUserId) return;
 
-      await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
+      await utils["getPost"].cancel();
 
-      utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
-        queryInfo.input,
-        (data) => {
-          if (!data) {
-            toast.error("Oops, it seemes that data can't be loaded.");
+      utils["getPost"].setData(post.id, (data) => {
+        if (!data) {
+          toast.error("Oops, it seemes that data can't be loaded.");
 
-            return {
-              pages: [],
-              pageParams: [],
-            };
-          }
+          return post;
+        }
 
-          return {
-            ...data,
-            pages: data.pages.map((page) => ({
-              ...page,
-              posts: page.posts.map((_post) => {
-                if (_post.id !== variables.postId) return _post;
+        let usersToPosts = structuredClone(data.usersToPosts);
 
-                let usersToPosts = structuredClone(_post.usersToPosts);
+        if (!userToPost) {
+          usersToPosts.push({
+            userId: currentUserId,
+            saved: false,
+            hidden: false,
+            ...variables,
+          });
+        } else {
+          const index = usersToPosts.findLastIndex(
+            (_userToPost) => _userToPost.userId === currentUserId,
+          );
 
-                if (!userToPost) {
-                  usersToPosts.push({
-                    hidden: false,
-                    saved: false,
-                    userId: currentUserId,
-                    createdAt: new Date(),
-                    ...variables,
-                  });
-                } else {
-                  const index = usersToPosts.findLastIndex(
-                    (_userToPost) => _userToPost.userId === currentUserId,
-                  );
+          usersToPosts = usersToPosts.with(index, {
+            ...userToPost,
+            ...variables,
+          });
+        }
 
-                  usersToPosts = usersToPosts.with(index, {
-                    ...userToPost,
-                    ...variables,
-                  });
-                }
-
-                return {
-                  ..._post,
-                  usersToPosts,
-                };
-              }),
-            })),
-          };
-        },
-      );
+        return {
+          ...data,
+          usersToPosts,
+        };
+      });
     },
-    onError: async (error) => {
-      await utils["infiniteQueryPosts"][queryInfo.procedure].refetch(
-        queryInfo.input,
-        {},
-        { throwOnError: true },
-      );
+    onError: async ({ message }) => {
+      if (message !== "UNAUTHORIZED") {
+        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
+      }
 
-      toast.error(error.message);
+      toast.error(message);
     },
   });
 
-  const votes = usersToPosts.reduce((accumulator, currentValue) => {
+  const votes = post.usersToPosts.reduce((accumulator, currentValue) => {
     return (
       accumulator +
       (currentValue.voteStatus === "upvoted"
@@ -122,10 +92,10 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
           },
         )}
         onClick={(e) => {
-          e.preventDefault();
+          e.stopPropagation();
 
           votePost.mutate({
-            postId,
+            postId: post.id,
             voteStatus:
               userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
           });
@@ -150,10 +120,10 @@ const PostVote = memo(function PostVote<T extends InfiniteQueryPostProcedure>({
           },
         )}
         onClick={(e) => {
-          e.preventDefault();
+          e.stopPropagation();
 
           votePost.mutate({
-            postId,
+            postId: post.id,
             voteStatus:
               userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
           });

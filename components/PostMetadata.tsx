@@ -16,6 +16,7 @@ export default function PostMetadata({ post }: { post: InfiniteQueryPost }) {
         <Link
           href={`/r/${post.community.name}`}
           className="flex items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
         >
           {post.community.imageUrl ? (
             <Image
@@ -41,7 +42,11 @@ export default function PostMetadata({ post }: { post: InfiniteQueryPost }) {
         <Image src={dot} alt="dot" height={2} width={2} />
         <div className="text-zinc-500">
           Posted by{" "}
-          <Link href={`/u/${post.author.name}`} className="hover:underline">
+          <Link
+            href={`/u/${post.author.name}`}
+            className="hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
             u/{post.author.name}
           </Link>{" "}
           {hydrated ? (

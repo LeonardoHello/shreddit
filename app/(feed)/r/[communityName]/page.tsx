@@ -8,7 +8,7 @@ import CommunityAbout from "@/components/CommunityAbout";
 import CommunityHeader from "@/components/CommunityHeader";
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
-import Posts from "@/components/Posts";
+import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
 import { getCommunity, getUserToCommunity } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,
@@ -107,7 +107,7 @@ export default async function CommunityPage({
           )}
           <FeedSort />
 
-          <Posts<"getCommunityPosts">
+          <PostsInfiniteQuery<"getCommunityPosts">
             currentUserId={userId}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
