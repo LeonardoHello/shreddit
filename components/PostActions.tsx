@@ -132,6 +132,7 @@ export default function PostActions({
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
+          //@ts-expect-error
         }).format(post.commentCount)}{" "}
         <span className="hidden sm:block">comments</span>
       </div>
