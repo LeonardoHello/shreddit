@@ -49,8 +49,8 @@ export default function RootLayout({
         >
           <NextSSRPlugin routerConfig={extractRouterConfig(uploadRouter)} />
           <TRPCReactProvider>
-            <div className="flex min-h-screen flex-col">
-              <Header />
+            <Header />
+            <div className="mt-12 flex min-h-[calc(100vh-3rem)] flex-col">
               {children}
             </div>
           </TRPCReactProvider>
