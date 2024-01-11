@@ -4,14 +4,14 @@ import { DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "../db/schema";
 import { comments, usersToPosts } from "../db/schema";
 
-type PostsQueryConfig = DBQueryConfig<
+export type PostsQueryConfig = DBQueryConfig<
   "many",
   true,
   ExtractTablesWithRelations<typeof schema>,
   ExtractTablesWithRelations<typeof schema>["posts"]
 >;
 
-export const postQueryWithConfig: NonNullable<PostsQueryConfig["with"]> = {
+export const postQueryWithConfig = {
   usersToPosts: { columns: { postId: false, createdAt: false } },
   community: { columns: { name: true, imageUrl: true } },
   author: { columns: { name: true } },
@@ -20,7 +20,7 @@ export const postQueryWithConfig: NonNullable<PostsQueryConfig["with"]> = {
     with: { author: true, usersToComments: true },
   },
   files: true,
-};
+} as const;
 
 export const postsQueryConfig: PostsQueryConfig = {
   limit: 10,

@@ -10,10 +10,6 @@ export type QueryInfo<T extends InfiniteQueryPostProcedure> = {
   input: RouterInput["infiniteQueryPosts"][T];
 };
 
-export type InfiniteQueryPost = ArrElement<
-  RouterOutput["infiniteQueryPosts"][InfiniteQueryPostProcedure]["posts"]
->;
-
 export enum SortPosts {
   BEST = "best",
   HOT = "hot",

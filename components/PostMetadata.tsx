@@ -2,12 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 import useHydration from "@/lib/hooks/useHydration";
-import type { InfiniteQueryPost } from "@/lib/types";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
+import type { RouterOutput } from "@/trpc/procedures";
 
-export default function PostMetadata({ post }: { post: InfiniteQueryPost }) {
+export default function PostMetadata({
+  post,
+}: {
+  post: NonNullable<RouterOutput["getPost"]>;
+}) {
   const hydrated = useHydration();
 
   return (

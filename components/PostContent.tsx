@@ -11,13 +11,13 @@ import { generateHTML } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
 import type { File, Post } from "@/lib/db/schema";
-import type { InfiniteQueryPost } from "@/lib/types";
 import cn from "@/lib/utils/cn";
+import type { RouterOutput } from "@/trpc/procedures";
 
 export default memo(function PostContent({
   post,
 }: {
-  post: InfiniteQueryPost;
+  post: NonNullable<RouterOutput["getPost"]>;
 }) {
   if (post.text === null && post.files.length === 0) return null;
 

@@ -13,13 +13,12 @@ import { toast } from "sonner";
 
 import type { Post, User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
-import type { InfiniteQueryPost } from "@/lib/types";
-import { RouterInput } from "@/trpc/procedures";
+import type { RouterInput, RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type Props = {
   currentUserId: User["id"] | null;
-  post: InfiniteQueryPost;
+  post: NonNullable<RouterOutput["getPost"]>;
   removePostFromQuery?: (postId: Post["id"]) => void;
   children: React.ReactNode;
 };
@@ -63,7 +62,6 @@ export default function PostActions({
 
         if (!userToPost) {
           usersToPosts.push({
-            createdAt: new Date(),
             userId: currentUserId,
             saved: false,
             hidden: false,

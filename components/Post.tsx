@@ -3,7 +3,7 @@
 import { memo } from "react";
 
 import type { Post, User } from "@/lib/db/schema";
-import type { InfiniteQueryPost } from "@/lib/types";
+import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 import PostActions from "./PostActions";
@@ -14,7 +14,7 @@ import PostVote from "./PostVote";
 
 type Props = {
   currentUserId: User["id"] | null;
-  initialData: InfiniteQueryPost;
+  initialData: NonNullable<RouterOutput["getPost"]>;
   removePostFromQuery?: (postId: Post["id"]) => void;
 };
 

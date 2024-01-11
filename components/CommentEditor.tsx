@@ -27,7 +27,6 @@ export default function CommentEditor({ postId }: { postId: Post["id"] }) {
     extensions: [
       StarterKit,
       CharacterCount.configure({ limit: 255 }),
-      Image.configure({ inline: true }),
       Placeholder.configure({
         placeholder: "What are your thoughts?",
       }),
