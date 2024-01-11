@@ -1,15 +1,15 @@
 import db from "@/lib/db";
-import postsQueryConfig from "@/lib/utils/getPostsBaseQueryConfig";
+import {
+  controversialPostsQueryConfig,
+  postQueryWithConfig,
+  postsQueryConfig,
+  topPostsQueryConfig,
+} from "@/lib/utils/getPostsQueryConfig";
 
 export const getAllBestPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`vote_count`),
       asc(post.createdAt),
@@ -19,13 +19,8 @@ export const getAllBestPosts = db.query.posts
 
 export const getAllHotPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -42,25 +37,15 @@ export const getAllHotPosts = db.query.posts
 export const getAllNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    with: postQueryWithConfig,
     orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_all_posts");
 
 export const getAllControversialPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...controversialPostsQueryConfig,
+    with: postQueryWithConfig,
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`comment_count`),
       asc(post.createdAt),

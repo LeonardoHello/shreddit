@@ -1,8 +1,4 @@
-import { DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
-
 import type { RouterInput, RouterOutput } from "@/trpc/procedures";
-
-import type * as schema from "../db/schema";
 
 export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
 
@@ -31,10 +27,3 @@ export enum UserPostsFilter {
   UPVOTED = "upvoted",
   DOWNVOTED = "downvoted",
 }
-
-export type PostsQueryConfig = DBQueryConfig<
-  "many",
-  true,
-  ExtractTablesWithRelations<typeof schema>,
-  ExtractTablesWithRelations<typeof schema>["posts"]
->;

@@ -1,28 +1,16 @@
 import db from "@/lib/db";
 import { communities } from "@/lib/db/schema";
-import postsQueryConfig from "@/lib/utils/getPostsBaseQueryConfig";
+import {
+  controversialPostsQueryConfig,
+  postQueryWithConfig,
+  postsQueryConfig,
+  topPostsQueryConfig,
+} from "@/lib/utils/getPostsQueryConfig";
 
 export const getCommunityBestPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(communities)
-          .where(
-            and(
-              eq(communities.id, post.communityId),
-              eq(communities.name, sql.placeholder("communityName")),
-            ),
-          ),
-      ),
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`vote_count`),
       asc(post.createdAt),
@@ -32,13 +20,8 @@ export const getCommunityBestPosts = db.query.posts
 
 export const getCommunityHotPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -68,12 +51,7 @@ export const getCommunityHotPosts = db.query.posts
 export const getCommunityNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    with: postQueryWithConfig,
     where: (post, { exists, and, eq, sql }) =>
       exists(
         db
@@ -92,13 +70,8 @@ export const getCommunityNewPosts = db.query.posts
 
 export const getCommunityControversialPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...controversialPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { exists, and, eq, sql }) =>
       exists(
         db

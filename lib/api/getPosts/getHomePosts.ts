@@ -1,16 +1,16 @@
 import db from "@/lib/db";
 import { usersToCommunities } from "@/lib/db/schema";
-import postsQueryConfig from "@/lib/utils/getPostsBaseQueryConfig";
+import {
+  controversialPostsQueryConfig,
+  postQueryWithConfig,
+  postsQueryConfig,
+  topPostsQueryConfig,
+} from "@/lib/utils/getPostsQueryConfig";
 
 export const getHomeBestPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -18,7 +18,7 @@ export const getHomeBestPosts = db.query.posts
           .from(usersToCommunities)
           .where(
             and(
-              eq(usersToCommunities.userId, sql.placeholder("userId")),
+              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
               eq(usersToCommunities.member, true),
               eq(usersToCommunities.userId, post.authorId),
             ),
@@ -33,13 +33,8 @@ export const getHomeBestPosts = db.query.posts
 
 export const getHomeHotPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -51,7 +46,7 @@ export const getHomeHotPosts = db.query.posts
             .from(usersToCommunities)
             .where(
               and(
-                eq(usersToCommunities.userId, sql.placeholder("userId")),
+                eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
                 eq(usersToCommunities.member, true),
                 eq(usersToCommunities.userId, post.authorId),
               ),
@@ -70,12 +65,7 @@ export const getHomeHotPosts = db.query.posts
 export const getHomeNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -83,7 +73,7 @@ export const getHomeNewPosts = db.query.posts
           .from(usersToCommunities)
           .where(
             and(
-              eq(usersToCommunities.userId, sql.placeholder("userId")),
+              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
               eq(usersToCommunities.member, true),
               eq(usersToCommunities.userId, post.authorId),
             ),
@@ -95,13 +85,8 @@ export const getHomeNewPosts = db.query.posts
 
 export const getHomeControversialPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...controversialPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -109,7 +94,7 @@ export const getHomeControversialPosts = db.query.posts
           .from(usersToCommunities)
           .where(
             and(
-              eq(usersToCommunities.userId, sql.placeholder("userId")),
+              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
               eq(usersToCommunities.member, true),
               eq(usersToCommunities.userId, post.authorId),
             ),

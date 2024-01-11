@@ -1,16 +1,16 @@
 import db from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import postsQueryConfig from "@/lib/utils/getPostsBaseQueryConfig";
+import {
+  controversialPostsQueryConfig,
+  postQueryWithConfig,
+  postsQueryConfig,
+  topPostsQueryConfig,
+} from "@/lib/utils/getPostsQueryConfig";
 
 export const getUserBestPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -32,13 +32,8 @@ export const getUserBestPosts = db.query.posts
 
 export const getUserHotPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...topPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -68,12 +63,7 @@ export const getUserHotPosts = db.query.posts
 export const getUserNewPosts = db.query.posts
   .findMany({
     ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -92,13 +82,8 @@ export const getUserNewPosts = db.query.posts
 
 export const getUserControversialPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
-      community: { columns: { name: true, imageUrl: true } },
-      author: { columns: { name: true } },
-      files: true,
-    },
+    ...controversialPostsQueryConfig,
+    with: postQueryWithConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
