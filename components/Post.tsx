@@ -12,17 +12,17 @@ import PostVote from "./PostVote";
 
 type Props = {
   currentUserId: User["id"] | null;
-  initialPost: InfiniteQueryPost;
+  initialData: InfiniteQueryPost;
   removePostFromQuery?: (postId: Post["id"]) => void;
 };
 
 export default function Post({
   currentUserId,
-  initialPost,
+  initialData,
   removePostFromQuery,
 }: Props) {
-  const { data: post } = trpc.getPost.useQuery(initialPost.id, {
-    initialData: initialPost,
+  const { data: post } = trpc.getPost.useQuery(initialData.id, {
+    initialData,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });

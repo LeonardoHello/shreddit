@@ -40,6 +40,7 @@ const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
 
         if (!userToPost) {
           usersToPosts.push({
+            createdAt: new Date(),
             userId: currentUserId,
             saved: false,
             hidden: false,
@@ -86,7 +87,7 @@ const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
     <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
       <ArrowUpCircleIcon
         className={cn(
-          "h-8 w-8 rounded transition-colors hover:bg-zinc-700/50",
+          "h-8 w-8 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-rose-500": userToPost?.voteStatus === "upvoted",
           },
@@ -114,7 +115,7 @@ const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
       </div>
       <ArrowDownCircleIcon
         className={cn(
-          "h-8 w-8 rounded transition-colors hover:bg-zinc-700/50",
+          "h-8 w-8 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-blue-500": userToPost?.voteStatus === "downvoted",
           },

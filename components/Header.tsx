@@ -56,7 +56,7 @@ async function HeaderAuthenticated({
       moderatedCommunitiesData,
       joinedCommunitiesData,
     ]).catch(() => {
-      throw new Error("Could not load users information.");
+      throw new Error("There was a problem with loading user information.");
     });
 
   return (

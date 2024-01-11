@@ -1,7 +1,6 @@
 import db from "../db";
-import { User } from "../db/schema";
 
-export const getUser = db.query.users
+export const getUserByName = db.query.users
   .findFirst({
     where: (user, { sql, eq }) => eq(user.name, sql.placeholder("userName")),
     with: {
@@ -27,4 +26,18 @@ export const getUser = db.query.users
       },
     },
   })
-  .prepare("get_user");
+  .prepare("get_user_by_name");
+
+export const getUserById = db.query.users
+  .findFirst({
+    where: (user, { sql, eq }) => eq(user.id, sql.placeholder("currentUserId")),
+    columns: { createdAt: false },
+  })
+  .prepare("get_user_by_id");
+
+export const getUserImage = db.query.users
+  .findFirst({
+    where: (user, { eq, sql }) => eq(user.name, sql.placeholder("name")),
+    columns: { imageUrl: true },
+  })
+  .prepare("get_user_image_url");

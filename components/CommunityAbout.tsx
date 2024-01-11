@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { CakeIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { getCommunity } from "@/lib/api/getCommunity";
+import { getCommunityByName } from "@/lib/api/getCommunity";
 import { User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
@@ -19,7 +19,9 @@ export default function CommunityAbout({
   community,
   currentUserId,
 }: {
-  community: NonNullable<Awaited<ReturnType<typeof getCommunity.execute>>>;
+  community: NonNullable<
+    Awaited<ReturnType<typeof getCommunityByName.execute>>
+  >;
   currentUserId: User["id"] | undefined;
 }) {
   const router = useRouter();

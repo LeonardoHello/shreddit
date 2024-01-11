@@ -7,7 +7,7 @@ import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
 import UserCommunities from "@/components/UserCommunities";
 import UserInfo from "@/components/UserInfo";
 import UserNavigation from "@/components/UserNavigation";
-import { getUser } from "@/lib/api/getUser";
+import { getUserByName } from "@/lib/api/getUser";
 import type { QueryInfo } from "@/lib/types";
 import getUserPosts from "@/lib/utils/getUserPosts";
 
@@ -20,25 +20,29 @@ export default async function UserPage({
   params: { userName: string };
   searchParams: { filter: string | undefined; sort: string | undefined };
 }) {
-  const user = await getUser.execute({
-    userName,
-  });
+  const user = await getUserByName
+    .execute({
+      userName,
+    })
+    .catch(() => {
+      throw new Error("There was a problem with loading user information.");
+    });
 
   if (user === undefined) notFound();
 
   const { userId } = auth();
+
+  if (user.id !== userId && filter === "hidden")
+    permanentRedirect(`/u/${userName}`);
 
   const posts = await getUserPosts({
     userId: user.id,
     userName,
     filter,
     sort,
+  }).catch(() => {
+    throw new Error("There was a problem with loading post information.");
   });
-
-  const isCurrentUser = user.id === userId;
-
-  if (!isCurrentUser && filter === "hidden")
-    permanentRedirect(`/u/${userName}`);
 
   let nextCursor: QueryInfo<"getUserPosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
@@ -55,7 +59,7 @@ export default async function UserPage({
       <UserNavigation
         userName={userName}
         filter={filter}
-        isCurrentUser={isCurrentUser}
+        isCurrentUser={user.id === userId}
       />
 
       <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">

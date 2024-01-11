@@ -6,7 +6,7 @@ import { BellSlashIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
 
-import type { getCommunity } from "@/lib/api/getCommunity";
+import type { getCommunityByName } from "@/lib/api/getCommunity";
 import cn from "@/lib/utils/cn";
 import defaultCommunityImage from "@/public/community-logo.svg";
 import type { RouterInput, RouterOutput } from "@/trpc/procedures";
@@ -18,7 +18,9 @@ export default function CommunityHeader({
   initialData,
 }: {
   isAuthenticated: boolean;
-  community: NonNullable<Awaited<ReturnType<typeof getCommunity.execute>>>;
+  community: NonNullable<
+    Awaited<ReturnType<typeof getCommunityByName.execute>>
+  >;
   initialData: RouterOutput["getUserToCommunity"];
 }) {
   const { data: userToCommunity, refetch } = trpc.getUserToCommunity.useQuery(

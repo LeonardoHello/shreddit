@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import type { getUser } from "@/lib/api/getUser";
+import type { getUserByName } from "@/lib/api/getUser";
 import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
 
@@ -9,7 +9,7 @@ export default function UserCommunities({
   communities,
 }: {
   communities: NonNullable<
-    Awaited<ReturnType<typeof getUser.execute>>
+    Awaited<ReturnType<typeof getUserByName.execute>>
   >["communities"];
 }) {
   if (communities.length === 0) return null;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
   CheckIcon,
@@ -21,35 +22,36 @@ export default function PostActionsDropdown({
   post,
   removePostFromQuery,
 }: Props) {
+  const router = useRouter();
   const utils = trpc.useUtils();
 
-  const onMutate = async (
-    variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
-  ) => {
-    await utils["getPost"].cancel();
+  const queryConfig = {
+    onMutate: async (
+      variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
+    ) => {
+      await utils["getPost"].cancel();
 
-    utils["getPost"].setData(post.id, (data) => {
-      if (!data) {
-        toast.error("Oops, it seemes that data can't be loaded.");
+      utils["getPost"].setData(post.id, (data) => {
+        if (!data) {
+          toast.error("Oops, it seemes that data can't be loaded.");
 
-        return post;
+          return post;
+        }
+
+        return { ...data, ...variables };
+      });
+    },
+    onError: async ({ message }: { message: string }) => {
+      if (message !== "UNAUTHORIZED") {
+        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
       }
 
-      return { ...data, ...variables };
-    });
-  };
-
-  const onError = async ({ message }: { message: string }) => {
-    if (message !== "UNAUTHORIZED") {
-      await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-    }
-
-    toast.error(message);
+      toast.error(message);
+    },
   };
 
   const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
-    onError,
-    onMutate,
+    ...queryConfig,
     onSuccess: (data) => {
       if (data[0].spoiler) {
         toast.success("Post has been marked as spoiler");
@@ -60,8 +62,7 @@ export default function PostActionsDropdown({
   });
 
   const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
-    onError,
-    onMutate,
+    ...queryConfig,
     onSuccess: (data) => {
       if (data[0].nsfw) {
         toast.success("Post has been marked as spoiler");
@@ -72,19 +73,28 @@ export default function PostActionsDropdown({
   });
 
   const deletedPost = trpc.deletePost.useMutation({
-    onError,
-    onMutate: async () => {
+    onError: queryConfig.onError,
+    onMutate: () => {
       if (removePostFromQuery !== undefined) {
         removePostFromQuery(post.id);
       }
     },
     onSuccess: () => {
+      if (removePostFromQuery === undefined) {
+        router.replace("/");
+      }
+
       toast.success("Post deleted successfully.");
     },
   });
 
   return (
-    <div className="absolute right-0 z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:left-0">
+    <div
+      className={cn(
+        "absolute right-0 z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:left-0",
+        { "pointer-events-none opacity-40": deletedPost.isLoading },
+      )}
+    >
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {

@@ -1,6 +1,6 @@
 import db from "../db";
 
-export const getCommunity = db.query.communities
+export const getCommunityByName = db.query.communities
   .findFirst({
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
@@ -8,7 +8,7 @@ export const getCommunity = db.query.communities
       usersToCommunities: true,
     },
   })
-  .prepare("get_community");
+  .prepare("get_community_by_name");
 
 export const getUserToCommunity = db.query.usersToCommunities
   .findFirst({
@@ -20,3 +20,11 @@ export const getUserToCommunity = db.query.usersToCommunities
     columns: { favorite: true, muted: true, member: true },
   })
   .prepare("get_user_to_community");
+
+export const getCommunityImage = db.query.communities
+  .findFirst({
+    where: (community, { eq, sql }) =>
+      eq(community.name, sql.placeholder("name")),
+    columns: { imageUrl: true },
+  })
+  .prepare("get_community_imageUrl");

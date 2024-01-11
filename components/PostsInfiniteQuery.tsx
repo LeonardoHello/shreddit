@@ -27,6 +27,7 @@ export default function PostsInfiniteQuery<
   const infiniteQuery = trpc.infiniteQueryPosts[
     queryInfo.procedure
   ].useInfiniteQuery(queryInfo.input, {
+    // filter hidden posts
     select: (data) => {
       if (!currentUserId || searchparams.get("filter")) {
         return data;
@@ -95,7 +96,7 @@ export default function PostsInfiniteQuery<
           >
             <Post
               currentUserId={currentUserId}
-              initialPost={post}
+              initialData={post}
               removePostFromQuery={removePostFromQuery}
             />
           </div>

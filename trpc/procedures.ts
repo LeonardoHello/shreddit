@@ -7,9 +7,8 @@ import {
   getJoinedCommunities,
   getModeratedCommunities,
 } from "@/lib/api/getCommunities";
-import { getUserToCommunity } from "@/lib/api/getCommunity";
-import { getCommunityImage, getUserImage } from "@/lib/api/getImage";
-import { getPost } from "@/lib/api/getPost";
+import { getCommunityImage, getUserToCommunity } from "@/lib/api/getCommunity";
+import { getPostById } from "@/lib/api/getPost";
 import {
   getAllBestPosts,
   getAllControversialPosts,
@@ -28,13 +27,16 @@ import {
   getHomeHotPosts,
   getHomeNewPosts,
 } from "@/lib/api/getPosts/getHomePosts";
+import { getUserImage } from "@/lib/api/getUser";
 import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
+  CommentSchema,
   CommunitySchema,
   PostSchema,
   UserSchema,
   UserToCommunitySchema,
   UserToPostSchema,
+  comments,
   communities,
   posts,
   usersToCommunities,
@@ -209,7 +211,7 @@ export const appRouter = router({
       }),
   }),
   getPost: procedure.input(PostSchema.shape.id).query(({ input }) => {
-    return getPost.execute({ postId: input });
+    return getPostById.execute({ postId: input });
   }),
   searchUsers: procedure.input(z.string()).query(({ input }) => {
     return searchUsers.execute({ search: `%${input}%` });
@@ -278,8 +280,7 @@ export const appRouter = router({
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
           set: { favorite: input.favorite },
-        })
-        .returning({ favorite: usersToCommunities.favorite });
+        });
     }),
   joinCommunity: protectedProcedure
     .input(
@@ -326,7 +327,10 @@ export const appRouter = router({
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {
-      return ctx.db.delete(posts).where(eq(posts.id, input));
+      return ctx.db
+        .delete(posts)
+        .where(eq(posts.id, input))
+        .returning({ id: posts.id });
     }),
   savePost: protectedProcedure
     .input(
@@ -401,6 +405,19 @@ export const appRouter = router({
         .set({ nsfw: input.nsfw, updatedAt: new Date() })
         .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
         .returning({ nsfw: posts.nsfw });
+    }),
+  postComment: protectedProcedure
+    .input(
+      z.object({ postId: PostSchema.shape.id, text: CommentSchema.shape.text }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(comments)
+        .values({
+          authorId: ctx.auth.userId,
+          ...input,
+        })
+        .returning();
     }),
 });
 

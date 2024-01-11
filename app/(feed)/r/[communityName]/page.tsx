@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { currentUser } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
 
 import CommunityAbout from "@/components/CommunityAbout";
@@ -9,13 +8,14 @@ import CommunityHeader from "@/components/CommunityHeader";
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
 import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
-import { getCommunity, getUserToCommunity } from "@/lib/api/getCommunity";
+import { getCommunityByName, getUserToCommunity } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,
   getCommunityControversialPosts,
   getCommunityHotPosts,
   getCommunityNewPosts,
 } from "@/lib/api/getPosts/getCommunityPosts";
+import { getUserById } from "@/lib/api/getUser";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 
 export const runtime = "edge";
@@ -27,38 +27,54 @@ export default async function CommunityPage({
   params: { communityName: string };
   searchParams: { sort: string | undefined };
 }) {
-  const { userId } = auth();
-
-  let posts;
+  let postsData;
   switch (sort) {
     case SortPosts.HOT:
-      posts = await getCommunityHotPosts.execute({
+      postsData = getCommunityHotPosts.execute({
         offset: 0,
         communityName,
       });
       break;
 
     case SortPosts.NEW:
-      posts = await getCommunityNewPosts.execute({
+      postsData = getCommunityNewPosts.execute({
         offset: 0,
         communityName,
       });
       break;
 
     case SortPosts.CONTROVERSIAL:
-      posts = await getCommunityControversialPosts.execute({
+      postsData = getCommunityControversialPosts.execute({
         offset: 0,
         communityName,
       });
       break;
 
     default:
-      posts = await getCommunityBestPosts.execute({
+      postsData = getCommunityBestPosts.execute({
         offset: 0,
         communityName,
       });
       break;
   }
+
+  const { userId } = auth();
+
+  const [user, community, posts] = await Promise.all([
+    getUserById.execute({ currentUserId: userId }),
+    getCommunityByName.execute({
+      communityName,
+    }),
+    postsData,
+  ]).catch(() => {
+    throw new Error("There was a problem with loading community information.");
+  });
+
+  if (community === undefined) return notFound();
+
+  const userToCommunity = community.usersToCommunities.find(
+    (userToCommunity) => userToCommunity.userId === userId,
+  );
 
   let nextCursor: QueryInfo<"getCommunityPosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
@@ -70,14 +86,6 @@ export default async function CommunityPage({
     input: { communityName, sort },
   };
 
-  const community = await getCommunity.execute({
-    communityName,
-  });
-
-  if (community === undefined) return notFound();
-
-  const user = await currentUser();
-
   const newMemberCount = community.usersToCommunities.filter(
     (userToCommunity) => {
       const monthAgo = new Date();
@@ -86,11 +94,6 @@ export default async function CommunityPage({
       return monthAgo < userToCommunity.createdAt;
     },
   ).length;
-
-  const userToCommunity = await getUserToCommunity.execute({
-    communityId: community.id,
-    userId: user?.id,
-  });
 
   return (
     <main className="flex grow flex-col">
@@ -103,12 +106,12 @@ export default async function CommunityPage({
       <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
         <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
           {user && (
-            <FeedInput userImageUrl={user.imageUrl} userName={user.username} />
+            <FeedInput userImageUrl={user.imageUrl} userName={user.name} />
           )}
           <FeedSort />
 
           <PostsInfiniteQuery<"getCommunityPosts">
-            currentUserId={userId}
+            currentUserId={user ? user.id : null}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
           />

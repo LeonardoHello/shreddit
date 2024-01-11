@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import type { getUser } from "@/lib/api/getUser";
+import type { getUserByName } from "@/lib/api/getUser";
 import getOnions from "@/lib/utils/getOnions";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import cake from "@/public/cake.svg";
@@ -8,7 +8,7 @@ import dot from "@/public/dot.svg";
 import onion from "@/public/onion.svg";
 import userBackground from "@/public/userBackground.jpg";
 
-type user = NonNullable<Awaited<ReturnType<typeof getUser.execute>>>;
+type user = NonNullable<Awaited<ReturnType<typeof getUserByName.execute>>>;
 
 export default function UserInfo({ user }: { user: user }) {
   return (

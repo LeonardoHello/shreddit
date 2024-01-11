@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
@@ -15,6 +14,7 @@ import {
   getHomeHotPosts,
   getHomeNewPosts,
 } from "@/lib/api/getPosts/getHomePosts";
+import { getUserById } from "@/lib/api/getUser";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 import home from "@/public/home.jpg";
 
@@ -29,38 +29,43 @@ export default async function HomePage({
 
   if (userId === null) throw new Error("Could not load users information.");
 
-  const user = await currentUser();
-
-  let posts;
+  let postsData;
   switch (sort) {
     case SortPosts.HOT:
-      posts = await getHomeHotPosts.execute({
+      postsData = getHomeHotPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
 
     case SortPosts.NEW:
-      posts = await getHomeNewPosts.execute({
+      postsData = getHomeNewPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
 
     case SortPosts.CONTROVERSIAL:
-      posts = await getHomeControversialPosts.execute({
+      postsData = getHomeControversialPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
 
     default:
-      posts = await getHomeBestPosts.execute({
+      postsData = getHomeBestPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
   }
+
+  const [user, posts] = await Promise.all([
+    getUserById.execute({ currentUserId: userId }),
+    postsData,
+  ]).catch(() => {
+    throw new Error("There was a problem with loading user information.");
+  });
 
   let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
@@ -76,7 +81,7 @@ export default async function HomePage({
     <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
       <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
         {user && (
-          <FeedInput userImageUrl={user.imageUrl} userName={user.username} />
+          <FeedInput userImageUrl={user.imageUrl} userName={user.name} />
         )}
         <FeedSort />
         <PostsInfiniteQuery<"getHomePosts">

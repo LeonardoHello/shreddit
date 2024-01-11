@@ -63,6 +63,7 @@ export default function PostActions({
 
         if (!userToPost) {
           usersToPosts.push({
+            createdAt: new Date(),
             userId: currentUserId,
             saved: false,
             hidden: false,
@@ -132,12 +133,11 @@ export default function PostActions({
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
-          //@ts-expect-error
-        }).format(post.commentCount)}{" "}
+        }).format(post.comments.length)}{" "}
         <span className="hidden sm:block">comments</span>
       </div>
       <div
-        className="flex items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
+        className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
         onClick={(e) => {
           e.stopPropagation();
           copyLink(post.community.name, post.id);
@@ -147,7 +147,7 @@ export default function PostActions({
         <div className="hidden sm:block">Copy Link</div>
       </div>
       <div
-        className="flex items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
+        className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
         onClick={(e) => {
           e.stopPropagation();
 
@@ -170,7 +170,7 @@ export default function PostActions({
         )}
       </div>
       <div
-        className="flex items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
+        className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
         onClick={(e) => {
           e.stopPropagation();
 
@@ -195,7 +195,7 @@ export default function PostActions({
       {post.authorId === currentUserId && (
         <div
           ref={dropdownRef}
-          className="relative"
+          className="relative cursor-pointer"
           onClick={(e) => e.stopPropagation()}
         >
           <EllipsisHorizontalIcon
