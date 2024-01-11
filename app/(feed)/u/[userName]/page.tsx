@@ -12,6 +12,7 @@ import type { QueryInfo } from "@/lib/types";
 import getUserPosts from "@/lib/utils/getUserPosts";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 export default async function UserPage({
   params: { userName },

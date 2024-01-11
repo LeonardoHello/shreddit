@@ -19,6 +19,7 @@ import { getUserById } from "@/lib/api/getUser";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 export default async function CommunityPage({
   params: { communityName },

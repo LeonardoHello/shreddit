@@ -17,6 +17,7 @@ import { type QueryInfo, SortPosts } from "@/lib/types";
 import galaxy from "@/public/galaxy.jpg";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 export default async function AllPage({
   searchParams: { sort },

@@ -19,6 +19,7 @@ import { type QueryInfo, SortPosts } from "@/lib/types";
 import home from "@/public/home.jpg";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 export default async function HomePage({
   searchParams: { sort },

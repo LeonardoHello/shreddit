@@ -6,6 +6,7 @@ import { createContext } from "@/trpc/context";
 import { appRouter } from "@/trpc/procedures";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({

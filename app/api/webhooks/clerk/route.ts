@@ -8,6 +8,7 @@ import db from "@/lib/db";
 import { users } from "@/lib/db/schema";
 
 export const runtime = "edge";
+export const preferredRegion = ["fra1"];
 
 export async function POST(req: Request) {
   // https://clerk.com/docs/users/sync-data#sync-clerk-data-to-your-backend-with-webhooks
