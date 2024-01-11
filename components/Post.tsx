@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 import type { Post, User } from "@/lib/db/schema";
 import type { InfiniteQueryPost } from "@/lib/types";
 import { trpc } from "@/trpc/react";
@@ -16,14 +18,13 @@ type Props = {
   removePostFromQuery?: (postId: Post["id"]) => void;
 };
 
-export default function Post({
+export default memo(function Post({
   currentUserId,
   initialData,
   removePostFromQuery,
 }: Props) {
   const { data: post } = trpc.getPost.useQuery(initialData.id, {
     initialData,
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
 
@@ -48,4 +49,4 @@ export default function Post({
       </div>
     </>
   );
-}
+});
