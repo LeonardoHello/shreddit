@@ -232,8 +232,6 @@ export const usersToComments = pgTable(
       .references(() => comments.id, { onDelete: "cascade" })
       .notNull(),
     voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
-    saved: boolean("saved").notNull().default(false),
-    hidden: boolean("hidden").notNull().default(false),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.commentId] }),
