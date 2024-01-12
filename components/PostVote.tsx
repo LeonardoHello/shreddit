@@ -1,5 +1,3 @@
-import { memo } from "react";
-
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
@@ -16,7 +14,7 @@ type Props = {
   post: NonNullable<RouterOutput["getPost"]>;
 };
 
-const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
+const PostVote = function PostVote({ currentUserId, post }: Props) {
   const utils = trpc.useUtils();
 
   const userToPost = post.usersToPosts.findLast(
@@ -40,7 +38,6 @@ const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
 
         if (!userToPost) {
           usersToPosts.push({
-            createdAt: new Date(),
             userId: currentUserId,
             saved: false,
             hidden: false,
@@ -132,6 +129,6 @@ const PostVote = memo(function PostVote({ currentUserId, post }: Props) {
       />
     </div>
   );
-});
+};
 
 export default PostVote;
