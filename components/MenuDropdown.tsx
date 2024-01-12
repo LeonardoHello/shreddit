@@ -15,7 +15,7 @@ export default async function MenuDropdown({
   if (!user) throw new Error("Couldn't fetch user information.");
 
   return (
-    <div className="absolute top-full z-20 flex max-h-[30rem] w-64 flex-col gap-5 overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit py-4 lg:w-full">
+    <div className="absolute top-full flex max-h-[30rem] w-64 flex-col gap-5 overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit py-4 lg:w-full">
       {children}
 
       <div className="flex flex-col gap-2.5">
