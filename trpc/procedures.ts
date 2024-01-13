@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
+import { getComment } from "@/lib/api/getComment";
 import {
   getFavoriteCommunities,
   getJoinedCommunities,
@@ -34,11 +35,13 @@ import {
   CommunitySchema,
   PostSchema,
   UserSchema,
+  UserToCommentSchema,
   UserToCommunitySchema,
   UserToPostSchema,
   comments,
   communities,
   posts,
+  usersToComments,
   usersToCommunities,
   usersToPosts,
 } from "@/lib/db/schema";
@@ -408,7 +411,7 @@ export const appRouter = router({
     }),
   postComment: protectedProcedure
     .input(
-      z.object({ postId: PostSchema.shape.id, text: CommentSchema.shape.text }),
+      CommentSchema.pick({ postId: true, parentCommentId: true, text: true }),
     )
     .mutation(({ input, ctx }) => {
       return ctx.db
@@ -419,6 +422,20 @@ export const appRouter = router({
         })
         .returning();
     }),
+  voteComment: protectedProcedure
+    .input(UserToCommentSchema.pick({ commentId: true, voteStatus: true }))
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(usersToComments)
+        .values({ userId: ctx.auth.userId, ...input })
+        .onConflictDoUpdate({
+          target: [usersToComments.userId, usersToComments.commentId],
+          set: { voteStatus: input.voteStatus },
+        });
+    }),
+  getComment: procedure.input(CommentSchema.shape.id).query(({ input }) => {
+    return getComment.execute({ commentId: input });
+  }),
 });
 
 export type AppRouter = typeof appRouter;

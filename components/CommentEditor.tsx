@@ -5,18 +5,25 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import CharacterCount from "@tiptap/extension-character-count";
-import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
-import { Post } from "@/lib/db/schema";
+import { Comment, Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-export default function CommentEditor({ postId }: { postId: Post["id"] }) {
+export default function CommentEditor({
+  postId,
+  parentCommentId,
+  setReply,
+}: {
+  postId: Post["id"];
+  parentCommentId: Comment["parentCommentId"];
+  setReply?: (data: boolean) => void;
+}) {
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -44,7 +51,12 @@ export default function CommentEditor({ postId }: { postId: Post["id"] }) {
       })}
     >
       <EditorContent editor={editor} />
-      <EditorMenu editor={editor} postId={postId} />
+      <EditorMenu
+        editor={editor}
+        postId={postId}
+        parentCommentId={parentCommentId}
+        setReply={setReply}
+      />
     </div>
   );
 }
@@ -52,9 +64,13 @@ export default function CommentEditor({ postId }: { postId: Post["id"] }) {
 function EditorMenu({
   editor,
   postId,
+  parentCommentId,
+  setReply,
 }: {
   editor: Editor;
   postId: Post["id"];
+  parentCommentId: Comment["parentCommentId"];
+  setReply?: (data: boolean) => void;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -416,20 +432,39 @@ function EditorMenu({
           </svg>
         </button>
       </div>
-      <button
-        className={cn(
-          "ml-auto self-stretch rounded-full bg-zinc-300 px-4 text-sm font-bold text-zinc-800 transition-opacity hover:opacity-80",
-          {
-            "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
-          },
+      <div className="ml-auto flex gap-2">
+        {setReply && (
+          <button
+            className="rounded-full px-4 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-700/50"
+            onClick={() => setReply(false)}
+          >
+            cancel
+          </button>
         )}
-        disabled={isEmpty || isMutating}
-        onClick={() => {
-          postComment.mutate({ postId, text: editor.getHTML() });
-        }}
-      >
-        Comment
-      </button>
+
+        <button
+          className={cn(
+            "rounded-full bg-zinc-300 px-4 text-sm font-bold text-zinc-800 transition-opacity hover:opacity-80",
+            {
+              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+            },
+          )}
+          disabled={isEmpty || isMutating}
+          onClick={() => {
+            postComment.mutate({
+              postId,
+              parentCommentId,
+              text: editor.getHTML(),
+            });
+
+            if (setReply) {
+              setReply(false);
+            }
+          }}
+        >
+          {setReply ? "Reply" : "Comment"}
+        </button>
+      </div>
     </div>
   );
 }

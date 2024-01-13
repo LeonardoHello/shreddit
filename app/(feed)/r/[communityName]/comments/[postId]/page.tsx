@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import Comment from "@/components/Comment";
 import CommentEditor from "@/components/CommentEditor";
+import Comments from "@/components/Comments";
 import Post from "@/components/Post";
 import { getPostById } from "@/lib/api/getPost";
 import { getUserById } from "@/lib/api/getUser";
@@ -46,13 +46,16 @@ export default async function PostPage({
                   {user.name}
                 </Link>
               </div>
-              <CommentEditor postId={post.id} />
+              <CommentEditor postId={post.id} parentCommentId={null} />
             </div>
           )}
           <hr className="border-zinc-700/70" />
-          {post.comments.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
-          ))}
+          <Comments
+            comments={post.comments.filter(
+              (comment) => !comment.parentCommentId,
+            )}
+            replies={post.comments.filter((comment) => comment.parentCommentId)}
+          />
         </div>
       </div>
     </main>

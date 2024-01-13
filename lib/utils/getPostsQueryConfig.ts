@@ -16,8 +16,11 @@ export const postQueryWithConfig = {
   community: { columns: { name: true, imageUrl: true } },
   author: { columns: { name: true } },
   comments: {
-    columns: { id: true, text: true, parentCommentId: true },
-    with: { author: true, usersToComments: true },
+    with: {
+      author: true,
+      usersToComments: true,
+      post: { columns: { authorId: true } },
+    },
   },
   files: true,
 } as const;

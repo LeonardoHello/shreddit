@@ -29,7 +29,7 @@ const PostVote = function PostVote({ currentUserId, post }: Props) {
 
       utils["getPost"].setData(post.id, (data) => {
         if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
+          toast.error("Failed to upvote post.");
 
           return post;
         }
