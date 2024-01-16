@@ -28,7 +28,7 @@ export const users = pgTable(
     imageUrl: text("image_url").notNull(),
   },
   (t) => ({
-    nameIdx: uniqueIndex("name_idx").on(t.name),
+    nameIdx: uniqueIndex("user_name_idx").on(t.name),
   }),
 );
 
@@ -56,7 +56,7 @@ export const communities = pgTable(
       .notNull(),
   },
   (t) => ({
-    nameIdx: uniqueIndex("name_idx").on(t.name),
+    nameIdx: uniqueIndex("community_name_idx").on(t.name),
   }),
 );
 
@@ -85,7 +85,7 @@ export const usersToCommunities = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.communityId] }),
-    userIdIdx: index("user_id_idx").on(t.userId),
+    userIdIdx: index("user_to_community_user_id_idx").on(t.userId),
   }),
 );
 
@@ -151,8 +151,8 @@ export const usersToPosts = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.postId] }),
-    userIdIdx: index("user_id_idx").on(t.userId),
-    postIdIdx: index("post_id_idx").on(t.postId),
+    userIdIdx: index("user_to_post_user_id_idx").on(t.userId),
+    postIdIdx: index("user_to_post_post_id_idx").on(t.postId),
   }),
 );
 
@@ -235,8 +235,8 @@ export const usersToComments = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.userId, t.commentId] }),
-    userIdIdx: index("user_id_idx").on(t.userId),
-    commentIdIdx: index("comment_id_idx").on(t.commentId),
+    userIdIdx: index("user_to_comment_user_id_idx").on(t.userId),
+    commentIdIdx: index("user_to_comment_comment_id_idx").on(t.commentId),
   }),
 );
 

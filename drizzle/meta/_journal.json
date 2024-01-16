@@ -155,6 +155,13 @@
       "when": 1705029548904,
       "tag": "0021_nervous_loa",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1705427220983,
+      "tag": "0022_luxuriant_shadow_king",
+      "breakpoints": true
     }
   ]
 }
