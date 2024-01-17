@@ -11,6 +11,18 @@ export const getCommunityBestPosts = db.query.posts
   .findMany({
     ...topPostsQueryConfig,
     with: postQueryWithConfig,
+    where: (post, { exists, and, eq, sql }) =>
+      exists(
+        db
+          .select()
+          .from(communities)
+          .where(
+            and(
+              eq(communities.id, post.communityId),
+              eq(communities.name, sql.placeholder("communityName")),
+            ),
+          ),
+      ),
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`vote_count`),
       asc(post.createdAt),
