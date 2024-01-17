@@ -125,7 +125,7 @@ export default function PostActions({
   };
 
   return (
-    <div className="flex select-none items-center gap-2 text-xs font-bold text-zinc-500">
+    <div className="flex select-none items-center gap-2 text-xs font-bold capitalize text-zinc-500">
       <div className="flex items-center gap-1  px-2 py-1">
         <ChatBubbleLeftIcon className="h-6 w-6" />
         {new Intl.NumberFormat("en-US", {
@@ -142,7 +142,7 @@ export default function PostActions({
         }}
       >
         <LinkIcon className="h-6 w-6" />
-        <div className="hidden sm:block">Copy Link</div>
+        <div className="hidden sm:block">copy link</div>
       </div>
       <div
         className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
@@ -158,12 +158,12 @@ export default function PostActions({
         {userToPost?.saved ? (
           <>
             <BookmarkSlashIcon className="h-6 w-6" />
-            <div className="hidden sm:block">Unsave</div>
+            <div className="hidden sm:block">unsave</div>
           </>
         ) : (
           <>
             <BookmarkIcon className="h-6 w-6" />
-            <div className="hidden sm:block">Save</div>
+            <div className="hidden sm:block">save</div>
           </>
         )}
       </div>
@@ -181,12 +181,12 @@ export default function PostActions({
         {userToPost?.hidden ? (
           <>
             <EyeSlashIcon className="h-6 w-6" />
-            <div className="hidden sm:block">Unhide</div>
+            <div className="hidden sm:block">unhide</div>
           </>
         ) : (
           <>
             <EyeIcon className="h-6 w-6" />
-            <div className="hidden sm:block">Hide</div>
+            <div className="hidden sm:block">hide</div>
           </>
         )}
       </div>

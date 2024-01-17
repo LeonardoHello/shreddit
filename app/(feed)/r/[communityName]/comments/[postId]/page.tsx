@@ -34,7 +34,7 @@ export default async function PostPage({
         <div className="flex w-full max-w-5xl gap-4 rounded bg-zinc-900 p-2">
           <Post currentUserId={user ? user.id : null} initialData={post} />
         </div>
-        <div className="flex w-full max-w-5xl flex-col gap-6 bg-zinc-900 px-14 py-4">
+        <div className="flex w-full max-w-5xl grow flex-col gap-6 bg-zinc-900 px-14 py-4">
           <div>
             <div className="mb-2 text-xs">
               {user && (

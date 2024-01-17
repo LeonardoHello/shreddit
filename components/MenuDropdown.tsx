@@ -19,7 +19,7 @@ export default async function MenuDropdown({
       {children}
 
       <div className="flex flex-col gap-2.5">
-        <h2 className="px-6 text-2xs text-zinc-300/60">FEEDS</h2>
+        <h2 className="px-6 text-2xs uppercase text-zinc-300/60">feeds</h2>
         <menu className="w-full self-center">
           <li>
             <Link
@@ -47,7 +47,7 @@ export default async function MenuDropdown({
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="px-6 text-2xs text-zinc-300/60">OTHER</h2>
+        <h2 className="px-6 text-2xs uppercase text-zinc-300/60">other</h2>
         <menu className="w-full self-center">
           <li>
             <Link
