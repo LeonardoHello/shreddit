@@ -229,29 +229,6 @@ export default function RTEButtons({ editor }: { editor: Editor }) {
 
       <div className="flex items-center gap-1">
         <button
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
-          title="Horizontal Rule"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              d="M2 11H4V13H2V11ZM6 11H18V13H6V11ZM20 11H22V13H20V11Z"
-              fill="#71717a"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <div className="h-4 w-px self-center bg-zinc-700/70" />
-
-      <div className="flex items-center gap-1">
-        <button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().chain().focus().undo().run()}
           className={cn(
