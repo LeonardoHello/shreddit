@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
+import { usePostContext } from "@/lib/context/PostContextProvider";
 import type { Post, User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
 import type { RouterInput, RouterOutput } from "@/trpc/procedures";
@@ -18,13 +19,11 @@ import { trpc } from "@/trpc/react";
 
 type Props = {
   currentUserId: User["id"] | null;
-  post: NonNullable<RouterOutput["getPost"]>;
   removePostFromQuery?: (postId: Post["id"]) => void;
   children: React.ReactNode;
 };
 
 export default function PostActions({
-  post,
   currentUserId,
   removePostFromQuery,
   children,
@@ -33,6 +32,7 @@ export default function PostActions({
   const utils = trpc.useUtils();
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
+  const post = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,

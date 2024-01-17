@@ -10,15 +10,13 @@ import { Image as ImageExtension } from "@tiptap/extension-image";
 import { generateHTML } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import { usePostContext } from "@/lib/context/PostContextProvider";
 import type { File, Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
-import type { RouterOutput } from "@/trpc/procedures";
 
-export default memo(function PostContent({
-  post,
-}: {
-  post: NonNullable<RouterOutput["getPost"]>;
-}) {
+export default memo(function PostContent() {
+  const post = usePostContext();
+
   if (post.text === null && post.files.length === 0) return null;
 
   if (post.text) {

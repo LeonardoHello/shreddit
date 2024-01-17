@@ -1,18 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { usePostContext } from "@/lib/context/PostContextProvider";
 import useHydration from "@/lib/hooks/useHydration";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
-import type { RouterOutput } from "@/trpc/procedures";
 
-export default function PostMetadata({
-  post,
-}: {
-  post: NonNullable<RouterOutput["getPost"]>;
-}) {
+export default function PostMetadata() {
   const hydrated = useHydration();
+  const post = usePostContext();
 
   return (
     <>

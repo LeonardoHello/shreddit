@@ -8,22 +8,21 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
+import { usePostContext } from "@/lib/context/PostContextProvider";
 import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
-import type { RouterInput, RouterOutput } from "@/trpc/procedures";
+import type { RouterInput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type Props = {
-  post: NonNullable<RouterOutput["getPost"]>;
   removePostFromQuery?: (postId: Post["id"]) => void;
 };
 
-export default function PostActionsDropdown({
-  post,
-  removePostFromQuery,
-}: Props) {
+export default function PostActionsDropdown({ removePostFromQuery }: Props) {
   const router = useRouter();
   const utils = trpc.useUtils();
+
+  const post = usePostContext();
 
   const queryConfig = {
     onMutate: async (

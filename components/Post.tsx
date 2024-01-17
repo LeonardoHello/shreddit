@@ -2,6 +2,7 @@
 
 import { memo } from "react";
 
+import PostContextProvider from "@/lib/context/PostContextProvider";
 import type { Post, User } from "@/lib/db/schema";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
@@ -31,22 +32,18 @@ export default memo(function Post({
   if (!post) throw new Error("Couldn't fetch post information");
 
   return (
-    <>
-      <PostVote currentUserId={currentUserId} post={post} />
+    <PostContextProvider post={post}>
+      <PostVote currentUserId={currentUserId} />
       <div className="flex grow flex-col gap-1.5">
-        <PostMetadata post={post} />
-        <PostContent post={post} />
+        <PostMetadata />
+        <PostContent />
         <PostActions
           currentUserId={currentUserId}
-          post={post}
           removePostFromQuery={removePostFromQuery}
         >
-          <PostActionsDropdown
-            post={post}
-            removePostFromQuery={removePostFromQuery}
-          />
+          <PostActionsDropdown removePostFromQuery={removePostFromQuery} />
         </PostActions>
       </div>
-    </>
+    </PostContextProvider>
   );
 });

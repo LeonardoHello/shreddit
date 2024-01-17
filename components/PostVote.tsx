@@ -4,18 +4,19 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
+import { usePostContext } from "@/lib/context/PostContextProvider";
 import type { UserToPost } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
-import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type Props = {
   currentUserId: UserToPost["userId"] | null;
-  post: NonNullable<RouterOutput["getPost"]>;
 };
 
-const PostVote = function PostVote({ currentUserId, post }: Props) {
+const PostVote = function PostVote({ currentUserId }: Props) {
   const utils = trpc.useUtils();
+
+  const post = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,
