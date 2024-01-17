@@ -409,7 +409,7 @@ export const appRouter = router({
         .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
         .returning({ nsfw: posts.nsfw });
     }),
-  postComment: protectedProcedure
+  createComment: protectedProcedure
     .input(
       CommentSchema.pick({ postId: true, parentCommentId: true, text: true }),
     )
@@ -420,6 +420,19 @@ export const appRouter = router({
           authorId: ctx.auth.userId,
           ...input,
         })
+        .onConflictDoUpdate({
+          target: [comments.id],
+          set: { text: input.text, updatedAt: new Date() },
+        })
+        .returning();
+    }),
+  updateComment: protectedProcedure
+    .input(CommentSchema.pick({ id: true, text: true }))
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .update(comments)
+        .set({ text: input.text, updatedAt: new Date() })
+        .where(eq(comments.id, input.id))
         .returning();
     }),
   voteComment: protectedProcedure
@@ -436,6 +449,14 @@ export const appRouter = router({
   getComment: procedure.input(CommentSchema.shape.id).query(({ input }) => {
     return getComment.execute({ commentId: input });
   }),
+  deleteComment: protectedProcedure
+    .input(CommentSchema.shape.id)
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .delete(comments)
+        .where(eq(comments.id, input))
+        .returning({ id: comments.id });
+    }),
 });
 
 export type AppRouter = typeof appRouter;

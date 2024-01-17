@@ -1,0 +1,47 @@
+import {
+  ChatBubbleLeftIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/24/outline";
+
+import { useCommentContext } from "@/lib/context/CommentContextProvider";
+import type { User } from "@/lib/db/schema";
+import useDropdown from "@/lib/hooks/useDropdown";
+
+import CommentVote from "./CommentVote";
+
+export default function CommentActions({
+  currentUserId,
+  toggleReply,
+  children,
+}: {
+  currentUserId: User["id"] | null;
+  toggleReply: () => void;
+  children: React.ReactNode;
+}) {
+  const { dropdownRef, isOpen, setIsOpen } = useDropdown();
+
+  const comment = useCommentContext();
+
+  return (
+    <div className="flex items-center gap-1 text-xs font-bold text-zinc-500">
+      <CommentVote currentUserId={currentUserId} />
+      <div
+        className="flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 transition-colors hover:bg-zinc-700/50"
+        onClick={toggleReply}
+      >
+        <ChatBubbleLeftIcon className="h-6 w-6" />
+        <span className="hidden sm:block">Relpy</span>
+      </div>
+      {comment.authorId === currentUserId && (
+        <div
+          ref={dropdownRef}
+          className="relative cursor-pointer"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
+          {isOpen && children}
+        </div>
+      )}
+    </div>
+  );
+}

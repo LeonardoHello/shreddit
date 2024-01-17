@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommentEditor from "@/components/CommentEditor";
+import CommentRTE from "@/components/CommentRTE";
 import Comments from "@/components/Comments";
 import Post from "@/components/Post";
 import { getPostById } from "@/lib/api/getPost";
@@ -35,20 +35,23 @@ export default async function PostPage({
           <Post currentUserId={user ? user.id : null} initialData={post} />
         </div>
         <div className="flex w-full max-w-5xl flex-col gap-6 bg-zinc-900 px-14 py-4">
-          {user && (
-            <div>
-              <div className="mb-2 text-xs">
-                Comment as{" "}
-                <Link
-                  href={`/u/${user.name}`}
-                  className="text-sky-500 hover:underline"
-                >
-                  {user.name}
-                </Link>
-              </div>
-              <CommentEditor postId={post.id} parentCommentId={null} />
+          <div>
+            <div className="mb-2 text-xs">
+              {user && (
+                <>
+                  Comment as{" "}
+                  <Link
+                    href={`/u/${user.name}`}
+                    className="text-sky-500 hover:underline"
+                  >
+                    {user.name}
+                  </Link>
+                </>
+              )}
             </div>
-          )}
+
+            <CommentRTE postId={post.id} />
+          </div>
           <hr className="border-zinc-700/70" />
           <Comments
             comments={post.comments.filter(

@@ -6,20 +6,19 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
+import { useCommentContext } from "@/lib/context/CommentContextProvider";
 import { User } from "@/lib/db/schema";
-import type { ArrElement } from "@/lib/types";
 import cn from "@/lib/utils/cn";
-import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 export default function CommentVote({
-  comment,
   currentUserId,
 }: {
-  comment: ArrElement<NonNullable<RouterOutput["getPost"]>["comments"]>;
   currentUserId: User["id"] | null;
 }) {
   const utils = trpc.useUtils();
+
+  const comment = useCommentContext();
 
   const userToComment = comment.usersToComments.find(
     (userToComment) => userToComment.userId === currentUserId,

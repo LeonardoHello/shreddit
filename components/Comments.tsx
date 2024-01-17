@@ -23,14 +23,16 @@ export default function Comments({
             initialData={comment}
           >
             {/* replies */}
-            <Comments
-              comments={replies.filter(
-                (reply) => reply.parentCommentId === comment.id,
-              )}
-              replies={replies.filter(
-                (reply) => reply.parentCommentId !== comment.id,
-              )}
-            />
+            {replies.some((reply) => reply.parentCommentId === comment.id) ? (
+              <Comments
+                comments={replies.filter(
+                  (reply) => reply.parentCommentId === comment.id,
+                )}
+                replies={replies.filter(
+                  (reply) => reply.parentCommentId !== comment.id,
+                )}
+              />
+            ) : null}
           </Comment>
         ))}
     </div>

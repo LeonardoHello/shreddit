@@ -1,111 +1,16 @@
-"use client";
+import { type Editor } from "@tiptap/react";
 
-import { useTransition } from "react";
-
-import { useRouter } from "next/navigation";
-
-import CharacterCount from "@tiptap/extension-character-count";
-import Placeholder from "@tiptap/extension-placeholder";
-import { EditorContent, useEditor } from "@tiptap/react";
-import type { Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { toast } from "sonner";
-
-import { Comment, Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
-import { trpc } from "@/trpc/react";
 
-export default function CommentEditor({
-  postId,
-  parentCommentId,
-  setReply,
-}: {
-  postId: Post["id"];
-  parentCommentId: Comment["parentCommentId"];
-  setReply?: (data: boolean) => void;
-}) {
-  const editor = useEditor({
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
-      },
-    },
-    extensions: [
-      StarterKit,
-      CharacterCount.configure({ limit: 255 }),
-      Placeholder.configure({
-        placeholder: "What are your thoughts?",
-      }),
-    ],
-  });
-
-  if (!editor) {
-    return null;
-  }
-
-  return (
-    <div
-      className={cn("rounded border border-zinc-700/70", {
-        "border-zinc-300": editor.isFocused,
-      })}
-    >
-      <EditorContent editor={editor} />
-      <EditorMenu
-        editor={editor}
-        postId={postId}
-        parentCommentId={parentCommentId}
-        setReply={setReply}
-      />
-    </div>
-  );
-}
-
-function EditorMenu({
-  editor,
-  postId,
-  parentCommentId,
-  setReply,
-}: {
-  editor: Editor;
-  postId: Post["id"];
-  parentCommentId: Comment["parentCommentId"];
-  setReply?: (data: boolean) => void;
-}) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const postComment = trpc.postComment.useMutation({
-    onMutate: () => {
-      editor.setEditable(false);
-    },
-    onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
-      });
-      editor.commands.clearContent();
-      editor.setEditable(true);
-
-      toast.success("Comment successfully posted.");
-    },
-    onError: (error) => {
-      editor.setEditable(true);
-      toast.error(error.message);
-    },
-  });
-
-  const isMutating = isPending || postComment.isLoading;
-
+export default function RTEButtons({ editor }: { editor: Editor }) {
   const setActive = (name: string, attributes?: {} | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
       "#71717a": !editor.isActive(name, attributes),
     });
 
-  const isEmpty = editor.state.doc.textContent.trim().length === 0;
-
   return (
-    <div className="flex flex-wrap gap-2 rounded-t bg-zinc-800 px-1.5 py-1">
+    <>
       <div className="flex items-center gap-1">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -201,7 +106,7 @@ function EditorMenu({
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -283,6 +188,24 @@ function EditorMenu({
           </svg>
         </button>
         <button
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
+          title="Blockquote"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+          >
+            <path fill="none" d="M0 0h24v24H0z" />
+            <path
+              d="M19.4167 6.67891C20.4469 7.77257 21.0001 9 21.0001 10.9897C21.0001 14.4891 18.5436 17.6263 14.9695 19.1768L14.0768 17.7992C17.4121 15.9946 18.0639 13.6539 18.3245 12.178C17.7875 12.4557 17.0845 12.5533 16.3954 12.4895C14.591 12.3222 13.1689 10.8409 13.1689 9C13.1689 7.067 14.7359 5.5 16.6689 5.5C17.742 5.5 18.7681 5.99045 19.4167 6.67891ZM9.41669 6.67891C10.4469 7.77257 11.0001 9 11.0001 10.9897C11.0001 14.4891 8.54359 17.6263 4.96951 19.1768L4.07682 17.7992C7.41206 15.9946 8.06392 13.6539 8.32447 12.178C7.78747 12.4557 7.08452 12.5533 6.39539 12.4895C4.59102 12.3222 3.16895 10.8409 3.16895 9C3.16895 7.067 4.73595 5.5 6.66895 5.5C7.742 5.5 8.76814 5.99045 9.41669 6.67891Z"
+              fill={setActive("blockquote")}
+            />
+          </svg>
+        </button>
+        <button
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
           title="Code Block"
@@ -302,27 +225,9 @@ function EditorMenu({
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
-        <button
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
-          title="Blockquote"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              d="M19.4167 6.67891C20.4469 7.77257 21.0001 9 21.0001 10.9897C21.0001 14.4891 18.5436 17.6263 14.9695 19.1768L14.0768 17.7992C17.4121 15.9946 18.0639 13.6539 18.3245 12.178C17.7875 12.4557 17.0845 12.5533 16.3954 12.4895C14.591 12.3222 13.1689 10.8409 13.1689 9C13.1689 7.067 14.7359 5.5 16.6689 5.5C17.742 5.5 18.7681 5.99045 19.4167 6.67891ZM9.41669 6.67891C10.4469 7.77257 11.0001 9 11.0001 10.9897C11.0001 14.4891 8.54359 17.6263 4.96951 19.1768L4.07682 17.7992C7.41206 15.9946 8.06392 13.6539 8.32447 12.178C7.78747 12.4557 7.08452 12.5533 6.39539 12.4895C4.59102 12.3222 3.16895 10.8409 3.16895 9C3.16895 7.067 4.73595 5.5 6.66895 5.5C7.742 5.5 8.76814 5.99045 9.41669 6.67891Z"
-              fill={setActive("blockquote")}
-            />
-          </svg>
-        </button>
         <button
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
@@ -343,48 +248,7 @@ function EditorMenu({
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
-
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => editor.chain().focus().clearNodes().run()}
-          className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
-          title="Clear Format"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              d="M12.6512 14.0654L11.6047 19.9999H9.57389L10.9247 12.3389L3.51465 4.92886L4.92886 3.51465L20.4852 19.071L19.071 20.4852L12.6512 14.0654ZM11.7727 7.53003L12.0425 5.99993H10.2426L8.24257 3.99993H19.9999V5.99993H14.0733L13.4991 9.25646L11.7727 7.53003Z"
-              fill="#71717a"
-            />
-          </svg>
-        </button>
-        <button
-          onClick={() => editor.chain().focus().setHardBreak().run()}
-          className="p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70"
-          title="Hard Break"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path fill="none" d="M0 0h24v24H0z" />
-            <path
-              d="M15 18H16.5C17.8807 18 19 16.8807 19 15.5C19 14.1193 17.8807 13 16.5 13H3V11H16.5C18.9853 11 21 13.0147 21 15.5C21 17.9853 18.9853 20 16.5 20H15V22L11 19L15 16V18ZM3 4H21V6H3V4ZM9 18V20H3V18H9Z"
-              fill="#71717a"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -432,39 +296,6 @@ function EditorMenu({
           </svg>
         </button>
       </div>
-      <div className="ml-auto flex gap-2">
-        {setReply && (
-          <button
-            className="rounded-full px-4 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-700/50"
-            onClick={() => setReply(false)}
-          >
-            cancel
-          </button>
-        )}
-
-        <button
-          className={cn(
-            "rounded-full bg-zinc-300 px-4 text-sm font-bold text-zinc-800 transition-opacity hover:opacity-80",
-            {
-              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
-            },
-          )}
-          disabled={isEmpty || isMutating}
-          onClick={() => {
-            postComment.mutate({
-              postId,
-              parentCommentId,
-              text: editor.getHTML(),
-            });
-
-            if (setReply) {
-              setReply(false);
-            }
-          }}
-        >
-          {setReply ? "Reply" : "Comment"}
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

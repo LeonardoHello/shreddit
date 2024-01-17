@@ -147,7 +147,7 @@ export default function PostActionsDropdown({
         onClick={() => {
           if (deletedPost.isLoading) return;
 
-          deletedPost.mutateAsync(post.id);
+          deletedPost.mutate(post.id);
         }}
       >
         <TrashIcon className="h-5 w-5" /> Delete

@@ -8,7 +8,7 @@ import CommunityHeader from "@/components/CommunityHeader";
 import FeedInput from "@/components/FeedInput";
 import FeedSort from "@/components/FeedSort";
 import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
-import { getCommunityByName, getUserToCommunity } from "@/lib/api/getCommunity";
+import { getCommunityByName } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,
   getCommunityControversialPosts,

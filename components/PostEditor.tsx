@@ -189,7 +189,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -290,7 +290,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -331,7 +331,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -372,7 +372,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <div className="flex items-center gap-1">
         <button
@@ -421,7 +421,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         </button>
       </div>
 
-      <div className="h-6 w-px bg-zinc-700" />
+      <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <button
         {...getRootProps()}
