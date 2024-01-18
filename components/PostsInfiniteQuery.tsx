@@ -9,8 +9,8 @@ import type { InfiniteQueryPostProcedure, QueryInfo } from "@/lib/types";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import EmptyPosts from "./EmptyPosts";
 import Post from "./Post";
+import PostsEmpty from "./PostsEmpty";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
@@ -58,7 +58,7 @@ export default function PostsInfiniteQuery<
     throw new Error("Couldn't fetch posts");
   }
 
-  if (infiniteQuery.data.pages[0].posts.length === 0) return <EmptyPosts />;
+  if (infiniteQuery.data.pages[0].posts.length === 0) return <PostsEmpty />;
 
   const removePostFromQuery = async (postId: PostType["id"]) => {
     await utils["getPost"].cancel();

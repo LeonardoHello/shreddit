@@ -6,16 +6,16 @@ import {
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function EmptyPosts() {
+export default function PostsEmpty() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const filter = searchParams.get("filter");
 
   return (
-    <div className="relative flex flex-col border border-zinc-700/30">
+    <div className="relative flex flex-col rounded border border-zinc-700/25">
       {[0, 1, 2, 3, 4].map((_) => (
-        <div key={_} className="flex gap-2 bg-zinc-900 p-2 opacity-30">
+        <div key={_} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
           <div className="flex select-none flex-col items-center gap-4 text-zinc-500">
             <ArrowUpCircleIcon className="h-8 w-8 rounded" />
             <ArrowDownCircleIcon className="h-8 w-8 rounded" />
@@ -46,8 +46,8 @@ export default function EmptyPosts() {
         )}
 
         {!filter && (
-          <Link href="/submit" className="rounded-full bg-zinc-300 px-12">
-            <button className="w-full rounded-full  p-1.5 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
+          <Link href="/submit" className="rounded-full">
+            <button className="w-full rounded-full bg-zinc-300 p-1.5 px-12 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
               Create Post
             </button>
           </Link>
