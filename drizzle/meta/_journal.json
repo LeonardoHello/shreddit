@@ -162,6 +162,13 @@
       "when": 1705427220983,
       "tag": "0022_luxuriant_shadow_king",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1705595216159,
+      "tag": "0023_medical_sentinel",
+      "breakpoints": true
     }
   ]
 }

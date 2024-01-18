@@ -28,6 +28,7 @@ export const users = pgTable(
     imageUrl: text("image_url").notNull(),
   },
   (t) => ({
+    idIdx: uniqueIndex("user_id_idx").on(t.id),
     nameIdx: uniqueIndex("user_name_idx").on(t.name),
   }),
 );
@@ -103,23 +104,30 @@ export const usersToCommunitiesRelations = relations(
   }),
 );
 
-export const posts = pgTable("posts", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  title: text("title").notNull(),
-  text: text("text"),
-  nsfw: boolean("nsfw").notNull().default(false),
-  spoiler: boolean("spoiler").notNull().default(false),
-  authorId: text("author_id")
-    .references(() => users.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
-  communityId: uuid("community_id")
-    .references(() => communities.id, { onDelete: "cascade" })
-    .notNull(),
-});
+export const posts = pgTable(
+  "posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    title: text("title").notNull(),
+    text: text("text"),
+    nsfw: boolean("nsfw").notNull().default(false),
+    spoiler: boolean("spoiler").notNull().default(false),
+    authorId: text("author_id")
+      .references(() => users.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
+    communityId: uuid("community_id")
+      .references(() => communities.id, { onDelete: "cascade" })
+      .notNull(),
+  },
+
+  (t) => ({
+    idIdx: uniqueIndex("post_id_idx").on(t.id),
+  }),
+);
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
@@ -184,26 +192,32 @@ export const filesRelations = relations(files, ({ one }) => ({
   }),
 }));
 
-export const comments = pgTable("comments", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  text: text("text").notNull(),
-  parentCommentId: uuid("parent_comment_id").references(
-    (): AnyPgColumn => comments.id,
-    {
-      onDelete: "cascade",
-    },
-  ),
-  authorId: text("author_id")
-    .references(() => users.id, {
-      onDelete: "cascade",
-    })
-    .notNull(),
-  postId: uuid("post_id")
-    .references(() => posts.id, { onDelete: "cascade" })
-    .notNull(),
-});
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    text: text("text").notNull(),
+    parentCommentId: uuid("parent_comment_id").references(
+      (): AnyPgColumn => comments.id,
+      {
+        onDelete: "cascade",
+      },
+    ),
+    authorId: text("author_id")
+      .references(() => users.id, {
+        onDelete: "cascade",
+      })
+      .notNull(),
+    postId: uuid("post_id")
+      .references(() => posts.id, { onDelete: "cascade" })
+      .notNull(),
+  },
+  (t) => ({
+    idIdx: uniqueIndex("comment_id_idx").on(t.id),
+  }),
+);
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
   post: one(posts, {
