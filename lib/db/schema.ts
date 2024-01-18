@@ -57,6 +57,7 @@ export const communities = pgTable(
       .notNull(),
   },
   (t) => ({
+    idIdx: uniqueIndex("community_id_idx").on(t.id),
     nameIdx: uniqueIndex("community_name_idx").on(t.name),
   }),
 );
