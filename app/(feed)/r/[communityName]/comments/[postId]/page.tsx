@@ -30,13 +30,13 @@ export default async function PostPage({
 
   return (
     <main className="flex grow flex-col items-center bg-zinc-900">
-      <div className="flex w-full max-w-7xl grow flex-col items-center bg-black p-4">
-        <div className="flex w-full max-w-5xl gap-4 rounded bg-zinc-900 p-2">
-          <Post currentUserId={user ? user.id : null} initialData={post} />
-        </div>
-        <div className="flex w-full max-w-5xl grow flex-col gap-6 bg-zinc-900 px-14 py-4">
-          <div>
-            <div className="mb-2 text-xs">
+      <div className="flex w-full max-w-7xl grow flex-col items-center bg-zinc-950 px-2 py-4">
+        <div className="flex w-full max-w-5xl grow flex-col bg-zinc-900">
+          <div className="flex gap-4 rounded p-2">
+            <Post currentUserId={user ? user.id : null} initialData={post} />
+          </div>
+          <div className="flex flex-col gap-2 p-4 px-14">
+            <div className="text-xs">
               {user && (
                 <>
                   Comment as{" "}
@@ -49,16 +49,19 @@ export default async function PostPage({
                 </>
               )}
             </div>
-
             <CommentRTE postId={post.id} />
           </div>
-          <hr className="border-zinc-700/70" />
-          <Comments
-            comments={post.comments.filter(
-              (comment) => !comment.parentCommentId,
-            )}
-            replies={post.comments.filter((comment) => comment.parentCommentId)}
-          />
+          <hr className="mx-14 my-2 border-zinc-700/70" />
+          <div className="flex grow flex-col gap-6 bg-zinc-900 p-4">
+            <Comments
+              comments={post.comments.filter(
+                (comment) => !comment.parentCommentId,
+              )}
+              replies={post.comments.filter(
+                (comment) => comment.parentCommentId,
+              )}
+            />
+          </div>
         </div>
       </div>
     </main>
