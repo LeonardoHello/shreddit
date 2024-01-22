@@ -457,6 +457,29 @@ export const appRouter = router({
         .where(eq(comments.id, input))
         .returning({ id: comments.id });
     }),
+  createCommunity: protectedProcedure
+    .input(
+      CommunitySchema.shape.name
+        .min(3, {
+          message: "Community names must contain at least 3 characters.",
+        })
+        .max(21, {
+          message: "Community names must contain at most 21 characters.",
+        })
+        .regex(/^[a-zA-Z0-9_]+$/, {
+          message:
+            "Community names can only contain letters, numbers, or underscores.",
+        }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(communities)
+        .values({
+          moderatorId: ctx.auth.userId,
+          name: input,
+        })
+        .returning();
+    }),
 });
 
 export type AppRouter = typeof appRouter;

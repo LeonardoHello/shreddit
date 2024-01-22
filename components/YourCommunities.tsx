@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import type { ArrElement } from "@/lib/types";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
@@ -101,7 +100,8 @@ export default function YourCommunities({
           ))}
           <li>
             <Link
-              href="/submit"
+              href={{ query: { submit: "community" } }}
+              scroll={false}
               className="flex h-9 items-center gap-2 px-6 text-sm hover:bg-zinc-700/30"
             >
               <PlusIcon className="h-5 w-5 stroke-2 text-zinc-300" />
