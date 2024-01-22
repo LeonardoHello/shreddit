@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import { User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
-import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
 import CommunityOptions from "./CommunityOptions";
@@ -36,6 +35,7 @@ export default function CommunityAbout({
       startTransition(() => {
         router.refresh();
       });
+      setEdit(false);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -67,41 +67,38 @@ export default function CommunityAbout({
         )}
       </div>
       {!edit && community.about && (
-        <p
-          className={cn("max-w-[302px] break-words", {
-            "animate-pulse": isMutating,
-          })}
-        >
-          {community.about}
-        </p>
+        <p className="max-w-[302px] break-words">{community.about}</p>
       )}
       {edit && (
         <>
           <textarea
             ref={aboutRef}
             defaultValue={community.about}
-            rows={8}
+            rows={6}
             className="min-w-0 rounded bg-zinc-400/10 px-2 py-1 outline-none ring-1 ring-inset ring-zinc-700 hover:bg-inherit hover:ring-zinc-300 focus:bg-inherit focus:ring-zinc-300"
             spellCheck={false}
+            readOnly={isMutating}
           />
           <div className="flex justify-end gap-2 text-xs">
             <button
-              className="text-rose-500 hover:opacity-80"
+              className="capitalize text-rose-500 transition-opacity hover:opacity-80"
               onClick={() => setEdit(false)}
             >
-              Cancel
+              cancel
             </button>
             <button
-              className="hover:opacity-80"
+              className="capitalize transition-opacity hover:opacity-80"
+              disabled={isMutating}
               onClick={() => {
+                if (isMutating) return;
+
                 setAboutCommunity.mutate({
                   id: community.id,
                   about: aboutRef.current?.value ?? "",
                 });
-                setEdit(false);
               }}
             >
-              Save
+              {isMutating ? "editing..." : "save"}
             </button>
           </div>
         </>

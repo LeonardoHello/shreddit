@@ -17,8 +17,8 @@ export default function CommunityOptions({
 
   const deleteCommunity = trpc.deleteCommunity.useMutation({
     onSuccess: (data) => {
-      toast.error(`Successfully deleted r/${data[0].name}`);
       router.replace("/");
+      toast.success(`Successfully deleted r/${data[0].name}`);
     },
     onError: ({ message }) => {
       toast.error(message);
