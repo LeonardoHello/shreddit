@@ -39,8 +39,8 @@ export default async function getUserPosts({
 }: {
   userId: User["id"];
   userName: User["name"];
-  filter?: string | undefined;
-  sort?: string | undefined;
+  filter?: string | string[] | undefined;
+  sort?: string | string[] | undefined;
 }) {
   let posts;
 

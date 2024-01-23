@@ -1,17 +1,17 @@
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function PostsEmpty() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-
-  const filter = searchParams.get("filter");
-
+export default function PostsEmpty({
+  userName,
+  filter,
+}: {
+  userName?: string;
+  filter?: string | string[] | undefined;
+}) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
       {[0, 1, 2, 3, 4].map((_) => (
@@ -32,25 +32,18 @@ export default function PostsEmpty() {
         </div>
       ))}
       <div className="absolute top-1/4 flex flex-col items-center gap-2 self-center p-12 text-center">
-        {filter || pathname.startsWith("/u") ? (
-          <h1 className="text-lg font-medium">
-            hmm... looks like nothing has been {filter || "posted"} yet
-          </h1>
-        ) : (
+        <h1 className="text-lg font-medium">
+          hmm... looks like nothing has been {filter || "posted"} yet
+        </h1>
+        {!(filter || userName) && (
           <>
-            <h1 className="text-lg font-medium">
-              There are no posts in this subreddit
-            </h1>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
+            <Link href="/submit" className="rounded-full">
+              <button className="w-full rounded-full bg-zinc-300 p-1.5 px-12 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
+                Create Post
+              </button>
+            </Link>
           </>
-        )}
-
-        {!filter && (
-          <Link href="/submit" className="rounded-full">
-            <button className="w-full rounded-full bg-zinc-300 p-1.5 px-12 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
-              Create Post
-            </button>
-          </Link>
         )}
       </div>
     </div>

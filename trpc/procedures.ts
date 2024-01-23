@@ -58,7 +58,7 @@ export const appRouter = router({
           // cursor input needed to expose useInfiniteQuery hook
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
-          sort: z.string().optional(),
+          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
       .query(async ({ input, ctx }) => {
@@ -104,7 +104,7 @@ export const appRouter = router({
       .input(
         z.object({
           cursor: z.number().nullish(),
-          sort: z.string().optional(),
+          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
       .query(async ({ input }) => {
@@ -147,8 +147,8 @@ export const appRouter = router({
       .input(
         z.object({
           cursor: z.number().nullish(),
-          sort: z.string().optional(),
           communityName: z.string(),
+          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
       .query(async ({ input: { cursor, sort, communityName } }) => {
@@ -196,8 +196,8 @@ export const appRouter = router({
           cursor: z.number().nullish(),
           userId: UserSchema.shape.id,
           userName: UserSchema.shape.name,
-          filter: z.string().optional(),
-          sort: z.string().optional(),
+          filter: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
       .query(async ({ input }) => {

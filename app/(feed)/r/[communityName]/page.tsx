@@ -22,12 +22,17 @@ export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function CommunityPage({
-  params: { communityName },
-  searchParams: { sort },
+  params,
+  searchParams,
 }: {
   params: { communityName: string };
-  searchParams: { sort: string | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const { userId } = auth();
+
+  const { communityName } = params;
+  const { sort } = searchParams;
+
   let postsData;
   switch (sort) {
     case SortPosts.HOT:
@@ -58,8 +63,6 @@ export default async function CommunityPage({
       });
       break;
   }
-
-  const { userId } = auth();
 
   const [user, community, posts] = await Promise.all([
     getUserById.execute({ currentUserId: userId }),
@@ -115,6 +118,8 @@ export default async function CommunityPage({
             currentUserId={user ? user.id : null}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
+            params={params}
+            searchParams={searchParams}
           />
         </div>
         <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">

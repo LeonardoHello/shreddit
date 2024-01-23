@@ -17,7 +17,7 @@ export default function UserCommunities({
   return (
     <div className="rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
       <h1 className="mb-6 max-w-[15rem] font-bold tracking-wide text-zinc-500">
-        You&apos;re a moderator of these communities
+        Moderator of these communities
       </h1>
       <div className="flex flex-col gap-3.5">
         {communities.map((community) => (

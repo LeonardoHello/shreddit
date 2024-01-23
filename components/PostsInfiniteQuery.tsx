@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
@@ -16,36 +16,63 @@ type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
   initialPosts: RouterOutput["infiniteQueryPosts"][T];
   queryInfo: QueryInfo<T>;
+  params: { userName?: string; communityName?: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export default function PostsInfiniteQuery<
   T extends InfiniteQueryPostProcedure,
->({ currentUserId, initialPosts, queryInfo }: Props<T>) {
+>({ currentUserId, initialPosts, queryInfo, params, searchParams }: Props<T>) {
   const router = useRouter();
   const utils = trpc.useUtils();
-  const searchparams = useSearchParams();
 
   const infiniteQuery = trpc.infiniteQueryPosts[
     queryInfo.procedure
   ].useInfiniteQuery(queryInfo.input, {
-    // filter hidden posts
+    // filter muted communities and hidden posts
     select: (data) => {
-      if (!currentUserId || searchparams.get("filter")) {
+      if (!currentUserId || searchParams.filter) {
         return data;
+      }
+
+      if (params.communityName) {
+        return {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            posts: page.posts.filter(
+              (post) =>
+                !post.usersToPosts.some(
+                  (userToPost) =>
+                    userToPost.hidden === true &&
+                    userToPost.userId === currentUserId,
+                ),
+            ),
+          })),
+        };
       }
 
       return {
         ...data,
         pages: data.pages.map((page) => ({
           ...page,
-          posts: page.posts.filter(
-            (post) =>
-              !post.usersToPosts.some(
-                (userToPost) =>
-                  userToPost.hidden === true &&
-                  userToPost.userId === currentUserId,
-              ),
-          ),
+          posts: page.posts
+            .filter(
+              (post) =>
+                !post.community.usersToCommunities.some(
+                  (userToCommunity) =>
+                    userToCommunity.muted &&
+                    userToCommunity.userId === currentUserId,
+                ),
+            )
+            .filter(
+              (post) =>
+                !post.usersToPosts.some(
+                  (userToPost) =>
+                    userToPost.hidden === true &&
+                    userToPost.userId === currentUserId,
+                ),
+            ),
         })),
       };
     },
@@ -58,7 +85,10 @@ export default function PostsInfiniteQuery<
     throw new Error("Couldn't fetch posts");
   }
 
-  if (infiniteQuery.data.pages[0].posts.length === 0) return <PostsEmpty />;
+  if (infiniteQuery.data.pages[0].posts.length === 0)
+    return (
+      <PostsEmpty userName={params.userName} filter={searchParams.filter} />
+    );
 
   const removePostFromQuery = async (postId: PostType["id"]) => {
     await utils["getPost"].cancel();

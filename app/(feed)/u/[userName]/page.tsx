@@ -15,12 +15,14 @@ export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function UserPage({
-  params: { userName },
-  searchParams: { filter, sort },
+  params,
+  searchParams,
 }: {
   params: { userName: string };
-  searchParams: { filter: string | undefined; sort: string | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  const { userName } = params;
+
   const user = await getUserByName
     .execute({
       userName,
@@ -32,6 +34,8 @@ export default async function UserPage({
   if (user === undefined) notFound();
 
   const { userId } = auth();
+
+  const { filter, sort } = searchParams;
 
   if (user.id !== userId && filter === "hidden")
     permanentRedirect(`/u/${userName}`);
@@ -70,6 +74,8 @@ export default async function UserPage({
             currentUserId={userId}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
+            params={params}
+            searchParams={searchParams}
           />
         </div>
         <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">

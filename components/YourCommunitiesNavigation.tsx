@@ -1,7 +1,5 @@
 "use client";
 
-import type { MouseEvent } from "react";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -80,7 +78,7 @@ export default function YourCommunitiesNavigation({
         utils.getModeratedCommunities.refetch(),
         utils.getJoinedCommunities.refetch(),
       ]).catch(() => {
-        throw new Error("Could not load users information.");
+        throw new Error("Could not load menu information.");
       });
 
       toast.error(message);

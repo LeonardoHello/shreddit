@@ -8,8 +8,8 @@ export default function UserNavigation({
   isCurrentUser,
 }: {
   userName: string;
-  filter: string | undefined;
   isCurrentUser: boolean;
+  filter?: string | string[] | undefined;
 }) {
   const defaultNav = !(
     filter === "saved" ||

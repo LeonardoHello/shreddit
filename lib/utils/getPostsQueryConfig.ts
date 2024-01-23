@@ -13,7 +13,10 @@ export type PostsQueryConfig = DBQueryConfig<
 
 export const postQueryWithConfig = {
   usersToPosts: { columns: { postId: false, createdAt: false } },
-  community: { columns: { name: true, imageUrl: true } },
+  community: {
+    columns: { name: true, imageUrl: true },
+    with: { usersToCommunities: { columns: { muted: true, userId: true } } },
+  },
   author: { columns: { name: true } },
   comments: {
     with: {

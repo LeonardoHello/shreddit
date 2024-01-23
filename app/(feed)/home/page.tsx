@@ -22,13 +22,17 @@ export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function HomePage({
-  searchParams: { sort },
+  params,
+  searchParams,
 }: {
-  searchParams: { sort: string | undefined };
+  params: {};
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const { userId } = auth();
 
-  if (userId === null) throw new Error("Could not load users information.");
+  if (userId === null) throw new Error("Could not load home page information.");
+
+  const { sort } = searchParams;
 
   let postsData;
   switch (sort) {
@@ -89,6 +93,8 @@ export default async function HomePage({
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}
+          params={params}
+          searchParams={searchParams}
         />
       </div>
       <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
