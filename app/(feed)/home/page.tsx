@@ -121,7 +121,11 @@ export default async function HomePage({
               Create Post
             </button>
           </Link>
-          <Link href="/submit" className="rounded-full">
+          <Link
+            href={{ query: { submit: "community" } }}
+            scroll={false}
+            className="rounded-full"
+          >
             <button className="w-full rounded-full border border-zinc-300 p-1.5 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-800">
               Create Community
             </button>
