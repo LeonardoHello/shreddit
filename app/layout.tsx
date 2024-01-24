@@ -7,9 +7,7 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { Toaster } from "sonner";
 import { extractRouterConfig } from "uploadthing/server";
 
-import CommunityCreate from "@/components/CommunityCreate";
 import Header from "@/components/Header";
-import Modal from "@/components/Modal";
 import cn from "@/lib/utils/cn";
 import { TRPCReactProvider } from "@/trpc/react";
 import { uploadRouter } from "@/uploadthing/server";
@@ -54,9 +52,6 @@ export default function RootLayout({
             <div className="mt-12 flex min-h-[calc(100vh-3rem)] flex-col">
               {children}
             </div>
-            <Modal>
-              <CommunityCreate />
-            </Modal>
           </TRPCReactProvider>
           <Toaster theme="dark" richColors closeButton />
         </body>

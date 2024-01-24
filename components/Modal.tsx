@@ -7,7 +7,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export default function Modal({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -17,12 +16,12 @@ export default function Modal({ children }: { children: React.ReactNode }) {
     document.body.classList.add("overflow-hidden");
     document.addEventListener("keydown", onKeyDown);
     return () => {
+      console.log("eee");
+
       document.body.classList.remove("overflow-hidden");
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [router, pathname]);
-
-  if (searchParams.get("submit") !== "community") return null;
 
   return (
     <div

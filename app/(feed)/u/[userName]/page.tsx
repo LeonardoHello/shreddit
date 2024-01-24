@@ -2,7 +2,9 @@ import { notFound, permanentRedirect } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
+import CommunityCreate from "@/components/CommunityCreate";
 import FeedSort from "@/components/FeedSort";
+import Modal from "@/components/Modal";
 import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
 import UserCommunities from "@/components/UserCommunities";
 import UserInfo from "@/components/UserInfo";
@@ -60,29 +62,36 @@ export default async function UserPage({
   };
 
   return (
-    <main className="flex grow flex-col">
-      <UserNavigation
-        userName={userName}
-        filter={filter}
-        isCurrentUser={user.id === userId}
-      />
+    <>
+      {searchParams.submit === "community" && (
+        <Modal>
+          <CommunityCreate />
+        </Modal>
+      )}
+      <main className="flex grow flex-col">
+        <UserNavigation
+          userName={userName}
+          filter={filter}
+          isCurrentUser={user.id === userId}
+        />
 
-      <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
-        <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
-          <FeedSort />
-          <PostsInfiniteQuery<"getUserPosts">
-            currentUserId={userId}
-            initialPosts={{ posts, nextCursor }}
-            queryInfo={queryInfo}
-            params={params}
-            searchParams={searchParams}
-          />
+        <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
+          <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
+            <FeedSort />
+            <PostsInfiniteQuery<"getUserPosts">
+              currentUserId={userId}
+              initialPosts={{ posts, nextCursor }}
+              queryInfo={queryInfo}
+              params={params}
+              searchParams={searchParams}
+            />
+          </div>
+          <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+            <UserInfo user={user} />
+            <UserCommunities communities={user.communities} />
+          </div>
         </div>
-        <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
-          <UserInfo user={user} />
-          <UserCommunities communities={user.communities} />
-        </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
