@@ -8,10 +8,10 @@ import {
   useState,
 } from "react";
 
-import type { getMinCommunityByName } from "../api/getCommunity";
+import type { getSelectedCommunity } from "../api/getCommunity";
 
 type SelectedCommunity = Awaited<
-  ReturnType<typeof getMinCommunityByName.execute>
+  ReturnType<typeof getSelectedCommunity.execute>
 >;
 
 const SubmitContext = createContext<{
