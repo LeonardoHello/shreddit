@@ -5,7 +5,7 @@ import type { getUserByName } from "@/lib/api/getUser";
 import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
 
-export default function UserCommunities({
+export default function ModeratedCommunities({
   communities,
 }: {
   communities: NonNullable<
@@ -42,7 +42,7 @@ export default function UserCommunities({
                 className="rounded-full border border-zinc-300 bg-zinc-300"
               />
             )}
-            <div className="text-xs">
+            <div className="text-xs tracking-wide">
               <Link
                 href={`/r/${community.name}`}
                 className="max-w-[15rem] cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-medium lowercase hover:underline"

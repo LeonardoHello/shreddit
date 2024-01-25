@@ -6,7 +6,7 @@ import CommunityCreate from "@/components/community/CommunityCreate";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import FeedSort from "@/components/shared/FeedSort";
 import Modal from "@/components/shared/Modal";
-import UserCommunities from "@/components/user/UserCommunities";
+import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";
 import { getUserByName } from "@/lib/api/getUser";
@@ -88,7 +88,7 @@ export default async function UserPage({
           </div>
           <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
             <UserInfo user={user} />
-            <UserCommunities communities={user.communities} />
+            <ModeratedCommunities communities={user.communities} />
           </div>
         </div>
       </main>

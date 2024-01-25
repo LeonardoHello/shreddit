@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
-export default function Premium() {
+export default function PremiumButton() {
   return (
     <div className="flex flex-col gap-2 rounded border border-zinc-700/70 bg-zinc-900 px-3 py-2">
       <div className="flex gap-2">

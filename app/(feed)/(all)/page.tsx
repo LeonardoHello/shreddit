@@ -8,7 +8,7 @@ import CommunityCreate from "@/components/community/CommunityCreate";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import FeedSort from "@/components/shared/FeedSort";
 import Modal from "@/components/shared/Modal";
-import Premium from "@/components/shared/Premium";
+import PremiumButton from "@/components/shared/PremiumButton";
 import {
   getAllBestPosts,
   getAllControversialPosts,
@@ -88,7 +88,7 @@ export default async function AllPage({
           />
         </div>
         <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
-          <Premium />
+          <PremiumButton />
           <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
             <Image
               src={galaxy}
