@@ -2,13 +2,13 @@ import { notFound, permanentRedirect } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/CommunityCreate";
-import FeedSort from "@/components/FeedSort";
-import Modal from "@/components/Modal";
-import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
-import UserCommunities from "@/components/UserCommunities";
-import UserInfo from "@/components/UserInfo";
-import UserNavigation from "@/components/UserNavigation";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import FeedSort from "@/components/shared/FeedSort";
+import Modal from "@/components/shared/Modal";
+import UserCommunities from "@/components/user/UserCommunities";
+import UserInfo from "@/components/user/UserInfo";
+import UserNavigation from "@/components/user/UserNavigation";
 import { getUserByName } from "@/lib/api/getUser";
 import type { QueryInfo } from "@/lib/types";
 import getUserPosts from "@/lib/utils/getUserPosts";

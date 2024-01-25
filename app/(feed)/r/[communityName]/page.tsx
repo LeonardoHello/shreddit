@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommunityAbout from "@/components/CommunityAbout";
-import CommunityCreate from "@/components/CommunityCreate";
-import CommunityHeader from "@/components/CommunityHeader";
-import FeedInput from "@/components/FeedInput";
-import FeedSort from "@/components/FeedSort";
-import Modal from "@/components/Modal";
-import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
+import CommunityAbout from "@/components/community/CommunityAbout";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import CommunityHeader from "@/components/community/CommunityHeader";
+import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import FeedInput from "@/components/shared/FeedInput";
+import FeedSort from "@/components/shared/FeedSort";
+import Modal from "@/components/shared/Modal";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,

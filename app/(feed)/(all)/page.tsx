@@ -4,11 +4,11 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
-import CommunityCreate from "@/components/CommunityCreate";
-import FeedSort from "@/components/FeedSort";
-import Modal from "@/components/Modal";
-import PostsInfiniteQuery from "@/components/PostsInfiniteQuery";
-import Premium from "@/components/Premium";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import FeedSort from "@/components/shared/FeedSort";
+import Modal from "@/components/shared/Modal";
+import Premium from "@/components/shared/Premium";
 import {
   getAllBestPosts,
   getAllControversialPosts,

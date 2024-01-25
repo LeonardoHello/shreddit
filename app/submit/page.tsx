@@ -3,10 +3,11 @@ import Link from "next/link";
 
 import { auth } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/CommunityCreate";
-import CommunitySelect from "@/components/CommunitySelect";
-import CommunitySelectDropdown from "@/components/CommunitySelectDropdown";
-import Modal from "@/components/Modal";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import Modal from "@/components/shared/Modal";
+import CommunitySelect from "@/components/submit/CommunitySelect";
+import CommunitySelectDropdown from "@/components/submit/CommunitySelectDropdown";
+import PostSubmit from "@/components/submit/PostSubmit";
 import { getSelectableCommunities } from "@/lib/api/getCommunities";
 import { getSelectedCommunity } from "@/lib/api/getCommunity";
 import { getUserById } from "@/lib/api/getUser";

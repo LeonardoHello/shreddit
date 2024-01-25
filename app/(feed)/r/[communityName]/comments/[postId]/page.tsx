@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommentRTE from "@/components/CommentRTE";
-import Comments from "@/components/Comments";
-import CommunityCreate from "@/components/CommunityCreate";
-import Modal from "@/components/Modal";
-import Post from "@/components/Post";
+import CommentRTE from "@/components/RTE/CommentRTE";
+import Comments from "@/components/comment/Comments";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import Post from "@/components/post/Post";
+import Modal from "@/components/shared/Modal";
 import { getPostById } from "@/lib/api/getPost";
 import { getUserById } from "@/lib/api/getUser";
 

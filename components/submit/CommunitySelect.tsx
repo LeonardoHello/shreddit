@@ -21,13 +21,13 @@ export default function CommunitySelect({
   return (
     <div
       ref={dropdownRef}
-      className="relative flex h-10 w-72 flex-col rounded bg-inherit bg-zinc-900"
+      className="relative flex w-72 flex-col rounded bg-inherit bg-zinc-900"
       onClick={() => setIsOpen((prev) => !prev)}
     >
       {selectedCommunity && (
         <button
           className={cn(
-            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 px-2.5",
+            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
             {
               "rounded-b-none": isOpen,
             },
@@ -61,7 +61,7 @@ export default function CommunitySelect({
       {!selectedCommunity && (
         <button
           className={cn(
-            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 px-2.5",
+            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
             {
               "rounded-b-none": isOpen,
             },

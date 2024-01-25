@@ -10,7 +10,7 @@ import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 import Post from "./Post";
-import PostsEmpty from "./PostsEmpty";
+import PostsInfiniteQueryEmpty from "./PostsInfiniteQueryEmpty";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
@@ -87,7 +87,7 @@ export default function PostsInfiniteQuery<
 
   if (infiniteQuery.data.pages[0].posts.length === 0)
     return (
-      <PostsEmpty
+      <PostsInfiniteQueryEmpty
         communityName={params.communityName}
         userName={params.userName}
         filter={searchParams.filter}

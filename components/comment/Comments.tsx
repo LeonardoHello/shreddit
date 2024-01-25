@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs";
 
-import Comment from "@/components/Comment";
+import Comment from "@/components/comment/Comment";
 import { RouterOutput } from "@/trpc/procedures";
 
 export default function Comments({

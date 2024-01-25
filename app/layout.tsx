@@ -7,7 +7,7 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { Toaster } from "sonner";
 import { extractRouterConfig } from "uploadthing/server";
 
-import Header from "@/components/Header";
+import Header from "@/components/header/Header";
 import cn from "@/lib/utils/cn";
 import { TRPCReactProvider } from "@/trpc/react";
 import { uploadRouter } from "@/uploadthing/server";

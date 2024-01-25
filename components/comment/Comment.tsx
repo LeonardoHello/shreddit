@@ -14,10 +14,10 @@ import dot from "@/public/dot.svg";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
+import CommentEditRTE from "../RTE/CommentEditRTE";
+import CommentReplyRTE from "../RTE/CommentReplyRTE";
 import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";
-import CommentEditRTE from "./CommentEditRTE";
-import CommentReplyRTE from "./CommentReplyRTE";
 
 export default function Comment({
   currentUserId,

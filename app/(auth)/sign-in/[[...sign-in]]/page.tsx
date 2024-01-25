@@ -1,7 +1,7 @@
 import { SignIn } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/CommunityCreate";
-import Modal from "@/components/Modal";
+import CommunityCreate from "@/components/community/CommunityCreate";
+import Modal from "@/components/shared/Modal";
 
 export default function SignInPage({
   searchParams,

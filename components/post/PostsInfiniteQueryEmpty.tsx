@@ -5,7 +5,7 @@ import {
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function PostsEmpty({
+export default function PostsInfiniteQueryEmpty({
   userName,
   communityName,
   filter,

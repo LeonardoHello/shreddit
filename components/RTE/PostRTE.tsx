@@ -2,7 +2,6 @@
 
 import { useCallback } from "react";
 
-import CharacterCount from "@tiptap/extension-character-count";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -16,7 +15,7 @@ import { generateClientDropzoneAccept } from "uploadthing/client";
 import cn from "@/lib/utils/cn";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 
-export default function PostEditor() {
+export default function PostRTE() {
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -26,7 +25,6 @@ export default function PostEditor() {
     },
     extensions: [
       StarterKit,
-      CharacterCount.configure({ limit: 255 }),
       Image.configure({ inline: true }),
       Placeholder.configure({
         placeholder: "Text (optional)",

@@ -2,8 +2,8 @@ import dynamic from "next/dynamic";
 
 import { auth } from "@clerk/nextjs";
 
-import Logo from "@/components/Logo";
-import Search from "@/components/Search";
+import Logo from "@/components/header/Logo";
+import Search from "@/components/header/Search";
 import {
   getFavoriteCommunities,
   getJoinedCommunities,
@@ -12,12 +12,12 @@ import {
 import { User } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 
-import Menu from "./Menu";
-import MenuDropdown from "./MenuDropdown";
+import Menu from "../menu/Menu";
+import MenuDropdown from "../menu/MenuDropdown";
+import UserProfile from "../user/UserProfile";
 import SignInButton from "./SignInButton";
-import UserProfile from "./UserProfile";
 
-const YourCommunities = dynamic(() => import("./YourCommunities"));
+const YourCommunities = dynamic(() => import("../menu/YourCommunities"));
 
 export default function Header() {
   const { userId } = auth();
