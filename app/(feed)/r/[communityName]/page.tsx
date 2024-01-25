@@ -66,11 +66,14 @@ export default async function CommunityPage({
       break;
   }
 
+  const userData = getUserById.execute({ currentUserId: userId });
+  const communityData = getCommunityByName.execute({
+    communityName,
+  });
+
   const [user, community, posts] = await Promise.all([
-    getUserById.execute({ currentUserId: userId }),
-    getCommunityByName.execute({
-      communityName,
-    }),
+    userData,
+    communityData,
     postsData,
   ]).catch(() => {
     throw new Error("There was a problem with loading community information.");
@@ -163,7 +166,13 @@ export default async function CommunityPage({
               </div>
               <hr className="border-zinc-700/70" />
               <div>
-                <Link href="/submit" className="rounded-full">
+                <Link
+                  href={{
+                    pathname: "/submit",
+                    query: { community: communityName },
+                  }}
+                  className="rounded-full"
+                >
                   <button className="w-full rounded-full bg-zinc-300 p-1.5 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
                     Create Post
                   </button>

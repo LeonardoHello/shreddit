@@ -67,10 +67,9 @@ export default async function HomePage({
       break;
   }
 
-  const [user, posts] = await Promise.all([
-    getUserById.execute({ currentUserId: userId }),
-    postsData,
-  ]).catch(() => {
+  const userData = getUserById.execute({ currentUserId: userId });
+
+  const [user, posts] = await Promise.all([userData, postsData]).catch(() => {
     throw new Error("There was a problem with loading user information.");
   });
 

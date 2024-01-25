@@ -87,7 +87,11 @@ export default function PostsInfiniteQuery<
 
   if (infiniteQuery.data.pages[0].posts.length === 0)
     return (
-      <PostsEmpty userName={params.userName} filter={searchParams.filter} />
+      <PostsEmpty
+        communityName={params.communityName}
+        userName={params.userName}
+        filter={searchParams.filter}
+      />
     );
 
   const removePostFromQuery = async (postId: PostType["id"]) => {

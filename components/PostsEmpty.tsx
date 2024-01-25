@@ -7,9 +7,11 @@ import {
 
 export default function PostsEmpty({
   userName,
+  communityName,
   filter,
 }: {
   userName?: string;
+  communityName?: string;
   filter?: string | string[] | undefined;
 }) {
   return (
@@ -38,7 +40,13 @@ export default function PostsEmpty({
         {!(filter || userName) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
-            <Link href="/submit" className="rounded-full">
+            <Link
+              href={{
+                pathname: "/submit",
+                query: { community: communityName },
+              }}
+              className="rounded-full"
+            >
               <button className="w-full rounded-full bg-zinc-300 p-1.5 px-12 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
                 Create Post
               </button>
