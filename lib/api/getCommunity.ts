@@ -10,6 +10,20 @@ export const getCommunityByName = db.query.communities
   })
   .prepare("get_community_by_name");
 
+export const getSelectedCommunity = db.query.communities
+  .findFirst({
+    where: (community, { sql, eq }) =>
+      eq(community.name, sql.placeholder("communityName")),
+    columns: { id: true, name: true, imageUrl: true },
+    with: {
+      usersToCommunities: {
+        columns: { userId: true },
+        where: (userToCommunity, { eq }) => eq(userToCommunity.member, true),
+      },
+    },
+  })
+  .prepare("get_community_by_name");
+
 export const getUserToCommunity = db.query.usersToCommunities
   .findFirst({
     where: (community, { sql, and, eq }) =>

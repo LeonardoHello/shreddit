@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useParams, usePathname } from "next/navigation";
 
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { ChartBarIcon, HomeIcon, UserIcon } from "@heroicons/react/24/solid";
 
 import useDropdown from "@/lib/hooks/useDropdown";
@@ -16,6 +16,7 @@ import { trpc } from "@/trpc/react";
 export default function Menu({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { communityName, userName } = useParams();
+
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   useEffect(() => {
@@ -48,7 +49,11 @@ export default function Menu({ children }: { children: React.ReactNode }) {
           <CurrentCommunityFeed communityName={communityName} />
         )}
 
-        {!userName && !communityName && <HomeFeed pathname={pathname} />}
+        {pathname === "/submit" && <SubmitFeed />}
+
+        {!userName && !communityName && pathname !== "/submit" && (
+          <HomeFeed pathname={pathname} />
+        )}
 
         <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2" />
       </button>
@@ -135,6 +140,17 @@ function HomeFeed({ pathname }: { pathname: string }) {
       <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
       <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
         All
+      </h1>
+    </>
+  );
+}
+
+function SubmitFeed() {
+  return (
+    <>
+      <PlusIcon className="h-6 w-6 stroke-2 text-zinc-300" />
+      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+        Create Post
       </h1>
     </>
   );

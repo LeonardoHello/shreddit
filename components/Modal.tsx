@@ -16,8 +16,6 @@ export default function Modal({ children }: { children: React.ReactNode }) {
     document.body.classList.add("overflow-hidden");
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      console.log("eee");
-
       document.body.classList.remove("overflow-hidden");
       document.removeEventListener("keydown", onKeyDown);
     };

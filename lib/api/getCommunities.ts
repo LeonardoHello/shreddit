@@ -44,3 +44,26 @@ export const getJoinedCommunities = db.query.usersToCommunities
     with: { community: { columns: { id: true, name: true, imageUrl: true } } },
   })
   .prepare("get_joined_communities");
+
+export const getSelectableCommunities = db.query.usersToCommunities
+  .findMany({
+    where: (userToCommunity, { sql, and, eq }) =>
+      and(
+        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
+        eq(userToCommunity.member, true),
+      ),
+    columns: {},
+    with: {
+      community: {
+        columns: { id: true, name: true, imageUrl: true },
+        with: {
+          usersToCommunities: {
+            columns: { userId: true },
+            where: (userToCommunity, { eq }) =>
+              eq(userToCommunity.member, true),
+          },
+        },
+      },
+    },
+  })
+  .prepare("get_selectable_communities");
