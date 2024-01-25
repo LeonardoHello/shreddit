@@ -55,13 +55,13 @@ export default function SearchDropdown({
                 })}
               />
               <div className="min-w-0">
-                <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-medium">
+                <div className="truncate text-sm font-medium">
                   r/{community.name}
                 </div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500">
                   <span>Community</span>
                   <Image src={dot} alt="dot" height={4} width={4} />
-                  <span className="overflow-hidden overflow-ellipsis whitespace-nowrap lowercase">
+                  <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
@@ -98,13 +98,13 @@ export default function SearchDropdown({
                 className="rounded-full"
               />
               <div className="min-w-0">
-                <div className="overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-medium">
+                <div className="truncate text-sm font-medium">
                   u/{user.name}
                 </div>
-                <div className="flex items-center gap-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-xs text-zinc-500">
+                <div className="flex items-center gap-1 truncate text-xs text-zinc-500">
                   <span>User</span>
                   <Image src={dot} alt="dot" height={4} width={4} />
-                  <span className="overflow-hidden overflow-ellipsis whitespace-nowrap lowercase">
+                  <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,

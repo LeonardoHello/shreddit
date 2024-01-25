@@ -45,7 +45,7 @@ export default function ModeratedCommunities({
             <div className="text-xs tracking-wide">
               <Link
                 href={`/r/${community.name}`}
-                className="max-w-[15rem] cursor-pointer overflow-hidden overflow-ellipsis whitespace-nowrap font-medium lowercase hover:underline"
+                className="max-w-[15rem] cursor-pointer truncate font-medium lowercase hover:underline"
               >
                 r/{community.name}
               </Link>

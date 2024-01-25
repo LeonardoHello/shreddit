@@ -81,7 +81,7 @@ function CurrentUserFeed({ userName }: { userName: string }) {
       ) : (
         <UserIcon className="h-5 w-5 animate-pulse rounded-full bg-zinc-300 p-0.5 text-zinc-800 opacity-80" />
       )}
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+      <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         u/{userName}
       </h1>
     </>
@@ -116,7 +116,7 @@ function CurrentCommunityFeed({ communityName }: { communityName: string }) {
         />
       )}
 
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+      <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         u/{communityName}
       </h1>
     </>
@@ -128,7 +128,7 @@ function HomeFeed({ pathname }: { pathname: string }) {
     return (
       <>
         <HomeIcon className="h-5 w-5" />
-        <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+        <h1 className="hidden truncate text-center text-sm font-medium lg:block">
           Home
         </h1>
       </>
@@ -138,7 +138,7 @@ function HomeFeed({ pathname }: { pathname: string }) {
   return (
     <>
       <ChartBarIcon className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900" />
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+      <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         All
       </h1>
     </>
@@ -149,7 +149,7 @@ function SubmitFeed() {
   return (
     <>
       <PlusIcon className="h-6 w-6 stroke-2 text-zinc-300" />
-      <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+      <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         Create Post
       </h1>
     </>

@@ -35,7 +35,7 @@ export default function CommunitySelectDropdown({
             className="rounded"
           />
 
-          <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
             u/{user.name}
           </h1>
         </div>
@@ -75,10 +75,10 @@ export default function CommunitySelectDropdown({
               )}
 
               <div className="flex flex-col">
-                <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-sm lg:block">
+                <h1 className="hidden truncate text-sm lg:block">
                   r/{selectableCommunity.community.name}
                 </h1>
-                <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap text-xs lowercase text-zinc-500">
+                <h2 className="truncate text-xs lowercase text-zinc-500">
                   {new Intl.NumberFormat("en-US", {
                     notation: "compact",
                     maximumFractionDigits: 1,

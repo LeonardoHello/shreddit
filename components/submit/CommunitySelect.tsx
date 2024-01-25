@@ -50,7 +50,7 @@ export default function CommunitySelect({
               className="rounded-full border border-zinc-300 bg-zinc-300"
             />
           )}
-          <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
             r/{selectedCommunity.name}
           </h1>
 
@@ -68,7 +68,7 @@ export default function CommunitySelect({
           )}
         >
           <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
-          <h1 className="hidden overflow-hidden overflow-ellipsis whitespace-nowrap text-center text-sm font-medium lg:block">
+          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
             Choose a community
           </h1>
 

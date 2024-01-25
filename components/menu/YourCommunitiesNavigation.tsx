@@ -110,9 +110,7 @@ export default function YourCommunitiesNavigation({
           </svg>
         )}
 
-        <h2 className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-          r/{communityRelation.community.name}
-        </h2>
+        <h2 className="truncate">r/{communityRelation.community.name}</h2>
 
         <StarIcon
           className={cn("ml-auto h-6 w-6 min-w-[1.5rem]", {
