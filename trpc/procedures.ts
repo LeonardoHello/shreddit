@@ -233,13 +233,13 @@ export const appRouter = router({
       return getCommunityImage.execute({ name: input });
     }),
   getFavoriteCommunities: protectedProcedure.query(({ ctx }) => {
-    return getFavoriteCommunities(ctx.auth.userId);
+    return getFavoriteCommunities.execute({ currentUserId: ctx.auth.userId });
   }),
   getModeratedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getModeratedCommunities(ctx.auth.userId);
+    return getModeratedCommunities.execute({ currentUserId: ctx.auth.userId });
   }),
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getJoinedCommunities(ctx.auth.userId);
+    return getJoinedCommunities.execute({ currentUserId: ctx.auth.userId });
   }),
   setAboutCommunity: protectedProcedure
     .input(CommunitySchema.pick({ id: true, about: true }))

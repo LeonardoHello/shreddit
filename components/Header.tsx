@@ -46,9 +46,13 @@ async function HeaderAuthenticated({
 }: {
   currentUserId: User["id"];
 }) {
-  const favoriteCommunitiesData = getFavoriteCommunities(currentUserId);
-  const moderatedCommunitiesData = getModeratedCommunities(currentUserId);
-  const joinedCommunitiesData = getJoinedCommunities(currentUserId);
+  const favoriteCommunitiesData = getFavoriteCommunities.execute({
+    currentUserId,
+  });
+  const moderatedCommunitiesData = getModeratedCommunities.execute({
+    currentUserId,
+  });
+  const joinedCommunitiesData = getJoinedCommunities.execute({ currentUserId });
 
   const [favoriteCommunities, moderatedCommunities, joinedCommunities] =
     await Promise.all([
