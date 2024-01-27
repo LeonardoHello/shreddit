@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs";
 import { type FileRouter, createUploadthing } from "uploadthing/next";
-import { UTApi } from "uploadthing/server";
 
 import { setFile } from "@/lib/api/setFile";
 import { FileSchema } from "@/lib/db/schema";
@@ -8,10 +7,8 @@ import { FileSchema } from "@/lib/db/schema";
 const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
-export const uploadRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
-  imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 12 } })
-    // .input(FileSchema.shape.id)
+export const ourFileRouter = {
+  imageUploader: f({ image: { maxFileSize: "4MB" } })
     // Set permissions and file types for this FileRoute
     .middleware(() => {
       // This code runs on your server before upload
@@ -41,6 +38,4 @@ export const uploadRouter = {
     }),
 } satisfies FileRouter;
 
-export const utapi = new UTApi();
-
-export type OurFileRouter = typeof uploadRouter;
+export type OurFileRouter = typeof ourFileRouter;

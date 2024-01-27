@@ -1,26 +1,19 @@
 "use client";
 
-import { useCallback } from "react";
-
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import type { FileWithPath } from "@uploadthing/react";
-import { useDropzone } from "@uploadthing/react/hooks";
-import { toast } from "sonner";
-import { generateClientDropzoneAccept } from "uploadthing/client";
 
 import cn from "@/lib/utils/cn";
-import { useUploadThing } from "@/lib/utils/uploadthing";
 
 export default function PostRTE() {
   const editor = useEditor({
     editorProps: {
       attributes: {
         class:
-          "prose prose-zinc prose-invert min-h-[8rem] max-w-none p-2 focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-none",
       },
     },
     extensions: [
@@ -49,41 +42,6 @@ export default function PostRTE() {
 }
 
 function EditorMenu({ editor }: { editor: Editor }) {
-  const { startUpload, permittedFileInfo, isUploading } = useUploadThing(
-    "imageUploader",
-    {
-      onClientUploadComplete: (res) => {
-        editor.commands.forEach(res, (file, { commands }) => {
-          return commands.setImage({ src: file.url });
-        });
-
-        toast.success("uploaded successfully");
-      },
-      onUploadError: (e) => {
-        toast.error(e.message);
-      },
-      onUploadProgress: (number) => {
-        toast.loading(number, { id: 0 });
-      },
-    },
-  );
-
-  const onDrop = useCallback(
-    (acceptedFiles: FileWithPath[]) => {
-      startUpload(acceptedFiles);
-    },
-    [startUpload],
-  );
-
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
-
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
-  });
-
   const setActive = (name: string, attributes?: {} | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
@@ -422,15 +380,12 @@ function EditorMenu({ editor }: { editor: Editor }) {
       <div className="h-4 w-px self-center bg-zinc-700/70" />
 
       <button
-        {...getRootProps()}
-        disabled={isUploading}
         className={cn(
           "p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70",
-          { "opacity-30": isUploading },
+          { "opacity-30": false },
         )}
         title="Image"
       >
-        <input {...getInputProps()} />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

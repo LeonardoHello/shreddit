@@ -1,10 +1,10 @@
-import { createNextRouteHandler } from "uploadthing/next";
+import { createRouteHandler } from "uploadthing/next";
 
-import { uploadRouter } from "@/uploadthing/server";
+import { ourFileRouter } from "./core";
 
-// export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export const { GET, POST } = createNextRouteHandler({
-  router: uploadRouter,
+// Export routes for Next App Router
+export const { GET, POST } = createRouteHandler({
+  router: ourFileRouter,
 });
