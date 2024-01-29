@@ -14,7 +14,7 @@ import dot from "@/public/dot.svg";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import CommentEditRTE from "../RTE/CommentEditRTE";
+import CommentContentRTE from "../RTE/CommentContentRTE";
 import CommentReplyRTE from "../RTE/CommentReplyRTE";
 import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";
@@ -86,7 +86,7 @@ export default function Comment({
         </div>
         <div className="ml-3 flex flex-col gap-4 border-l-2 border-zinc-700/70 pl-2">
           <div className="flex flex-col gap-1 pl-2">
-            <CommentEditRTE editable={editable} cancelEdit={cancelEdit} />
+            <CommentContentRTE editable={editable} cancelEdit={cancelEdit} />
 
             <CommentActions
               currentUserId={currentUserId}

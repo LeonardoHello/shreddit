@@ -24,7 +24,7 @@ const extensions = [
   }),
 ];
 
-export default function CommentEditRTE({
+export default function CommentContentRTE({
   editable,
   cancelEdit,
 }: {
