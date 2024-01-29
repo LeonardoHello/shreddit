@@ -2,10 +2,10 @@ import { notFound, permanentRedirect } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/community/CommunityCreate";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import FeedSort from "@/components/shared/FeedSort";
-import Modal from "@/components/shared/Modal";
 import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";

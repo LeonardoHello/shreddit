@@ -5,9 +5,9 @@ import { auth } from "@clerk/nextjs";
 
 import CommentRTE from "@/components/RTE/CommentRTE";
 import Comments from "@/components/comment/Comments";
-import CommunityCreate from "@/components/community/CommunityCreate";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
-import Modal from "@/components/shared/Modal";
 import { getPostById } from "@/lib/api/getPost";
 import { getUserById } from "@/lib/api/getUser";
 
@@ -43,7 +43,7 @@ export default async function PostPage({
         <div className="flex w-full max-w-7xl grow flex-col items-center bg-zinc-950 px-2 py-4">
           <div className="flex w-full max-w-5xl grow flex-col bg-zinc-900">
             <div className="flex gap-4 rounded p-2">
-              <Post currentUserId={user ? user.id : null} initialData={post} />
+              <Post currentUserId={userId} initialData={post} />
             </div>
             <div className="flex flex-col gap-2 p-4 px-14">
               <div className="text-xs">

@@ -3,8 +3,8 @@ import Link from "next/link";
 
 import { auth } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/community/CommunityCreate";
-import Modal from "@/components/shared/Modal";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 import CommunitySelect from "@/components/submit/CommunitySelect";
 import CommunitySelectDropdown from "@/components/submit/CommunitySelectDropdown";
 import PostSubmit from "@/components/submit/PostSubmit";
@@ -50,8 +50,8 @@ export default async function SubmitPage({
         </Modal>
       )}
       <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
-        <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
-          <h1 className="border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
+        <div className="flex basis-full flex-col gap-2 lg:basis-2/3">
+          <h1 className="mb-2 border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
             Create a post
           </h1>
 

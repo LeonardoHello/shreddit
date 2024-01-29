@@ -1,7 +1,7 @@
 import { SignUp } from "@clerk/nextjs";
 
-import CommunityCreate from "@/components/community/CommunityCreate";
-import Modal from "@/components/shared/Modal";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 
 export default function SignUpPage({
   searchParams,

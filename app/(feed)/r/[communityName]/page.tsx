@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs";
 
 import CommunityAbout from "@/components/community/CommunityAbout";
-import CommunityCreate from "@/components/community/CommunityCreate";
 import CommunityHeader from "@/components/community/CommunityHeader";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import FeedInput from "@/components/shared/FeedInput";
 import FeedSort from "@/components/shared/FeedSort";
-import Modal from "@/components/shared/Modal";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,

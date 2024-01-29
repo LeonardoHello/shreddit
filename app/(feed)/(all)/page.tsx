@@ -4,10 +4,10 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
-import CommunityCreate from "@/components/community/CommunityCreate";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import FeedSort from "@/components/shared/FeedSort";
-import Modal from "@/components/shared/Modal";
 import PremiumButton from "@/components/shared/PremiumButton";
 import {
   getAllBestPosts,
