@@ -100,7 +100,7 @@ function CommentEditRTEMenu({
     };
   }, [editor]);
 
-  const updateComment = trpc.updateComment.useMutation({
+  const editComment = trpc.editComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
     },
@@ -119,7 +119,7 @@ function CommentEditRTEMenu({
     },
   });
 
-  const isMutating = isPending || updateComment.isLoading;
+  const isMutating = isPending || editComment.isLoading;
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
@@ -155,7 +155,7 @@ function CommentEditRTEMenu({
           )}
           disabled={isEmpty || isMutating}
           onClick={() => {
-            updateComment.mutate({
+            editComment.mutate({
               id: comment.id,
               text: editor.getHTML(),
             });

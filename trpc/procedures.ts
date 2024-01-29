@@ -426,7 +426,7 @@ export const appRouter = router({
         })
         .returning();
     }),
-  updateComment: protectedProcedure
+  editComment: protectedProcedure
     .input(CommentSchema.pick({ id: true, text: true }))
     .mutation(({ input, ctx }) => {
       return ctx.db
