@@ -7,9 +7,9 @@ import type { Post, User } from "@/lib/db/schema";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
+import PostContentRTE from "../RTE/PostContentRTE";
 import PostActions from "./PostActions";
 import PostActionsDropdown from "./PostActionsDropdown";
-import PostContent from "./PostContent";
 import PostContentMedia from "./PostContentMedia";
 import PostMetadata from "./PostMetadata";
 import PostVote from "./PostVote";
@@ -39,7 +39,7 @@ export default memo(function Post({
       <PostVote currentUserId={currentUserId} />
       <div className="flex grow flex-col gap-2">
         <PostMetadata />
-        {post.text ? <PostContent /> : <PostContentMedia />}
+        {post.text ? <PostContentRTE /> : <PostContentMedia />}
 
         <PostActions
           currentUserId={currentUserId}
