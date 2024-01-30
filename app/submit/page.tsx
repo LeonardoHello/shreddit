@@ -64,6 +64,7 @@ export default async function SubmitPage({
                 selectableCommunities={selectableCommunities}
               />
             </CommunitySelect>
+            <PostSubmit initialMediaSubmit={searchParams.submit === "media"} />
           </SubmitContextProvider>
         </div>
         <div className="my-8 hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">

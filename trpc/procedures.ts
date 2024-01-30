@@ -327,6 +327,21 @@ export const appRouter = router({
         })
         .returning({ muted: usersToCommunities.muted });
     }),
+  createPost: protectedProcedure
+    .input(
+      PostSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+      }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(posts)
+        .values({ ...input, authorId: ctx.auth.userId })
+        .returning({ id: posts.id });
+    }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {
