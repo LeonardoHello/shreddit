@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   CheckIcon,
@@ -22,7 +22,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
   const router = useRouter();
   const utils = trpc.useUtils();
 
-  const post = usePostContext();
+  const { post, setEditable } = usePostContext();
 
   const queryConfig = {
     onMutate: async (
@@ -132,13 +132,25 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
         />{" "}
         Mark As NSFW
       </div>
-      {post.files.length === 0 && (
+      {/* the value of removePostFromQuery will determine where Post component is located */}
+      {post.files.length === 0 && removePostFromQuery && (
         <Link
-          href={`/r/${post.community.name}/comments/${post.id}/edit`}
+          href={{
+            pathname: `/r/${post.community.name}/comments/${post.id}`,
+            query: { edit: "true" },
+          }}
           className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         >
           <PencilSquareIcon className="h-5 w-5" /> Edit
         </Link>
+      )}
+      {post.files.length === 0 && !removePostFromQuery && (
+        <div
+          className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
+          onClick={() => setEditable((prev) => !prev)}
+        >
+          <PencilSquareIcon className="h-5 w-5" /> Edit
+        </div>
       )}
 
       <div

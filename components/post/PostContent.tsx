@@ -15,7 +15,7 @@ import type { File, Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 
 export default memo(function PostContent() {
-  const post = usePostContext();
+  const { post } = usePostContext();
 
   if (post.text === null && post.files.length === 0) return null;
 

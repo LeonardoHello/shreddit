@@ -1,15 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/lib/context/PostContextProvider";
 import useHydration from "@/lib/hooks/useHydration";
+import cn from "@/lib/utils/cn";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 
 export default function PostMetadata() {
+  const { postId } = useParams();
+
   const hydrated = useHydration();
-  const post = usePostContext();
+  const { post } = usePostContext();
 
   return (
     <>
@@ -63,8 +67,12 @@ export default function PostMetadata() {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <h2 className="text-lg font-medium">{post.title}</h2>
+      <div className="mb-1 flex items-center gap-3">
+        <h2
+          className={cn("text-lg font-medium", { "text-xl font-bold": postId })}
+        >
+          {post.title}
+        </h2>
         {post.spoiler && (
           <div className="border border-zinc-400 px-1 text-xs text-zinc-400">
             spoiler

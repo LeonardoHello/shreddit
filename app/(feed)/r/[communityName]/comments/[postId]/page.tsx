@@ -43,7 +43,11 @@ export default async function PostPage({
         <div className="flex w-full max-w-7xl grow flex-col items-center bg-zinc-950 px-2 py-4">
           <div className="flex w-full max-w-5xl grow flex-col bg-zinc-900">
             <div className="flex gap-4 rounded p-2">
-              <Post currentUserId={userId} initialData={post} />
+              <Post
+                currentUserId={userId}
+                initialData={post}
+                initialEdit={searchParams.edit === "true"}
+              />
             </div>
             <div className="flex flex-col gap-2 p-4 px-14">
               <div className="text-xs">

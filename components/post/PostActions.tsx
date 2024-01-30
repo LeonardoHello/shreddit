@@ -32,7 +32,7 @@ export default function PostActions({
   const utils = trpc.useUtils();
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
-  const post = usePostContext();
+  const { post } = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,
@@ -126,7 +126,7 @@ export default function PostActions({
 
   return (
     <div className="flex select-none items-center gap-2 text-xs font-bold capitalize text-zinc-500">
-      <div className="flex items-center gap-1  px-2 py-1">
+      <div className="flex items-center gap-1">
         <ChatBubbleLeftIcon className="h-6 w-6" />
         {new Intl.NumberFormat("en-US", {
           notation: "compact",

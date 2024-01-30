@@ -16,7 +16,7 @@ type Props = {
 const PostVote = function PostVote({ currentUserId }: Props) {
   const utils = trpc.useUtils();
 
-  const post = usePostContext();
+  const { post } = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,
