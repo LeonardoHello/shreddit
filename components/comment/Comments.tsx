@@ -14,7 +14,7 @@ export default function Comments({
 
   if (comments.length === 0)
     return (
-      <div className="flex grow flex-col items-center justify-center gap-4 text-center text-zinc-500">
+      <div className="flex min-h-[20rem] grow flex-col items-center justify-center gap-4 text-center text-zinc-500">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -31,7 +31,7 @@ export default function Comments({
     );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pb-4">
       {comments
         .toSorted((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
         .map((comment) => (

@@ -40,7 +40,7 @@ export default async function PostPage({
         </Modal>
       )}
       <main className="flex grow flex-col items-center bg-zinc-900">
-        <div className="flex w-full max-w-7xl grow flex-col items-center bg-zinc-950 px-2 py-4">
+        <div className="flex w-full max-w-7xl grow flex-col items-center bg-zinc-950 px-2 py-6 md:pb-12 md:pt-4">
           <div className="flex w-full max-w-5xl grow flex-col bg-zinc-900">
             <div className="flex gap-4 rounded p-2">
               <Post
