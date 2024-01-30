@@ -10,6 +10,7 @@ import { trpc } from "@/trpc/react";
 import PostActions from "./PostActions";
 import PostActionsDropdown from "./PostActionsDropdown";
 import PostContent from "./PostContent";
+import PostContentMedia from "./PostContentMedia";
 import PostMetadata from "./PostMetadata";
 import PostVote from "./PostVote";
 
@@ -38,7 +39,8 @@ export default memo(function Post({
       <PostVote currentUserId={currentUserId} />
       <div className="flex grow flex-col gap-2">
         <PostMetadata />
-        <PostContent />
+        {post.text ? <PostContent /> : <PostContentMedia />}
+
         <PostActions
           currentUserId={currentUserId}
           removePostFromQuery={removePostFromQuery}
