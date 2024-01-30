@@ -135,7 +135,8 @@ export default function PostSubmit({
 
   const isMutating = isPending || createPost.isLoading;
 
-  const disabled = isMutating || !state.communityId || state.title.length === 0;
+  const disabled =
+    isMutating || !state.communityId || !state.text || state.title.length === 0;
 
   function handleTitleChange(e: ChangeEvent<HTMLInputElement>) {
     dispatch({
