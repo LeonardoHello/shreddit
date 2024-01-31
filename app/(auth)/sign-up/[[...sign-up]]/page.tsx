@@ -15,7 +15,7 @@ export default function SignUpPage({
           <CommunityCreate />
         </Modal>
       )}
-      <SignUp signInUrl="/sign-in" />;
+      <SignUp signInUrl="/sign-in" />
     </>
   );
 }

@@ -12,11 +12,17 @@ export default authMiddleware({
     "/api/uploadthing",
   ],
   afterAuth: (auth, req) => {
-    if (!auth.userId && !auth.isPublicRoute) {
-      if (req.nextUrl.pathname === "/home") {
-        const unauthenticatedHomePage = new URL("/", req.nextUrl.origin);
-        return NextResponse.redirect(unauthenticatedHomePage, { status: 301 });
-      } else if (req.nextUrl.pathname.endsWith("/submit")) {
+    if (!auth.userId) {
+      if (!auth.isPublicRoute) {
+        if (req.nextUrl.pathname === "/home") {
+          const unauthenticatedHomePage = new URL("/", req.nextUrl.origin);
+          return NextResponse.redirect(unauthenticatedHomePage, {
+            status: 301,
+          });
+        } else if (req.nextUrl.pathname.endsWith("/submit")) {
+          return redirectToSignIn({ returnBackUrl: req.url });
+        }
+      } else if (req.nextUrl.searchParams.get("submit") === "community") {
         return redirectToSignIn({ returnBackUrl: req.url });
       }
     }
