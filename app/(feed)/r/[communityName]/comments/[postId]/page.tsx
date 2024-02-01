@@ -8,6 +8,7 @@ import Comments from "@/components/comment/Comments";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import Modal from "@/components/modal/Modal";
 import Post from "@/components/post/Post";
+import { getComments } from "@/lib/api/getComment";
 import { getPostById } from "@/lib/api/getPost";
 import { getUserById } from "@/lib/api/getUser";
 
@@ -23,11 +24,12 @@ export default async function PostPage({
 }) {
   const { userId } = auth();
 
-  const [user, post] = await Promise.all([
+  const [user, post, comments] = await Promise.all([
     getUserById.execute({ currentUserId: userId }),
     getPostById.execute({ postId }),
-  ]).catch(() => {
-    throw new Error("There was a problem with loading post information.");
+    getComments.execute({ postId }),
+  ]).catch((err) => {
+    throw new Error(err);
   });
 
   if (!post) notFound();
@@ -68,12 +70,10 @@ export default async function PostPage({
             <hr className="mx-14 my-2 border-zinc-700/70" />
             <div className="flex grow flex-col gap-6 bg-zinc-900 p-4">
               <Comments
-                comments={post.comments.filter(
+                comments={comments.filter(
                   (comment) => !comment.parentCommentId,
                 )}
-                replies={post.comments.filter(
-                  (comment) => comment.parentCommentId,
-                )}
+                replies={comments.filter((comment) => comment.parentCommentId)}
               />
             </div>
           </div>

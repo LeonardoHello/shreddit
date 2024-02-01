@@ -2,9 +2,7 @@ import { createContext, useContext } from "react";
 
 import type { RouterOutput } from "@/trpc/procedures";
 
-import type { ArrElement } from "../types";
-
-type Comment = ArrElement<NonNullable<RouterOutput["getPost"]>["comments"]>;
+type Comment = NonNullable<RouterOutput["getComment"]>;
 
 const CommentContext = createContext<Comment | null>(null);
 

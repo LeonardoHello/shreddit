@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { usePostContext } from "@/lib/context/PostContextProvider";
 import type { Post, User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
-import type { RouterInput, RouterOutput } from "@/trpc/procedures";
+import type { RouterInput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 type Props = {
@@ -131,7 +131,7 @@ export default function PostActions({
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
-        }).format(post.comments.length)}{" "}
+        }).format(post.commentCount)}{" "}
         <span className="hidden sm:block">comments</span>
       </div>
       <div

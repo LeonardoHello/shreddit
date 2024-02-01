@@ -1,14 +1,16 @@
 import { auth } from "@clerk/nextjs";
 
 import Comment from "@/components/comment/Comment";
-import { RouterOutput } from "@/trpc/procedures";
+import type { getComments } from "@/lib/api/getComment";
+
+type Comments = Awaited<ReturnType<typeof getComments.execute>>;
 
 export default function Comments({
   comments,
   replies,
 }: {
-  comments: NonNullable<RouterOutput["getPost"]>["comments"];
-  replies: NonNullable<RouterOutput["getPost"]>["comments"];
+  comments: Comments;
+  replies: Comments;
 }) {
   const { userId } = auth();
 

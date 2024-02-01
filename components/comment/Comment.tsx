@@ -4,8 +4,7 @@ import { useState } from "react";
 
 import CommentContextProvider from "@/lib/context/CommentContextProvider";
 import type { User } from "@/lib/db/schema";
-import type { ArrElement } from "@/lib/types";
-import type { RouterOutput } from "@/trpc/procedures";
+import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 import CommentContentRTE from "../RTE/CommentContentRTE";
@@ -14,15 +13,17 @@ import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";
 import CommentMetadata from "./CommentMetadata";
 
+type Props = {
+  currentUserId: User["id"] | null;
+  initialData: NonNullable<RouterOutput["getComment"]>;
+  children: React.ReactNode;
+};
+
 export default function Comment({
   currentUserId,
   initialData,
   children,
-}: {
-  currentUserId: User["id"] | null;
-  initialData: ArrElement<NonNullable<RouterOutput["getPost"]>["comments"]>;
-  children: React.ReactNode;
-}) {
+}: Props) {
   const { data: comment } = trpc.getComment.useQuery(initialData.id, {
     initialData,
     refetchOnMount: false,
