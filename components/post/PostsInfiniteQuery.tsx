@@ -95,7 +95,7 @@ export default function PostsInfiniteQuery<
     );
 
   const removePostFromQuery = async (postId: PostType["id"]) => {
-    await utils["getPost"].cancel();
+    await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
     utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
       queryInfo.input,
