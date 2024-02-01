@@ -1,16 +1,10 @@
 import db from "@/lib/db";
 import { communities } from "@/lib/db/schema";
-import {
-  controversialPostsQueryConfig,
-  postQueryWithConfig,
-  postsQueryConfig,
-  topPostsQueryConfig,
-} from "@/lib/utils/getPostsQueryConfig";
+import { postQueryConfig } from "@/lib/utils/getPostsQueryConfig";
 
 export const getCommunityBestPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { exists, and, eq, sql }) =>
       exists(
         db
@@ -32,8 +26,7 @@ export const getCommunityBestPosts = db.query.posts
 
 export const getCommunityHotPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -62,8 +55,7 @@ export const getCommunityHotPosts = db.query.posts
 
 export const getCommunityNewPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { exists, and, eq, sql }) =>
       exists(
         db
@@ -82,8 +74,7 @@ export const getCommunityNewPosts = db.query.posts
 
 export const getCommunityControversialPosts = db.query.posts
   .findMany({
-    ...controversialPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { exists, and, eq, sql }) =>
       exists(
         db

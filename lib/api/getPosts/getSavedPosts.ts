@@ -1,16 +1,10 @@
 import db from "@/lib/db";
 import { usersToPosts } from "@/lib/db/schema";
-import {
-  controversialPostsQueryConfig,
-  postQueryWithConfig,
-  postsQueryConfig,
-  topPostsQueryConfig,
-} from "@/lib/utils/getPostsQueryConfig";
+import { postQueryConfig } from "@/lib/utils/getPostsQueryConfig";
 
 export const getSavedBestPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -33,8 +27,7 @@ export const getSavedBestPosts = db.query.posts
 
 export const getSavedHotPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -64,8 +57,7 @@ export const getSavedHotPosts = db.query.posts
 
 export const getSavedNewPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -85,8 +77,7 @@ export const getSavedNewPosts = db.query.posts
 
 export const getSavedControversialPosts = db.query.posts
   .findMany({
-    ...controversialPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db

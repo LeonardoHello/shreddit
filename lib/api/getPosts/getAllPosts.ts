@@ -1,15 +1,9 @@
 import db from "@/lib/db";
-import {
-  controversialPostsQueryConfig,
-  postQueryWithConfig,
-  postsQueryConfig,
-  topPostsQueryConfig,
-} from "@/lib/utils/getPostsQueryConfig";
+import { postQueryConfig } from "@/lib/utils/getPostsQueryConfig";
 
 export const getAllBestPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`vote_count`),
       asc(post.createdAt),
@@ -19,8 +13,7 @@ export const getAllBestPosts = db.query.posts
 
 export const getAllHotPosts = db.query.posts
   .findMany({
-    ...topPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     where: (post, { gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -36,16 +29,14 @@ export const getAllHotPosts = db.query.posts
 
 export const getAllNewPosts = db.query.posts
   .findMany({
-    ...postsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_all_posts");
 
 export const getAllControversialPosts = db.query.posts
   .findMany({
-    ...controversialPostsQueryConfig,
-    with: postQueryWithConfig,
+    ...postQueryConfig,
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`comment_count`),
       asc(post.createdAt),

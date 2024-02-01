@@ -1,8 +1,11 @@
-import { sql } from "drizzle-orm";
-import { DBQueryConfig, ExtractTablesWithRelations } from "drizzle-orm";
+import {
+  DBQueryConfig,
+  ExtractTablesWithRelations,
+  RelationTableAliasProxyHandler,
+  sql,
+} from "drizzle-orm";
 
 import type * as schema from "../db/schema";
-import { comments, usersToPosts } from "../db/schema";
 
 export type PostsQueryConfig = DBQueryConfig<
   "many",
@@ -11,56 +14,75 @@ export type PostsQueryConfig = DBQueryConfig<
   ExtractTablesWithRelations<typeof schema>["posts"]
 >;
 
-export const postQueryWithConfig = {
-  usersToPosts: { columns: { postId: false, createdAt: false } },
-  community: {
-    columns: { name: true, imageUrl: true },
-    with: { usersToCommunities: { columns: { muted: true, userId: true } } },
-  },
-  author: { columns: { name: true } },
-  comments: {
-    with: {
-      author: true,
-      usersToComments: true,
-      post: { columns: { authorId: true } },
-    },
-  },
-  files: true,
-} as const;
+// const typesafePostQueryConfig: PostsQueryConfig = {
+//   limit: 10,
+//   offset: sql.placeholder("offset"),
+//   with: {
+//     usersToPosts: { columns: { postId: false, createdAt: false } },
+//     community: {
+//       columns: { name: true, imageUrl: true },
+//       with: { usersToCommunities: { columns: { muted: true, userId: true } } },
+//     },
+//     author: { columns: { name: true } },
+//     files: true,
+//   },
+//   extras: (post, { sql }) => ({
+//     voteCount: sql<number>`
+// 				 (
+// 					 SELECT COUNT(*)
+// 					 FROM users_to_posts
+// 					 WHERE users_to_posts.post_id = ${post.id}
+// 						 AND users_to_posts.vote_status = 'upvoted'
+// 				 ) - (
+// 					 SELECT COUNT(*)
+// 					 FROM users_to_posts
+// 					 WHERE users_to_posts.post_id = ${post.id}
+// 						 AND users_to_posts.vote_status = 'downvoted'
+// 				 )
+// 			 `.as("vote_count"),
+//     commentCount: sql<number>`
+// 				 (
+// 					 SELECT COUNT(*)
+// 					 FROM comments
+// 					 WHERE comments.post_id = ${post.id}
+// 				 )
+// 			 `.as("comment_count"),
+//   }),
+// };
 
-export const postsQueryConfig: PostsQueryConfig = {
+export const postQueryConfig = {
   limit: 10,
   offset: sql.placeholder("offset"),
-};
-
-export const topPostsQueryConfig: PostsQueryConfig = {
-  ...postsQueryConfig,
+  with: {
+    usersToPosts: { columns: { postId: false, createdAt: false } },
+    community: {
+      columns: { name: true, imageUrl: true },
+      with: { usersToCommunities: { columns: { muted: true, userId: true } } },
+    },
+    author: { columns: { name: true } },
+    files: true,
+  },
+  // @ts-expect-error
   extras: (post, { sql }) => ({
     voteCount: sql<number>`
 				 (
 					 SELECT COUNT(*) 
-					 FROM ${usersToPosts} 
-					 WHERE ${usersToPosts}.post_id = ${post.id} 
-						 AND ${usersToPosts}.vote_status = 'upvoted' 
+					 FROM users_to_posts 
+					 WHERE users_to_posts.post_id = ${post.id} 
+						 AND users_to_posts.vote_status = 'upvoted' 
 				 ) - (
 					 SELECT COUNT(*) 
-					 FROM ${usersToPosts} 
-					 WHERE ${usersToPosts}.post_id = ${post.id} 
-						 AND ${usersToPosts}.vote_status = 'downvoted'
+					 FROM users_to_posts 
+					 WHERE users_to_posts.post_id = ${post.id} 
+						 AND users_to_posts.vote_status = 'downvoted'
 				 )
 			 `.as("vote_count"),
-  }),
-};
-
-export const controversialPostsQueryConfig: PostsQueryConfig = {
-  ...postsQueryConfig,
-  extras: (post, { sql }) => ({
     commentCount: sql<number>`
 				 (
 					 SELECT COUNT(*)
-					 FROM ${comments}
-					 WHERE ${comments}.post_id = ${post.id}
+					 FROM comments
+					 WHERE comments.post_id = ${post.id}
 				 )
 			 `.as("comment_count"),
   }),
-};
+} as const;
