@@ -194,12 +194,12 @@ export default function PostActions({
         <div
           ref={dropdownRef}
           className="relative cursor-pointer"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen((prev) => !prev);
+          }}
         >
-          <EllipsisHorizontalIcon
-            className="h-6 w-6 rounded hover:bg-zinc-700/50"
-            onClick={() => setIsOpen((prev) => !prev)}
-          />
+          <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
           {isOpen && children}
         </div>
       )}

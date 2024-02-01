@@ -342,6 +342,20 @@ export const appRouter = router({
         .values({ ...input, authorId: ctx.auth.userId })
         .returning({ id: posts.id });
     }),
+  editPost: protectedProcedure
+    .input(
+      PostSchema.pick({
+        id: true,
+        text: true,
+      }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .update(posts)
+        .set({ ...input, updatedAt: new Date() })
+        .where(eq(posts.id, input.id))
+        .returning();
+    }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {

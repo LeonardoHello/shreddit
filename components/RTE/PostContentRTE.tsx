@@ -1,14 +1,16 @@
-import { memo, useCallback, useEffect } from "react";
+import { useEffect, useTransition } from "react";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { toast } from "sonner";
 
 import { usePostContext } from "@/lib/context/PostContextProvider";
 import cn from "@/lib/utils/cn";
+import { trpc } from "@/trpc/react";
 
 import RTEButtons from "./RTEButtons";
 
@@ -20,7 +22,7 @@ const extensions = [
   }),
 ];
 
-export default memo(function PostContentRTE() {
+export default function PostContentRTE() {
   const { postId } = useParams();
 
   const { post, editable } = usePostContext();
@@ -60,9 +62,34 @@ export default memo(function PostContentRTE() {
       <EditorContent editor={editor} />
     </div>
   );
-});
+}
 
 function EditorMenu({ editor }: { editor: Editor }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const { post, setEditable } = usePostContext();
+
+  const editPost = trpc.editPost.useMutation({
+    onMutate: () => {
+      editor.setEditable(false);
+    },
+    onSuccess: () => {
+      startTransition(() => {
+        router.refresh();
+      });
+      setEditable(false);
+
+      toast.success("Post successfully edited.");
+    },
+    onError: (error) => {
+      editor.setEditable(true);
+      toast.error(error.message);
+    },
+  });
+
+  const isMutating = isPending || editPost.isLoading;
+
   useEffect(() => {
     editor.setEditable(true);
     editor.setOptions({
@@ -86,6 +113,8 @@ function EditorMenu({ editor }: { editor: Editor }) {
       });
     };
   }, [editor]);
+
+  const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
     <div className="flex flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5">
@@ -113,6 +142,44 @@ function EditorMenu({ editor }: { editor: Editor }) {
           />
         </svg>
       </button>
+      <div className="ml-auto flex gap-2">
+        <button
+          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
+          onClick={() => {
+            setEditable(false);
+            editor.commands.setContent(post.text);
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
+          onClick={() => {
+            editor.commands.clearContent();
+          }}
+        >
+          Clear
+        </button>
+
+        <button
+          className={cn(
+            "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+            {
+              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+            },
+          )}
+          disabled={isEmpty || isMutating}
+          onClick={() => {
+            editPost.mutate({
+              id: post.id,
+              text: editor.getHTML(),
+            });
+          }}
+        >
+          Edit
+        </button>
+      </div>
     </div>
   );
 }
