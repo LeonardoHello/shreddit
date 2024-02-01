@@ -24,14 +24,8 @@ const extensions = [
   }),
 ];
 
-export default function CommentContentRTE({
-  editable,
-  cancelEdit,
-}: {
-  editable: boolean;
-  cancelEdit: () => void;
-}) {
-  const comment = useCommentContext();
+export default function CommentContentRTE() {
+  const { comment, editable } = useCommentContext();
 
   const editor = useEditor({
     content: comment.text,
@@ -57,24 +51,16 @@ export default function CommentContentRTE({
       })}
     >
       <EditorContent editor={editor} />
-      {editable && (
-        <CommentEditRTEMenu editor={editor} cancelEdit={cancelEdit} />
-      )}
+      {editable && <CommentEditRTEMenu editor={editor} />}
     </div>
   );
 }
 
-function CommentEditRTEMenu({
-  editor,
-  cancelEdit,
-}: {
-  editor: Editor;
-  cancelEdit: () => void;
-}) {
+function CommentEditRTEMenu({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const comment = useCommentContext();
+  const { comment, setEditable } = useCommentContext();
 
   useEffect(() => {
     editor.setEditable(true);
@@ -109,7 +95,7 @@ function CommentEditRTEMenu({
         router.refresh();
       });
 
-      cancelEdit();
+      setEditable(false);
 
       toast.success("Comment successfully edited.");
     },
@@ -130,8 +116,8 @@ function CommentEditRTEMenu({
         <button
           className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
           onClick={() => {
-            cancelEdit();
             editor.commands.setContent(comment.text);
+            setEditable(false);
           }}
         >
           Cancel

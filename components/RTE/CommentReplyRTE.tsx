@@ -24,11 +24,9 @@ const extensions = [
   }),
 ];
 
-export default function CommentReplyRTE({
-  cancelReply,
-}: {
-  cancelReply: () => void;
-}) {
+export default function CommentReplyRTE() {
+  const { reply } = useCommentContext();
+
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -39,33 +37,29 @@ export default function CommentReplyRTE({
     extensions,
   });
 
-  if (!editor) {
+  if (!editor || !reply) {
     return null;
   }
 
   return (
-    <div
-      className={cn("rounded border border-zinc-700/70", {
-        "border-zinc-300": editor.isFocused,
-      })}
-    >
-      <EditorContent editor={editor} />
-      <CommentReplyRTEMenu editor={editor} cancelReply={cancelReply} />
+    <div className="ml-3 border-l-2 border-zinc-700/70 pl-6">
+      <div
+        className={cn("rounded border border-zinc-700/70", {
+          "border-zinc-300": editor.isFocused,
+        })}
+      >
+        <EditorContent editor={editor} />
+        <CommentReplyRTEMenu editor={editor} />
+      </div>
     </div>
   );
 }
 
-function CommentReplyRTEMenu({
-  editor,
-  cancelReply,
-}: {
-  editor: Editor;
-  cancelReply: () => void;
-}) {
+function CommentReplyRTEMenu({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const comment = useCommentContext();
+  const { comment, setReply } = useCommentContext();
 
   if (!editor) {
     return null;
@@ -80,7 +74,7 @@ function CommentReplyRTEMenu({
         router.refresh();
       });
 
-      cancelReply();
+      setReply(false);
 
       toast.success("Reply successfully posted.");
     },
@@ -100,7 +94,7 @@ function CommentReplyRTEMenu({
       <div className="ml-auto flex gap-2">
         <button
           className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={cancelReply}
+          onClick={() => setReply(false)}
         >
           Cancel
         </button>

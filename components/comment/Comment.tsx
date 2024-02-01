@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import CommentContextProvider from "@/lib/context/CommentContextProvider";
 import type { User } from "@/lib/db/schema";
 import { RouterOutput } from "@/trpc/procedures";
@@ -32,34 +30,21 @@ export default function Comment({
 
   if (!comment) throw new Error("Couldn't fetch comment information");
 
-  const [reply, setReply] = useState(false);
-  const [editable, setEditable] = useState(false);
-
-  const toggleEdit = () => setEditable((prev) => !prev);
-  const cancelEdit = () => setEditable(false);
-  const toggleReply = () => setReply((prev) => !prev);
-  const cancelReply = () => setReply(false);
-
   return (
     <CommentContextProvider comment={comment}>
       <div className="flex flex-col gap-2">
         <CommentMetadata />
         <div className="ml-3 flex flex-col gap-4 border-l-2 border-zinc-700/70 pl-2">
           <div className="flex flex-col gap-1 pl-2">
-            <CommentContentRTE editable={editable} cancelEdit={cancelEdit} />
+            <CommentContentRTE />
 
-            <CommentActions
-              currentUserId={currentUserId}
-              toggleReply={toggleReply}
-            >
-              <CommentActionsDropdown toggleEdit={toggleEdit} />
+            <CommentActions currentUserId={currentUserId}>
+              <CommentActionsDropdown />
             </CommentActions>
           </div>
-          {reply && (
-            <div className="ml-3 border-l-2 border-zinc-700/70 pl-6">
-              <CommentReplyRTE cancelReply={cancelReply} />
-            </div>
-          )}
+
+          {/* create comment */}
+          <CommentReplyRTE />
 
           {/* Replies */}
           {children}

@@ -9,15 +9,11 @@ import { useCommentContext } from "@/lib/context/CommentContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-export default function CommentActionsDropdown({
-  toggleEdit,
-}: {
-  toggleEdit: () => void;
-}) {
+export default function CommentActionsDropdown() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const comment = useCommentContext();
+  const { comment, setEditable } = useCommentContext();
 
   const deleteComment = trpc.deleteComment.useMutation({
     onError: async ({ message }: { message: string }) => {
@@ -43,7 +39,7 @@ export default function CommentActionsDropdown({
     >
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
-        onClick={toggleEdit}
+        onClick={() => setEditable((prev) => !prev)}
       >
         <PencilSquareIcon className="h-5 w-5" /> Edit
       </div>

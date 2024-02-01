@@ -1,10 +1,16 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 
 import type { RouterOutput } from "@/trpc/procedures";
 
 type Comment = NonNullable<RouterOutput["getComment"]>;
 
-const CommentContext = createContext<Comment | null>(null);
+const CommentContext = createContext<{
+  comment: Comment;
+  editable: boolean;
+  setEditable: React.Dispatch<React.SetStateAction<boolean>>;
+  reply: boolean;
+  setReply: React.Dispatch<React.SetStateAction<boolean>>;
+} | null>(null);
 
 export default function CommentContextProvider({
   comment,
@@ -13,8 +19,13 @@ export default function CommentContextProvider({
   comment: Comment;
   children: React.ReactNode;
 }) {
+  const [editable, setEditable] = useState(false);
+  const [reply, setReply] = useState(false);
+
   return (
-    <CommentContext.Provider value={comment}>
+    <CommentContext.Provider
+      value={{ comment, editable, setEditable, reply, setReply }}
+    >
       {children}
     </CommentContext.Provider>
   );

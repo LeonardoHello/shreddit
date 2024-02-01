@@ -1,10 +1,4 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  createContext,
-  useContext,
-  useState,
-} from "react";
+import { createContext, useContext, useState } from "react";
 
 import type { RouterOutput } from "@/trpc/procedures";
 
@@ -13,7 +7,7 @@ type Post = NonNullable<RouterOutput["getPost"]>;
 const PostContext = createContext<{
   post: Post;
   editable: boolean;
-  setEditable: Dispatch<SetStateAction<boolean>>;
+  setEditable: React.Dispatch<React.SetStateAction<boolean>>;
 } | null>(null);
 
 export default function PostContextProvider({

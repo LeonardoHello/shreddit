@@ -8,7 +8,7 @@ import dot from "@/public/dot.svg";
 
 export default function CommentMetadata() {
   const hydrated = useHydration();
-  const comment = useCommentContext();
+  const { comment } = useCommentContext();
 
   return (
     <div className="flex items-center gap-1 text-xs">

@@ -18,7 +18,7 @@ export default function CommentVote({
 }) {
   const utils = trpc.useUtils();
 
-  const comment = useCommentContext();
+  const { comment } = useCommentContext();
 
   const userToComment = comment.usersToComments.find(
     (userToComment) => userToComment.userId === currentUserId,
