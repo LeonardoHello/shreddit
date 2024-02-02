@@ -1,6 +1,6 @@
-import { useEffect, useTransition } from "react";
+import { useTransition } from "react";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -22,43 +22,29 @@ const extensions = [
   }),
 ];
 
-export default function PostContentRTE() {
-  const { postId } = useParams();
-
-  const { post, editable } = usePostContext();
+export default function PostEditRTE() {
+  const { post } = usePostContext();
 
   const editor = useEditor({
     content: post.text,
-    editable,
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
       },
     },
     extensions,
   });
 
-  if (!editor || !post.text || (!postId && (post.spoiler || post.nsfw)))
-    return null;
-
-  if (!postId) {
-    return (
-      <div className="relative max-h-72 overflow-hidden">
-        <EditorContent editor={editor} />
-        <div className="absolute top-0 h-full w-full bg-gradient-to-b from-transparent to-zinc-900" />
-      </div>
-    );
-  }
+  if (!editor) return null;
 
   return (
     <div
-      className={cn({
-        "rounded border border-zinc-700/70": editable,
-        "border-zinc-300": editable && editor.isFocused,
+      className={cn("rounded border border-zinc-700/70", {
+        "border-zinc-300": editor.isFocused,
       })}
     >
-      {editable && <EditorMenu editor={editor} />}
+      <EditorMenu editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );
@@ -89,30 +75,6 @@ function EditorMenu({ editor }: { editor: Editor }) {
   });
 
   const isMutating = isPending || editPost.isLoading;
-
-  useEffect(() => {
-    editor.setEditable(true);
-    editor.setOptions({
-      editorProps: {
-        attributes: {
-          class:
-            "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
-        },
-      },
-    });
-
-    return () => {
-      editor.setEditable(false);
-      editor.setOptions({
-        editorProps: {
-          attributes: {
-            class:
-              "prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none",
-          },
-        },
-      });
-    };
-  }, [editor]);
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
