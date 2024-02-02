@@ -1,7 +1,3 @@
-import { useTransition } from "react";
-
-import { useRouter } from "next/navigation";
-
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
@@ -51,30 +47,33 @@ export default function PostEditRTE() {
 }
 
 function EditorMenu({ editor }: { editor: Editor }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const utils = trpc.useUtils();
 
   const { post, setEditable } = usePostContext();
 
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
-      editor.setEditable(false);
+      utils["getPost"].setData(post.id, (updater) => {
+        if (!updater) {
+          const post = utils["getPost"].getData();
+
+          return post;
+        }
+
+        return { ...updater, text: editor.getHTML() };
+      });
     },
     onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
-      });
       setEditable(false);
 
       toast.success("Post successfully edited.");
     },
-    onError: (error) => {
-      editor.setEditable(true);
+    onError: async (error) => {
+      await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
+
       toast.error(error.message);
     },
   });
-
-  const isMutating = isPending || editPost.isLoading;
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
@@ -128,10 +127,10 @@ function EditorMenu({ editor }: { editor: Editor }) {
           className={cn(
             "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
             {
-              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+              "cursor-not-allowed text-zinc-500": isEmpty || editPost.isLoading,
             },
           )}
-          disabled={isEmpty || isMutating}
+          disabled={isEmpty || editPost.isLoading}
           onClick={() => {
             editPost.mutate({
               id: post.id,
