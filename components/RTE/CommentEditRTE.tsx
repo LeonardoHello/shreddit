@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useTransition } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -24,17 +24,16 @@ const extensions = [
   }),
 ];
 
-export default function CommentContentRTE() {
+export default function CommentEditRTE() {
   const { comment, editable } = useCommentContext();
 
   const editor = useEditor({
     content: comment.text,
     extensions,
-    editable: false,
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
       },
     },
   });
@@ -51,7 +50,7 @@ export default function CommentContentRTE() {
       })}
     >
       <EditorContent editor={editor} />
-      {editable && <CommentEditRTEMenu editor={editor} />}
+      <CommentEditRTEMenu editor={editor} />
     </div>
   );
 }
@@ -61,30 +60,6 @@ function CommentEditRTEMenu({ editor }: { editor: Editor }) {
   const [isPending, startTransition] = useTransition();
 
   const { comment, setEditable } = useCommentContext();
-
-  useEffect(() => {
-    editor.setEditable(true);
-    editor.setOptions({
-      editorProps: {
-        attributes: {
-          class:
-            "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
-        },
-      },
-    });
-
-    return () => {
-      editor.setEditable(false);
-      editor.setOptions({
-        editorProps: {
-          attributes: {
-            class:
-              "prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none",
-          },
-        },
-      });
-    };
-  }, [editor]);
 
   const editComment = trpc.editComment.useMutation({
     onMutate: () => {

@@ -5,10 +5,10 @@ import type { User } from "@/lib/db/schema";
 import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import CommentContentRTE from "../RTE/CommentContentRTE";
 import CommentReplyRTE from "../RTE/CommentReplyRTE";
 import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";
+import CommentContent from "./CommentContent";
 import CommentMetadata from "./CommentMetadata";
 
 type Props = {
@@ -36,7 +36,7 @@ export default function Comment({
         <CommentMetadata />
         <div className="ml-3 flex flex-col gap-4 border-l-2 border-zinc-700/70 pl-2">
           <div className="flex flex-col gap-1 pl-2">
-            <CommentContentRTE />
+            <CommentContent />
 
             <CommentActions currentUserId={currentUserId}>
               <CommentActionsDropdown />
