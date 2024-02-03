@@ -62,10 +62,10 @@ function EditorMenu({ editor }: { editor: Editor }) {
 
         return { ...updater, text: editor.getHTML() };
       });
+
+      setEditable(false);
     },
     onSuccess: () => {
-      setEditable(false);
-
       toast.success("Post successfully edited.");
     },
     onError: async (error) => {
@@ -107,8 +107,8 @@ function EditorMenu({ editor }: { editor: Editor }) {
         <button
           className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
           onClick={() => {
-            setEditable(false);
             editor.commands.setContent(post.text);
+            setEditable(false);
           }}
         >
           Cancel
