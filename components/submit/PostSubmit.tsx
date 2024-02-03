@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type ChangeEvent,
-  useEffect,
-  useReducer,
-  useState,
-  useTransition,
-} from "react";
+import { useState, useTransition } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -22,77 +16,15 @@ import {
 } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
 
-import { useSubmitContext } from "@/lib/context/SubmitContextProvider";
-import type { Post } from "@/lib/db/schema";
+import {
+  REDUCER_ACTION_TYPE,
+  usePostSubmitContext,
+} from "@/lib/context/PostSubmitContextProvider";
 import cn from "@/lib/utils/cn";
 import { UploadDropzone } from "@/lib/utils/uploadthing";
 import { trpc } from "@/trpc/react";
 
 import PostRTE from "../RTE/PostRTE";
-
-type InitialReducerState = Omit<
-  Post,
-  "createdAt" | "updatedAt" | "id" | "communityId" | "authorId"
-> &
-  Partial<Pick<Post, "communityId">>;
-
-enum REDUCER_ACTION_TYPE {
-  CHANGED_COMMUNITY,
-  CHANGED_TITLE,
-  CHANGED_TEXT,
-  TOGGLED_SPOILER,
-  TOGGLED_NSFW,
-}
-
-type ReducerAction = {
-  [K in REDUCER_ACTION_TYPE]: K extends REDUCER_ACTION_TYPE.CHANGED_TITLE
-    ? { type: K; nextTitle: InitialReducerState["title"] }
-    : K extends REDUCER_ACTION_TYPE.CHANGED_COMMUNITY
-    ? { type: K; nextCommunityId: InitialReducerState["communityId"] }
-    : K extends REDUCER_ACTION_TYPE.CHANGED_TEXT
-    ? { type: K; nextText: InitialReducerState["text"] }
-    : { type: K };
-}[REDUCER_ACTION_TYPE];
-
-function reducer(
-  state: InitialReducerState,
-  action: ReducerAction,
-): InitialReducerState {
-  switch (action.type) {
-    case REDUCER_ACTION_TYPE.CHANGED_COMMUNITY:
-      return {
-        ...state,
-        communityId: action.nextCommunityId,
-      };
-
-    case REDUCER_ACTION_TYPE.CHANGED_TITLE:
-      return {
-        ...state,
-        title: action.nextTitle,
-      };
-
-    case REDUCER_ACTION_TYPE.CHANGED_TEXT:
-      return {
-        ...state,
-        text: action.nextText,
-      };
-
-    case REDUCER_ACTION_TYPE.TOGGLED_SPOILER:
-      return {
-        ...state,
-        spoiler: !state.spoiler,
-      };
-
-    case REDUCER_ACTION_TYPE.TOGGLED_NSFW:
-      return {
-        ...state,
-        nsfw: !state.nsfw,
-      };
-
-    default:
-      throw Error("Unknown action");
-  }
-}
 
 const maxTitleLength = 300;
 
@@ -105,27 +37,12 @@ export default function PostSubmit({
   const [isPending, startTransition] = useTransition();
 
   const [mediaSubmit, setMediaSubmit] = useState(initialMediaSubmit);
-  const [state, dispatch] = useReducer(reducer, {
-    communityId: undefined,
-    title: "",
-    text: null,
-    nsfw: false,
-    spoiler: false,
-  });
-
-  const { selectedCommunity } = useSubmitContext();
-
-  useEffect(() => {
-    dispatch({
-      type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
-      nextCommunityId: selectedCommunity?.id,
-    });
-  }, [selectedCommunity]);
+  const { state, dispatch } = usePostSubmitContext();
 
   const createPost = trpc.createPost.useMutation({
     onSuccess: (data) => {
       startTransition(() => {
-        router.push(`/r/${selectedCommunity?.name}/comments/${data[0].id}`);
+        router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
       });
     },
     onError: (error) => {
@@ -136,33 +53,10 @@ export default function PostSubmit({
   const isMutating = isPending || createPost.isLoading;
 
   const disabled =
-    isMutating || !state.communityId || !state.text || state.title.length === 0;
-
-  function handleTitleChange(e: ChangeEvent<HTMLInputElement>) {
-    dispatch({
-      type: REDUCER_ACTION_TYPE.CHANGED_TITLE,
-      nextTitle: e.currentTarget.value,
-    });
-  }
-
-  function handleSpoilerToggle() {
-    dispatch({
-      type: REDUCER_ACTION_TYPE.TOGGLED_SPOILER,
-    });
-  }
-
-  function handleNsfwToggle() {
-    dispatch({
-      type: REDUCER_ACTION_TYPE.TOGGLED_NSFW,
-    });
-  }
-
-  function handleTextChange(nextText: InitialReducerState["text"]) {
-    dispatch({
-      type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
-      nextText,
-    });
-  }
+    isMutating ||
+    !state.community?.id ||
+    !state.text ||
+    state.title.length === 0;
 
   return (
     <div className="bg-zinc-900 text-sm">
@@ -195,7 +89,10 @@ export default function PostSubmit({
           )}
           onClick={() => {
             if (!mediaSubmit) {
-              handleTextChange(null);
+              dispatch({
+                type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
+                nextText: null,
+              });
               setMediaSubmit(true);
             }
           }}
@@ -213,13 +110,18 @@ export default function PostSubmit({
               maxLength={maxTitleLength}
               autoComplete="off"
               className="w-full min-w-0 overflow-y-hidden rounded bg-inherit py-2.5 pl-4 pr-16 text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 focus:ring-zinc-300 "
-              onChange={handleTitleChange}
+              onChange={(e) => {
+                dispatch({
+                  type: REDUCER_ACTION_TYPE.CHANGED_TITLE,
+                  nextTitle: e.currentTarget.value,
+                });
+              }}
             />
             <div className="absolute right-3 text-2xs font-bold text-zinc-500">
               {state.title.length}/{maxTitleLength}
             </div>
           </div>
-          {!mediaSubmit && <PostRTE handleTextChange={handleTextChange} />}
+          {!mediaSubmit && <PostRTE />}
           {mediaSubmit && (
             <UploadDropzone
               endpoint="imageUploader"
@@ -240,7 +142,9 @@ export default function PostSubmit({
               "flex items-center gap-1.5 rounded-full border border-zinc-500 px-3.5 py-1 capitalize tracking-wide",
               { "border-zinc-950 bg-zinc-950 text-zinc-300": state.spoiler },
             )}
-            onClick={handleSpoilerToggle}
+            onClick={() => {
+              dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_SPOILER });
+            }}
           >
             {state.spoiler && <CheckIcon className="h-6 w-6 rotate-6" />}
             {!state.spoiler && <PlusIcon className="h-6 w-6" />}
@@ -251,7 +155,9 @@ export default function PostSubmit({
               "flex items-center gap-1.5 rounded-full border border-zinc-500 px-3.5 py-1 uppercase tracking-wide",
               { "border-rose-500 bg-rose-500 text-zinc-900": state.nsfw },
             )}
-            onClick={handleNsfwToggle}
+            onClick={() => {
+              dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_NSFW });
+            }}
           >
             {state.nsfw && <CheckIcon className="h-6 w-6 rotate-6" />}
             {!state.nsfw && <PlusIcon className="h-6 w-6" />}
@@ -268,8 +174,8 @@ export default function PostSubmit({
           )}
           disabled={disabled}
           onClick={() => {
-            if (state.communityId) {
-              createPost.mutate({ ...state, communityId: state.communityId });
+            if (state.community) {
+              createPost.mutate({ ...state, communityId: state.community.id });
             }
           }}
         >

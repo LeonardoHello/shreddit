@@ -4,7 +4,10 @@ import Image from "next/image";
 
 import type { getSelectableCommunities } from "@/lib/api/getCommunities";
 import type { getUserById } from "@/lib/api/getUser";
-import { useSubmitContext } from "@/lib/context/SubmitContextProvider";
+import {
+  REDUCER_ACTION_TYPE,
+  usePostSubmitContext,
+} from "@/lib/context/PostSubmitContextProvider";
 import communityImage from "@/public/community-logo.svg";
 
 type Props = {
@@ -18,7 +21,7 @@ export default function CommunitySelectDropdown({
   user,
   selectableCommunities,
 }: Props) {
-  const { setSelectedCommunity } = useSubmitContext();
+  const { dispatch } = usePostSubmitContext();
 
   return (
     <div className="absolute top-full z-10 flex max-h-[30rem] w-64 flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit lg:w-full">
@@ -53,7 +56,10 @@ export default function CommunitySelectDropdown({
               key={selectableCommunity.community.id}
               className="flex h-9 cursor-pointer items-center gap-2"
               onClick={() =>
-                setSelectedCommunity(selectableCommunity.community)
+                dispatch({
+                  type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
+                  nextCommunity: selectableCommunity.community,
+                })
               }
             >
               {selectableCommunity.community.imageUrl ? (

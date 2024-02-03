@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-import { useSubmitContext } from "@/lib/context/SubmitContextProvider";
+import { usePostSubmitContext } from "@/lib/context/PostSubmitContextProvider";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
@@ -16,7 +16,7 @@ export default function CommunitySelect({
 }) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
-  const { selectedCommunity } = useSubmitContext();
+  const { state } = usePostSubmitContext();
 
   return (
     <div
@@ -24,7 +24,7 @@ export default function CommunitySelect({
       className="relative flex w-72 flex-col rounded bg-inherit bg-zinc-900"
       onClick={() => setIsOpen((prev) => !prev)}
     >
-      {selectedCommunity && (
+      {state.community && (
         <button
           className={cn(
             "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
@@ -33,9 +33,9 @@ export default function CommunitySelect({
             },
           )}
         >
-          {selectedCommunity.imageUrl ? (
+          {state.community.imageUrl ? (
             <Image
-              src={selectedCommunity.imageUrl}
+              src={state.community.imageUrl}
               alt="community icon"
               width={24}
               height={24}
@@ -51,14 +51,14 @@ export default function CommunitySelect({
             />
           )}
           <h1 className="hidden truncate text-center text-sm font-medium lg:block">
-            r/{selectedCommunity.name}
+            r/{state.community.name}
           </h1>
 
           <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
         </button>
       )}
 
-      {!selectedCommunity && (
+      {!state.community && (
         <button
           className={cn(
             "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",

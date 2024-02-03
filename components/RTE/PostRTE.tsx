@@ -8,6 +8,10 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import {
+  REDUCER_ACTION_TYPE,
+  usePostSubmitContext,
+} from "@/lib/context/PostSubmitContextProvider";
 import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 
@@ -21,11 +25,9 @@ const extensions = [
   }),
 ];
 
-export default function PostRTE({
-  handleTextChange,
-}: {
-  handleTextChange: (data: Post["text"]) => void;
-}) {
+export default function PostRTE() {
+  const { dispatch } = usePostSubmitContext();
+
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -36,9 +38,12 @@ export default function PostRTE({
     extensions,
     onUpdate: ({ editor }) => {
       if (editor.state.doc.textContent.trim().length === 0) {
-        handleTextChange(null);
+        dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
       } else {
-        handleTextChange(editor.getHTML());
+        dispatch({
+          type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
+          nextText: editor.getHTML(),
+        });
       }
     },
   });

@@ -11,7 +11,7 @@ import PostSubmit from "@/components/submit/PostSubmit";
 import { getSelectableCommunities } from "@/lib/api/getCommunities";
 import { getSelectedCommunity } from "@/lib/api/getCommunity";
 import { getUserById } from "@/lib/api/getUser";
-import SubmitContextProvider from "@/lib/context/SubmitContextProvider";
+import PostSubmitContextProvider from "@/lib/context/PostSubmitContextProvider";
 import ogre from "@/public/logo-green.svg";
 
 export default async function SubmitPage({
@@ -55,7 +55,7 @@ export default async function SubmitPage({
             Create a post
           </h1>
 
-          <SubmitContextProvider
+          <PostSubmitContextProvider
             initialSelectedCommunity={initialSelectedCommunity}
           >
             <CommunitySelect>
@@ -65,7 +65,7 @@ export default async function SubmitPage({
               />
             </CommunitySelect>
             <PostSubmit initialMediaSubmit={searchParams.submit === "media"} />
-          </SubmitContextProvider>
+          </PostSubmitContextProvider>
         </div>
         <div className="my-8 hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
           <div className="rounded bg-zinc-900 p-4">
