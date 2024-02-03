@@ -15,7 +15,7 @@ export default function PostContentText() {
   if (postId) {
     return (
       <div
-        className="prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none"
+        className="prose prose-sm prose-zinc prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.text }}
       />
     );
@@ -28,7 +28,7 @@ export default function PostContentText() {
   return (
     <div className="relative max-h-72 overflow-hidden">
       <div
-        className="prose prose-sm prose-zinc prose-invert max-w-none focus:outline-none"
+        className="prose prose-sm prose-zinc prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: post.text }}
       />
       <div className="absolute top-0 h-full w-full bg-gradient-to-b from-transparent to-zinc-900" />
