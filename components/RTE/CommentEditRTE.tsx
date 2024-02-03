@@ -1,5 +1,3 @@
-"use client";
-
 import { useTransition } from "react";
 
 import { useRouter } from "next/navigation";
@@ -25,7 +23,7 @@ const extensions = [
 ];
 
 export default function CommentEditRTE() {
-  const { comment, editable } = useCommentContext();
+  const { comment } = useCommentContext();
 
   const editor = useEditor({
     content: comment.text,
@@ -44,9 +42,8 @@ export default function CommentEditRTE() {
 
   return (
     <div
-      className={cn({
-        "rounded border border-zinc-700/70": editable,
-        "border-zinc-300": editable && editor.isFocused,
+      className={cn("rounded border border-zinc-700/70", {
+        "border-zinc-300": editor.isFocused,
       })}
     >
       <EditorContent editor={editor} />
@@ -56,31 +53,30 @@ export default function CommentEditRTE() {
 }
 
 function CommentEditRTEMenu({ editor }: { editor: Editor }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const utils = trpc.useUtils();
 
   const { comment, setEditable } = useCommentContext();
 
   const editComment = trpc.editComment.useMutation({
     onMutate: () => {
-      editor.setEditable(false);
+      utils["getComment"].setData(comment.id, (updater) => {
+        if (!updater) {
+          return comment;
+        }
+
+        return { ...comment, text: editor.getHTML() };
+      });
+      setEditable(false);
     },
     onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
-      });
-
-      setEditable(false);
-
       toast.success("Comment successfully edited.");
     },
-    onError: (error) => {
-      editor.setEditable(true);
+    onError: async (error) => {
+      await utils["getComment"].refetch(comment.id, {}, { throwOnError: true });
+
       toast.error(error.message);
     },
   });
-
-  const isMutating = isPending || editComment.isLoading;
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
@@ -111,10 +107,11 @@ function CommentEditRTEMenu({ editor }: { editor: Editor }) {
           className={cn(
             "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
             {
-              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+              "cursor-not-allowed text-zinc-500":
+                isEmpty || editComment.isLoading,
             },
           )}
-          disabled={isEmpty || isMutating}
+          disabled={isEmpty || editComment.isLoading}
           onClick={() => {
             editComment.mutate({
               id: comment.id,
