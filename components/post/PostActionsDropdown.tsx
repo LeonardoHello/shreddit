@@ -133,7 +133,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
         Mark As NSFW
       </div>
       {/* the value of removePostFromQuery will determine where Post component is located */}
-      {post.files.length === 0 && removePostFromQuery && (
+      {post.text && removePostFromQuery && (
         <Link
           href={{
             pathname: `/r/${post.community.name}/comments/${post.id}`,
@@ -144,7 +144,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
           <PencilSquareIcon className="h-5 w-5" /> Edit
         </Link>
       )}
-      {post.files.length === 0 && !removePostFromQuery && (
+      {post.text && !removePostFromQuery && (
         <div
           className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
           onClick={() => setEditable((prev) => !prev)}
