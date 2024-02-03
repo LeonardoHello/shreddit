@@ -1,7 +1,3 @@
-import { useTransition } from "react";
-
-import { useRouter } from "next/navigation";
-
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, EditorContent, useEditor } from "@tiptap/react";
@@ -36,8 +32,14 @@ export default function CommentEditRTE() {
     },
   });
 
+  // still displaying comment content until editor instance loads
   if (!editor) {
-    return null;
+    return (
+      <div
+        className="prose prose-sm prose-zinc prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: comment.text }}
+      />
+    );
   }
 
   return (

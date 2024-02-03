@@ -8,6 +8,7 @@ import { usePostContext } from "@/lib/context/PostContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
+import PostContentText from "../post/PostContentText";
 import RTEButtons from "./RTEButtons";
 
 const extensions = [
@@ -23,16 +24,18 @@ export default function PostEditRTE() {
 
   const editor = useEditor({
     content: post.text,
+    extensions,
     editorProps: {
       attributes: {
         class:
           "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
       },
     },
-    extensions,
   });
 
-  if (!editor) return null;
+  if (!editor) {
+    return <PostContentText />;
+  }
 
   return (
     <div
