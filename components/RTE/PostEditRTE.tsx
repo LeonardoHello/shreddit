@@ -8,7 +8,7 @@ import { usePostContext } from "@/lib/context/PostContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import PostContentText from "../post/PostContentText";
+import PostRTELoading from "./PostRTELoading";
 import RTEButtons from "./RTEButtons";
 
 const extensions = [
@@ -34,7 +34,7 @@ export default function PostEditRTE() {
   });
 
   if (!editor) {
-    return <PostContentText />;
+    return <PostRTELoading />;
   }
 
   return (

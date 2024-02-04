@@ -14,6 +14,7 @@ import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
+import CommentRTELoading from "./CommentRTELoading";
 import RTEButtons from "./RTEButtons";
 
 const extensions = [
@@ -36,7 +37,7 @@ export default function CommentRTE({ postId }: { postId: Post["id"] }) {
   });
 
   if (!editor) {
-    return null;
+    return <CommentRTELoading />;
   }
 
   return (
@@ -87,7 +88,7 @@ function CommentRTEMenu({
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex flex-wrap gap-2 rounded-b bg-zinc-800 px-1.5 py-1">
+    <div className="flex flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
       <RTEButtons editor={editor} />
       <div className="ml-auto flex gap-2">
         <button

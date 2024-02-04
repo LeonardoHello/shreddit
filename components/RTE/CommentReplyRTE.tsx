@@ -14,6 +14,7 @@ import { useCommentContext } from "@/lib/context/CommentContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
+import CommentRTELoading from "./CommentRTELoading";
 import RTEButtons from "./RTEButtons";
 
 const extensions = [
@@ -37,8 +38,12 @@ export default function CommentReplyRTE() {
     extensions,
   });
 
-  if (!editor || !reply) {
+  if (!reply) {
     return null;
+  }
+
+  if (!editor) {
+    return <CommentRTELoading />;
   }
 
   return (
@@ -62,7 +67,7 @@ function CommentReplyRTEMenu({ editor }: { editor: Editor }) {
   const { comment, setReply } = useCommentContext();
 
   if (!editor) {
-    return null;
+    return <CommentRTELoading />;
   }
 
   const createComment = trpc.createComment.useMutation({
@@ -89,7 +94,7 @@ function CommentReplyRTEMenu({ editor }: { editor: Editor }) {
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex flex-wrap gap-2 rounded-b bg-zinc-800 px-1.5 py-1">
+    <div className="flex flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
       <RTEButtons editor={editor} />
       <div className="ml-auto flex gap-2">
         <button

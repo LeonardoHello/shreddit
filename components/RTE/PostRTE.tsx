@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback } from "react";
-
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -12,9 +10,9 @@ import {
   REDUCER_ACTION_TYPE,
   usePostSubmitContext,
 } from "@/lib/context/PostSubmitContextProvider";
-import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 
+import PostRTELoading from "./PostRTELoading";
 import RTEButtons from "./RTEButtons";
 
 const extensions = [
@@ -49,7 +47,7 @@ export default function PostRTE() {
   });
 
   if (!editor) {
-    return null;
+    return <PostRTELoading />;
   }
 
   return (
