@@ -31,7 +31,7 @@ export default memo(function PostContentMedia() {
       >
         <Image
           src={files[0].url}
-          alt="post image"
+          alt={files[0].name}
           width={500}
           height={500}
           className="h-auto max-h-96 min-w-full object-contain"
@@ -53,7 +53,7 @@ export default memo(function PostContentMedia() {
           >
             <Image
               src={image.url}
-              alt="post slider image"
+              alt={image.name}
               height={500}
               width={500}
               className="h-auto max-h-96 min-w-full object-contain"

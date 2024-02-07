@@ -84,6 +84,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
         .forEach(res, (file, { commands }) => {
           return commands.setImage({
             src: file.url,
+            alt: file.name,
           });
         })
         .run();
