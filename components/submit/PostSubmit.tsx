@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -21,10 +21,10 @@ import {
   usePostSubmitContext,
 } from "@/lib/context/PostSubmitContextProvider";
 import cn from "@/lib/utils/cn";
-import { UploadDropzone } from "@/lib/utils/uploadthing";
 import { trpc } from "@/trpc/react";
 
 import PostRTE from "../RTE/PostRTE";
+import Dropzone from "./Dropzone";
 
 const maxTitleLength = 300;
 
@@ -34,29 +34,36 @@ export default function PostSubmit({
   initialMediaSubmit: boolean;
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
-  const [mediaSubmit, setMediaSubmit] = useState(initialMediaSubmit);
   const { state, dispatch } = usePostSubmitContext();
+  const [mediaSubmit, setMediaSubmit] = useState(initialMediaSubmit);
+
+  const createFiles = trpc.createFile.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const createPost = trpc.createPost.useMutation({
     onSuccess: (data) => {
-      startTransition(() => {
-        router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
-      });
+      const filesToInsert = state.files.map((file) => ({
+        ...file,
+        postId: data[0].id,
+      }));
+      createFiles.mutate(filesToInsert);
+
+      router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
     },
     onError: (error) => {
       toast.error(error.message);
     },
   });
 
-  const isMutating = isPending || createPost.isLoading;
-
   const disabled =
-    isMutating ||
+    state.isMutating ||
     !state.community?.id ||
-    !state.text ||
-    state.title.length === 0;
+    state.title.length === 0 ||
+    (!state.text && state.files.length === 0);
 
   return (
     <div className="bg-zinc-900 text-sm">
@@ -71,6 +78,11 @@ export default function PostSubmit({
           )}
           onClick={() => {
             if (mediaSubmit) {
+              dispatch({
+                type: REDUCER_ACTION_TYPE.CHANGED_FILES,
+                nextFiles: [],
+              });
+
               setMediaSubmit(false);
             }
           }}
@@ -89,10 +101,16 @@ export default function PostSubmit({
           )}
           onClick={() => {
             if (!mediaSubmit) {
+              // post state cleanup
               dispatch({
                 type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
                 nextText: null,
               });
+              dispatch({
+                type: REDUCER_ACTION_TYPE.CHANGED_FILES,
+                nextFiles: [],
+              });
+
               setMediaSubmit(true);
             }
           }}
@@ -122,19 +140,7 @@ export default function PostSubmit({
             </div>
           </div>
           {!mediaSubmit && <PostRTE />}
-          {mediaSubmit && (
-            <UploadDropzone
-              endpoint="imageUploader"
-              className="mt-0 rounded border border-zinc-700/70"
-              onClientUploadComplete={(res) => {
-                console.log(res);
-              }}
-              onBeforeUploadBegin={(files) => {
-                console.log(files);
-                return files;
-              }}
-            />
-          )}
+          {mediaSubmit && <Dropzone />}
         </div>
         <div className="flex items-center gap-2 font-bold text-zinc-400">
           <button
@@ -174,12 +180,15 @@ export default function PostSubmit({
           )}
           disabled={disabled}
           onClick={() => {
-            if (state.community) {
-              createPost.mutate({ ...state, communityId: state.community.id });
+            dispatch({ type: REDUCER_ACTION_TYPE.MUTATED });
+
+            const { community, files, isMutating, ...rest } = state;
+            if (community) {
+              createPost.mutate({ ...rest, communityId: community.id });
             }
           }}
         >
-          {isMutating ? "posting..." : "post"}
+          {state.isMutating ? "posting..." : "post"}
         </button>
       </div>
     </div>

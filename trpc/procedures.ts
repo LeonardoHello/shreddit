@@ -33,6 +33,7 @@ import { searchCommunities, searchUsers } from "@/lib/api/search";
 import {
   CommentSchema,
   CommunitySchema,
+  FileSchema,
   PostSchema,
   UserSchema,
   UserToCommentSchema,
@@ -40,6 +41,7 @@ import {
   UserToPostSchema,
   comments,
   communities,
+  files,
   posts,
   usersToComments,
   usersToCommunities,
@@ -508,6 +510,11 @@ export const appRouter = router({
           name: input,
         })
         .returning();
+    }),
+  createFile: protectedProcedure
+    .input(FileSchema.omit({ id: true }).array())
+    .mutation(({ input, ctx }) => {
+      return ctx.db.insert(files).values(input).returning();
     }),
 });
 

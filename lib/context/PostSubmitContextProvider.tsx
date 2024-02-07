@@ -2,20 +2,25 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import type { Post } from "@/lib/db/schema";
+import type { File, Post } from "@/lib/db/schema";
 
 import type { getSelectedCommunity } from "../api/getCommunity";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   community: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
+  files: Omit<File, "id" | "postId">[];
+  isMutating: boolean;
 };
 
 export enum REDUCER_ACTION_TYPE {
   CHANGED_COMMUNITY,
   CHANGED_TITLE,
   CHANGED_TEXT,
+  CHANGED_FILES,
+  ADDED_FILES,
   TOGGLED_SPOILER,
   TOGGLED_NSFW,
+  MUTATED,
 }
 
 type ReducerAction = {
@@ -25,6 +30,10 @@ type ReducerAction = {
     ? { type: K; nextCommunity: ReducerState["community"] }
     : K extends REDUCER_ACTION_TYPE.CHANGED_TEXT
     ? { type: K; nextText: ReducerState["text"] }
+    : K extends REDUCER_ACTION_TYPE.CHANGED_FILES
+    ? { type: K; nextFiles: ReducerState["files"] }
+    : K extends REDUCER_ACTION_TYPE.ADDED_FILES
+    ? { type: K; nextFiles: ReducerState["files"] }
     : { type: K };
 }[REDUCER_ACTION_TYPE];
 
@@ -60,6 +69,24 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         nsfw: !state.nsfw,
       };
 
+    case REDUCER_ACTION_TYPE.CHANGED_FILES:
+      return {
+        ...state,
+        files: action.nextFiles,
+      };
+
+    case REDUCER_ACTION_TYPE.ADDED_FILES:
+      return {
+        ...state,
+        files: state.files.concat(action.nextFiles),
+      };
+
+    case REDUCER_ACTION_TYPE.MUTATED:
+      return {
+        ...state,
+        isMutating: true,
+      };
+
     default:
       throw Error("Unknown action");
   }
@@ -83,6 +110,8 @@ export default function PostSubmitContextProvider({
     text: null,
     nsfw: false,
     spoiler: false,
+    files: [],
+    isMutating: false,
   });
 
   return (

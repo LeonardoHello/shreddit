@@ -1,16 +1,22 @@
 "use client";
 
+import { useCallback, useEffect } from "react";
+
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useDropzone } from "@uploadthing/react";
+import { toast } from "sonner";
+import { generateClientDropzoneAccept } from "uploadthing/client";
 
 import {
   REDUCER_ACTION_TYPE,
   usePostSubmitContext,
 } from "@/lib/context/PostSubmitContextProvider";
 import cn from "@/lib/utils/cn";
+import { useUploadThing } from "@/lib/utils/uploadthing";
 
 import PostRTELoading from "./PostRTELoading";
 import RTEButtons from "./RTEButtons";
@@ -23,19 +29,21 @@ const extensions = [
   }),
 ];
 
+const toastId = "loading_toast";
+
 export default function PostRTE() {
   const { dispatch } = usePostSubmitContext();
 
   const editor = useEditor({
+    extensions,
     editorProps: {
       attributes: {
         class:
           "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-none",
       },
     },
-    extensions,
     onUpdate: ({ editor }) => {
-      if (editor.state.doc.textContent.trim().length === 0) {
+      if (editor.isEmpty) {
         dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
       } else {
         dispatch({
@@ -43,6 +51,9 @@ export default function PostRTE() {
           nextText: editor.getHTML(),
         });
       }
+    },
+    onDestroy: () => {
+      dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
     },
   });
 
@@ -63,17 +74,66 @@ export default function PostRTE() {
 }
 
 function EditorMenu({ editor }: { editor: Editor }) {
+  const { dispatch } = usePostSubmitContext();
+
+  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onClientUploadComplete: (res) => {
+      editor
+        .chain()
+        .focus()
+        .forEach(res, (file, { commands }) => {
+          return commands.setImage({
+            src: file.url,
+          });
+        })
+        .run();
+
+      const files = res.map(({ size, serverData, ...rest }) => rest);
+
+      dispatch({
+        type: REDUCER_ACTION_TYPE.ADDED_FILES,
+        nextFiles: files,
+      });
+
+      toast.dismiss(toastId);
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
+    onUploadError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      startUpload(acceptedFiles);
+    },
+    [startUpload],
+  );
+
+  const fileTypes = permittedFileInfo?.config
+    ? Object.keys(permittedFileInfo?.config)
+    : [];
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+  });
+
   return (
     <div className="flex flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5">
       <RTEButtons editor={editor} />
       <div className="h-4 w-px self-center bg-zinc-700/70" />
-      <button
+      <div
+        {...getRootProps()}
         title="Image"
         className={cn(
-          "p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70",
+          "cursor-pointer p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70",
           { "opacity-30": false },
         )}
       >
+        <input {...getInputProps()} />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -86,7 +146,7 @@ function EditorMenu({ editor }: { editor: Editor }) {
             fill="#71717a"
           />
         </svg>
-      </button>
+      </div>
     </div>
   );
 }
