@@ -29,17 +29,24 @@ export default function SubmitContent() {
   });
 
   const createPost = trpc.createPost.useMutation({
+    onMutate: () => {
+      dispatch({ type: REDUCER_ACTION_TYPE.MUTATED });
+    },
     onSuccess: (data) => {
-      const filesToInsert = state.files
-        .filter((file) => {
-          if (!state.media) {
-          }
-          return file;
-        })
-        .map((file) => ({
-          ...file,
-          postId: data[0].id,
-        }));
+      let files = state.files;
+
+      if (!state.media) {
+        files = state.files.filter(
+          (file) =>
+            state.text?.includes(`<img src="${file.url}" alt="${file.name}">`),
+        );
+      }
+
+      const filesToInsert = files.map((file) => ({
+        ...file,
+        postId: data[0].id,
+      }));
+
       createFiles.mutate(filesToInsert);
 
       router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
@@ -117,8 +124,6 @@ export default function SubmitContent() {
         )}
         disabled={disabled}
         onClick={() => {
-          dispatch({ type: REDUCER_ACTION_TYPE.MUTATED });
-
           const { community, files, isMutating, media, ...rest } = state;
           if (community) {
             createPost.mutate({ ...rest, communityId: community.id });
