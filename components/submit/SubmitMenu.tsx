@@ -18,11 +18,13 @@ export default function SubmitMenu() {
   return (
     <div className="flex font-bold">
       <button
+        disabled={state.isMutating}
         className={cn(
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
               !state.media,
+            "cursor-not-allowed hover:bg-inherit": state.isMutating,
           },
         )}
         onClick={() => {
@@ -44,11 +46,13 @@ export default function SubmitMenu() {
       </button>
 
       <button
+        disabled={state.isMutating}
         className={cn(
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-l border-b-zinc-700/70 border-l-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
               state.media,
+            "cursor-not-allowed hover:bg-inherit": state.isMutating,
           },
         )}
         onClick={() => {
