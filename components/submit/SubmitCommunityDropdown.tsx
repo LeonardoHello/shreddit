@@ -6,8 +6,8 @@ import type { getSelectableCommunities } from "@/lib/api/getCommunities";
 import type { getUserById } from "@/lib/api/getUser";
 import {
   REDUCER_ACTION_TYPE,
-  usePostSubmitContext,
-} from "@/lib/context/PostSubmitContextProvider";
+  useSubmitContext,
+} from "@/lib/context/SubmitContextProvider";
 import communityImage from "@/public/community-logo.svg";
 
 type Props = {
@@ -17,11 +17,11 @@ type Props = {
   >;
 };
 
-export default function CommunitySelectDropdown({
+export default function SubmitCommunityDropdown({
   user,
   selectableCommunities,
 }: Props) {
-  const { dispatch } = usePostSubmitContext();
+  const { dispatch } = useSubmitContext();
 
   return (
     <div className="absolute top-full z-10 flex max-h-[30rem] w-64 flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit lg:w-full">

@@ -9,6 +9,7 @@ import type { getSelectedCommunity } from "../api/getCommunity";
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   community: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
   files: Omit<File, "id" | "postId">[];
+  media: boolean;
   isMutating: boolean;
 };
 
@@ -20,6 +21,8 @@ export enum REDUCER_ACTION_TYPE {
   ADDED_FILES,
   TOGGLED_SPOILER,
   TOGGLED_NSFW,
+  SET_MEDIA,
+  CANCELED_MEDIA,
   MUTATED,
 }
 
@@ -69,6 +72,18 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         nsfw: !state.nsfw,
       };
 
+    case REDUCER_ACTION_TYPE.SET_MEDIA:
+      return {
+        ...state,
+        media: true,
+      };
+
+    case REDUCER_ACTION_TYPE.CANCELED_MEDIA:
+      return {
+        ...state,
+        media: false,
+      };
+
     case REDUCER_ACTION_TYPE.CHANGED_FILES:
       return {
         ...state,
@@ -97,11 +112,13 @@ const SubmitContext = createContext<{
   dispatch: React.Dispatch<ReducerAction>;
 } | null>(null);
 
-export default function PostSubmitContextProvider({
+export default function SubmitContextProvider({
   initialSelectedCommunity,
+  initialMedia,
   children,
 }: {
   initialSelectedCommunity: ReducerState["community"];
+  initialMedia: string | string[] | undefined;
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(reducer, {
@@ -112,6 +129,7 @@ export default function PostSubmitContextProvider({
     spoiler: false,
     files: [],
     isMutating: false,
+    media: initialMedia === "media",
   });
 
   return (
@@ -121,7 +139,7 @@ export default function PostSubmitContextProvider({
   );
 }
 
-export function usePostSubmitContext() {
+export function useSubmitContext() {
   const context = useContext(SubmitContext);
 
   if (!context) {

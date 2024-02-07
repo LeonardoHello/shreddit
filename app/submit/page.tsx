@@ -5,13 +5,14 @@ import { auth } from "@clerk/nextjs";
 
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import Modal from "@/components/modal/Modal";
-import CommunitySelect from "@/components/submit/CommunitySelect";
-import CommunitySelectDropdown from "@/components/submit/CommunitySelectDropdown";
-import PostSubmit from "@/components/submit/PostSubmit";
+import SubmitCommunity from "@/components/submit/SubmitCommunity";
+import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
+import SubmitContent from "@/components/submit/SubmitContent";
+import SubmitMenu from "@/components/submit/SubmitMenu";
 import { getSelectableCommunities } from "@/lib/api/getCommunities";
 import { getSelectedCommunity } from "@/lib/api/getCommunity";
 import { getUserById } from "@/lib/api/getUser";
-import PostSubmitContextProvider from "@/lib/context/PostSubmitContextProvider";
+import SubmitContextProvider from "@/lib/context/SubmitContextProvider";
 import ogre from "@/public/logo-green.svg";
 
 export default async function SubmitPage({
@@ -55,17 +56,22 @@ export default async function SubmitPage({
             Create a post
           </h1>
 
-          <PostSubmitContextProvider
+          <SubmitContextProvider
             initialSelectedCommunity={initialSelectedCommunity}
+            initialMedia={searchParams.submit}
           >
-            <CommunitySelect>
-              <CommunitySelectDropdown
+            <SubmitCommunity>
+              <SubmitCommunityDropdown
                 user={user}
                 selectableCommunities={selectableCommunities}
               />
-            </CommunitySelect>
-            <PostSubmit initialMediaSubmit={searchParams.submit === "media"} />
-          </PostSubmitContextProvider>
+            </SubmitCommunity>
+
+            <div className="bg-zinc-900 text-sm">
+              <SubmitMenu />
+              <SubmitContent />
+            </div>
+          </SubmitContextProvider>
         </div>
         <div className="my-8 hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
           <div className="rounded bg-zinc-900 p-4">

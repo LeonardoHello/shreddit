@@ -4,19 +4,19 @@ import Image from "next/image";
 
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
-import { usePostSubmitContext } from "@/lib/context/PostSubmitContextProvider";
+import { useSubmitContext } from "@/lib/context/SubmitContextProvider";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
 
-export default function CommunitySelect({
+export default function SubmitCommunity({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
-  const { state } = usePostSubmitContext();
+  const { state } = useSubmitContext();
 
   return (
     <div

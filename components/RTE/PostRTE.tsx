@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -13,8 +13,8 @@ import { generateClientDropzoneAccept } from "uploadthing/client";
 
 import {
   REDUCER_ACTION_TYPE,
-  usePostSubmitContext,
-} from "@/lib/context/PostSubmitContextProvider";
+  useSubmitContext,
+} from "@/lib/context/SubmitContextProvider";
 import cn from "@/lib/utils/cn";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 
@@ -32,7 +32,7 @@ const extensions = [
 const toastId = "loading_toast";
 
 export default function PostRTE() {
-  const { dispatch } = usePostSubmitContext();
+  const { dispatch } = useSubmitContext();
 
   const editor = useEditor({
     extensions,
@@ -74,7 +74,7 @@ export default function PostRTE() {
 }
 
 function EditorMenu({ editor }: { editor: Editor }) {
-  const { dispatch } = usePostSubmitContext();
+  const { dispatch } = useSubmitContext();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
     onClientUploadComplete: (res) => {
