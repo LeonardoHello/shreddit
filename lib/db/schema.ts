@@ -179,8 +179,8 @@ export const usersToPostsRelations = relations(usersToPosts, ({ one }) => ({
 export const files = pgTable("files", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
-  key: text("key").notNull(),
-  url: text("url").notNull(),
+  key: text("key").unique().notNull(),
+  url: text("url").unique().notNull(),
   postId: uuid("post_id")
     .references(() => posts.id, { onDelete: "cascade" })
     .notNull(),

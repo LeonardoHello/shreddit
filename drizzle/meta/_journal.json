@@ -176,6 +176,13 @@
       "when": 1705595782617,
       "tag": "0024_daily_madrox",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1707266282289,
+      "tag": "0025_volatile_ricochet",
+      "breakpoints": true
     }
   ]
 }
