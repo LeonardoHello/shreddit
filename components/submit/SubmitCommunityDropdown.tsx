@@ -24,7 +24,7 @@ export default function SubmitCommunityDropdown({
   const { dispatch } = useSubmitContext();
 
   return (
-    <div className="absolute top-full z-10 flex max-h-[30rem] w-64 flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit lg:w-full">
+    <div className="absolute top-full z-10 flex max-h-[30rem] w-full flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit">
       <div className="flex flex-col gap-3.5 px-2 pb-3 pt-4">
         <h2 className="px-2 text-2xs font-medium uppercase tracking-wide text-zinc-300/60">
           your profile
@@ -38,7 +38,7 @@ export default function SubmitCommunityDropdown({
             className="rounded"
           />
 
-          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
+          <h1 className="truncate text-center text-sm font-medium">
             u/{user.name}
           </h1>
         </div>
@@ -81,7 +81,7 @@ export default function SubmitCommunityDropdown({
               )}
 
               <div className="flex flex-col">
-                <h1 className="hidden truncate text-sm lg:block">
+                <h1 className="truncate text-sm">
                   r/{selectableCommunity.community.name}
                 </h1>
                 <h2 className="truncate text-xs lowercase text-zinc-500">

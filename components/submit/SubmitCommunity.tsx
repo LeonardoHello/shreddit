@@ -50,7 +50,7 @@ export default function SubmitCommunity({
               className="rounded-full border border-zinc-300 bg-zinc-300"
             />
           )}
-          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
+          <h1 className="truncate text-center text-sm font-medium">
             r/{state.community.name}
           </h1>
 
@@ -68,7 +68,7 @@ export default function SubmitCommunity({
           )}
         >
           <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
-          <h1 className="hidden truncate text-center text-sm font-medium lg:block">
+          <h1 className="truncate text-center text-sm font-medium">
             Choose a community
           </h1>
 
