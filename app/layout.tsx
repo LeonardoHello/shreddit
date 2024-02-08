@@ -63,7 +63,9 @@ export default function RootLayout({
               <CommunityCreate />
             </CommunityCreateWrapper>
             <Header />
-            <div className="flex min-h-screen flex-col">{children}</div>
+            <div className="flex min-h-[calc(100vh-3rem)] flex-col">
+              {children}
+            </div>
           </TRPCReactProvider>
           <Toaster theme="dark" richColors closeButton />
         </body>
