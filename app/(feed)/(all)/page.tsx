@@ -4,6 +4,7 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
+import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/feed/PremiumButton";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
@@ -13,6 +14,7 @@ import {
   getAllHotPosts,
   getAllNewPosts,
 } from "@/lib/api/getPosts/getAllPosts";
+import { getUserById } from "@/lib/api/getUser";
 import { type QueryInfo, SortPosts } from "@/lib/types";
 import galaxy from "@/public/galaxy.jpg";
 
@@ -30,32 +32,36 @@ export default async function AllPage({
 
   const { sort } = searchParams;
 
-  let posts;
+  let postsData;
   switch (sort) {
     case SortPosts.HOT:
-      posts = await getAllHotPosts.execute({
+      postsData = getAllHotPosts.execute({
         offset: 0,
       });
       break;
 
     case SortPosts.NEW:
-      posts = await getAllNewPosts.execute({
+      postsData = getAllNewPosts.execute({
         offset: 0,
       });
       break;
 
     case SortPosts.CONTROVERSIAL:
-      posts = await getAllControversialPosts.execute({
+      postsData = getAllControversialPosts.execute({
         offset: 0,
       });
       break;
 
     default:
-      posts = await getAllBestPosts.execute({
+      postsData = getAllBestPosts.execute({
         offset: 0,
       });
       break;
   }
+
+  const userData = getUserById.execute({ currentUserId: userId });
+
+  const [user, posts] = await Promise.all([userData, postsData]);
 
   let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = null;
   if (posts.length === 10) {
@@ -68,20 +74,21 @@ export default async function AllPage({
   };
 
   return (
-    <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
-      <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
-        <FeedSort />
-        <PostsInfiniteQuery<"getAllPosts">
-          currentUserId={userId}
-          initialPosts={{ posts, nextCursor }}
-          queryInfo={queryInfo}
-          params={params}
-          searchParams={searchParams}
-        />
+    <main className="grid w-full max-w-5xl grow grid-flow-col grid-rows-[auto,1fr] gap-6 self-center p-2 py-4 lg:grid-cols-[2fr,1fr]">
+      <div className="flex flex-col gap-2.5">
+        {user && <FeedInput user={user} />}
+        <FeedSort searchParams={searchParams} />
       </div>
-      <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+      <PostsInfiniteQuery<"getAllPosts">
+        currentUserId={userId}
+        initialPosts={{ posts, nextCursor }}
+        queryInfo={queryInfo}
+        params={params}
+        searchParams={searchParams}
+      />
+      <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
         <PremiumButton />
-        <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
+        <div className="sticky top-16 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
             src={galaxy}
             alt="galaxy"

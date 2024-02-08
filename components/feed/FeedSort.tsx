@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import {
   ChatBubbleBottomCenterTextIcon,
@@ -19,12 +19,14 @@ import {
 import { SortPosts } from "@/lib/types";
 import cn from "@/lib/utils/cn";
 
-export default function FeedSort() {
+export default function FeedSort({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   const pathname = usePathname();
-  const searchparams = useSearchParams();
 
-  const sort = searchparams.get("sort");
-  const filter = searchparams.get("filter");
+  const { sort, filter } = searchParams;
 
   const defaultSort = !(
     sort === SortPosts.HOT ||

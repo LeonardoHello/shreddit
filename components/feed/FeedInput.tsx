@@ -3,22 +3,21 @@ import Link from "next/link";
 
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
-import { Community, User } from "@/lib/db/schema";
+import type { getUserById } from "@/lib/api/getUser";
+import { Community } from "@/lib/db/schema";
 
-export default function InputSubmit({
-  userImageUrl,
-  userName,
+export default function FeedInput({
+  user,
   communityName,
 }: {
-  userImageUrl: User["imageUrl"];
-  userName: User["name"] | null;
+  user: NonNullable<Awaited<ReturnType<typeof getUserById.execute>>>;
   communityName?: Community["name"];
 }) {
   return (
     <div className="flex gap-2 rounded border border-zinc-700/70 bg-zinc-900 p-2">
-      <Link href={`/u/${userName}`} className="rounded-full">
+      <Link href={`/u/${user.name}`} className="rounded-full">
         <Image
-          src={userImageUrl}
+          src={user.imageUrl}
           alt="user image"
           width={38}
           height={38}

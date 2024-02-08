@@ -46,7 +46,7 @@ export default function CommunityCreate() {
 
   return (
     <Modal>
-      <div className="flex w-full max-w-xl flex-col gap-4 rounded-t border border-zinc-700/70 bg-zinc-900 p-4">
+      <div className="flex w-full max-w-xl flex-col gap-4 rounded-t border border-zinc-800 bg-zinc-900 p-4">
         <div className="flex items-center justify-between">
           <h1 className="font-medium capitalize">create community</h1>
           <button onClick={() => router.replace(pathname, { scroll: false })}>
@@ -119,7 +119,7 @@ export default function CommunityCreate() {
           )}
         </div>
       </div>
-      <div className="flex justify-end gap-2 rounded-b bg-zinc-700 px-4 py-3 text-sm font-bold">
+      <div className="flex justify-end gap-2 rounded-b bg-zinc-800 px-4 py-3 text-sm font-bold">
         <button
           className="rounded-full border border-zinc-300 px-4 py-1 capitalize transition-colors hover:bg-zinc-600"
           onClick={() => router.replace(pathname, { scroll: false })}

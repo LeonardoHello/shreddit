@@ -82,23 +82,21 @@ export default async function HomePage({
   };
 
   return (
-    <main className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
-      <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
-        {user && (
-          <FeedInput userImageUrl={user.imageUrl} userName={user.name} />
-        )}
-        <FeedSort />
-        <PostsInfiniteQuery<"getHomePosts">
-          currentUserId={userId}
-          initialPosts={{ posts, nextCursor }}
-          queryInfo={queryInfo}
-          params={params}
-          searchParams={searchParams}
-        />
+    <main className="grid w-full max-w-5xl grow grid-flow-col grid-rows-[auto,1fr] gap-6 self-center p-2 py-4 lg:grid-cols-[2fr,1fr]">
+      <div className="flex flex-col gap-2.5">
+        {user && <FeedInput user={user} />}
+        <FeedSort searchParams={searchParams} />
       </div>
-      <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+      <PostsInfiniteQuery<"getHomePosts">
+        currentUserId={userId}
+        initialPosts={{ posts, nextCursor }}
+        queryInfo={queryInfo}
+        params={params}
+        searchParams={searchParams}
+      />
+      <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
         <PremiumButton />
-        <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
+        <div className="sticky top-16 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
             src={home}
             alt="home"

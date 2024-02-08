@@ -7,17 +7,18 @@ import { BellIcon } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
 
 import type { getCommunityByName } from "@/lib/api/getCommunity";
+import type { User } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import defaultCommunityImage from "@/public/community-logo.svg";
 import type { RouterInput, RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
 export default function CommunityHeader({
-  isAuthenticated,
+  currentUserId,
   community,
   initialData,
 }: {
-  isAuthenticated: boolean;
+  currentUserId: User["id"] | null;
   community: NonNullable<
     Awaited<ReturnType<typeof getCommunityByName.execute>>
   >;
@@ -40,7 +41,7 @@ export default function CommunityHeader({
 
   const queryConfig = {
     onMutate: (variables: RouterInput["joinCommunity" | "muteCommunity"]) => {
-      if (!isAuthenticated) return;
+      if (!currentUserId) return;
 
       utils["getUserToCommunity"].setData(community.id, (updater) => {
         if (!updater) {
