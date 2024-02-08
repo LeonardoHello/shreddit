@@ -1,11 +1,16 @@
+import { useCallback, useState } from "react";
+
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useDropzone } from "@uploadthing/react";
 import { toast } from "sonner";
+import { generateClientDropzoneAccept } from "uploadthing/client";
 
 import { usePostContext } from "@/lib/context/PostContextProvider";
 import cn from "@/lib/utils/cn";
+import { useUploadThing } from "@/lib/utils/uploadthing";
 import { trpc } from "@/trpc/react";
 
 import PostRTELoading from "./PostRTELoading";
@@ -19,12 +24,14 @@ const extensions = [
   }),
 ];
 
+const toastId = "loading_toast";
+
 export default function PostEditRTE() {
   const { post } = usePostContext();
 
   const editor = useEditor({
-    content: post.text,
     extensions,
+    content: post.text,
     editorProps: {
       attributes: {
         class:
@@ -34,7 +41,7 @@ export default function PostEditRTE() {
   });
 
   if (!editor) {
-    return <PostRTELoading />;
+    return <PostRTELoading content={post.text} />;
   }
 
   return (
@@ -54,6 +61,21 @@ function EditorMenu({ editor }: { editor: Editor }) {
 
   const { post, setEditable } = usePostContext();
 
+  const initialFiles = post.files.map(({ id, postId, ...rest }) => rest);
+  const [files, setFiles] = useState(initialFiles);
+
+  const deleteFiles = trpc.deleteFile.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const createFiles = trpc.createFile.useMutation({
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
       utils["getPost"].setData(post.id, (updater) => {
@@ -70,12 +92,83 @@ function EditorMenu({ editor }: { editor: Editor }) {
     },
     onSuccess: () => {
       toast.success("Post successfully edited.");
+
+      const filesToDelete = post.files
+        .filter(
+          (file) =>
+            !editor
+              .getHTML()
+              .includes(`<img src="${file.url}" alt="${file.name}">`),
+        )
+        .map(({ key }) => key);
+
+      if (filesToDelete.length > 0) {
+        deleteFiles.mutate({ postId: post.id, keys: filesToDelete });
+      }
+
+      const filesToInsert = files
+        .filter((file) =>
+          editor
+            .getHTML()
+            .includes(`<img src="${file.url}" alt="${file.name}">`),
+        )
+        .map((file) => ({
+          ...file,
+          postId: post.id,
+        }));
+
+      if (filesToInsert.length > 0) {
+        createFiles.mutate(filesToInsert);
+      }
     },
     onError: async (error) => {
       await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
 
       toast.error(error.message);
     },
+  });
+
+  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onClientUploadComplete: (res) => {
+      editor
+        .chain()
+        .focus()
+        .forEach(res, (file, { commands }) => {
+          return commands.setImage({
+            src: file.url,
+            alt: file.name,
+          });
+        })
+        .run();
+
+      const files = res.map(({ size, serverData, ...rest }) => rest);
+
+      setFiles((prev) => [...prev, ...files]);
+
+      toast.dismiss(toastId);
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
+    onUploadError: (e) => {
+      toast.error(e.message);
+    },
+  });
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      startUpload(acceptedFiles);
+    },
+    [startUpload],
+  );
+
+  const fileTypes = permittedFileInfo?.config
+    ? Object.keys(permittedFileInfo?.config)
+    : [];
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
   });
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
@@ -86,13 +179,15 @@ function EditorMenu({ editor }: { editor: Editor }) {
 
       <div className="h-4 w-px self-center bg-zinc-700/70" />
 
-      <button
+      <div
+        {...getRootProps()}
         title="Image"
         className={cn(
-          "p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70",
+          "cursor-pointer p-0.5 transition-colors hover:rounded hover:bg-zinc-700/70",
           { "opacity-30": false },
         )}
       >
+        <input {...getInputProps()} />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -105,7 +200,8 @@ function EditorMenu({ editor }: { editor: Editor }) {
             fill="#71717a"
           />
         </svg>
-      </button>
+      </div>
+
       <div className="ml-auto flex gap-2">
         <button
           className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"

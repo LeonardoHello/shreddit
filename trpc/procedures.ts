@@ -1,5 +1,5 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 import { getComment } from "@/lib/api/getComment";
@@ -514,7 +514,26 @@ export const appRouter = router({
   createFile: protectedProcedure
     .input(FileSchema.omit({ id: true }).array())
     .mutation(({ input, ctx }) => {
-      return ctx.db.insert(files).values(input).returning();
+      return ctx.db
+        .insert(files)
+        .values(input)
+        .onConflictDoNothing()
+        .returning();
+    }),
+  deleteFile: protectedProcedure
+    .input(
+      z.object({
+        keys: FileSchema.shape.key.array(),
+        postId: FileSchema.shape.postId,
+      }),
+    )
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .delete(files)
+        .where(
+          and(eq(files.postId, input.postId), inArray(files.key, input.keys)),
+        )
+        .returning();
     }),
 });
 
