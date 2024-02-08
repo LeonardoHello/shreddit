@@ -5,11 +5,11 @@ import { auth } from "@clerk/nextjs";
 
 import CommunityAbout from "@/components/community/CommunityAbout";
 import CommunityHeader from "@/components/community/CommunityHeader";
+import FeedInput from "@/components/feed/FeedInput";
+import FeedSort from "@/components/feed/FeedSort";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
-import FeedInput from "@/components/shared/FeedInput";
-import FeedSort from "@/components/shared/FeedSort";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import {
   getCommunityBestPosts,

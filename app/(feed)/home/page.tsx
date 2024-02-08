@@ -4,12 +4,12 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
+import FeedInput from "@/components/feed/FeedInput";
+import FeedSort from "@/components/feed/FeedSort";
+import PremiumButton from "@/components/feed/PremiumButton";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
-import FeedInput from "@/components/shared/FeedInput";
-import FeedSort from "@/components/shared/FeedSort";
-import PremiumButton from "@/components/shared/PremiumButton";
 import {
   getHomeBestPosts,
   getHomeControversialPosts,
