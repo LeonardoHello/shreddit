@@ -34,7 +34,7 @@ export default function CommentEditRTE() {
   });
 
   if (!editor) {
-    return <CommentRTELoading />;
+    return <CommentRTELoading content={comment.text} />;
   }
 
   return (
