@@ -42,12 +42,14 @@ export default function SubmitContent() {
         );
       }
 
-      const filesToInsert = files.map((file) => ({
-        ...file,
-        postId: data[0].id,
-      }));
+      if (files.length > 0) {
+        const filesToInsert = files.map((file) => ({
+          ...file,
+          postId: data[0].id,
+        }));
 
-      createFiles.mutate(filesToInsert);
+        createFiles.mutate(filesToInsert);
+      }
 
       router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
     },
