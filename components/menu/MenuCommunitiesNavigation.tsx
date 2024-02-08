@@ -18,7 +18,7 @@ type CommunityRelation = ArrElement<
     | "getJoinedCommunities"]
 >;
 
-export default function YourCommunitiesNavigation({
+export default function MenuCommunitiesNavigation({
   communityRelation,
 }: {
   communityRelation: CommunityRelation;

@@ -9,7 +9,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import YourCommunitiesNavigation from "./YourCommunitiesNavigation";
+import MenuCommunitiesNavigation from "./MenuCommunitiesNavigation";
 
 type Props = {
   initialFavoriteCommunities: RouterOutput["getFavoriteCommunities"];
@@ -17,7 +17,7 @@ type Props = {
   initialJoinedCommunities: RouterOutput["getJoinedCommunities"];
 };
 
-export default function YourCommunities({
+export default function MenuCommunities({
   initialFavoriteCommunities,
   initialModeratedCommunities,
   initialJoinedCommunities,
@@ -80,7 +80,7 @@ export default function YourCommunities({
           </h2>
           <menu className="w-full self-center">
             {favoriteCommunities.map((communityRelation) => (
-              <YourCommunitiesNavigation
+              <MenuCommunitiesNavigation
                 key={communityRelation.communityId}
                 communityRelation={communityRelation}
               />
@@ -93,7 +93,7 @@ export default function YourCommunities({
         <h2 className="px-6 text-2xs uppercase text-zinc-300/60">moderating</h2>
         <menu className="w-full self-center">
           {moderatedCommunities.map((communityRelation) => (
-            <YourCommunitiesNavigation
+            <MenuCommunitiesNavigation
               key={communityRelation.communityId}
               communityRelation={communityRelation}
             />
@@ -118,7 +118,7 @@ export default function YourCommunities({
           </h2>
           <menu className="w-full self-center">
             {joinedCommunities.map((communityRelation) => (
-              <YourCommunitiesNavigation
+              <MenuCommunitiesNavigation
                 key={communityRelation.communityId}
                 communityRelation={communityRelation}
               />

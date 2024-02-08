@@ -17,7 +17,7 @@ import MenuDropdown from "../menu/MenuDropdown";
 import UserProfile from "../user/UserProfile";
 import SignInButton from "./SignInButton";
 
-const YourCommunities = dynamic(() => import("../menu/YourCommunities"));
+const MenuCommunities = dynamic(() => import("../menu/MenuCommunities"));
 
 export default function Header() {
   const { userId } = auth();
@@ -67,7 +67,7 @@ async function HeaderAuthenticated({
     <>
       <Menu>
         <MenuDropdown>
-          <YourCommunities
+          <MenuCommunities
             initialFavoriteCommunities={favoriteCommunities}
             initialModeratedCommunities={moderatedCommunities}
             initialJoinedCommunities={joinedCommunities}
