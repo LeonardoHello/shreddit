@@ -2,7 +2,13 @@ import { type Editor } from "@tiptap/react";
 
 import cn from "@/lib/utils/cn";
 
-export default function RTEButtons({ editor }: { editor: Editor }) {
+export default function RTEButtons({
+  children,
+  editor,
+}: {
+  children?: React.ReactNode;
+  editor: Editor;
+}) {
   const setActive = (name: string, attributes?: {} | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
@@ -10,7 +16,7 @@ export default function RTEButtons({ editor }: { editor: Editor }) {
     });
 
   return (
-    <>
+    <div className="flex flex-wrap gap-2">
       <div className="flex items-center gap-1">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -273,6 +279,7 @@ export default function RTEButtons({ editor }: { editor: Editor }) {
           </svg>
         </button>
       </div>
-    </>
+      {children}
+    </div>
   );
 }
