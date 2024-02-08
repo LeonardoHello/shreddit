@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Modal({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function Modal({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="fixed top-0 z-20 grid h-screen w-screen place-items-center bg-zinc-900/70 p-2"
+      className="fixed top-0 z-30 grid h-screen w-screen place-items-center bg-zinc-900/70 p-2"
       onClick={() => router.replace(pathname, { scroll: false })}
     >
       <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>

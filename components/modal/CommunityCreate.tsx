@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
+import Modal from "./Modal";
+
 const maxCommunityNameLength = 21;
 
 export default function CommunityCreate() {
@@ -43,7 +45,7 @@ export default function CommunityCreate() {
   };
 
   return (
-    <div>
+    <Modal>
       <div className="flex w-full max-w-xl flex-col gap-4 rounded-t border border-zinc-700/70 bg-zinc-900 p-4">
         <div className="flex items-center justify-between">
           <h1 className="font-medium capitalize">create community</h1>
@@ -141,6 +143,6 @@ export default function CommunityCreate() {
           {isMutating ? "creating community..." : "create community"}
         </button>
       </div>
-    </div>
+    </Modal>
   );
 }

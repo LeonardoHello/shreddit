@@ -9,6 +9,9 @@ import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
+import CommunityCreate from "@/components/modal/CommunityCreate";
+import CommunityCreateWrapper from "@/components/modal/CommunityCreateWrapper";
+import Modal from "@/components/modal/Modal";
 import cn from "@/lib/utils/cn";
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -56,6 +59,9 @@ export default function RootLayout({
             routerConfig={extractRouterConfig(ourFileRouter)}
           />
           <TRPCReactProvider>
+            <CommunityCreateWrapper>
+              <CommunityCreate />
+            </CommunityCreateWrapper>
             <Header />
             <div className="mt-12 flex min-h-[calc(100vh-3rem)] flex-col">
               {children}

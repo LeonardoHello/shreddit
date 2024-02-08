@@ -3,8 +3,6 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { auth } from "@clerk/nextjs";
 
 import FeedSort from "@/components/feed/FeedSort";
-import CommunityCreate from "@/components/modal/CommunityCreate";
-import Modal from "@/components/modal/Modal";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
@@ -62,36 +60,29 @@ export default async function UserPage({
   };
 
   return (
-    <>
-      {searchParams.submit === "community" && (
-        <Modal>
-          <CommunityCreate />
-        </Modal>
-      )}
-      <main className="flex grow flex-col">
-        <UserNavigation
-          userName={userName}
-          filter={filter}
-          isCurrentUser={user.id === userId}
-        />
+    <main className="flex grow flex-col">
+      <UserNavigation
+        userName={userName}
+        filter={filter}
+        isCurrentUser={user.id === userId}
+      />
 
-        <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
-          <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
-            <FeedSort />
-            <PostsInfiniteQuery<"getUserPosts">
-              currentUserId={userId}
-              initialPosts={{ posts, nextCursor }}
-              queryInfo={queryInfo}
-              params={params}
-              searchParams={searchParams}
-            />
-          </div>
-          <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
-            <UserInfo user={user} />
-            <ModeratedCommunities communities={user.communities} />
-          </div>
+      <div className="flex grow justify-center gap-6 p-2 py-4 lg:w-full lg:max-w-5xl lg:self-center">
+        <div className="flex basis-full flex-col gap-4 lg:basis-2/3">
+          <FeedSort />
+          <PostsInfiniteQuery<"getUserPosts">
+            currentUserId={userId}
+            initialPosts={{ posts, nextCursor }}
+            queryInfo={queryInfo}
+            params={params}
+            searchParams={searchParams}
+          />
         </div>
-      </main>
-    </>
+        <div className="hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+          <UserInfo user={user} />
+          <ModeratedCommunities communities={user.communities} />
+        </div>
+      </div>
+    </main>
   );
 }
