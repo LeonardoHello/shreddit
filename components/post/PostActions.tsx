@@ -113,14 +113,12 @@ export default function PostActions({
     },
   });
 
-  const copyLink = async (communityName: string, postId: string) => {
+  const copyLink = async (postId: string) => {
     const origin = process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
       : "http://localhost:3000";
 
-    const path = `r/${communityName}/comments/${postId}`;
-
-    await navigator.clipboard.writeText(`${origin}/${path}`);
+    await navigator.clipboard.writeText(`${origin}/post/${postId}`);
     toast.success("Copied link!");
   };
 
@@ -138,7 +136,7 @@ export default function PostActions({
         className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
         onClick={(e) => {
           e.stopPropagation();
-          copyLink(post.community.name, post.id);
+          copyLink(post.id);
         }}
       >
         <LinkIcon className="h-6 w-6" />

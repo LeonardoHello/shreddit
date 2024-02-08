@@ -127,9 +127,7 @@ export default function PostsInfiniteQuery<
           <div
             key={post.id}
             className="flex cursor-pointer gap-4 rounded border border-zinc-700/70 bg-zinc-900 p-2 hover:border-zinc-500"
-            onClick={() =>
-              router.push(`/r/${post.community.name}/comments/${post.id}`)
-            }
+            onClick={() => router.push(`/post/${post.id}`)}
           >
             <Post
               currentUserId={currentUserId}
