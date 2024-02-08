@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs";
 
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
+import ScrollToTop from "@/components/feed/ScrollToTop";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
@@ -83,6 +84,7 @@ export default async function UserPage({
         <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
           <UserInfo user={user} />
           <ModeratedCommunities communities={user.communities} />
+          <ScrollToTop />
         </div>
       </main>
     </>

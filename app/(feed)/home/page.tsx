@@ -7,6 +7,7 @@ import { HomeIcon } from "@heroicons/react/24/solid";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/feed/PremiumButton";
+import ScrollToTop from "@/components/feed/ScrollToTop";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import {
   getHomeBestPosts,
@@ -128,6 +129,7 @@ export default async function HomePage({
             </button>
           </Link>
         </div>
+        <ScrollToTop />
       </div>
     </main>
   );

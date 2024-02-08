@@ -7,6 +7,7 @@ import CommunityAbout from "@/components/community/CommunityAbout";
 import CommunityHeader from "@/components/community/CommunityHeader";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
+import ScrollToTop from "@/components/feed/ScrollToTop";
 import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import {
@@ -169,6 +170,7 @@ export default async function CommunityPage({
               </Link>
             </div>
           </div>
+          <ScrollToTop />
         </div>
       </main>
     </>
