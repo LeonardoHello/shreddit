@@ -13,6 +13,9 @@ import { getUserById } from "@/lib/api/getUser";
 import SubmitContextProvider from "@/lib/context/SubmitContextProvider";
 import ogre from "@/public/logo-green.svg";
 
+export const runtime = "edge";
+export const preferredRegion = ["fra1"];
+
 export default async function SubmitPage({
   searchParams,
 }: {
