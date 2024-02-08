@@ -13,8 +13,8 @@ import cn from "@/lib/utils/cn";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 import { trpc } from "@/trpc/react";
 
-import PostRTELoading from "./PostRTELoading";
 import RTEButtons from "./RTEButtons";
+import RTEpostLoading from "./RTEPostLoading";
 
 const extensions = [
   StarterKit,
@@ -26,7 +26,7 @@ const extensions = [
 
 const toastId = "loading_toast";
 
-export default function PostEditRTE() {
+export default function RTEPostEdit() {
   const { post } = usePostContext();
 
   const editor = useEditor({
@@ -41,7 +41,7 @@ export default function PostEditRTE() {
   });
 
   if (!editor) {
-    return <PostRTELoading content={post.text} />;
+    return <RTEpostLoading content={post.text} />;
   }
 
   return (
@@ -50,13 +50,13 @@ export default function PostEditRTE() {
         "border-zinc-300": editor.isFocused,
       })}
     >
-      <EditorMenu editor={editor} />
+      <RTEPostEditMenu editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );
 }
 
-function EditorMenu({ editor }: { editor: Editor }) {
+function RTEPostEditMenu({ editor }: { editor: Editor }) {
   const utils = trpc.useUtils();
 
   const { post, setEditable } = usePostContext();

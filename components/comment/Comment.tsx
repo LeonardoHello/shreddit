@@ -5,7 +5,7 @@ import type { User } from "@/lib/db/schema";
 import { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import CommentReplyRTE from "../RTE/CommentReplyRTE";
+import RTECommentReply from "../RTE/RTECommentReply";
 import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";
 import CommentContent from "./CommentContent";
@@ -44,7 +44,7 @@ export default function Comment({
           </div>
 
           {/* create comment */}
-          <CommentReplyRTE />
+          <RTECommentReply />
 
           {/* Replies */}
           {children}

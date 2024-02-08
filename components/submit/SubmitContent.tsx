@@ -12,7 +12,7 @@ import {
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import PostRTE from "../RTE/PostRTE";
+import RTEPost from "../RTE/RTEPost";
 import Dropzone from "./SubmitDropzone";
 
 const maxTitleLength = 300;
@@ -84,7 +84,7 @@ export default function SubmitContent() {
             {state.title.length}/{maxTitleLength}
           </div>
         </div>
-        {!state.media && <PostRTE />}
+        {!state.media && <RTEPost />}
         {state.media && <Dropzone />}
       </div>
 

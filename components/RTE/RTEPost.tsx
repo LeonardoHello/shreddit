@@ -18,8 +18,8 @@ import {
 import cn from "@/lib/utils/cn";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 
-import PostRTELoading from "./PostRTELoading";
 import RTEButtons from "./RTEButtons";
+import RTEpostLoading from "./RTEPostLoading";
 
 const extensions = [
   StarterKit,
@@ -31,7 +31,7 @@ const extensions = [
 
 const toastId = "loading_toast";
 
-export default function PostRTE() {
+export default function RTEPost() {
   const { dispatch } = useSubmitContext();
 
   const editor = useEditor({
@@ -58,7 +58,7 @@ export default function PostRTE() {
   });
 
   if (!editor) {
-    return <PostRTELoading />;
+    return <RTEpostLoading />;
   }
 
   return (
@@ -67,13 +67,13 @@ export default function PostRTE() {
         "border-zinc-300": editor.isFocused,
       })}
     >
-      <EditorMenu editor={editor} />
+      <RTEPostMenu editor={editor} />
       <EditorContent editor={editor} />
     </div>
   );
 }
 
-function EditorMenu({ editor }: { editor: Editor }) {
+function RTEPostMenu({ editor }: { editor: Editor }) {
   const { dispatch } = useSubmitContext();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {

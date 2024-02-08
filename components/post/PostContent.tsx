@@ -1,6 +1,6 @@
 import { usePostContext } from "@/lib/context/PostContextProvider";
 
-import PostEditRTE from "../RTE/PostEditRTE";
+import RTEPostEdit from "../RTE/RTEPostEdit";
 import PostContentMedia from "./PostContentMedia";
 import PostContentText from "./PostContentText";
 
@@ -8,7 +8,7 @@ export default function PostContent() {
   const { post, editable } = usePostContext();
 
   if (editable) {
-    return <PostEditRTE />;
+    return <RTEPostEdit />;
   }
 
   return post.text ? <PostContentText /> : <PostContentMedia />;

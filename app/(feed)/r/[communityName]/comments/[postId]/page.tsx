@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { auth } from "@clerk/nextjs";
 
-import CommentRTE from "@/components/RTE/CommentRTE";
+import RTEComment from "@/components/RTE/RTEComment";
 import Comments from "@/components/comment/Comments";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import Modal from "@/components/modal/Modal";
@@ -65,7 +65,7 @@ export default async function PostPage({
                   </>
                 )}
               </div>
-              <CommentRTE postId={post.id} />
+              <RTEComment postId={post.id} />
             </div>
             <hr className="mx-14 my-2 border-zinc-700/70" />
             <div className="flex grow flex-col gap-6 bg-zinc-900 p-4">

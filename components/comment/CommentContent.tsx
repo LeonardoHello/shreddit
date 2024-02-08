@@ -1,12 +1,12 @@
 import { useCommentContext } from "@/lib/context/CommentContextProvider";
 
-import CommentEditRTE from "../RTE/CommentEditRTE";
+import RTECommentEdit from "../RTE/RTECommentEdit";
 
 export default function CommentContent() {
   const { comment, editable } = useCommentContext();
 
   if (editable) {
-    return <CommentEditRTE />;
+    return <RTECommentEdit />;
   }
 
   return (

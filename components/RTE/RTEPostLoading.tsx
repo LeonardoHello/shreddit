@@ -1,6 +1,6 @@
 import { Post } from "@/lib/db/schema";
 
-export default function PostRTELoading({
+export default function RTEPostLoading({
   content,
 }: {
   content?: Post["text"];

@@ -14,8 +14,8 @@ import { useCommentContext } from "@/lib/context/CommentContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import CommentRTELoading from "./CommentRTELoading";
 import RTEButtons from "./RTEButtons";
+import RTEcommentLoading from "./RTECommentLoading";
 
 const extensions = [
   StarterKit,
@@ -25,7 +25,7 @@ const extensions = [
   }),
 ];
 
-export default function CommentReplyRTE() {
+export default function RTECommentReply() {
   const { reply } = useCommentContext();
 
   const editor = useEditor({
@@ -43,7 +43,7 @@ export default function CommentReplyRTE() {
   }
 
   if (!editor) {
-    return <CommentRTELoading />;
+    return <RTEcommentLoading />;
   }
 
   return (
@@ -54,20 +54,20 @@ export default function CommentReplyRTE() {
         })}
       >
         <EditorContent editor={editor} />
-        <CommentReplyRTEMenu editor={editor} />
+        <RTECommentReplyMenu editor={editor} />
       </div>
     </div>
   );
 }
 
-function CommentReplyRTEMenu({ editor }: { editor: Editor }) {
+function RTECommentReplyMenu({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const { comment, setReply } = useCommentContext();
 
   if (!editor) {
-    return <CommentRTELoading />;
+    return <RTEcommentLoading />;
   }
 
   const createComment = trpc.createComment.useMutation({

@@ -14,8 +14,8 @@ import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import CommentRTELoading from "./CommentRTELoading";
 import RTEButtons from "./RTEButtons";
+import RTEcommentLoading from "./RTECommentLoading";
 
 const extensions = [
   StarterKit,
@@ -25,7 +25,7 @@ const extensions = [
   }),
 ];
 
-export default function CommentRTE({ postId }: { postId: Post["id"] }) {
+export default function RTEComment({ postId }: { postId: Post["id"] }) {
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -37,7 +37,7 @@ export default function CommentRTE({ postId }: { postId: Post["id"] }) {
   });
 
   if (!editor) {
-    return <CommentRTELoading />;
+    return <RTEcommentLoading />;
   }
 
   return (
@@ -47,12 +47,12 @@ export default function CommentRTE({ postId }: { postId: Post["id"] }) {
       })}
     >
       <EditorContent editor={editor} />
-      <CommentRTEMenu editor={editor} postId={postId} />
+      <RTECommentMenu editor={editor} postId={postId} />
     </div>
   );
 }
 
-function CommentRTEMenu({
+function RTECommentMenu({
   editor,
   postId,
 }: {

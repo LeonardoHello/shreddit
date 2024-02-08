@@ -8,8 +8,8 @@ import { useCommentContext } from "@/lib/context/CommentContextProvider";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import CommentRTELoading from "./CommentRTELoading";
 import RTEButtons from "./RTEButtons";
+import RTEcommentLoading from "./RTECommentLoading";
 
 const extensions = [
   StarterKit,
@@ -19,7 +19,7 @@ const extensions = [
   }),
 ];
 
-export default function CommentEditRTE() {
+export default function RTECommentEdit() {
   const { comment } = useCommentContext();
 
   const editor = useEditor({
@@ -34,7 +34,7 @@ export default function CommentEditRTE() {
   });
 
   if (!editor) {
-    return <CommentRTELoading content={comment.text} />;
+    return <RTEcommentLoading content={comment.text} />;
   }
 
   return (
@@ -44,12 +44,12 @@ export default function CommentEditRTE() {
       })}
     >
       <EditorContent editor={editor} />
-      <CommentEditRTEMenu editor={editor} />
+      <RTECommentEditMenu editor={editor} />
     </div>
   );
 }
 
-function CommentEditRTEMenu({ editor }: { editor: Editor }) {
+function RTECommentEditMenu({ editor }: { editor: Editor }) {
   const utils = trpc.useUtils();
 
   const { comment, setEditable } = useCommentContext();

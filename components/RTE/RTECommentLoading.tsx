@@ -1,6 +1,6 @@
 import type { Comment } from "@/lib/db/schema";
 
-export default function CommentRTELoading({
+export default function RTECommentLoading({
   content,
 }: {
   content?: Comment["text"];
