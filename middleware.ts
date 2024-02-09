@@ -7,9 +7,10 @@ export default authMiddleware({
     "/",
     "/u/:userName",
     "/r/:communityName",
-    "/r/:communityName/comments/:postId",
+    "/post/:postId",
     "/api/webhooks/(.*)",
     "/api/uploadthing",
+    "/api/cron",
   ],
   afterAuth: (auth, req) => {
     if (!auth.userId) {
