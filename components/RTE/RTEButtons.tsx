@@ -67,7 +67,13 @@ export default function RTEButtons({
   );
 }
 
-export function RTEButtonsInline({ editor }: { editor: Editor }) {
+export function RTEButtonsInline({
+  children,
+  editor,
+}: {
+  children?: React.ReactNode;
+  editor: Editor;
+}) {
   const setActive = (name: string, attributes?: {} | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
@@ -168,11 +174,18 @@ export function RTEButtonsInline({ editor }: { editor: Editor }) {
           />
         </svg>
       </button>
+      {children}
     </div>
   );
 }
 
-export function RTEButtonsNode({ editor }: { editor: Editor }) {
+export function RTEButtonsNode({
+  children,
+  editor,
+}: {
+  children?: React.ReactNode;
+  editor: Editor;
+}) {
   const setActive = (name: string, attributes?: {} | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
@@ -291,6 +304,7 @@ export function RTEButtonsNode({ editor }: { editor: Editor }) {
           />
         </svg>
       </button>
+      {children}
     </div>
   );
 }
