@@ -51,7 +51,7 @@ export default function SubmitContent() {
         createFiles.mutate(filesToInsert);
       }
 
-      router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
+      router.push(`/post/${data[0].id}`);
     },
     onError: (error) => {
       toast.error(error.message);
