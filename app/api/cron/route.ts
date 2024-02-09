@@ -5,7 +5,7 @@ import { getFiles } from "@/lib/api/getFiles";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export async function DELETE() {
+export async function GET() {
   const utapi = new UTApi();
   const files = await getFiles;
 
