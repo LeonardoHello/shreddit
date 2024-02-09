@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
-import { type Editor, EditorContent, useEditor } from "@tiptap/react";
+import {
+  BubbleMenu,
+  type Editor,
+  EditorContent,
+  FloatingMenu,
+  useEditor,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
@@ -14,7 +20,7 @@ import type { Post } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
 
-import RTEButtons from "./RTEButtons";
+import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
 
 const extensions = [
@@ -46,6 +52,18 @@ export default function RTEComment({ postId }: { postId: Post["id"] }) {
         "border-zinc-300": editor.isFocused,
       })}
     >
+      <BubbleMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+      >
+        <RTEButtonsInline editor={editor} />
+      </BubbleMenu>
+      <FloatingMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+      >
+        <RTEButtonsNode editor={editor} />
+      </FloatingMenu>
       <EditorContent editor={editor} />
       <RTECommentMenu editor={editor} postId={postId} />
     </div>
@@ -88,7 +106,7 @@ function RTECommentMenu({
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
+    <div className="flex h-10 flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
       <RTEButtons editor={editor} />
       <div className="ml-auto flex gap-2">
         <button

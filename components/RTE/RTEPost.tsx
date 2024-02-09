@@ -2,9 +2,15 @@
 
 import { useCallback } from "react";
 
+import ExtensionBubbleMenu from "@tiptap/extension-bubble-menu";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import { EditorContent, useEditor } from "@tiptap/react";
+import {
+  BubbleMenu,
+  EditorContent,
+  FloatingMenu,
+  useEditor,
+} from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
@@ -18,11 +24,12 @@ import {
 import cn from "@/lib/utils/cn";
 import { useUploadThing } from "@/lib/utils/uploadthing";
 
-import RTEButtons from "./RTEButtons";
+import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEpostLoading from "./RTEPostLoading";
 
 const extensions = [
   StarterKit,
+  ExtensionBubbleMenu,
   Image.configure({ inline: true }),
   Placeholder.configure({
     placeholder: "Text",
@@ -67,6 +74,18 @@ export default function RTEPost() {
         "border-zinc-300": editor.isFocused,
       })}
     >
+      <BubbleMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+      >
+        <RTEButtonsInline editor={editor} />
+      </BubbleMenu>
+      <FloatingMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+      >
+        <RTEButtonsNode editor={editor} />
+      </FloatingMenu>
       <RTEPostMenu editor={editor} />
       <EditorContent editor={editor} />
     </div>
@@ -123,7 +142,7 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
   });
 
   return (
-    <div className="flex flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5">
+    <div className="hidden h-10 flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5 lg:flex">
       <RTEButtons editor={editor}>
         <div className="h-4 w-px self-center bg-zinc-700/70" />
         <div
