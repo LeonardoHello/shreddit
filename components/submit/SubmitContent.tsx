@@ -30,12 +30,12 @@ export default function SubmitContent() {
 
   const createPost = trpc.createPost.useMutation({
     onMutate: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.MUTATED });
+      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_MUTATE });
     },
     onSuccess: (data) => {
       let files = state.files;
 
-      if (!state.media) {
+      if (!state.isMediaSubmit) {
         files = state.files.filter(
           (file) =>
             state.text?.includes(`<img src="${file.url}" alt="${file.name}">`),
@@ -60,6 +60,7 @@ export default function SubmitContent() {
 
   const disabled =
     state.isMutating ||
+    state.isUploading ||
     !state.community?.id ||
     state.title.length === 0 ||
     (!state.text && state.files.length === 0);
@@ -84,8 +85,8 @@ export default function SubmitContent() {
             {state.title.length}/{maxTitleLength}
           </div>
         </div>
-        {!state.media && <RTEPost />}
-        {state.media && <Dropzone />}
+        {!state.isMediaSubmit && <RTEPost />}
+        {state.isMediaSubmit && <Dropzone />}
       </div>
 
       <div className="flex items-center gap-2 font-bold text-zinc-400">
@@ -126,7 +127,7 @@ export default function SubmitContent() {
         )}
         disabled={disabled}
         onClick={() => {
-          const { community, files, isMutating, media, ...rest } = state;
+          const { community, ...rest } = state;
           if (community) {
             createPost.mutate({ ...rest, communityId: community.id });
           }

@@ -9,8 +9,9 @@ import type { getSelectedCommunity } from "../api/getCommunity";
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   community: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
   files: Omit<File, "id" | "postId">[];
-  media: boolean;
   isMutating: boolean;
+  isUploading: boolean;
+  isMediaSubmit: boolean;
 };
 
 export enum REDUCER_ACTION_TYPE {
@@ -19,11 +20,12 @@ export enum REDUCER_ACTION_TYPE {
   CHANGED_TEXT,
   CHANGED_FILES,
   ADDED_FILES,
+  TOGGLED_MEDIA_SUBMIT,
   TOGGLED_SPOILER,
   TOGGLED_NSFW,
-  SET_MEDIA,
-  CANCELED_MEDIA,
-  MUTATED,
+  STARTED_UPLOAD,
+  STOPPED_UPLOAD,
+  STARTED_MUTATE,
 }
 
 type ReducerAction = {
@@ -60,30 +62,6 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         text: action.nextText,
       };
 
-    case REDUCER_ACTION_TYPE.TOGGLED_SPOILER:
-      return {
-        ...state,
-        spoiler: !state.spoiler,
-      };
-
-    case REDUCER_ACTION_TYPE.TOGGLED_NSFW:
-      return {
-        ...state,
-        nsfw: !state.nsfw,
-      };
-
-    case REDUCER_ACTION_TYPE.SET_MEDIA:
-      return {
-        ...state,
-        media: true,
-      };
-
-    case REDUCER_ACTION_TYPE.CANCELED_MEDIA:
-      return {
-        ...state,
-        media: false,
-      };
-
     case REDUCER_ACTION_TYPE.CHANGED_FILES:
       return {
         ...state,
@@ -96,7 +74,37 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         files: state.files.concat(action.nextFiles),
       };
 
-    case REDUCER_ACTION_TYPE.MUTATED:
+    case REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT:
+      return {
+        ...state,
+        isMediaSubmit: !state.isMediaSubmit,
+      };
+
+    case REDUCER_ACTION_TYPE.TOGGLED_SPOILER:
+      return {
+        ...state,
+        spoiler: !state.spoiler,
+      };
+
+    case REDUCER_ACTION_TYPE.TOGGLED_NSFW:
+      return {
+        ...state,
+        nsfw: !state.nsfw,
+      };
+
+    case REDUCER_ACTION_TYPE.STARTED_UPLOAD:
+      return {
+        ...state,
+        isUploading: true,
+      };
+
+    case REDUCER_ACTION_TYPE.STOPPED_UPLOAD:
+      return {
+        ...state,
+        isUploading: false,
+      };
+
+    case REDUCER_ACTION_TYPE.STARTED_MUTATE:
       return {
         ...state,
         isMutating: true,
@@ -114,11 +122,11 @@ const SubmitContext = createContext<{
 
 export default function SubmitContextProvider({
   initialSelectedCommunity,
-  initialMedia,
+  initialSubmit,
   children,
 }: {
   initialSelectedCommunity: ReducerState["community"];
-  initialMedia: string | string[] | undefined;
+  initialSubmit: string | string[] | undefined;
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(reducer, {
@@ -129,7 +137,8 @@ export default function SubmitContextProvider({
     spoiler: false,
     files: [],
     isMutating: false,
-    media: initialMedia === "media",
+    isUploading: false,
+    isMediaSubmit: initialSubmit === "media",
   });
 
   return (

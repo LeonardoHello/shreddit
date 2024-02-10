@@ -91,6 +91,13 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
   const { dispatch } = useSubmitContext();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
+      return files;
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
     onClientUploadComplete: (res) => {
       editor
         .chain()
@@ -109,13 +116,13 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
         type: REDUCER_ACTION_TYPE.ADDED_FILES,
         nextFiles: files,
       });
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
       toast.dismiss(toastId);
     },
-    onUploadProgress: (p) => {
-      toast.loading(p + "%", { id: toastId, duration: Infinity });
-    },
     onUploadError: (e) => {
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
+
       toast.error(e.message);
     },
   });
@@ -171,6 +178,13 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
   const { dispatch } = useSubmitContext();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
+      return files;
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
     onClientUploadComplete: (res) => {
       editor
         .chain()
@@ -191,9 +205,6 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
       });
 
       toast.dismiss(toastId);
-    },
-    onUploadProgress: (p) => {
-      toast.loading(p + "%", { id: toastId, duration: Infinity });
     },
     onUploadError: (e) => {
       toast.error(e.message);

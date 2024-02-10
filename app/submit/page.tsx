@@ -53,7 +53,7 @@ export default async function SubmitPage({
 
         <SubmitContextProvider
           initialSelectedCommunity={initialSelectedCommunity}
-          initialMedia={searchParams.submit}
+          initialSubmit={searchParams.submit}
         >
           <SubmitCommunity>
             <SubmitCommunityDropdown

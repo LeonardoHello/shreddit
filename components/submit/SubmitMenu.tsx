@@ -23,25 +23,26 @@ export default function SubmitMenu() {
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
-              !state.media,
+              !state.isMediaSubmit,
             "cursor-not-allowed hover:bg-inherit": state.isMutating,
           },
         )}
         onClick={() => {
-          if (state.media) {
+          if (state.isMediaSubmit) {
+            // post state cleanup
             dispatch({
               type: REDUCER_ACTION_TYPE.CHANGED_FILES,
               nextFiles: [],
             });
 
             dispatch({
-              type: REDUCER_ACTION_TYPE.CANCELED_MEDIA,
+              type: REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT,
             });
           }
         }}
       >
-        {state.media && <DocumentTextIcon className="h-6 w-6" />}
-        {!state.media && <DocumentTextIconSolid className="h-6 w-6" />}
+        {state.isMediaSubmit && <DocumentTextIcon className="h-6 w-6" />}
+        {!state.isMediaSubmit && <DocumentTextIconSolid className="h-6 w-6" />}
         post
       </button>
 
@@ -51,12 +52,12 @@ export default function SubmitMenu() {
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-l border-b-zinc-700/70 border-l-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
-              state.media,
+              state.isMediaSubmit,
             "cursor-not-allowed hover:bg-inherit": state.isMutating,
           },
         )}
         onClick={() => {
-          if (!state.media) {
+          if (!state.isMediaSubmit) {
             // post state cleanup
             dispatch({
               type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
@@ -67,13 +68,13 @@ export default function SubmitMenu() {
               nextFiles: [],
             });
             dispatch({
-              type: REDUCER_ACTION_TYPE.SET_MEDIA,
+              type: REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT,
             });
           }
         }}
       >
-        {state.media && <PhotoIconSolid className="h-6 w-6" />}
-        {!state.media && <PhotoIcon className="h-6 w-6" />}
+        {state.isMediaSubmit && <PhotoIconSolid className="h-6 w-6" />}
+        {!state.isMediaSubmit && <PhotoIcon className="h-6 w-6" />}
         images
       </button>
     </div>
