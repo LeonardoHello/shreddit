@@ -52,6 +52,7 @@ export default function RTEPost() {
     onUpdate: ({ editor }) => {
       if (editor.isEmpty) {
         dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
+        dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_FILES, nextFiles: [] });
       } else {
         dispatch({
           type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
