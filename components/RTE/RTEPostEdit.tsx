@@ -207,7 +207,11 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
     accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
   });
 
-  const disabled = editor.isEmpty || editPost.isLoading || isUploading;
+  const disabled =
+    editor.getHTML() === post.text ||
+    editor.isEmpty ||
+    editPost.isLoading ||
+    isUploading;
 
   return (
     <div className="flex h-10 flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5">
