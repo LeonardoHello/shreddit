@@ -162,7 +162,7 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
             {p < 10 ? 10 : p}%
           </div>
         </div>,
-        { id: toastId, duration: 1000 * 99, closeButton: false },
+        { id: toastId, duration: 1000 * 99 },
       );
     },
     onClientUploadComplete: (res) => {
@@ -305,7 +305,7 @@ function RTEPostEditFloatingMenu({ editor }: { editor: Editor }) {
             {p < 10 ? 10 : p}%
           </div>
         </div>,
-        { id: toastId, duration: 1000 * 99, closeButton: false },
+        { id: toastId, duration: 1000 * 99 },
       );
     },
     onClientUploadComplete: (res) => {

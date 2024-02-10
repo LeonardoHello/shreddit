@@ -115,7 +115,6 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
         {
           id: toastId,
           duration: 1000 * 99,
-          closeButton: false,
         },
       );
     },
@@ -220,7 +219,6 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
         {
           id: toastId,
           duration: 1000 * 99,
-          closeButton: false,
         },
       );
     },
