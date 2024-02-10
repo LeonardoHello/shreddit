@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
@@ -24,68 +26,91 @@ export default function PostsInfiniteQuery<
   T extends InfiniteQueryPostProcedure,
 >({ currentUserId, initialPosts, queryInfo, params, searchParams }: Props<T>) {
   const router = useRouter();
+
+  const targetRef = useRef<HTMLDivElement>(null);
+
   const utils = trpc.useUtils();
 
-  const infiniteQuery = trpc.infiniteQueryPosts[
-    queryInfo.procedure
-  ].useInfiniteQuery(queryInfo.input, {
-    // filter muted communities and hidden posts
-    select: (data) => {
-      if (!currentUserId || searchParams.filter) {
-        return data;
-      }
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    trpc.infiniteQueryPosts[queryInfo.procedure].useInfiniteQuery(
+      queryInfo.input,
+      {
+        // filter muted communities and hidden posts
+        select: (data) => {
+          if (!currentUserId || searchParams.filter) {
+            return data;
+          }
 
-      if (params.communityName) {
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            posts: page.posts.filter(
-              (post) =>
-                !post.usersToPosts.some(
-                  (userToPost) =>
-                    userToPost.hidden === true &&
-                    userToPost.userId === currentUserId,
+          if (params.communityName) {
+            return {
+              ...data,
+              pages: data.pages.map((page) => ({
+                ...page,
+                posts: page.posts.filter(
+                  (post) =>
+                    !post.usersToPosts.some(
+                      (userToPost) =>
+                        userToPost.hidden === true &&
+                        userToPost.userId === currentUserId,
+                    ),
                 ),
-            ),
-          })),
-        };
-      }
+              })),
+            };
+          }
 
-      return {
-        ...data,
-        pages: data.pages.map((page) => ({
-          ...page,
-          posts: page.posts
-            .filter(
-              (post) =>
-                !post.community.usersToCommunities.some(
-                  (userToCommunity) =>
-                    userToCommunity.muted &&
-                    userToCommunity.userId === currentUserId,
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              posts: page.posts
+                .filter(
+                  (post) =>
+                    !post.community.usersToCommunities.some(
+                      (userToCommunity) =>
+                        userToCommunity.muted &&
+                        userToCommunity.userId === currentUserId,
+                    ),
+                )
+                .filter(
+                  (post) =>
+                    !post.usersToPosts.some(
+                      (userToPost) =>
+                        userToPost.hidden === true &&
+                        userToPost.userId === currentUserId,
+                    ),
                 ),
-            )
-            .filter(
-              (post) =>
-                !post.usersToPosts.some(
-                  (userToPost) =>
-                    userToPost.hidden === true &&
-                    userToPost.userId === currentUserId,
-                ),
-            ),
-        })),
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage?.nextCursor,
-    initialData: { pages: [initialPosts], pageParams: [0] },
-    refetchOnWindowFocus: false,
-  });
+            })),
+          };
+        },
+        getNextPageParam: (lastPage) => lastPage?.nextCursor,
+        initialData: { pages: [initialPosts], pageParams: [0] },
+        refetchOnWindowFocus: false,
+      },
+    );
 
-  if (infiniteQuery.data === undefined) {
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (!entry.isIntersecting) return;
+
+      fetchNextPage();
+      observer.unobserve(entry.target);
+    });
+
+    if (targetRef.current && hasNextPage && !isFetchingNextPage) {
+      observer.observe(targetRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  if (data === undefined) {
     throw new Error("Couldn't fetch posts");
   }
 
-  if (infiniteQuery.data.pages[0].posts.length === 0)
+  if (data.pages[0].posts.length === 0)
     return (
       <PostsInfiniteQueryEmpty
         communityName={params.communityName}
@@ -122,10 +147,11 @@ export default function PostsInfiniteQuery<
 
   return (
     <div className="flex flex-col gap-2.5">
-      {infiniteQuery.data.pages.map((page) =>
-        page.posts.map((post) => (
+      {data.pages.map((page) =>
+        page.posts.map((post, postI, posts) => (
           <div
             key={post.id}
+            ref={postI === posts.length - 1 ? targetRef : undefined}
             className="flex cursor-pointer gap-4 rounded border border-zinc-700/70 bg-zinc-900 p-2 hover:border-zinc-500"
             onClick={() => router.push(`/post/${post.id}`)}
           >
