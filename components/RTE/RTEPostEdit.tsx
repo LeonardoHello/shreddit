@@ -74,7 +74,7 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
   const utils = trpc.useUtils();
 
   const { post, setEditable } = usePostContext();
-  const { files, setFiles } = useFilesContext();
+  const { files, setFiles, isUploading, setIsUploading } = useFilesContext();
 
   const deleteFiles = trpc.deleteFile.useMutation({
     onError: (error) => {
@@ -142,6 +142,13 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
   });
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      setIsUploading(true);
+      return files;
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
     onClientUploadComplete: (res) => {
       editor
         .chain()
@@ -157,13 +164,13 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
       const files = res.map(({ size, serverData, ...rest }) => rest);
 
       setFiles((prev) => [...prev, ...files]);
+      setIsUploading(false);
 
       toast.dismiss(toastId);
     },
-    onUploadProgress: (p) => {
-      toast.loading(p + "%", { id: toastId, duration: Infinity });
-    },
     onUploadError: (e) => {
+      setIsUploading(false);
+
       toast.error(e.message);
     },
   });
@@ -183,6 +190,8 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
     onDrop,
     accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
   });
+
+  const disabled = editor.isEmpty || editPost.isLoading || isUploading;
 
   return (
     <div className="flex h-10 flex-wrap gap-2 rounded-t bg-zinc-800 p-1.5">
@@ -236,11 +245,10 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
           className={cn(
             "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
             {
-              "cursor-not-allowed text-zinc-500":
-                editor.isEmpty || editPost.isLoading,
+              "cursor-not-allowed text-zinc-500": disabled,
             },
           )}
-          disabled={editor.isEmpty || editPost.isLoading}
+          disabled={disabled}
           onClick={() => {
             editPost.mutate({
               id: post.id,
@@ -256,9 +264,16 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
 }
 
 function RTEPostEditFloatingMenu({ editor }: { editor: Editor }) {
-  const { setFiles } = useFilesContext();
+  const { setFiles, setIsUploading } = useFilesContext();
 
   const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      setIsUploading(true);
+      return files;
+    },
+    onUploadProgress: (p) => {
+      toast.loading(p + "%", { id: toastId, duration: Infinity });
+    },
     onClientUploadComplete: (res) => {
       editor
         .chain()
@@ -274,13 +289,13 @@ function RTEPostEditFloatingMenu({ editor }: { editor: Editor }) {
       const files = res.map(({ size, serverData, ...rest }) => rest);
 
       setFiles((prev) => [...prev, ...files]);
+      setIsUploading(false);
 
       toast.dismiss(toastId);
     },
-    onUploadProgress: (p) => {
-      toast.loading(p + "%", { id: toastId, duration: Infinity });
-    },
     onUploadError: (e) => {
+      setIsUploading(false);
+
       toast.error(e.message);
     },
   });
