@@ -34,6 +34,10 @@ const extensions = [
 export default function RTECommentReply() {
   const { reply } = useCommentContext();
 
+  return reply && <RTECommentReplyContent />;
+}
+
+function RTECommentReplyContent() {
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -43,10 +47,6 @@ export default function RTECommentReply() {
     },
     extensions,
   });
-
-  if (!reply) {
-    return null;
-  }
 
   if (!editor) {
     return <RTEcommentLoading />;
