@@ -33,7 +33,7 @@ export default function CommentActionsDropdown() {
   return (
     <div
       className={cn(
-        "absolute right-0 z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:left-0",
+        "absolute left-4 z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 sm:left-auto",
         { "pointer-events-none opacity-40": isMutating },
       )}
     >

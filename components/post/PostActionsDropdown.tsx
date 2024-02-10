@@ -90,7 +90,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
   return (
     <div
       className={cn(
-        "absolute right-0 z-10 flex w-48 flex-col border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:left-0",
+        "absolute right-4 z-10 flex w-48 flex-col self-end border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:right-auto",
         { "pointer-events-none opacity-40": deletedPost.isLoading },
       )}
     >
@@ -110,7 +110,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
             "h-5 w-5 rounded-sm border-2 border-zinc-600 stroke-2",
             { "stroke-transparent": !post.spoiler },
           )}
-        />{" "}
+        />
         Mark As Spoiler
       </div>
       <div
@@ -129,7 +129,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
             "h-5 w-5 rounded-sm border-2 border-zinc-600 stroke-2",
             { "stroke-transparent": !post.nsfw },
           )}
-        />{" "}
+        />
         Mark As NSFW
       </div>
       {/* the value of removePostFromQuery will determine where Post component is located */}

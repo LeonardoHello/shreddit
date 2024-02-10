@@ -33,7 +33,7 @@ export default function CommentActions({
       {comment.authorId === currentUserId && (
         <div
           ref={dropdownRef}
-          className="relative cursor-pointer"
+          className="cursor-pointer"
           onClick={() => setIsOpen((prev) => !prev)}
         >
           <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />

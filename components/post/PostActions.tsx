@@ -191,7 +191,7 @@ export default function PostActions({
       {post.authorId === currentUserId && (
         <div
           ref={dropdownRef}
-          className="relative cursor-pointer"
+          className="cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             setIsOpen((prev) => !prev);
