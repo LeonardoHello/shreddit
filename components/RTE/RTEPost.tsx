@@ -203,10 +203,13 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
         type: REDUCER_ACTION_TYPE.ADDED_FILES,
         nextFiles: files,
       });
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
       toast.dismiss(toastId);
     },
     onUploadError: (e) => {
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
+
       toast.error(e.message);
     },
   });
