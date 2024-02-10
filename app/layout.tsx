@@ -63,7 +63,7 @@ export default function RootLayout({
               <CommunityCreate />
             </CommunityCreateWrapper>
             <Header />
-            <div className="flex min-h-[calc(100vh-3rem)] flex-col">
+            <div className="flex min-h-[calc(100vh-3rem)] flex-col overflow-hidden">
               {children}
             </div>
           </TRPCReactProvider>

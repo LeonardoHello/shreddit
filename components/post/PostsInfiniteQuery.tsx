@@ -13,6 +13,7 @@ import { trpc } from "@/trpc/react";
 
 import Post from "./Post";
 import PostsInfiniteQueryEmpty from "./PostsInfiniteQueryEmpty";
+import PostsInfiniteQueryLoading from "./PostsInfiniteQueryLoading";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
@@ -163,6 +164,7 @@ export default function PostsInfiniteQuery<
           </div>
         )),
       )}
+      {isFetchingNextPage && <PostsInfiniteQueryLoading />}
     </div>
   );
 }
