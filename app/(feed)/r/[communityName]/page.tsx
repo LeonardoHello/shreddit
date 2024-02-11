@@ -117,7 +117,7 @@ export default async function CommunityPage({
           {user && <FeedInput user={user} communityName={communityName} />}
           <FeedSort searchParams={searchParams} />
         </div>
-        <PostsInfiniteQuery<"getCommunityPosts">
+        <PostsInfiniteQuery
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

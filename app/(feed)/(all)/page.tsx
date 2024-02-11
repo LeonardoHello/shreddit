@@ -80,7 +80,7 @@ export default async function AllPage({
         {user && <FeedInput user={user} />}
         <FeedSort searchParams={searchParams} />
       </div>
-      <PostsInfiniteQuery<"getAllPosts">
+      <PostsInfiniteQuery
         currentUserId={userId}
         initialPosts={{ posts, nextCursor }}
         queryInfo={queryInfo}

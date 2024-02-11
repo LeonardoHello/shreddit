@@ -88,7 +88,7 @@ export default async function HomePage({
         {user && <FeedInput user={user} />}
         <FeedSort searchParams={searchParams} />
       </div>
-      <PostsInfiniteQuery<"getHomePosts">
+      <PostsInfiniteQuery
         currentUserId={userId}
         initialPosts={{ posts, nextCursor }}
         queryInfo={queryInfo}

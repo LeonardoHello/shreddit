@@ -74,7 +74,7 @@ export default async function UserPage({
           <FeedSort searchParams={searchParams} />
         </div>
 
-        <PostsInfiniteQuery<"getUserPosts">
+        <PostsInfiniteQuery
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}
