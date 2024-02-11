@@ -213,8 +213,9 @@ export const appRouter = router({
         return { posts, nextCursor };
       }),
   }),
-  getPost: procedure.input(PostSchema.shape.id).query(({ input }) => {
-    return getPostById.execute({ postId: input });
+  getPost: procedure.input(PostSchema.shape.id).query(async ({ input }) => {
+    const post = await getPostById.execute({ postId: input });
+    return post ?? null;
   }),
   searchUsers: procedure.input(z.string()).query(({ input }) => {
     return searchUsers.execute({ search: `%${input}%` });
@@ -475,9 +476,12 @@ export const appRouter = router({
           set: { voteStatus: input.voteStatus },
         });
     }),
-  getComment: procedure.input(CommentSchema.shape.id).query(({ input }) => {
-    return getComment.execute({ commentId: input });
-  }),
+  getComment: procedure
+    .input(CommentSchema.shape.id)
+    .query(async ({ input }) => {
+      const comment = await getComment.execute({ commentId: input });
+      return comment ?? null;
+    }),
   deleteComment: protectedProcedure
     .input(CommentSchema.shape.id)
     .mutation(({ input, ctx }) => {
