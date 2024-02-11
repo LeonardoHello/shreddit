@@ -17,7 +17,8 @@ Shreddit is a clone of Reddit with some modifications to the user experience. It
 * **Reddit Clone:** Shreddit mirrors the functionality of Reddit, allowing users to create posts, upvote/downvote, comment, and engage in discussions.
 * **Type Safety:** TypeScript is extensively used throughout the project to enforce type safety, reducing bugs and improving code quality.
 * **Secure Authentication:** Clerk provides robust user management and authentication, ensuring a secure environment for handling sensitive user data.
-* **Optimized Data Fetching:** React Query optimizes data fetching, enabling features gradual fetching for a responsive and efficient user experience.
+* **Optimized Data Fetching:** With the implementation of React Query's useInfiniteQuery, featuring gradual fetching for a responsive and efficient user experience handling of posts.
+* **Optimistic Updates:** Incorporates optimistic updates to provide immediate feedback to users while ensuring data consistency.
 
 # Usage
 **To run Shreddit locally:**
