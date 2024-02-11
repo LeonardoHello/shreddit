@@ -203,13 +203,11 @@ export const appRouter = router({
         }),
       )
       .query(async ({ input }) => {
-        const { cursor, ...rest } = input;
+        const posts = await getUserPosts(input);
 
-        const posts = await getUserPosts(rest);
-
-        let nextCursor: typeof cursor = null;
+        let nextCursor: typeof input.cursor = null;
         if (posts.length === 10) {
-          nextCursor = cursor! + 10;
+          nextCursor = input.cursor! + 10;
         }
 
         return { posts, nextCursor };

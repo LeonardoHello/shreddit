@@ -34,177 +34,150 @@ import { SortPosts, UserPostsFilter } from "../types";
 export default async function getUserPosts({
   userId,
   userName,
+  cursor,
   filter,
   sort,
 }: {
   userId: User["id"];
   userName: User["name"];
+  cursor?: number | null | undefined;
   filter?: string | string[] | undefined;
   sort?: string | string[] | undefined;
 }) {
-  let posts;
-
   switch (filter) {
     case UserPostsFilter.SAVED:
       switch (sort) {
         case SortPosts.HOT:
-          posts = await getSavedHotPosts.execute({
-            offset: 0,
+          return getSavedHotPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.NEW:
-          posts = await getSavedNewPosts.execute({
-            offset: 0,
+          return getSavedNewPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.CONTROVERSIAL:
-          posts = await getSavedControversialPosts.execute({
-            offset: 0,
+          return getSavedControversialPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         default:
-          posts = await getSavedBestPosts.execute({
-            offset: 0,
+          return getSavedBestPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
       }
-      break;
 
     case UserPostsFilter.HIDDEN:
       switch (sort) {
         case SortPosts.HOT:
-          posts = await getHiddenHotPosts.execute({
-            offset: 0,
+          return getHiddenHotPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.NEW:
-          posts = await getHiddenNewPosts.execute({
-            offset: 0,
+          return getHiddenNewPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.CONTROVERSIAL:
-          posts = await getHiddenControversialPosts.execute({
-            offset: 0,
+          return getHiddenControversialPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         default:
-          posts = await getHiddenBestPosts.execute({
-            offset: 0,
+          return getHiddenBestPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
       }
-      break;
 
     case UserPostsFilter.UPVOTED:
       switch (sort) {
         case SortPosts.HOT:
-          posts = await getUpvotedHotPosts.execute({
-            offset: 0,
+          return getUpvotedHotPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.NEW:
-          posts = await getUpvotedNewPosts.execute({
-            offset: 0,
+          return getUpvotedNewPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.CONTROVERSIAL:
-          posts = await getUpvotedControversialPosts.execute({
-            offset: 0,
+          return getUpvotedControversialPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         default:
-          posts = await getUpvotedBestPosts.execute({
-            offset: 0,
+          return getUpvotedBestPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
       }
-      break;
 
     case UserPostsFilter.DOWNVOTED:
       switch (sort) {
         case SortPosts.HOT:
-          posts = await getDownvotedHotPosts.execute({
-            offset: 0,
+          return getDownvotedHotPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.NEW:
-          posts = await getDownvotedNewPosts.execute({
-            offset: 0,
+          return getDownvotedNewPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         case SortPosts.CONTROVERSIAL:
-          posts = await getDownvotedControversialPosts.execute({
-            offset: 0,
+          return getDownvotedControversialPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
 
         default:
-          posts = await getDownvotedBestPosts.execute({
-            offset: 0,
+          return getDownvotedBestPosts.execute({
+            offset: cursor,
             userId,
           });
-          break;
       }
-      break;
 
     default:
       switch (sort) {
         case SortPosts.HOT:
-          posts = await getUserHotPosts.execute({
-            offset: 0,
+          return getUserHotPosts.execute({
+            offset: cursor,
             userName,
           });
-          break;
 
         case SortPosts.NEW:
-          posts = await getUserNewPosts.execute({
-            offset: 0,
+          return getUserNewPosts.execute({
+            offset: cursor,
             userName,
           });
-          break;
 
         case SortPosts.CONTROVERSIAL:
-          posts = await getUserControversialPosts.execute({
-            offset: 0,
+          return getUserControversialPosts.execute({
+            offset: cursor,
             userName,
           });
-          break;
 
         default:
-          posts = await getUserBestPosts.execute({
-            offset: 0,
+          return getUserBestPosts.execute({
+            offset: cursor,
             userName,
           });
-          break;
       }
-      break;
   }
-
-  return posts;
 }
