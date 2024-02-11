@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -23,7 +23,7 @@ type Props<T extends InfiniteQueryPostProcedure> = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default function PostsInfiniteQuery<
+export default memo(function PostsInfiniteQuery<
   T extends InfiniteQueryPostProcedure,
 >({ currentUserId, initialPosts, queryInfo, params, searchParams }: Props<T>) {
   const router = useRouter();
@@ -89,27 +89,28 @@ export default function PostsInfiniteQuery<
       },
     );
 
+  if (data === undefined) {
+    throw new Error("Couldn't fetch posts");
+  }
+
   useEffect(() => {
+    if (!targetRef.current || !hasNextPage || isFetchingNextPage) return;
+
     const observer = new IntersectionObserver((entries) => {
       const entry = entries[0];
-      if (!entry.isIntersecting) return;
 
-      fetchNextPage();
-      observer.unobserve(entry.target);
+      if (entry.isIntersecting) {
+        observer.unobserve(entry.target);
+        fetchNextPage();
+      }
     });
 
-    if (targetRef.current && hasNextPage && !isFetchingNextPage) {
-      observer.observe(targetRef.current);
-    }
+    observer.observe(targetRef.current);
 
     return () => {
       observer.disconnect();
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  if (data === undefined) {
-    throw new Error("Couldn't fetch posts");
-  }
 
   if (data.pages[0].posts.length === 0)
     return (
@@ -167,4 +168,4 @@ export default function PostsInfiniteQuery<
       {isFetchingNextPage && <PostsInfiniteQueryLoading />}
     </div>
   );
-}
+});
