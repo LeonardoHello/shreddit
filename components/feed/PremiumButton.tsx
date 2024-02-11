@@ -13,7 +13,7 @@ export default function PremiumButton() {
         </div>
       </div>
       <Link
-        href="https://utfs.io/f/13f13b19-107c-4ab7-85d9-10f4714529e2-pmcoca.jpg"
+        href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
         target="_blank"
       >
         <button className="w-full rounded-full bg-rose-500 p-1.5 text-sm font-bold text-white transition-colors hover:bg-rose-400">

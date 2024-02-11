@@ -95,7 +95,7 @@ export default async function SubmitPage({
         <div className="text-xs font-medium text-zinc-500">
           Please be mindful of shreddit&apos;s{" "}
           <Link
-            href="https://utfs.io/f/13f13b19-107c-4ab7-85d9-10f4714529e2-pmcoca.jpg"
+            href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
             className="text-blue-500"
             target="_blank"
           >
@@ -103,7 +103,7 @@ export default async function SubmitPage({
           </Link>{" "}
           and practice good{" "}
           <Link
-            href="https://utfs.io/f/13f13b19-107c-4ab7-85d9-10f4714529e2-pmcoca.jpg"
+            href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
             className="text-blue-500"
             target="_blank"
           >
