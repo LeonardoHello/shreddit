@@ -22,7 +22,7 @@ Shreddit is a clone of Reddit with some modifications to the user experience. It
 
 # Usage
 **To run Shreddit locally:**
-1. Clone the repository: **`git clone https://github.com/*yourusername*/shreddit.git`**
+1. Clone the repository: **`git clone https://github.com/LeonardoHello/shreddit.git`**
 2. Install dependencies: **`npm install`**
 3. Add env variables inside .env.local file: 
 ```
