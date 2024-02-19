@@ -2,12 +2,19 @@
 
 import Image from "next/image";
 
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 
-import { useSubmitContext } from "@/lib/context/SubmitContextProvider";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmitContext,
+} from "@/lib/context/SubmitContextProvider";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
 import communityImage from "@/public/community-logo.svg";
+import { trpc } from "@/trpc/react";
 
 export default function SubmitCommunity({
   children,
@@ -20,63 +27,113 @@ export default function SubmitCommunity({
 
   return (
     <div
-      ref={dropdownRef}
       className="relative flex w-72 flex-col rounded bg-inherit bg-zinc-900"
-      onClick={() => setIsOpen((prev) => !prev)}
+      ref={dropdownRef}
     >
-      {state.community && (
-        <button
-          className={cn(
-            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
-            {
-              "rounded-b-none": isOpen,
-            },
-          )}
+      <button
+        className={cn(
+          "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
+          {
+            "rounded-b-none": isOpen,
+          },
+        )}
+        onClick={() => !isOpen && setIsOpen(true)}
+      >
+        {isOpen && <SearchCommunity />}
+        {!isOpen && !state.community && <UnselectedCommunity />}
+        {!isOpen && state.community && (
+          <SelectedCommunity community={state.community} />
+        )}
+
+        <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
+      </button>
+
+      {isOpen && (
+        <div
+          className="absolute top-full z-10 flex max-h-[30rem] w-full flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit"
+          onClick={() => setIsOpen(false)}
         >
-          {state.community.imageUrl ? (
-            <Image
-              src={state.community.imageUrl}
-              alt="community icon"
-              width={24}
-              height={24}
-              className="rounded-full"
-            />
-          ) : (
-            <Image
-              src={communityImage}
-              alt="community icon"
-              width={24}
-              height={24}
-              className="rounded-full border border-zinc-300 bg-zinc-300"
-            />
-          )}
-          <h1 className="truncate text-center text-sm font-medium">
-            r/{state.community.name}
-          </h1>
-
-          <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
-        </button>
+          {children}
+        </div>
       )}
-
-      {!state.community && (
-        <button
-          className={cn(
-            "flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2",
-            {
-              "rounded-b-none": isOpen,
-            },
-          )}
-        >
-          <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
-          <h1 className="truncate text-center text-sm font-medium">
-            Choose a community
-          </h1>
-
-          <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
-        </button>
-      )}
-
-      {isOpen && children}
     </div>
+  );
+}
+
+function SearchCommunity() {
+  const { dispatch } = useSubmitContext();
+
+  const utils = trpc.useUtils();
+
+  const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // replace every character except letters, numbers, underscores and dashes
+    const searchedValue = e.currentTarget.value.replaceAll(
+      /[^a-zA-Z0-9_-]/g,
+      "",
+    );
+
+    await utils.searchCommunities.cancel();
+
+    dispatch({
+      type: REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY,
+      nextSearch: searchedValue,
+    });
+  };
+
+  return (
+    <>
+      <MagnifyingGlassIcon className="h-6 w-6 text-zinc-500" />
+      <input
+        className="truncate bg-inherit text-sm font-medium outline-none placeholder:text-zinc-300"
+        placeholder="Search communities"
+        autoFocus
+        onChange={onInputChange}
+      />
+    </>
+  );
+}
+
+function SelectedCommunity({
+  community,
+}: {
+  community: NonNullable<
+    ReturnType<typeof useSubmitContext>["state"]["community"]
+  >;
+}) {
+  return (
+    <>
+      {community.imageUrl ? (
+        <Image
+          src={community.imageUrl}
+          alt="community icon"
+          width={24}
+          height={24}
+          className="rounded-full"
+        />
+      ) : (
+        <Image
+          src={communityImage}
+          alt="community icon"
+          width={24}
+          height={24}
+          className="rounded-full border border-zinc-300 bg-zinc-300"
+        />
+      )}
+
+      <h1 className="grow truncate text-start text-sm font-medium">
+        r/{community.name}
+      </h1>
+    </>
+  );
+}
+
+function UnselectedCommunity() {
+  return (
+    <>
+      <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
+      <h1 className="grow truncate text-start text-sm font-medium">
+        Choose a community
+      </h1>
+    </>
   );
 }

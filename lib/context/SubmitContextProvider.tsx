@@ -9,6 +9,7 @@ import type { getSelectedCommunity } from "../api/getCommunity";
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   community: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
   files: Omit<File, "id" | "postId">[];
+  search: string;
   isMutating: boolean;
   isUploading: boolean;
   isMediaSubmit: boolean;
@@ -23,6 +24,7 @@ export enum REDUCER_ACTION_TYPE {
   TOGGLED_MEDIA_SUBMIT,
   TOGGLED_SPOILER,
   TOGGLED_NSFW,
+  SEARCHED_COMMUNITY,
   STARTED_UPLOAD,
   STOPPED_UPLOAD,
   STARTED_MUTATE,
@@ -35,6 +37,8 @@ type ReducerAction = {
     ? { type: K; nextCommunity: ReducerState["community"] }
     : K extends REDUCER_ACTION_TYPE.CHANGED_TEXT
     ? { type: K; nextText: ReducerState["text"] }
+    : K extends REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY
+    ? { type: K; nextSearch: string }
     : K extends REDUCER_ACTION_TYPE.CHANGED_FILES
     ? { type: K; nextFiles: ReducerState["files"] }
     : K extends REDUCER_ACTION_TYPE.ADDED_FILES
@@ -92,6 +96,12 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         nsfw: !state.nsfw,
       };
 
+    case REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY:
+      return {
+        ...state,
+        search: action.nextSearch,
+      };
+
     case REDUCER_ACTION_TYPE.STARTED_UPLOAD:
       return {
         ...state,
@@ -136,6 +146,7 @@ export default function SubmitContextProvider({
     nsfw: false,
     spoiler: false,
     files: [],
+    search: "",
     isMutating: false,
     isUploading: false,
     isMediaSubmit: initialSubmit === "media",

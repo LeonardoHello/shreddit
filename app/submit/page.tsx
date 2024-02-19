@@ -7,7 +7,7 @@ import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
 import SubmitContent from "@/components/submit/SubmitContent";
 import SubmitMenu from "@/components/submit/SubmitMenu";
-import { getSelectableCommunities } from "@/lib/api/getCommunities";
+import { getYourCommunities } from "@/lib/api/getCommunities";
 import { getSelectedCommunity } from "@/lib/api/getCommunity";
 import { getUserById } from "@/lib/api/getUser";
 import SubmitContextProvider from "@/lib/context/SubmitContextProvider";
@@ -26,21 +26,20 @@ export default async function SubmitPage({
   if (!userId) throw new Error("Cannot read current user information.");
 
   const userData = getUserById.execute({ currentUserId: userId });
-  const selectableCommunitiesData = getSelectableCommunities.execute({
+  const yourCommunitiesData = getYourCommunities.execute({
     currentUserId: userId,
   });
   const initialSelectedCommunityData = getSelectedCommunity.execute({
     communityName: searchParams.community,
   });
 
-  const [user, selectableCommunities, initialSelectedCommunity] =
-    await Promise.all([
-      userData,
-      selectableCommunitiesData,
-      initialSelectedCommunityData,
-    ]).catch(() => {
-      throw new Error("There was a problem with loading user information.");
-    });
+  const [user, yourCommunities, initialSelectedCommunity] = await Promise.all([
+    userData,
+    yourCommunitiesData,
+    initialSelectedCommunityData,
+  ]).catch(() => {
+    throw new Error("There was a problem with loading user information.");
+  });
 
   if (!user) throw new Error("Cannot read current user information.");
 
@@ -58,7 +57,7 @@ export default async function SubmitPage({
           <SubmitCommunity>
             <SubmitCommunityDropdown
               user={user}
-              selectableCommunities={selectableCommunities}
+              yourCommunities={yourCommunities}
             />
           </SubmitCommunity>
 
