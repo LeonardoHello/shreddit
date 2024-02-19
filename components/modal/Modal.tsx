@@ -23,7 +23,7 @@ export default function Modal({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="fixed top-0 z-30 grid h-screen w-screen place-items-center bg-zinc-900/70 p-2"
+      className="fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center overflow-y-scroll bg-zinc-900/70 p-2"
       onClick={() => router.replace(pathname, { scroll: false })}
     >
       <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>

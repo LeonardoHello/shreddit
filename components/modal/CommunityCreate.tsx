@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
@@ -13,6 +14,16 @@ import Modal from "./Modal";
 const maxCommunityNameLength = 21;
 
 export default function CommunityCreate() {
+  const searchParams = useSearchParams();
+
+  if (searchParams.get("submit") !== "community") {
+    return null;
+  }
+
+  return <CommunityCreateContent />;
+}
+
+function CommunityCreateContent() {
   const router = useRouter();
   const pathname = usePathname();
 

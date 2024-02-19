@@ -12,9 +12,11 @@ export default function PremiumButton() {
           <p>The best Shreddit experience</p>
         </div>
       </div>
+
       <Link
-        href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
-        target="_blank"
+        href={{ query: { purchase: "premium" } }}
+        scroll={false}
+        className="rounded-full"
       >
         <button className="w-full rounded-full bg-rose-500 p-1.5 text-sm font-bold text-white transition-colors hover:bg-rose-400">
           Try Now
