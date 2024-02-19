@@ -91,11 +91,12 @@ export default async function AllPage({
         <PremiumButton />
         <div className="sticky top-16 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
-            src={galaxy}
-            alt="galaxy"
+            src="https://www.redditstatic.com/desktop2x/img/id-cards/banner@2x.png"
+            alt="banner"
             priority
-            quality={10}
-            className="absolute left-0 top-0 h-8 rounded-t object-cover object-bottom "
+            width={624}
+            height={68}
+            className="absolute left-0 top-0 h-8 rounded-t object-cover"
           />
           <div className="z-10 mt-4 flex items-center gap-2">
             <ChartBarIcon
