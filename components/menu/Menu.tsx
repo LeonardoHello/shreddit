@@ -76,10 +76,10 @@ function CurrentUserFeed({ userName }: { userName: string }) {
           alt="user icon"
           width={20}
           height={20}
-          className="rounded-full"
+          className="rounded"
         />
       ) : (
-        <UserIcon className="h-5 w-5 animate-pulse rounded-full bg-zinc-300 p-0.5 text-zinc-800 opacity-80" />
+        <UserIcon className="h-5 w-5 animate-pulse rounded bg-zinc-300 p-0.5 text-zinc-800 opacity-80" />
       )}
       <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         u/{userName}
