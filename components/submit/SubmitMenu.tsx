@@ -15,20 +15,21 @@ import cn from "@/lib/utils/cn";
 export default function SubmitMenu() {
   const { state, dispatch } = useSubmitContext();
 
+  const disabled = state.isMutating || state.isUploading;
   return (
     <div className="flex font-bold">
       <button
-        disabled={state.isMutating}
+        disabled={disabled}
         className={cn(
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
               !state.isMediaSubmit,
-            "cursor-not-allowed hover:bg-inherit": state.isMutating,
+            "cursor-not-allowed hover:bg-inherit": disabled,
           },
         )}
         onClick={() => {
-          if (state.isMediaSubmit) {
+          if (state.isMediaSubmit && !disabled) {
             // post state cleanup
             dispatch({
               type: REDUCER_ACTION_TYPE.CHANGED_FILES,
@@ -47,17 +48,17 @@ export default function SubmitMenu() {
       </button>
 
       <button
-        disabled={state.isMutating}
+        disabled={disabled}
         className={cn(
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-l border-b-zinc-700/70 border-l-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
               state.isMediaSubmit,
-            "cursor-not-allowed hover:bg-inherit": state.isMutating,
+            "cursor-not-allowed hover:bg-inherit": disabled,
           },
         )}
         onClick={() => {
-          if (!state.isMediaSubmit) {
+          if (!state.isMediaSubmit && !disabled) {
             // post state cleanup
             dispatch({
               type: REDUCER_ACTION_TYPE.CHANGED_TEXT,

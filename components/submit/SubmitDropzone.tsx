@@ -12,6 +12,11 @@ export default function SubmitDropzone() {
   return (
     <UploadDropzone
       endpoint="imageUploader"
+      onBeforeUploadBegin={(files) => {
+        dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
+
+        return files;
+      }}
       content={{
         label: () => {
           return (
@@ -34,6 +39,7 @@ export default function SubmitDropzone() {
           type: REDUCER_ACTION_TYPE.CHANGED_FILES,
           nextFiles: files,
         });
+        dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
       }}
       onUploadError={(e) => {
         toast.error(e.message);
