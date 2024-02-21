@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { currentUser } from "@clerk/nextjs";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 import { ChartBarIcon, HomeIcon } from "@heroicons/react/24/solid";
 
 export default async function MenuDropdown({
@@ -72,6 +72,15 @@ export default async function MenuDropdown({
             >
               <PlusIcon className="h-6 w-6 stroke-2 text-zinc-300" />
               <h2 className="capitalize">create post</h2>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href={{ query: { purchase: "premium" } }}
+              className="flex h-9 items-center gap-2 px-6 text-sm hover:bg-zinc-700/30"
+            >
+              <ShieldCheckIcon className="h-6 w-6 text-zinc-300" />
+              <h2 className="capitalize">premium</h2>
             </Link>
           </li>
         </menu>
