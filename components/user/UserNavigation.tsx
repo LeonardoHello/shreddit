@@ -22,7 +22,7 @@ export default function UserNavigation({
 
   return (
     <div className="flex justify-center border-b border-zinc-700/70 bg-zinc-900">
-      <div className="flex w-[64rem] flex-wrap gap-x-6 gap-y-2 px-2 py-2.5 text-sm font-medium uppercase">
+      <div className="flex w-[72rem] flex-wrap gap-x-6 gap-y-2 px-2 py-2.5 text-sm font-medium uppercase">
         <Link
           href={href}
           className={cn("border-b-2 border-transparent", {

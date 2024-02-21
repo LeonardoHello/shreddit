@@ -44,7 +44,7 @@ export default async function SubmitPage({
   if (!user) throw new Error("Cannot read current user information.");
 
   return (
-    <main className="flex w-full max-w-5xl justify-center gap-6 p-2 py-4 lg:self-center">
+    <div className="container mx-auto flex justify-center gap-6 p-2 py-4 xl:max-w-6xl">
       <div className="flex w-0 basis-full flex-col gap-2 lg:basis-2/3">
         <h1 className="mb-2 border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
           Create a post
@@ -111,6 +111,6 @@ export default async function SubmitPage({
           .
         </div>
       </div>
-    </main>
+    </div>
   );
 }

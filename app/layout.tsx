@@ -46,7 +46,10 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning>
         <body
-          className={cn(nunito_sans.className, "bg-zinc-950 text-zinc-300")}
+          className={cn(
+            nunito_sans.className,
+            "flex h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-300",
+          )}
         >
           <NextSSRPlugin
             /**
@@ -63,9 +66,7 @@ export default function RootLayout({
             <PremiumPurchase />
 
             <Header />
-            <div className="flex min-h-[calc(100vh-3rem)] flex-col overflow-hidden">
-              {children}
-            </div>
+            <main className="relative grow overflow-y-scroll">{children}</main>
           </TRPCReactProvider>
           <Toaster theme="dark" richColors closeButton />
         </body>

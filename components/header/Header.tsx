@@ -25,7 +25,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-20 flex h-12 gap-5 border-b border-zinc-700/70 bg-zinc-900 px-5 py-1",
+        "min-h-12 z-20 flex gap-5 border-b border-zinc-700/70 bg-zinc-900 px-5 py-1",
         { "justify-between": userId === null },
       )}
     >

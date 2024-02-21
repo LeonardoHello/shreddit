@@ -17,7 +17,6 @@ import {
 } from "@/lib/api/getPosts/getHomePosts";
 import { getUserById } from "@/lib/api/getUser";
 import { type QueryInfo, SortPosts } from "@/lib/types";
-import home from "@/public/home.jpg";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
@@ -83,7 +82,7 @@ export default async function HomePage({
   };
 
   return (
-    <main className="grid w-full max-w-5xl grow grid-flow-col grid-rows-[auto,1fr] gap-6 self-center p-2 py-4 lg:grid-cols-[2fr,1fr]">
+    <div className="container mx-auto grid grid-flow-col grid-rows-[auto,1fr] gap-6 px-2 py-4 lg:grid-cols-[2fr,1fr] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2.5">
         {user && <FeedInput user={user} />}
         <FeedSort searchParams={searchParams} />
@@ -97,7 +96,7 @@ export default async function HomePage({
       />
       <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
         <PremiumButton />
-        <div className="sticky top-16 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
+        <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
             src="https://www.redditstatic.com/desktop2x/img/id-cards/home-banner@2x.png"
             alt="home banner"
@@ -132,6 +131,6 @@ export default async function HomePage({
         </div>
         <ScrollToTop />
       </div>
-    </main>
+    </div>
   );
 }

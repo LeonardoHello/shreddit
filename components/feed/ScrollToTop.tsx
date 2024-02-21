@@ -2,7 +2,10 @@
 
 export default function ScrollToTop() {
   const handleClick = () => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    document
+      .getElementsByTagName("main")
+      .item(0)
+      ?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   return (

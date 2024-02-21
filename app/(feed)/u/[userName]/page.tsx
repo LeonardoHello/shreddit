@@ -68,7 +68,7 @@ export default async function UserPage({
         isCurrentUser={user.id === userId}
       />
 
-      <main className="grid w-full max-w-5xl grow grid-flow-col grid-rows-[auto,1fr] gap-6 self-center p-2 py-4 lg:grid-cols-[2fr,1fr]">
+      <div className="container mx-auto grid grid-flow-col grid-rows-[auto,1fr] gap-6 px-2 py-4 lg:grid-cols-[2fr,1fr] lg:pb-12 xl:max-w-6xl">
         <div className="flex flex-col gap-2.5">
           {user.id === userId && <FeedInput user={user} />}
           <FeedSort searchParams={searchParams} />
@@ -86,7 +86,7 @@ export default async function UserPage({
           <ModeratedCommunities communities={user.communities} />
           <ScrollToTop />
         </div>
-      </main>
+      </div>
     </>
   );
 }
