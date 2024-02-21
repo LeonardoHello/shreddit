@@ -50,7 +50,7 @@ export default function SubmitCommunity({
 
       {isOpen && (
         <div
-          className="absolute top-full z-10 flex max-h-[30rem] w-full flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit"
+          className="absolute top-full z-10 flex max-h-96 w-full flex-col overflow-x-hidden rounded-b border-x border-b border-zinc-700/70 bg-inherit"
           onClick={() => setIsOpen(false)}
         >
           {children}

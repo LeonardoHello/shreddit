@@ -36,7 +36,7 @@ export default function SearchDropdown({
   });
 
   return (
-    <div className="absolute top-full w-full rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20">
+    <div className="absolute left-0 top-12 max-h-[min(calc(100vh-3rem),24rem)] w-full divide-y divide-zinc-700/70 overflow-y-scroll rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20 sm:top-full">
       {searchedCommunities.data.length > 0 && (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>
@@ -78,11 +78,7 @@ export default function SearchDropdown({
       )}
 
       {searchedUsers.data.length > 0 && (
-        <div
-          className={cn("py-3", {
-            "border-t border-zinc-700/70": searchedCommunities.data.length > 0,
-          })}
-        >
+        <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Users</h2>
           {searchedUsers.data.map((user) => (
             <Link
@@ -118,7 +114,7 @@ export default function SearchDropdown({
         </div>
       )}
 
-      <div className="flex items-center gap-2 border-t border-zinc-700/70 px-3.5 py-2 text-sm">
+      <div className="flex items-center gap-2 px-3.5 py-2 text-sm">
         <MagnifyingGlassIcon className="h-6 w-6 text-zinc-300" />
         <p>Search for &ldquo;{searchedValue}&rdquo;</p>
       </div>

@@ -57,11 +57,22 @@ export default function Search() {
 
   return (
     <div
-      className="relative order-1 flex max-w-4xl grow flex-col bg-inherit"
+      className="static order-1 flex max-w-2xl grow flex-col bg-inherit sm:relative"
       ref={dropdownRef}
     >
-      <div className="flex basis-full">
-        <label htmlFor="search" className="absolute left-4 self-center">
+      <div className="relative flex basis-full sm:static">
+        <label
+          htmlFor="search"
+          className="absolute left-4 self-center"
+          onClick={(e) => {
+            if (searchedValue.length === 0) return;
+
+            if (isOpen) {
+              e.preventDefault();
+              setIsOpen(false);
+            }
+          }}
+        >
           <MagnifyingGlassIcon className="h-6 w-6 text-zinc-500" />
         </label>
         <input
