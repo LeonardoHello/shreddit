@@ -2,8 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  color-scheme: dark;
+::-webkit-scrollbar {
+  @apply h-1 w-1;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-rose-500/70;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-rose-500/70;
 }
 
 .tiptap p.is-editor-empty:first-child::before {
