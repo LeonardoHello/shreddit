@@ -118,7 +118,9 @@ export default function PostActions({
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
       : "http://localhost:3000";
 
-    await navigator.clipboard.writeText(`${origin}/post/${postId}`);
+    await navigator.clipboard.writeText(
+      `${origin}/r/${post.community.name}/comments/${postId}`,
+    );
     toast.success("Copied link!");
   };
 

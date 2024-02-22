@@ -21,7 +21,7 @@ export default function CommunityAbout({
   community: NonNullable<
     Awaited<ReturnType<typeof getCommunityByName.execute>>
   >;
-  currentUserId: User["id"] | undefined;
+  currentUserId: User["id"] | null;
 }) {
   const router = useRouter();
   const aboutRef = useRef<HTMLTextAreaElement | null>(null);

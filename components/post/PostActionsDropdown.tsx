@@ -136,7 +136,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
       {post.text && removePostFromQuery && (
         <Link
           href={{
-            pathname: `/post/${post.id}`,
+            pathname: `/r/${post.community.name}/comments/${post.id}`,
             query: { edit: "true" },
           }}
           className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
