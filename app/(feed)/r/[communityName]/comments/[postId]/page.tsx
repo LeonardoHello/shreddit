@@ -30,7 +30,7 @@ export default async function PostPage({
   if (!post) notFound();
 
   return (
-    <div className="flex flex-col bg-zinc-900">
+    <div className="row-span-2 flex flex-col bg-zinc-900">
       <div className="flex gap-4 rounded p-2">
         <Post
           currentUserId={userId}
