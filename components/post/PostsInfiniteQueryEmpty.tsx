@@ -5,14 +5,14 @@ import {
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
+import type { Community, User } from "@/lib/db/schema";
+
 export default function PostsInfiniteQueryEmpty({
-  userName,
-  communityName,
-  filter,
+  params,
+  searchParams,
 }: {
-  userName?: string;
-  communityName?: string;
-  filter?: string | string[] | undefined;
+  params: { userName?: User["name"]; communityName?: Community["name"] };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
@@ -35,15 +35,16 @@ export default function PostsInfiniteQueryEmpty({
       ))}
       <div className="absolute top-1/4 flex flex-col items-center gap-2 self-center p-12 text-center">
         <h1 className="text-lg font-medium">
-          hmm... looks like nothing has been {filter || "posted"} yet
+          hmm... looks like nothing has been {searchParams.filter || "posted"}{" "}
+          yet
         </h1>
-        {!(filter || userName) && (
+        {!(searchParams.filter || params.userName) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
             <Link
               href={{
                 pathname: "/submit",
-                query: { community: communityName },
+                query: { community: params.communityName },
               }}
               className="rounded-full"
             >

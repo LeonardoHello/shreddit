@@ -6,12 +6,12 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
-import { type Post as PostType, type User } from "@/lib/db/schema";
+import type { Community, Post, User } from "@/lib/db/schema";
 import type { InfiniteQueryPostProcedure, QueryInfo } from "@/lib/types";
 import type { RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
 
-import Post from "./Post";
+import PostComponent from "./Post";
 import PostsInfiniteQueryEmpty from "./PostsInfiniteQueryEmpty";
 import PostsInfiniteQueryLoading from "./PostsInfiniteQueryLoading";
 
@@ -19,7 +19,7 @@ type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
   initialPosts: RouterOutput["infiniteQueryPosts"][T];
   queryInfo: QueryInfo<T>;
-  params: { userName?: string; communityName?: string };
+  params: { userName?: User["name"]; communityName?: Community["name"] };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
@@ -114,14 +114,10 @@ export default memo(function PostsInfiniteQuery<
 
   if (data.pages[0].posts.length === 0)
     return (
-      <PostsInfiniteQueryEmpty
-        communityName={params.communityName}
-        userName={params.userName}
-        filter={searchParams.filter}
-      />
+      <PostsInfiniteQueryEmpty params={params} searchParams={searchParams} />
     );
 
-  const removePostFromQuery = async (postId: PostType["id"]) => {
+  const removePostFromQuery = async (postId: Post["id"]) => {
     await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
     utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
@@ -159,7 +155,7 @@ export default memo(function PostsInfiniteQuery<
               router.push(`/r/${post.community.name}/comments/${post.id}`)
             }
           >
-            <Post
+            <PostComponent
               currentUserId={currentUserId}
               initialData={post}
               removePostFromQuery={removePostFromQuery}
