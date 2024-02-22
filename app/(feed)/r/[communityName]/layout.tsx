@@ -50,7 +50,7 @@ export default async function CommunityLayout({
 
       <div className="container mx-auto grid grid-flow-col grid-rows-[auto,1fr] gap-6 px-2 py-4 lg:grid-cols-[2fr,1fr] lg:pb-12 xl:max-w-6xl">
         {children}
-        <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
+        <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
           <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
             <CommunityAbout community={community} currentUserId={userId} />
             <hr className="border-zinc-700/70" />

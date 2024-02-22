@@ -81,7 +81,7 @@ export default async function UserPage({
           params={params}
           searchParams={searchParams}
         />
-        <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
+        <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
           <UserInfo user={user} />
           <ModeratedCommunities communities={user.communities} />
           <ScrollToTop />

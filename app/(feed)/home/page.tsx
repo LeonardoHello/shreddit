@@ -94,7 +94,7 @@ export default async function HomePage({
         params={params}
         searchParams={searchParams}
       />
-      <div className="row-span-2 hidden flex-col gap-4 text-sm lg:flex">
+      <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
         <PremiumButton />
         <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
           <Image
