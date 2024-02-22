@@ -94,7 +94,7 @@ export default function CommunityHeader({
             draggable={false}
           />
           <div className="self-start">
-            <h1 className="line-clamp-2 break-all text-lg font-bold before:content-['r/'] md:text-3xl md:before:content-['']">
+            <h1 className="break-all text-lg font-bold before:content-['r/'] md:text-3xl md:before:content-['']">
               {community.name}
             </h1>
             <h2 className="hidden text-sm text-zinc-500 md:block">
