@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { CakeIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import { getCommunityByName } from "@/lib/api/getCommunity";
 import { User } from "@/lib/db/schema";
 import useDropdown from "@/lib/hooks/useDropdown";
+import defaultCommunityImage from "@/public/community-logo.svg";
 import { trpc } from "@/trpc/react";
 
 import CommunityOptions from "./CommunityOptions";
@@ -65,6 +67,17 @@ export default function CommunityAbout({
             )}
           </div>
         )}
+      </div>
+      <div className="flex items-center gap-1.5">
+        <Image
+          src={community.imageUrl || defaultCommunityImage}
+          alt="community logo"
+          className="h-12 w-12 select-none rounded-full border-2 border-zinc-300 bg-zinc-300"
+          draggable={false}
+        />
+        <h2 className="truncate text-base font-medium tracking-wide">
+          r/{community.name}
+        </h2>
       </div>
       {!edit && community.about && (
         <p className="max-w-[302px] break-words">{community.about}</p>
