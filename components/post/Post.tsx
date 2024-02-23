@@ -37,7 +37,7 @@ export default memo(function Post({
     <PostContextProvider post={post} initialEdit={initialEdit}>
       <div className="flex gap-3 rounded bg-zinc-900 p-2">
         <PostVote currentUserId={currentUserId} />
-        <div className="flex grow flex-col gap-1">
+        <div className="flex w-0 grow flex-col gap-1">
           <PostMetadata />
           <PostContent />
           <PostActions

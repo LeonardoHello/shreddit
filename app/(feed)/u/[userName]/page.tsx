@@ -68,10 +68,16 @@ export default async function UserPage({
         isCurrentUser={user.id === userId}
       />
 
-      <div className="container mx-auto grid grid-flow-col grid-rows-[auto,1fr] gap-6 px-2 py-4 lg:grid-cols-[2fr,1fr] lg:pb-12 xl:max-w-6xl">
+      <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
         <div className="flex flex-col gap-2.5">
           {user.id === userId && <FeedInput user={user} />}
           <FeedSort searchParams={searchParams} />
+        </div>
+
+        <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
+          <UserInfo user={user} />
+          <ModeratedCommunities communities={user.communities} />
+          <ScrollToTop />
         </div>
 
         <PostsInfiniteQuery
@@ -81,11 +87,6 @@ export default async function UserPage({
           params={params}
           searchParams={searchParams}
         />
-        <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
-          <UserInfo user={user} />
-          <ModeratedCommunities communities={user.communities} />
-          <ScrollToTop />
-        </div>
       </div>
     </>
   );

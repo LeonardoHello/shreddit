@@ -73,7 +73,7 @@ export default async function CommunityPage({
 
   return (
     <>
-      <div className="flex flex-col gap-2.5">
+      <div className="-order-1 flex flex-col gap-2.5">
         {user && <FeedInput user={user} communityName={communityName} />}
         <FeedSort searchParams={searchParams} />
       </div>

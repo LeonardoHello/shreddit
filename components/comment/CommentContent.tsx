@@ -11,7 +11,7 @@ export default function CommentContent() {
 
   return (
     <div
-      className="prose prose-sm prose-zinc prose-invert max-w-none"
+      className="prose prose-sm prose-zinc prose-invert max-w-none break-words"
       dangerouslySetInnerHTML={{ __html: comment.text }}
     />
   );

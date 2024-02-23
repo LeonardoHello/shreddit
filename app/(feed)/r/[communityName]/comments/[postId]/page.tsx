@@ -30,7 +30,7 @@ export default async function PostPage({
   if (!post) notFound();
 
   return (
-    <div className="row-span-2 bg-zinc-900">
+    <div className="-order-1 row-span-2 bg-zinc-900">
       <Post
         currentUserId={userId}
         initialData={post}
