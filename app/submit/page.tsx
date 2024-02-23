@@ -44,8 +44,8 @@ export default async function SubmitPage({
   if (!user) throw new Error("Cannot read current user information.");
 
   return (
-    <div className="container mx-auto flex justify-center gap-6 p-2 py-4 xl:max-w-6xl">
-      <div className="flex w-0 basis-full flex-col gap-2 lg:basis-2/3">
+    <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
+      <div className="flex flex-col gap-2">
         <h1 className="mb-2 border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
           Create a post
         </h1>
@@ -67,7 +67,7 @@ export default async function SubmitPage({
           </div>
         </SubmitContextProvider>
       </div>
-      <div className="my-8 hidden basis-1/3 text-sm lg:flex lg:flex-col lg:gap-4">
+      <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
         <div className="rounded bg-zinc-900 p-4">
           <div className="mb-2 flex items-center gap-2">
             <Image src={ogre} alt="logo" className="h-8 w-8" />
