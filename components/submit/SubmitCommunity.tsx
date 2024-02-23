@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
@@ -13,8 +11,9 @@ import {
 } from "@/lib/context/SubmitContextProvider";
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
-import communityImage from "@/public/community-logo.svg";
 import { trpc } from "@/trpc/react";
+
+import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunity({
   children,
@@ -102,23 +101,7 @@ function SelectedCommunity({
 }) {
   return (
     <>
-      {community.imageUrl ? (
-        <Image
-          src={community.imageUrl}
-          alt="community icon"
-          width={24}
-          height={24}
-          className="rounded-full"
-        />
-      ) : (
-        <Image
-          src={communityImage}
-          alt="community icon"
-          width={24}
-          height={24}
-          className="rounded-full border border-zinc-300 bg-zinc-300"
-        />
-      )}
+      <CommunityImage imageUrl={community.imageUrl} size={24} />
 
       <h1 className="grow truncate text-start text-sm font-medium">
         r/{community.name}

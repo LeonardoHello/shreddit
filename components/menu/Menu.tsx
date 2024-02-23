@@ -10,8 +10,9 @@ import { ChartBarIcon, HomeIcon, UserIcon } from "@heroicons/react/24/solid";
 
 import useDropdown from "@/lib/hooks/useDropdown";
 import cn from "@/lib/utils/cn";
-import communityImage from "@/public/community-logo.svg";
 import { trpc } from "@/trpc/react";
+
+import CommunityImage from "../community/CommunityImage";
 
 export default function Menu({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -95,26 +96,7 @@ function CurrentCommunityFeed({ communityName }: { communityName: string }) {
 
   return (
     <>
-      {communityImageUrl.data ? (
-        <Image
-          src={communityImageUrl.data.imageUrl ?? communityImage}
-          alt="community icon"
-          width={20}
-          height={20}
-          className={cn("rounded-full", {
-            "border border-zinc-300 bg-zinc-300":
-              communityImageUrl.data?.imageUrl === null,
-          })}
-        />
-      ) : (
-        <Image
-          src={communityImage}
-          alt="community icon"
-          width={20}
-          height={20}
-          className="rounded-full border border-zinc-300 bg-zinc-300"
-        />
-      )}
+      <CommunityImage imageUrl={communityImageUrl.data?.imageUrl} size={20} />
 
       <h1 className="hidden truncate text-center text-sm font-medium lg:block">
         u/{communityName}

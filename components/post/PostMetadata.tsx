@@ -9,6 +9,8 @@ import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
 import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 
+import CommunityImage from "../community/CommunityImage";
+
 export default function PostMetadata() {
   const { postId } = useParams();
 
@@ -23,23 +25,7 @@ export default function PostMetadata() {
           className="flex items-center gap-1"
           onClick={(e) => e.stopPropagation()}
         >
-          {post.community.imageUrl ? (
-            <Image
-              src={post.community.imageUrl}
-              alt="community image"
-              width={20}
-              height={20}
-              className="select-none rounded-full"
-            />
-          ) : (
-            <Image
-              src={communityImage}
-              alt="community image"
-              width={20}
-              height={20}
-              className="select-none rounded-full border border-zinc-300 bg-zinc-300"
-            />
-          )}
+          <CommunityImage imageUrl={post.community.imageUrl} size={20} />
           <div className="font-bold hover:underline">
             r/{post.community.name}
           </div>

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import cn from "@/lib/utils/cn";
 import calculateOnions from "@/lib/utils/getOnions";
-import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 import { trpc } from "@/trpc/react";
+
+import CommunityImage from "../community/CommunityImage";
 
 export default function SearchDropdown({
   searchedValue,
@@ -46,14 +46,7 @@ export default function SearchDropdown({
               key={community.name}
               className="flex items-center gap-2 px-4 py-2 hover:bg-zinc-700/30"
             >
-              <Image
-                src={community.imageUrl ?? communityImage}
-                alt="community image"
-                className={cn("h-6 w-6  rounded-full", {
-                  "border border-zinc-300 bg-zinc-300":
-                    community.imageUrl === null,
-                })}
-              />
+              <CommunityImage imageUrl={community.imageUrl} size={24} />
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">
                   r/{community.name}

@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import { BellSlashIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
@@ -9,9 +7,10 @@ import { toast } from "sonner";
 import type { getCommunityByName } from "@/lib/api/getCommunity";
 import type { User } from "@/lib/db/schema";
 import cn from "@/lib/utils/cn";
-import defaultCommunityImage from "@/public/community-logo.svg";
 import type { RouterInput, RouterOutput } from "@/trpc/procedures";
 import { trpc } from "@/trpc/react";
+
+import CommunityImage from "./CommunityImage";
 
 export default function CommunityHeader({
   currentUserId,
@@ -87,14 +86,19 @@ export default function CommunityHeader({
       <div className="-z-10 h-12 bg-sky-600 md:h-20" />
       <div className="flex justify-center bg-zinc-900 px-4 py-2">
         <div className="flex w-[72rem] items-center gap-4">
-          <Image
-            src={community.imageUrl || defaultCommunityImage}
-            alt="community logo"
-            className="-mt-5 h-14 w-14 select-none self-start rounded-full border-2 border-zinc-300 bg-zinc-300 md:h-20 md:w-20 md:border-4"
-            draggable={false}
+          <CommunityImage
+            imageUrl={community.imageUrl}
+            size={56}
+            className={cn(
+              "-mt-5 min-w-[56px] self-start md:h-20 md:w-20 md:min-w-[80px]",
+              {
+                "border-2 md:border-4": !community.imageUrl,
+              },
+            )}
           />
+
           <div className="self-start">
-            <h1 className="break-all text-lg font-bold before:content-['r/'] md:text-3xl md:before:content-['']">
+            <h1 className="line-clamp-2 break-all text-lg font-bold before:content-['r/'] md:text-3xl md:before:content-['']">
               {community.name}
             </h1>
             <h2 className="hidden text-sm text-zinc-500 md:block">

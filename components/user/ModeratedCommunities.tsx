@@ -1,9 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import type { getUserByName } from "@/lib/api/getUser";
-import cn from "@/lib/utils/cn";
-import communityImage from "@/public/community-logo.svg";
+
+import CommunityImage from "../community/CommunityImage";
 
 export default function ModeratedCommunities({
   communities,
@@ -22,30 +21,12 @@ export default function ModeratedCommunities({
       <div className="flex flex-col gap-3.5">
         {communities.map((community) => (
           <div key={community.id} className="flex items-center gap-1.5">
-            {community.imageUrl ? (
-              <Image
-                src={community.imageUrl ?? communityImage}
-                alt="community icon"
-                width={32}
-                height={32}
-                className={cn("rounded-full", {
-                  "border border-zinc-300 bg-zinc-300":
-                    community.imageUrl === null,
-                })}
-              />
-            ) : (
-              <Image
-                src={communityImage}
-                alt="community icon"
-                width={32}
-                height={32}
-                className="rounded-full border border-zinc-300 bg-zinc-300"
-              />
-            )}
-            <div className="text-xs tracking-wide">
+            <CommunityImage imageUrl={community.imageUrl} size={32} />
+
+            <div className="truncate text-xs tracking-wide">
               <Link
                 href={`/r/${community.name}`}
-                className="max-w-[15rem] cursor-pointer truncate font-medium lowercase hover:underline"
+                className="max-w-[15rem] cursor-pointer font-medium lowercase hover:underline"
               >
                 r/{community.name}
               </Link>

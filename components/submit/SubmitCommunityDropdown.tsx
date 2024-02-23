@@ -13,8 +13,10 @@ import {
   REDUCER_ACTION_TYPE,
   useSubmitContext,
 } from "@/lib/context/SubmitContextProvider";
-import communityImage from "@/public/community-logo.svg";
+import cn from "@/lib/utils/cn";
 import { trpc } from "@/trpc/react";
+
+import CommunityImage from "../community/CommunityImage";
 
 type YourCommunities = Awaited<ReturnType<typeof getYourCommunities.execute>>;
 
@@ -47,7 +49,7 @@ export default function SubmitCommunityDropdown({
         <div className="flex items-center gap-2">
           <Image
             src={user.imageUrl}
-            alt="community icon"
+            alt="user profile"
             width={32}
             height={32}
             className="rounded"
@@ -112,29 +114,19 @@ function YourCommunities({
               }
             }}
           >
-            {yourCommunity.community.imageUrl ? (
-              <Image
-                src={yourCommunity.community.imageUrl}
-                alt="community icon"
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-            ) : (
-              <Image
-                src={communityImage}
-                alt="community icon"
-                width={32}
-                height={32}
-                className="rounded-full border border-zinc-300 bg-zinc-300"
-              />
-            )}
+            <CommunityImage
+              imageUrl={yourCommunity.community.imageUrl}
+              size={32}
+              className={cn({
+                "border-2": !yourCommunity.community.imageUrl,
+              })}
+            />
 
-            <div className="flex flex-col">
-              <h1 className="truncate text-sm">
+            <div className="truncate">
+              <h1 className="truncate text-sm tracking-wide">
                 r/{yourCommunity.community.name}
               </h1>
-              <h2 className="truncate text-xs lowercase text-zinc-500">
+              <h2 className="truncate text-xs font-light lowercase text-zinc-500">
                 {new Intl.NumberFormat("en-US", {
                   notation: "compact",
                   maximumFractionDigits: 1,
@@ -191,27 +183,19 @@ function SearchedCommunities() {
               }
             }}
           >
-            {searchedCommunity.imageUrl ? (
-              <Image
-                src={searchedCommunity.imageUrl}
-                alt="community icon"
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
-            ) : (
-              <Image
-                src={communityImage}
-                alt="community icon"
-                width={32}
-                height={32}
-                className="rounded-full border border-zinc-300 bg-zinc-300"
-              />
-            )}
+            <CommunityImage
+              imageUrl={searchedCommunity.imageUrl}
+              size={32}
+              className={cn({
+                "border-2": !searchedCommunity.imageUrl,
+              })}
+            />
 
-            <div className="flex flex-col">
-              <h1 className="truncate text-sm">r/{searchedCommunity.name}</h1>
-              <h2 className="truncate text-xs lowercase text-zinc-500">
+            <div className="truncate">
+              <h1 className="truncate text-sm tracking-wide">
+                r/{searchedCommunity.name}
+              </h1>
+              <h2 className="truncate text-xs font-light lowercase text-zinc-500">
                 {new Intl.NumberFormat("en-US", {
                   notation: "compact",
                   maximumFractionDigits: 1,
