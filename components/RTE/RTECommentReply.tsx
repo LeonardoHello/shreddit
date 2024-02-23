@@ -61,13 +61,13 @@ function RTECommentReplyContent() {
       >
         <BubbleMenu
           editor={editor}
-          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
         >
           <RTEButtonsInline editor={editor} />
         </BubbleMenu>
         <FloatingMenu
           editor={editor}
-          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
         >
           <RTEButtonsNode editor={editor} />
         </FloatingMenu>
@@ -113,7 +113,6 @@ function RTECommentReplyMenu({ editor }: { editor: Editor }) {
 
   return (
     <div className="flex h-10 flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
-      <RTEButtons editor={editor} />
       <div className="ml-auto flex gap-2">
         <button
           className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
