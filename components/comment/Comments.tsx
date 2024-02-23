@@ -33,7 +33,7 @@ export default function Comments({
     );
 
   return (
-    <div className="flex flex-col gap-6 pb-4">
+    <div className="flex flex-col gap-6">
       {comments
         .toSorted((a, b) => (a.createdAt > b.createdAt ? -1 : 1))
         .map((comment) => (

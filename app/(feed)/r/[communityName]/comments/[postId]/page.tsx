@@ -30,18 +30,16 @@ export default async function PostPage({
   if (!post) notFound();
 
   return (
-    <div className="row-span-2 flex flex-col bg-zinc-900">
-      <div className="flex gap-4 rounded p-2">
-        <Post
-          currentUserId={userId}
-          initialData={post}
-          initialEdit={searchParams.edit === "true"}
-        />
-      </div>
-      <div className="flex flex-col gap-2 p-4 px-14">
-        <div className="text-xs">
+    <div className="row-span-2 bg-zinc-900">
+      <Post
+        currentUserId={userId}
+        initialData={post}
+        initialEdit={searchParams.edit === "true"}
+      />
+      <div className="flex flex-col gap-4 p-4 pb-8">
+        <div className="flex flex-col gap-2 lg:ml-8">
           {user && (
-            <>
+            <div className="text-xs">
               Comment as{" "}
               <Link
                 href={`/u/${user.name}`}
@@ -49,17 +47,17 @@ export default async function PostPage({
               >
                 {user.name}
               </Link>
-            </>
+            </div>
           )}
+          <RTEComment postId={post.id} />
         </div>
-        <RTEComment postId={post.id} />
-      </div>
-      <hr className="mx-14 my-2 border-zinc-700/70" />
-      <div className="flex grow flex-col gap-6 bg-zinc-900 p-4">
-        <Comments
-          comments={comments.filter((comment) => !comment.parentCommentId)}
-          replies={comments.filter((comment) => comment.parentCommentId)}
-        />
+        <hr className="border-zinc-700/70 lg:ml-8" />
+        <div className="flex grow flex-col gap-6 bg-zinc-900">
+          <Comments
+            comments={comments.filter((comment) => !comment.parentCommentId)}
+            replies={comments.filter((comment) => comment.parentCommentId)}
+          />
+        </div>
       </div>
     </div>
   );

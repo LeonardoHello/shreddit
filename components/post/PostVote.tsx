@@ -82,10 +82,11 @@ const PostVote = function PostVote({ currentUserId }: Props) {
   }, 0);
 
   return (
-    <div className="flex select-none flex-col items-center gap-0.5 text-zinc-500">
+    <div className="flex select-none flex-col gap-0.5 text-center text-zinc-500">
       <ArrowUpCircleIcon
+        viewBox="2.25 2.25 19.5 19.5"
         className={cn(
-          "h-8 w-8 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
+          "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-rose-500": userToPost?.voteStatus === "upvoted",
           },
@@ -112,8 +113,9 @@ const PostVote = function PostVote({ currentUserId }: Props) {
         }).format(votes)}
       </div>
       <ArrowDownCircleIcon
+        viewBox="2.25 2.25 19.5 19.5"
         className={cn(
-          "h-8 w-8 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
+          "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-blue-500": userToPost?.voteStatus === "downvoted",
           },

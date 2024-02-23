@@ -150,7 +150,7 @@ export default memo(function PostsInfiniteQuery<
           <div
             key={post.id}
             ref={postI === posts.length - 1 ? targetRef : undefined}
-            className="flex cursor-pointer gap-4 rounded border border-zinc-700/70 bg-zinc-900 p-2 hover:border-zinc-500"
+            className="cursor-pointer rounded border border-zinc-700/70 hover:border-zinc-500"
             onClick={() =>
               router.push(`/r/${post.community.name}/comments/${post.id}`)
             }

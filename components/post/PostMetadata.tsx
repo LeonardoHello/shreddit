@@ -6,7 +6,6 @@ import { usePostContext } from "@/lib/context/PostContextProvider";
 import useHydration from "@/lib/hooks/useHydration";
 import cn from "@/lib/utils/cn";
 import getRelativeTimeString from "@/lib/utils/getRelativeTimeString";
-import communityImage from "@/public/community-logo.svg";
 import dot from "@/public/dot.svg";
 
 import CommunityImage from "../community/CommunityImage";
@@ -20,17 +19,19 @@ export default function PostMetadata() {
   return (
     <>
       <div className="flex items-center gap-1 text-xs">
-        <Link
-          href={`/r/${post.community.name}`}
-          className="flex items-center gap-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CommunityImage imageUrl={post.community.imageUrl} size={20} />
-          <div className="font-bold hover:underline">
-            r/{post.community.name}
-          </div>
-        </Link>
-        <Image src={dot} alt="dot" height={2} width={2} />
+        {!postId && (
+          <Link
+            href={`/r/${post.community.name}`}
+            className="flex items-center gap-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CommunityImage imageUrl={post.community.imageUrl} size={20} />
+            <div className="font-bold hover:underline">
+              r/{post.community.name}
+            </div>
+            <Image src={dot} alt="dot" height={2} width={2} />
+          </Link>
+        )}
         <div className="text-zinc-500">
           Posted by{" "}
           <Link
@@ -53,10 +54,8 @@ export default function PostMetadata() {
         </div>
       </div>
 
-      <div className="mb-1 flex items-center gap-3">
-        <h2
-          className={cn("text-lg font-medium", { "text-xl font-bold": postId })}
-        >
+      <div className="flex items-center gap-3">
+        <h2 className={cn("text-lg font-medium", { "text-xl": postId })}>
           {post.title}
         </h2>
         {post.spoiler && (

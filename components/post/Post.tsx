@@ -35,16 +35,18 @@ export default memo(function Post({
 
   return (
     <PostContextProvider post={post} initialEdit={initialEdit}>
-      <PostVote currentUserId={currentUserId} />
-      <div className="flex w-0 grow flex-col gap-2">
-        <PostMetadata />
-        <PostContent />
-        <PostActions
-          currentUserId={currentUserId}
-          removePostFromQuery={removePostFromQuery}
-        >
-          <PostActionsDropdown removePostFromQuery={removePostFromQuery} />
-        </PostActions>
+      <div className="flex gap-3 rounded bg-zinc-900 p-2">
+        <PostVote currentUserId={currentUserId} />
+        <div className="flex grow flex-col gap-1">
+          <PostMetadata />
+          <PostContent />
+          <PostActions
+            currentUserId={currentUserId}
+            removePostFromQuery={removePostFromQuery}
+          >
+            <PostActionsDropdown removePostFromQuery={removePostFromQuery} />
+          </PostActions>
+        </div>
       </div>
     </PostContextProvider>
   );
