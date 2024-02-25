@@ -11,7 +11,7 @@ import dot from "@/public/dot.svg";
 import CommunityImage from "../community/CommunityImage";
 
 export default function PostMetadata() {
-  const { postId } = useParams();
+  const { communityName, postId } = useParams();
 
   const hydrated = useHydration();
   const { post } = usePostContext();
@@ -19,7 +19,7 @@ export default function PostMetadata() {
   return (
     <>
       <div className="flex items-center gap-1 text-xs">
-        {!postId && (
+        {!communityName && (
           <Link
             href={`/r/${post.community.name}`}
             className="flex items-center gap-1"
