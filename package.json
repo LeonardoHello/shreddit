@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.6",
-    "@clerk/nextjs": "^4.29.3",
+    "@clerk/nextjs": "^4.31.5",
     "@clerk/themes": "^1.7.9",
     "@heroicons/react": "^2.0.18",
     "@neondatabase/serverless": "^0.6.0",
