@@ -12,7 +12,7 @@
     "",
     "<THIRD_PARTY_MODULES>",
     "",
-    "^(@)(/.*)$",
+    "^(@|@public)(/.*)$",
     "^[.]"
   ],
   "singleQuote": false,
