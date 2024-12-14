@@ -10,11 +10,13 @@ export async function GET() {
   const files = await getFiles;
 
   const destructuredFiles = files.map(({ key }) => key);
-  const uploadthingFiles = await utapi.listFiles({});
+  // default opts.limit 500
+  // default opts.offset 0
+  const uploadthingFiles = await utapi.listFiles();
 
   const filesToDelete = [];
 
-  for (const file of uploadthingFiles) {
+  for (const file of uploadthingFiles.files) {
     if (!destructuredFiles.includes(file.key)) {
       filesToDelete.push(file.key);
     }

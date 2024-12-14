@@ -15,7 +15,10 @@ import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
 import { toast } from "sonner";
-import { generateClientDropzoneAccept } from "uploadthing/client";
+import {
+  generateClientDropzoneAccept,
+  generatePermittedFileTypes,
+} from "uploadthing/client";
 
 import {
   REDUCER_ACTION_TYPE,
@@ -92,7 +95,7 @@ export default function RTEPost() {
 function RTEPostMenu({ editor }: { editor: Editor }) {
   const { dispatch } = useSubmitContext();
 
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
       dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
       return files;
@@ -153,13 +156,11 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
     [startUpload],
   );
 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
-
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept: generateClientDropzoneAccept(
+      generatePermittedFileTypes(routeConfig).fileTypes,
+    ),
   });
 
   return (
@@ -196,7 +197,7 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
 function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
   const { dispatch } = useSubmitContext();
 
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
       dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
       return files;
@@ -257,13 +258,11 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
     [startUpload],
   );
 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
-
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept: generateClientDropzoneAccept(
+      generatePermittedFileTypes(routeConfig).fileTypes,
+    ),
   });
   return (
     <div>

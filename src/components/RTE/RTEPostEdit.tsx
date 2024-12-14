@@ -12,7 +12,10 @@ import {
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
 import { toast } from "sonner";
-import { generateClientDropzoneAccept } from "uploadthing/client";
+import {
+  generateClientDropzoneAccept,
+  generatePermittedFileTypes,
+} from "uploadthing/client";
 
 import { useFilesContext } from "@/context/FilesContextProvider";
 import { usePostContext } from "@/context/PostContextProvider";
@@ -142,7 +145,7 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
     },
   });
 
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
       setIsUploading(true);
       return files;
@@ -197,13 +200,11 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
     [startUpload],
   );
 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
-
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept: generateClientDropzoneAccept(
+      generatePermittedFileTypes(routeConfig).fileTypes,
+    ),
   });
 
   const disabled =
@@ -285,7 +286,7 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
 function RTEPostEditFloatingMenu({ editor }: { editor: Editor }) {
   const { setFiles, setIsUploading } = useFilesContext();
 
-  const { startUpload, permittedFileInfo } = useUploadThing("imageUploader", {
+  const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
       setIsUploading(true);
       return files;
@@ -340,13 +341,11 @@ function RTEPostEditFloatingMenu({ editor }: { editor: Editor }) {
     [startUpload],
   );
 
-  const fileTypes = permittedFileInfo?.config
-    ? Object.keys(permittedFileInfo?.config)
-    : [];
-
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept: generateClientDropzoneAccept(
+      generatePermittedFileTypes(routeConfig).fileTypes,
+    ),
   });
 
   return (
