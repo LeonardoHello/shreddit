@@ -2,8 +2,8 @@
 
 import CommentContextProvider from "@/context/CommentContextProvider";
 import type { User } from "@/db/schema";
-import { RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import { RouterOutput } from "@/trpc/routers/_app";
 import RTECommentReply from "../RTE/RTECommentReply";
 import CommentActions from "./CommentActions";
 import CommentActionsDropdown from "./CommentActionsDropdown";

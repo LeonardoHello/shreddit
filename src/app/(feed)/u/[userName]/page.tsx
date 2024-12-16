@@ -6,11 +6,12 @@ import { getUserByName } from "@/api/getUser";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import ScrollToTop from "@/components/feed/ScrollToTop";
-import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
+import InfiniteQueryUserPosts from "@/components/post/InfiniteQueryUserPosts";
 import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";
-import type { QueryInfo } from "@/types";
+import type { QueryInfo, SortPosts, UserPostsFilter } from "@/types";
 import getUserPosts from "@/utils/getUserPosts";
 
 export const runtime = "edge";
@@ -21,10 +22,10 @@ export default async function UserPage({
   searchParams,
 }: {
   params: { userName: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { sort: SortPosts; filter: UserPostsFilter };
 }) {
   const { userName } = params;
-  const { filter, sort } = searchParams;
+  const { sort, filter } = searchParams;
 
   const user = await getUserByName
     .execute({
@@ -80,13 +81,16 @@ export default async function UserPage({
           <ScrollToTop />
         </div>
 
-        <PostsInfiniteQuery
-          currentUserId={userId}
-          initialPosts={{ posts, nextCursor }}
-          queryInfo={queryInfo}
-          params={params}
-          searchParams={searchParams}
-        />
+        {posts.length === 0 ? (
+          <InfiniteQueryPostsEmpty searchParams={searchParams} />
+        ) : (
+          <InfiniteQueryUserPosts
+            currentUserId={userId}
+            initialPosts={{ posts, nextCursor }}
+            queryInfo={queryInfo}
+            searchParams={searchParams}
+          />
+        )}
       </div>
     </>
   );

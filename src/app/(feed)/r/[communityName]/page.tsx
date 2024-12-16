@@ -9,7 +9,8 @@ import {
 import { getUserById } from "@/api/getUser";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
-import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import InfiniteQueryCommunityPosts from "@/components/post/InfiniteQueryCommunityPosts";
+import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
 export default async function CommunityPage({
@@ -77,13 +78,16 @@ export default async function CommunityPage({
         {user && <FeedInput user={user} communityName={communityName} />}
         <FeedSort searchParams={searchParams} />
       </div>
-      <PostsInfiniteQuery
-        currentUserId={userId}
-        initialPosts={{ posts, nextCursor }}
-        queryInfo={queryInfo}
-        params={params}
-        searchParams={searchParams}
-      />
+
+      {posts.length === 0 ? (
+        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+      ) : (
+        <InfiniteQueryCommunityPosts
+          currentUserId={userId}
+          initialPosts={{ posts, nextCursor }}
+          queryInfo={queryInfo}
+        />
+      )}
     </>
   );
 }

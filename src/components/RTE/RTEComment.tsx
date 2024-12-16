@@ -16,7 +16,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
 import type { Post } from "@/db/schema";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
@@ -99,7 +99,7 @@ function RTECommentMenu({
     },
   });
 
-  const isMutating = isPending || createComment.isLoading;
+  const isMutating = isPending || createComment.isPending;
 
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 

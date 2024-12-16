@@ -10,7 +10,7 @@ import {
   useSubmitContext,
 } from "@/context/SubmitContextProvider";
 import useDropdown from "@/hooks/useDropdown";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 

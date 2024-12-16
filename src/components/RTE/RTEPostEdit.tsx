@@ -19,7 +19,7 @@ import {
 
 import { useFilesContext } from "@/context/FilesContextProvider";
 import { usePostContext } from "@/context/PostContextProvider";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
@@ -210,7 +210,7 @@ function RTEPostEditMenu({ editor }: { editor: Editor }) {
   const disabled =
     editor.getHTML() === post.text ||
     editor.isEmpty ||
-    editPost.isLoading ||
+    editPost.isPending ||
     isUploading;
 
   return (

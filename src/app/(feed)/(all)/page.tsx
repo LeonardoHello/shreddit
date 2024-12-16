@@ -15,18 +15,17 @@ import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/feed/PremiumButton";
 import ScrollToTop from "@/components/feed/ScrollToTop";
-import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import InfiniteQueryAllPosts from "@/components/post/InfiniteQueryAllPosts";
+import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function AllPage({
-  params,
   searchParams,
 }: {
-  params: {};
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { sort: SortPosts };
 }) {
   const { userId } = auth();
 
@@ -122,13 +121,15 @@ export default async function AllPage({
         <ScrollToTop />
       </div>
 
-      <PostsInfiniteQuery
-        currentUserId={userId}
-        initialPosts={{ posts, nextCursor }}
-        queryInfo={queryInfo}
-        params={params}
-        searchParams={searchParams}
-      />
+      {posts.length === 0 ? (
+        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+      ) : (
+        <InfiniteQueryAllPosts
+          currentUserId={userId}
+          initialPosts={{ posts, nextCursor }}
+          queryInfo={queryInfo}
+        />
+      )}
     </div>
   );
 }

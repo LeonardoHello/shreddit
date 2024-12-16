@@ -12,7 +12,7 @@ import {
   REDUCER_ACTION_TYPE,
   useSubmitContext,
 } from "@/context/SubmitContextProvider";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
@@ -150,7 +150,7 @@ function SearchedCommunities() {
     initialData: [],
     refetchOnWindowFocus: false,
     retry: 2,
-    useErrorBoundary: () => {
+    throwOnError: () => {
       toast.error("There was a problem with fetching the communities");
       return false;
     },

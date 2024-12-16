@@ -11,7 +11,7 @@ import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import PremiumPurchase from "@/components/modal/PremiumPurchase";
-import { TRPCReactProvider } from "@/trpc/react";
+import { TRPCProvider } from "@/trpc/client";
 import cn from "@/utils/cn";
 
 import "./globals.css";
@@ -60,14 +60,14 @@ export default function RootLayout({
              */
             routerConfig={extractRouterConfig(ourFileRouter)}
           />
-          <TRPCReactProvider>
+          <TRPCProvider>
             {/* Modal components */}
             <CommunityCreate />
             <PremiumPurchase />
 
             <Header />
             <main className="relative grow overflow-y-scroll">{children}</main>
-          </TRPCReactProvider>
+          </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />
         </body>
       </html>

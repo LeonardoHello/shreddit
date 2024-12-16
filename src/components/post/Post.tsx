@@ -4,8 +4,8 @@ import { memo } from "react";
 
 import PostContextProvider from "@/context/PostContextProvider";
 import type { Post, User } from "@/db/schema";
-import type { RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import type { RouterOutput } from "@/trpc/routers/_app";
 import PostActions from "./PostActions";
 import PostActionsDropdown from "./PostActionsDropdown";
 import PostContent from "./PostContent";

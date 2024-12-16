@@ -4,7 +4,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 import { Community } from "@/db/schema";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 
 export default function CommunityOptions({
   communityId,

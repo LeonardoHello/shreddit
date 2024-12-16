@@ -14,8 +14,8 @@ import { toast } from "sonner";
 import { usePostContext } from "@/context/PostContextProvider";
 import type { Post, User } from "@/db/schema";
 import useDropdown from "@/hooks/useDropdown";
-import type { RouterInput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import type { RouterInput } from "@/trpc/routers/_app";
 
 type Props = {
   currentUserId: User["id"] | null;

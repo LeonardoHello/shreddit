@@ -49,17 +49,17 @@ import {
 } from "@/db/schema";
 import { SortPosts } from "@/types";
 import getUserPosts from "@/utils/getUserPosts";
-import { procedure, protectedProcedure, router } from ".";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
-export const appRouter = router({
-  infiniteQueryPosts: router({
+export const appRouter = createTRPCRouter({
+  infiniteQueryPosts: createTRPCRouter({
     getHomePosts: protectedProcedure
       .input(
         z.object({
           // cursor input needed to expose useInfiniteQuery hook
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
-          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          sort: z.nativeEnum(SortPosts),
         }),
       )
       .query(async ({ input, ctx }) => {
@@ -68,40 +68,40 @@ export const appRouter = router({
           case SortPosts.HOT:
             posts = await getHomeHotPosts.execute({
               offset: input.cursor,
-              currentUserId: ctx.auth.userId,
+              currentUserId: ctx.userId,
             });
             break;
 
           case SortPosts.NEW:
             posts = await getHomeNewPosts.execute({
               offset: input.cursor,
-              currentUserId: ctx.auth.userId,
+              currentUserId: ctx.userId,
             });
             break;
 
           case SortPosts.CONTROVERSIAL:
             posts = await getHomeControversialPosts.execute({
               offset: input.cursor,
-              currentUserId: ctx.auth.userId,
+              currentUserId: ctx.userId,
             });
             break;
 
           default:
             posts = await getHomeBestPosts.execute({
               offset: input.cursor,
-              currentUserId: ctx.auth.userId,
+              currentUserId: ctx.userId,
             });
             break;
         }
 
-        let nextCursor: typeof input.cursor = null;
+        let nextCursor: typeof input.cursor = undefined;
         if (posts.length === 10) {
           nextCursor = input.cursor! + 10;
         }
 
         return { posts, nextCursor };
       }),
-    getAllPosts: procedure
+    getAllPosts: baseProcedure
       .input(
         z.object({
           cursor: z.number().nullish(),
@@ -144,7 +144,7 @@ export const appRouter = router({
         return { posts, nextCursor };
       }),
 
-    getCommunityPosts: procedure
+    getCommunityPosts: baseProcedure
       .input(
         z.object({
           cursor: z.number().nullish(),
@@ -191,7 +191,7 @@ export const appRouter = router({
 
         return { posts, nextCursor };
       }),
-    getUserPosts: procedure
+    getUserPosts: baseProcedure
       .input(
         z.object({
           cursor: z.number().nullish(),
@@ -212,14 +212,14 @@ export const appRouter = router({
         return { posts, nextCursor };
       }),
   }),
-  getPost: procedure.input(PostSchema.shape.id).query(async ({ input }) => {
+  getPost: baseProcedure.input(PostSchema.shape.id).query(async ({ input }) => {
     const post = await getPostById.execute({ postId: input });
     return post ?? null;
   }),
-  searchUsers: procedure.input(z.string()).query(({ input }) => {
+  searchUsers: baseProcedure.input(z.string()).query(({ input }) => {
     return searchUsers.execute({ search: `%${input}%` });
   }),
-  searchCommunities: procedure.input(z.string()).query(({ input }) => {
+  searchCommunities: baseProcedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
   getUserImage: protectedProcedure
@@ -233,13 +233,13 @@ export const appRouter = router({
       return getCommunityImage.execute({ name: input });
     }),
   getFavoriteCommunities: protectedProcedure.query(({ ctx }) => {
-    return getFavoriteCommunities.execute({ currentUserId: ctx.auth.userId });
+    return getFavoriteCommunities.execute({ currentUserId: ctx.userId });
   }),
   getModeratedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getModeratedCommunities.execute({ currentUserId: ctx.auth.userId });
+    return getModeratedCommunities.execute({ currentUserId: ctx.userId });
   }),
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getJoinedCommunities.execute({ currentUserId: ctx.auth.userId });
+    return getJoinedCommunities.execute({ currentUserId: ctx.userId });
   }),
   setAboutCommunity: protectedProcedure
     .input(CommunitySchema.pick({ id: true, about: true }))
@@ -257,11 +257,11 @@ export const appRouter = router({
         .where(eq(communities.id, input))
         .returning({ name: communities.name });
     }),
-  getUserToCommunity: procedure
+  getUserToCommunity: baseProcedure
     .input(UserToCommunitySchema.shape.communityId)
     .query(({ input, ctx }) => {
       return getUserToCommunity.execute({
-        userId: ctx.auth.userId,
+        userId: ctx.userId,
         communityId: input,
       });
     }),
@@ -278,7 +278,7 @@ export const appRouter = router({
         .values({
           favorite: input.favorite,
           communityId: input.communityId,
-          userId: ctx.auth.userId,
+          userId: ctx.userId,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
@@ -298,7 +298,7 @@ export const appRouter = router({
         .values({
           member: input.member,
           communityId: input.communityId,
-          userId: ctx.auth.userId,
+          userId: ctx.userId,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
@@ -319,7 +319,7 @@ export const appRouter = router({
         .values({
           muted: input.muted,
           communityId: input.communityId,
-          userId: ctx.auth.userId,
+          userId: ctx.userId,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
@@ -339,7 +339,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(posts)
-        .values({ ...input, authorId: ctx.auth.userId })
+        .values({ ...input, authorId: ctx.userId })
         .returning({ id: posts.id });
     }),
   editPost: protectedProcedure
@@ -374,7 +374,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(usersToPosts)
-        .values({ ...input, userId: ctx.auth.userId })
+        .values({ ...input, userId: ctx.userId })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { saved: input.saved },
@@ -391,7 +391,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(usersToPosts)
-        .values({ ...input, userId: ctx.auth.userId })
+        .values({ ...input, userId: ctx.userId })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { hidden: input.hidden },
@@ -403,7 +403,7 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(usersToPosts)
-        .values({ ...input, userId: ctx.auth.userId })
+        .values({ ...input, userId: ctx.userId })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { voteStatus: input.voteStatus },
@@ -421,7 +421,7 @@ export const appRouter = router({
       return ctx.db
         .update(posts)
         .set({ spoiler: input.spoiler, updatedAt: new Date() })
-        .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
+        .where(and(eq(posts.authorId, ctx.userId), eq(posts.id, input.id)))
         .returning({ spoiler: posts.spoiler });
     }),
   setPostNSFWTag: protectedProcedure
@@ -435,7 +435,7 @@ export const appRouter = router({
       return ctx.db
         .update(posts)
         .set({ nsfw: input.nsfw, updatedAt: new Date() })
-        .where(and(eq(posts.authorId, ctx.auth.userId), eq(posts.id, input.id)))
+        .where(and(eq(posts.authorId, ctx.userId), eq(posts.id, input.id)))
         .returning({ nsfw: posts.nsfw });
     }),
   createComment: protectedProcedure
@@ -446,7 +446,7 @@ export const appRouter = router({
       return ctx.db
         .insert(comments)
         .values({
-          authorId: ctx.auth.userId,
+          authorId: ctx.userId,
           ...input,
         })
         .onConflictDoUpdate({
@@ -469,13 +469,13 @@ export const appRouter = router({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(usersToComments)
-        .values({ userId: ctx.auth.userId, ...input })
+        .values({ userId: ctx.userId, ...input })
         .onConflictDoUpdate({
           target: [usersToComments.userId, usersToComments.commentId],
           set: { voteStatus: input.voteStatus },
         });
     }),
-  getComment: procedure
+  getComment: baseProcedure
     .input(CommentSchema.shape.id)
     .query(async ({ input }) => {
       const comment = await getComment.execute({ commentId: input });
@@ -507,7 +507,7 @@ export const appRouter = router({
       return ctx.db
         .insert(communities)
         .values({
-          moderatorId: ctx.auth.userId,
+          moderatorId: ctx.userId,
           name: input,
         })
         .returning();

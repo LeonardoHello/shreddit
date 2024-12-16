@@ -6,8 +6,8 @@ import { toast } from "sonner";
 
 import type { getCommunityByName } from "@/api/getCommunity";
 import type { User } from "@/db/schema";
-import type { RouterInput, RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
 import cn from "@/utils/cn";
 import CommunityImage from "./CommunityImage";
 

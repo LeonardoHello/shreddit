@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { usePostContext } from "@/context/PostContextProvider";
 import type { UserToPost } from "@/db/schema";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
 type Props = {

@@ -5,87 +5,65 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
-import type { Community, Post, User } from "@/db/schema";
-import type { RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import type { Post, User } from "@/db/schema";
+import { trpc } from "@/trpc/client";
+import type { RouterOutput } from "@/trpc/routers/_app";
 import type { InfiniteQueryPostProcedure, QueryInfo } from "@/types";
+import PostsInfiniteQueryLoading from "./InfiniteQueryPostsLoading";
 import PostComponent from "./Post";
-import PostsInfiniteQueryEmpty from "./PostsInfiniteQueryEmpty";
-import PostsInfiniteQueryLoading from "./PostsInfiniteQueryLoading";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
   initialPosts: RouterOutput["infiniteQueryPosts"][T];
   queryInfo: QueryInfo<T>;
-  params: { userName?: User["name"]; communityName?: Community["name"] };
-  searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default memo(function PostsInfiniteQuery<
-  T extends InfiniteQueryPostProcedure,
->({ currentUserId, initialPosts, queryInfo, params, searchParams }: Props<T>) {
+const InfiniteQueryAllPosts = memo(function InfiniteQueryAllPosts({
+  currentUserId,
+  initialPosts,
+  queryInfo,
+}: Props<"getAllPosts">) {
   const router = useRouter();
-
   const targetRef = useRef<HTMLDivElement>(null);
 
   const utils = trpc.useUtils();
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = trpc[
+    "infiniteQueryPosts"
+  ][queryInfo.procedure].useInfiniteQuery(queryInfo.input, {
+    // filter muted communities and hidden posts
+    select: (data) => {
+      if (!currentUserId) {
+        return data;
+      }
 
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    trpc.infiniteQueryPosts[queryInfo.procedure].useInfiniteQuery(
-      queryInfo.input,
-      {
-        // filter muted communities and hidden posts
-        select: (data) => {
-          if (!currentUserId || searchParams.filter) {
-            return data;
-          }
-
-          if (params.communityName) {
-            return {
-              ...data,
-              pages: data.pages.map((page) => ({
-                ...page,
-                posts: page.posts.filter(
-                  (post) =>
-                    !post.usersToPosts.some(
-                      (userToPost) =>
-                        userToPost.hidden === true &&
-                        userToPost.userId === currentUserId,
-                    ),
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          posts: page.posts
+            .filter(
+              (post) =>
+                !post.community.usersToCommunities.some(
+                  (userToCommunity) =>
+                    userToCommunity.muted &&
+                    userToCommunity.userId === currentUserId,
                 ),
-              })),
-            };
-          }
-
-          return {
-            ...data,
-            pages: data.pages.map((page) => ({
-              ...page,
-              posts: page.posts
-                .filter(
-                  (post) =>
-                    !post.community.usersToCommunities.some(
-                      (userToCommunity) =>
-                        userToCommunity.muted &&
-                        userToCommunity.userId === currentUserId,
-                    ),
-                )
-                .filter(
-                  (post) =>
-                    !post.usersToPosts.some(
-                      (userToPost) =>
-                        userToPost.hidden === true &&
-                        userToPost.userId === currentUserId,
-                    ),
+            )
+            .filter(
+              (post) =>
+                !post.usersToPosts.some(
+                  (userToPost) =>
+                    userToPost.hidden === true &&
+                    userToPost.userId === currentUserId,
                 ),
-            })),
-          };
-        },
-        getNextPageParam: (lastPage) => lastPage?.nextCursor,
-        initialData: { pages: [initialPosts], pageParams: [0] },
-        refetchOnWindowFocus: false,
-      },
-    );
+            ),
+        })),
+      };
+    },
+    getNextPageParam: (lastPage) => lastPage?.nextCursor,
+    initialData: { pages: [initialPosts], pageParams: [0] },
+    refetchOnWindowFocus: false,
+  });
 
   if (data === undefined) {
     throw new Error("Couldn't fetch posts");
@@ -109,11 +87,6 @@ export default memo(function PostsInfiniteQuery<
       observer.disconnect();
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  if (data.pages[0].posts.length === 0)
-    return (
-      <PostsInfiniteQueryEmpty params={params} searchParams={searchParams} />
-    );
 
   const removePostFromQuery = async (postId: Post["id"]) => {
     await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
@@ -165,3 +138,5 @@ export default memo(function PostsInfiniteQuery<
     </div>
   );
 });
+
+export default InfiniteQueryAllPosts;

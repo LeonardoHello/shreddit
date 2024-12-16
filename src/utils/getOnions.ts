@@ -1,4 +1,4 @@
-import { RouterOutput } from "@/trpc/procedures";
+import { RouterOutput } from "@/trpc/routers/_app";
 import type { ArrElement } from "@/types";
 
 export default function getOnions(

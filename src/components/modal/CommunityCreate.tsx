@@ -3,7 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import Modal from "./Modal";
 
@@ -37,7 +37,7 @@ function CommunityCreateContent() {
     },
   });
 
-  const isMutating = isPending || createCommunity.isLoading;
+  const isMutating = isPending || createCommunity.isPending;
 
   const errorMessage = (error: NonNullable<typeof createCommunity.error>) => {
     if (

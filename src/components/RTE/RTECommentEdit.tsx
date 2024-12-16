@@ -11,7 +11,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
 import { useCommentContext } from "@/context/CommentContextProvider";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
@@ -121,10 +121,10 @@ function RTECommentEditMenu({ editor }: { editor: Editor }) {
             "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
             {
               "cursor-not-allowed text-zinc-500":
-                isEmpty || editComment.isLoading,
+                isEmpty || editComment.isPending,
             },
           )}
-          disabled={isEmpty || editComment.isLoading}
+          disabled={isEmpty || editComment.isPending}
           onClick={() => {
             editComment.mutate({
               id: comment.id,

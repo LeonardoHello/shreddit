@@ -1,4 +1,4 @@
-import type { RouterInput, RouterOutput } from "@/trpc/procedures";
+import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
 
 export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
 

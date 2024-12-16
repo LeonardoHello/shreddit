@@ -6,17 +6,18 @@ import {
 } from "@heroicons/react/24/outline";
 
 import type { Community, User } from "@/db/schema";
+import { SortPosts, UserPostsFilter } from "@/types";
 
-export default function PostsInfiniteQueryEmpty({
+export default function InfiniteQueryPostsEmpty({
   params,
   searchParams,
 }: {
-  params: { userName?: User["name"]; communityName?: Community["name"] };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params?: { userName?: User["name"]; communityName?: Community["name"] };
+  searchParams?: { sort?: SortPosts; filter?: UserPostsFilter };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
-      {[0, 1, 2, 3, 4].map((_) => (
+      {Array.of(4).map((_) => (
         <div key={_} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
           <div className="flex select-none flex-col items-center gap-4 text-zinc-500">
             <ArrowUpCircleIcon className="h-8 w-8 rounded" />
@@ -35,16 +36,16 @@ export default function PostsInfiniteQueryEmpty({
       ))}
       <div className="absolute top-1/4 flex flex-col items-center gap-2 self-center p-12 text-center">
         <h1 className="text-lg font-medium">
-          hmm... looks like nothing has been {searchParams.filter || "posted"}{" "}
+          hmm... looks like nothing has been {searchParams?.filter || "posted"}{" "}
           yet
         </h1>
-        {!(searchParams.filter || params.userName) && (
+        {!(params?.userName || searchParams?.filter) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
             <Link
               href={{
                 pathname: "/submit",
-                query: { community: params.communityName },
+                query: { community: params?.communityName },
               }}
               className="rounded-full"
             >

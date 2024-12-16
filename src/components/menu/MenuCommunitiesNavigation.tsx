@@ -5,8 +5,8 @@ import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import { RouterOutput } from "@/trpc/routers/_app";
 import type { ArrElement } from "@/types";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";

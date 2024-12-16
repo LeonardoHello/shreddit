@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 import { useCommentContext } from "@/context/CommentContextProvider";
 import { User } from "@/db/schema";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
 export default function CommentVote({

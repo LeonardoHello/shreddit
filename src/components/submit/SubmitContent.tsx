@@ -9,7 +9,7 @@ import {
   REDUCER_ACTION_TYPE,
   useSubmitContext,
 } from "@/context/SubmitContextProvider";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import RTEPost from "../RTE/RTEPost";
 import Dropzone from "./SubmitDropzone";

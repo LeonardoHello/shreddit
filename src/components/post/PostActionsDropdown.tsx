@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import {
   CheckIcon,
@@ -10,8 +10,8 @@ import { toast } from "sonner";
 
 import { usePostContext } from "@/context/PostContextProvider";
 import type { Post } from "@/db/schema";
-import type { RouterInput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
+import type { RouterInput } from "@/trpc/routers/_app";
 import cn from "@/utils/cn";
 
 type Props = {
@@ -91,13 +91,13 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
     <div
       className={cn(
         "absolute right-4 z-10 flex w-48 flex-col self-end border border-zinc-700/70 bg-zinc-900 text-sm font-medium shadow-[0_2px_4px_0] shadow-zinc-300/20 md:right-auto",
-        { "pointer-events-none opacity-40": deletedPost.isLoading },
+        { "pointer-events-none opacity-40": deletedPost.isPending },
       )}
     >
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
-          if (updateSpoilerTag.isLoading) return;
+          if (updateSpoilerTag.isPending) return;
 
           updateSpoilerTag.mutate({
             id: post.id,
@@ -116,7 +116,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
-          if (updateNSFWTag.isLoading) return;
+          if (updateNSFWTag.isPending) return;
 
           updateNSFWTag.mutate({
             id: post.id,
@@ -156,7 +156,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
       <div
         className="flex items-center gap-2 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
-          if (deletedPost.isLoading) return;
+          if (deletedPost.isPending) return;
 
           deletedPost.mutate(post.id);
         }}

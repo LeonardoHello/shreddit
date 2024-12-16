@@ -15,18 +15,17 @@ import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/feed/PremiumButton";
 import ScrollToTop from "@/components/feed/ScrollToTop";
-import PostsInfiniteQuery from "@/components/post/PostsInfiniteQuery";
+import InfiniteQueryPostsHome from "@/components/post/InfiniteQueryHomePosts";
+import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function HomePage({
-  params,
   searchParams,
 }: {
-  params: {};
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { sort: SortPosts };
 }) {
   const { userId } = auth();
 
@@ -71,7 +70,7 @@ export default async function HomePage({
     throw new Error("There was a problem with loading user information.");
   });
 
-  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = null;
+  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
     nextCursor = 10;
   }
@@ -126,13 +125,15 @@ export default async function HomePage({
         <ScrollToTop />
       </div>
 
-      <PostsInfiniteQuery
-        currentUserId={userId}
-        initialPosts={{ posts, nextCursor }}
-        queryInfo={queryInfo}
-        params={params}
-        searchParams={searchParams}
-      />
+      {posts.length === 0 ? (
+        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+      ) : (
+        <InfiniteQueryPostsHome
+          currentUserId={userId}
+          initialPosts={{ posts, nextCursor }}
+          queryInfo={queryInfo}
+        />
+      )}
     </div>
   );
 }

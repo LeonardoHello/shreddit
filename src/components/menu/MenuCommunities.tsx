@@ -1,14 +1,12 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
-
+import { useState, type ChangeEvent } from "react";
 import Link from "next/link";
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 
-import type { RouterOutput } from "@/trpc/procedures";
-import { trpc } from "@/trpc/react";
-
+import { trpc } from "@/trpc/client";
+import type { RouterOutput } from "@/trpc/routers/_app";
 import MenuCommunitiesNavigation from "./MenuCommunitiesNavigation";
 
 type Props = {

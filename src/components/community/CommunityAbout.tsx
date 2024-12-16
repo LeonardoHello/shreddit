@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { getCommunityByName } from "@/api/getCommunity";
 import { User } from "@/db/schema";
 import useDropdown from "@/hooks/useDropdown";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import CommunityImage from "./CommunityImage";
 import CommunityOptions from "./CommunityOptions";
@@ -42,7 +42,7 @@ export default function CommunityAbout({
     },
   });
 
-  const isMutating = isPending || setAboutCommunity.isLoading;
+  const isMutating = isPending || setAboutCommunity.isPending;
 
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);

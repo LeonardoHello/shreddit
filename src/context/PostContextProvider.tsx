@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
-import type { RouterOutput } from "@/trpc/procedures";
+import type { RouterOutput } from "@/trpc/routers/_app";
 
 type Post = NonNullable<RouterOutput["getPost"]>;
 

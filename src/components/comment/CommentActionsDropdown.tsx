@@ -5,7 +5,7 @@ import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 import { useCommentContext } from "@/context/CommentContextProvider";
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
 export default function CommentActionsDropdown() {
@@ -27,7 +27,7 @@ export default function CommentActionsDropdown() {
     },
   });
 
-  const isMutating = isPending || deleteComment.isLoading;
+  const isMutating = isPending || deleteComment.isPending;
 
   return (
     <div

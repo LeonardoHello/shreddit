@@ -4,7 +4,7 @@ import Link from "next/link";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { trpc } from "@/trpc/react";
+import { trpc } from "@/trpc/client";
 import calculateOnions from "@/utils/getOnions";
 import dot from "@public/dot.svg";
 import CommunityImage from "../community/CommunityImage";
@@ -18,7 +18,7 @@ export default function SearchDropdown({
     initialData: [],
     refetchOnWindowFocus: false,
     retry: 2,
-    useErrorBoundary: () => {
+    throwOnError: () => {
       toast.error("There was a problem with fetching the communities");
       return false;
     },
@@ -28,7 +28,7 @@ export default function SearchDropdown({
     initialData: [],
     refetchOnWindowFocus: false,
     retry: 2,
-    useErrorBoundary: () => {
+    throwOnError: () => {
       toast.error("There was a problem with fetching the users");
       return false;
     },
