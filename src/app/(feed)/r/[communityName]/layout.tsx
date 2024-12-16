@@ -11,13 +11,18 @@ import ScrollToTop from "@/components/feed/ScrollToTop";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function CommunityLayout({
-  params,
-  children,
-}: {
-  params: { communityName: string };
-  children: React.ReactNode;
-}) {
+export default async function CommunityLayout(
+  props: {
+    params: Promise<{ communityName: string }>;
+    children: React.ReactNode;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const { userId } = auth();
   const { communityName } = params;
 

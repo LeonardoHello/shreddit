@@ -22,11 +22,12 @@ import { SortPosts, type QueryInfo } from "@/types";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function AllPage({
-  searchParams,
-}: {
-  searchParams: { sort: SortPosts };
-}) {
+export default async function AllPage(
+  props: {
+    searchParams: Promise<{ sort: SortPosts }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { userId } = auth();
 
   const { sort } = searchParams;

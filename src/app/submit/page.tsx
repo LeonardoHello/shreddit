@@ -16,11 +16,12 @@ import ogre from "@public/logo-green.svg";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function SubmitPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function SubmitPage(
+  props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { userId } = auth();
 
   if (!userId) throw new Error("Cannot read current user information.");

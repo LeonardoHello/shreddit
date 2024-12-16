@@ -17,13 +17,14 @@ import getUserPosts from "@/utils/getUserPosts";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function UserPage({
-  params,
-  searchParams,
-}: {
-  params: { userName: string };
-  searchParams: { sort: SortPosts; filter: UserPostsFilter };
-}) {
+export default async function UserPage(
+  props: {
+    params: Promise<{ userName: string }>;
+    searchParams: Promise<{ sort: SortPosts; filter: UserPostsFilter }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { userName } = params;
   const { sort, filter } = searchParams;
 

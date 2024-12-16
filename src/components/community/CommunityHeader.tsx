@@ -108,7 +108,7 @@ export default function CommunityHeader({
             <button
               onClick={() => {
                 joinCommunity.mutate({
-                  member: !userToCommunity?.member ?? true,
+                  member: !userToCommunity?.member,
                   communityId: community.id,
                 });
               }}
@@ -125,7 +125,7 @@ export default function CommunityHeader({
             <button
               onClick={() => {
                 muteCommunity.mutate({
-                  muted: !userToCommunity?.muted ?? true,
+                  muted: !userToCommunity?.muted,
                   communityId: community.id,
                 });
               }}

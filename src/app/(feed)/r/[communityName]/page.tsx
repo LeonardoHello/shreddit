@@ -13,13 +13,14 @@ import InfiniteQueryCommunityPosts from "@/components/post/InfiniteQueryCommunit
 import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
-export default async function CommunityPage({
-  params,
-  searchParams,
-}: {
-  params: { communityName: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function CommunityPage(
+  props: {
+    params: Promise<{ communityName: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { userId } = auth();
 
   const { communityName } = params;

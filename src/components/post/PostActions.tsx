@@ -151,7 +151,7 @@ export default function PostActions({
 
           savePost.mutate({
             postId: post.id,
-            saved: !userToPost?.saved ?? true,
+            saved: !userToPost?.saved,
           });
         }}
       >
@@ -174,7 +174,7 @@ export default function PostActions({
 
           hidePost.mutate({
             postId: post.id,
-            hidden: !userToPost?.hidden ?? true,
+            hidden: !userToPost?.hidden,
           });
         }}
       >

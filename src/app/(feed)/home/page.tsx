@@ -22,11 +22,12 @@ import { SortPosts, type QueryInfo } from "@/types";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: { sort: SortPosts };
-}) {
+export default async function HomePage(
+  props: {
+    searchParams: Promise<{ sort: SortPosts }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { userId } = auth();
 
   if (userId === null) throw new Error("Could not load home page information.");

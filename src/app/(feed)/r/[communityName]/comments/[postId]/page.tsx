@@ -10,13 +10,19 @@ import Comments from "@/components/comment/Comments";
 import Post from "@/components/post/Post";
 import RTEComment from "@/components/RTE/RTEComment";
 
-export default async function PostPage({
-  params: { postId },
-  searchParams,
-}: {
-  params: { postId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function PostPage(
+  props: {
+    params: Promise<{ postId: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+
+  const {
+    postId
+  } = params;
+
   const { userId } = auth();
 
   const [user, post, comments] = await Promise.all([
