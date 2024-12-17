@@ -24,28 +24,28 @@ export default memo(function PostContentMedia() {
   if (files.length === 1) {
     return (
       <div
-        className={cn("grid max-h-96 place-content-center", {
+        className={cn("relative h-96", {
           "blur-2xl": !postId && (nsfw || spoiler),
         })}
       >
         <Image
           src={files[0].url}
           alt={files[0].name}
-          width={500}
-          height={500}
-          className="h-auto max-h-96 min-w-full object-contain"
+          fill
+          sizes="(max-width: 768px) 90vw, (max-width: 1024px) 700px, (max-width: 1280px) 610px, 740px"
+          className="object-contain"
         />
       </div>
     );
   }
 
   return (
-    <div className="relative flex max-h-96 flex-col justify-center overflow-hidden">
+    <div className="relative flex flex-col justify-center overflow-hidden">
       <div className="flex items-center">
         {files.map((image, i) => (
           <div
             key={image.id}
-            className={cn("order-2 grid min-w-full place-content-center", {
+            className={cn("relative order-2 h-96 min-w-full", {
               "order-1": currentIndex === i + 1,
               "blur-2xl": !postId && (nsfw || spoiler),
             })}
@@ -53,9 +53,9 @@ export default memo(function PostContentMedia() {
             <Image
               src={image.url}
               alt={image.name}
-              height={500}
-              width={500}
-              className="h-auto max-h-96 min-w-full object-contain"
+              fill
+              sizes="(max-width: 768px) 90vw, (max-width: 1024px) 700px, (max-width: 1280px) 610px, 740px"
+              className="object-contain"
             />
           </div>
         ))}
