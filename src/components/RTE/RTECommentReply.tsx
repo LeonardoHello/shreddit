@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { useCommentContext } from "@/context/CommentContextProvider";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
+import { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
 
 const extensions = [

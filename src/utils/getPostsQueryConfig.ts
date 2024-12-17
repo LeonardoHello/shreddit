@@ -1,9 +1,4 @@
-import {
-  DBQueryConfig,
-  ExtractTablesWithRelations,
-  RelationTableAliasProxyHandler,
-  sql,
-} from "drizzle-orm";
+import { DBQueryConfig, ExtractTablesWithRelations, sql } from "drizzle-orm";
 
 import type * as schema from "../db/schema";
 
@@ -62,7 +57,8 @@ export const postQueryConfig = {
     author: { columns: { name: true } },
     files: true,
   },
-  // @ts-expect-error
+  // TODO
+  // @ts-expect-error extra config is untyped
   extras: (post, { sql }) => ({
     voteCount: sql<number>`
 				 (
