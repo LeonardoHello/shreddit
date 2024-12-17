@@ -68,6 +68,7 @@ const InfiniteQueryUserPosts = memo(function InfiniteQueryUserPosts({
     },
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
+    staleTime: 0,
     refetchOnWindowFocus: false,
   });
 

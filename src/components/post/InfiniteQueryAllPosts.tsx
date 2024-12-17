@@ -62,6 +62,7 @@ const InfiniteQueryAllPosts = memo(function InfiniteQueryAllPosts({
     },
     getNextPageParam: (lastPage) => lastPage?.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
+    staleTime: 0,
     refetchOnWindowFocus: false,
   });
 
