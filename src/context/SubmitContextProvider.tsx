@@ -48,76 +48,40 @@ type ReducerAction = {
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
     case REDUCER_ACTION_TYPE.CHANGED_COMMUNITY:
-      return {
-        ...state,
-        community: action.nextCommunity,
-      };
+      return { ...state, community: action.nextCommunity };
 
     case REDUCER_ACTION_TYPE.CHANGED_TITLE:
-      return {
-        ...state,
-        title: action.nextTitle,
-      };
+      return { ...state, title: action.nextTitle };
 
     case REDUCER_ACTION_TYPE.CHANGED_TEXT:
-      return {
-        ...state,
-        text: action.nextText,
-      };
+      return { ...state, text: action.nextText };
 
     case REDUCER_ACTION_TYPE.CHANGED_FILES:
-      return {
-        ...state,
-        files: action.nextFiles,
-      };
+      return { ...state, files: action.nextFiles };
 
     case REDUCER_ACTION_TYPE.ADDED_FILES:
-      return {
-        ...state,
-        files: state.files.concat(action.nextFiles),
-      };
+      return { ...state, files: state.files.concat(action.nextFiles) };
 
     case REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT:
-      return {
-        ...state,
-        isMediaSubmit: !state.isMediaSubmit,
-      };
+      return { ...state, isMediaSubmit: !state.isMediaSubmit };
 
     case REDUCER_ACTION_TYPE.TOGGLED_SPOILER:
-      return {
-        ...state,
-        spoiler: !state.spoiler,
-      };
+      return { ...state, spoiler: !state.spoiler };
 
     case REDUCER_ACTION_TYPE.TOGGLED_NSFW:
-      return {
-        ...state,
-        nsfw: !state.nsfw,
-      };
+      return { ...state, nsfw: !state.nsfw };
 
     case REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY:
-      return {
-        ...state,
-        search: action.nextSearch,
-      };
+      return { ...state, search: action.nextSearch };
 
     case REDUCER_ACTION_TYPE.STARTED_UPLOAD:
-      return {
-        ...state,
-        isUploading: true,
-      };
+      return { ...state, isUploading: true };
 
     case REDUCER_ACTION_TYPE.STOPPED_UPLOAD:
-      return {
-        ...state,
-        isUploading: false,
-      };
+      return { ...state, isUploading: false };
 
     case REDUCER_ACTION_TYPE.STARTED_MUTATE:
-      return {
-        ...state,
-        isMutating: true,
-      };
+      return { ...state, isMutating: true };
 
     default:
       throw Error("Unknown action");
