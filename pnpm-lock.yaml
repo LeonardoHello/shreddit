@@ -63,7 +63,7 @@ importers:
         specifier: ^0.0.1
         version: 0.0.1
       clsx:
-        specifier: ^2.0.0
+        specifier: ^2.1.1
         version: 2.1.1
       drizzle-orm:
         specifier: ^0.38.2
@@ -96,7 +96,7 @@ importers:
         specifier: ^1.44.0
         version: 1.44.0
       tailwind-merge:
-        specifier: ^2.0.0
+        specifier: ^2.5.5
         version: 2.5.5
       uploadthing:
         specifier: ^7.4.1
