@@ -44,6 +44,7 @@ export default function RTEPost() {
   const { dispatch } = useSubmitContext();
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions,
     editorProps: {
       attributes: {

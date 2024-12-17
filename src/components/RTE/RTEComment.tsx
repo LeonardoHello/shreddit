@@ -31,6 +31,7 @@ const extensions = [
 
 export default function RTEComment({ postId }: { postId: Post["id"] }) {
   const editor = useEditor({
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
