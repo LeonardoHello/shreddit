@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { PlusIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 import { ChartBarIcon, HomeIcon } from "@heroicons/react/24/solid";
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
 import {
@@ -22,18 +22,15 @@ import { SortPosts, type QueryInfo } from "@/types";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function AllPage(
-  props: {
-    searchParams: Promise<{ sort: SortPosts }>;
-  }
-) {
+export default async function AllPage(props: {
+  searchParams: Promise<{ sort: SortPosts }>;
+}) {
   const searchParams = await props.searchParams;
-  const { userId } = auth();
 
-  const { sort } = searchParams;
+  const { userId } = await auth();
 
   let postsData;
-  switch (sort) {
+  switch (searchParams.sort) {
     case SortPosts.HOT:
       postsData = getAllHotPosts.execute({
         offset: 0,
@@ -70,7 +67,7 @@ export default async function AllPage(
 
   const queryInfo: QueryInfo<"getAllPosts"> = {
     procedure: "getAllPosts",
-    input: { sort },
+    input: { sort: searchParams.sort },
   };
 
   return (
@@ -123,7 +120,7 @@ export default async function AllPage(
       </div>
 
       {posts.length === 0 ? (
-        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+        <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryAllPosts
           currentUserId={userId}

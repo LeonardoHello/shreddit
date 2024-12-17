@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
 import {
@@ -22,20 +22,17 @@ import { SortPosts, type QueryInfo } from "@/types";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function HomePage(
-  props: {
-    searchParams: Promise<{ sort: SortPosts }>;
-  }
-) {
+export default async function HomePage(props: {
+  searchParams: Promise<{ sort: SortPosts }>;
+}) {
   const searchParams = await props.searchParams;
-  const { userId } = auth();
+
+  const { userId } = await auth();
 
   if (userId === null) throw new Error("Could not load home page information.");
 
-  const { sort } = searchParams;
-
   let postsData;
-  switch (sort) {
+  switch (searchParams.sort) {
     case SortPosts.HOT:
       postsData = getHomeHotPosts.execute({
         offset: 0,
@@ -78,7 +75,7 @@ export default async function HomePage(
 
   const queryInfo: QueryInfo<"getHomePosts"> = {
     procedure: "getHomePosts",
-    input: { sort },
+    input: { sort: searchParams.sort },
   };
 
   return (
@@ -127,7 +124,7 @@ export default async function HomePage(
       </div>
 
       {posts.length === 0 ? (
-        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+        <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryPostsHome
           currentUserId={userId}

@@ -1,18 +1,18 @@
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import type { getComments } from "@/api/getComment";
 import Comment from "@/components/comment/Comment";
 
 type Comments = Awaited<ReturnType<typeof getComments.execute>>;
 
-export default function Comments({
+export default async function Comments({
   comments,
   replies,
 }: {
   comments: Comments;
   replies: Comments;
 }) {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (comments.length === 0)
     return (

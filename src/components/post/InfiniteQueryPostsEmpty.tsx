@@ -12,8 +12,8 @@ export default function InfiniteQueryPostsEmpty({
   params,
   searchParams,
 }: {
-  params?: { userName?: User["name"]; communityName?: Community["name"] };
-  searchParams?: { sort?: SortPosts; filter?: UserPostsFilter };
+  params: { userName?: User["name"]; communityName?: Community["name"] };
+  searchParams: { sort?: SortPosts; filter?: UserPostsFilter };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
@@ -36,16 +36,16 @@ export default function InfiniteQueryPostsEmpty({
       ))}
       <div className="absolute top-1/4 flex flex-col items-center gap-2 self-center p-12 text-center">
         <h1 className="text-lg font-medium">
-          hmm... looks like nothing has been {searchParams?.filter || "posted"}{" "}
+          hmm... looks like nothing has been {searchParams.filter || "posted"}{" "}
           yet
         </h1>
-        {!(params?.userName || searchParams?.filter) && (
+        {!(params.userName || searchParams.filter) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
             <Link
               href={{
                 pathname: "/submit",
-                query: { community: params?.communityName },
+                query: { community: params.communityName },
               }}
               className="rounded-full"
             >

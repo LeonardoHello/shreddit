@@ -1,6 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import { getUserByName } from "@/api/getUser";
 import FeedInput from "@/components/feed/FeedInput";
@@ -17,20 +17,16 @@ import getUserPosts from "@/utils/getUserPosts";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function UserPage(
-  props: {
-    params: Promise<{ userName: string }>;
-    searchParams: Promise<{ sort: SortPosts; filter: UserPostsFilter }>;
-  }
-) {
+export default async function UserPage(props: {
+  params: Promise<{ userName: string }>;
+  searchParams: Promise<{ sort: SortPosts; filter: UserPostsFilter }>;
+}) {
   const searchParams = await props.searchParams;
   const params = await props.params;
-  const { userName } = params;
-  const { sort, filter } = searchParams;
 
   const user = await getUserByName
     .execute({
-      userName,
+      userName: params.userName,
     })
     .catch(() => {
       throw new Error("There was a problem with loading user information.");
@@ -38,16 +34,16 @@ export default async function UserPage(
 
   if (user === undefined) notFound();
 
-  const { userId } = auth();
+  const { userId } = await auth();
 
-  if (user.id !== userId && filter === "hidden")
-    permanentRedirect(`/u/${userName}`);
+  if (user.id !== userId && searchParams.filter === "hidden")
+    permanentRedirect(`/u/${params.userName}`);
 
   const posts = await getUserPosts({
     userId: user.id,
-    userName,
-    filter,
-    sort,
+    userName: params.userName,
+    filter: searchParams.filter,
+    sort: searchParams.sort,
   }).catch(() => {
     throw new Error("There was a problem with loading post information.");
   });
@@ -59,14 +55,19 @@ export default async function UserPage(
 
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
-    input: { userId: user.id, userName, filter, sort },
+    input: {
+      userId: user.id,
+      userName: params.userName,
+      filter: searchParams.filter,
+      sort: searchParams.sort,
+    },
   };
 
   return (
     <>
       <UserNavigation
-        userName={userName}
-        filter={filter}
+        userName={params.userName}
+        filter={searchParams.filter}
         isCurrentUser={user.id === userId}
       />
 
@@ -83,7 +84,10 @@ export default async function UserPage(
         </div>
 
         {posts.length === 0 ? (
-          <InfiniteQueryPostsEmpty searchParams={searchParams} />
+          <InfiniteQueryPostsEmpty
+            params={params}
+            searchParams={searchParams}
+          />
         ) : (
           <InfiniteQueryUserPosts
             currentUserId={userId}

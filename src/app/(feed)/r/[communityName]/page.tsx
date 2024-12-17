@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import {
   getCommunityBestPosts,
@@ -13,15 +13,14 @@ import InfiniteQueryCommunityPosts from "@/components/post/InfiniteQueryCommunit
 import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
-export default async function CommunityPage(
-  props: {
-    params: Promise<{ communityName: string }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  }
-) {
-  const searchParams = await props.searchParams;
+export default async function CommunityPage(props: {
+  params: Promise<{ communityName: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const params = await props.params;
-  const { userId } = auth();
+  const searchParams = await props.searchParams;
+
+  const { userId } = await auth();
 
   const { communityName } = params;
   const { sort } = searchParams;
@@ -81,7 +80,7 @@ export default async function CommunityPage(
       </div>
 
       {posts.length === 0 ? (
-        <InfiniteQueryPostsEmpty searchParams={searchParams} />
+        <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryCommunityPosts
           currentUserId={userId}

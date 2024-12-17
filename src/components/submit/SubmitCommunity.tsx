@@ -19,9 +19,8 @@ export default function SubmitCommunity({
 }: {
   children: React.ReactNode;
 }) {
-  const { dropdownRef, isOpen, setIsOpen } = useDropdown();
-
   const { state } = useSubmitContext();
+  const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   return (
     <div

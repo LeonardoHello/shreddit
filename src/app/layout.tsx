@@ -16,6 +16,8 @@ import cn from "@/utils/cn";
 
 import "./globals.css";
 
+import { Suspense } from "react";
+
 const nunito_sans = Roboto_Flex({
   subsets: ["latin"],
 });
@@ -33,6 +35,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider
+      dynamic
       appearance={{
         baseTheme: dark,
         layout: {
@@ -62,8 +65,12 @@ export default function RootLayout({
           />
           <TRPCProvider>
             {/* Modal components */}
-            <CommunityCreate />
-            <PremiumPurchase />
+            <Suspense>
+              <CommunityCreate />
+            </Suspense>
+            <Suspense>
+              <PremiumPurchase />
+            </Suspense>
 
             <Header />
             <main className="relative grow overflow-y-scroll">{children}</main>

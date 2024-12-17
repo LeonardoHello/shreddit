@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, Suspense } from "react";
 
 import PostContextProvider from "@/context/PostContextProvider";
 import type { Post, User } from "@/db/schema";
@@ -39,12 +39,14 @@ export default memo(function Post({
         <div className="flex w-0 grow flex-col gap-1">
           <PostMetadata />
           <PostContent />
-          <PostActions
-            currentUserId={currentUserId}
-            removePostFromQuery={removePostFromQuery}
-          >
-            <PostActionsDropdown removePostFromQuery={removePostFromQuery} />
-          </PostActions>
+          <Suspense>
+            <PostActions
+              currentUserId={currentUserId}
+              removePostFromQuery={removePostFromQuery}
+            >
+              <PostActionsDropdown removePostFromQuery={removePostFromQuery} />
+            </PostActions>
+          </Suspense>
         </div>
       </div>
     </PostContextProvider>

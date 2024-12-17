@@ -1,35 +1,30 @@
 import { NextResponse } from "next/server";
 
-import { authMiddleware, redirectToSignIn } from "@clerk/nextjs";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export default authMiddleware({
-  publicRoutes: [
-    "/",
-    "/u/:userName",
-    "/r/:communityName",
-    "/post/:postId",
-    "/api/webhooks/(.*)",
-    "/api/uploadthing",
-    "/api/cron",
-  ],
-  afterAuth: (auth, req) => {
-    if (!auth.userId) {
-      if (!auth.isPublicRoute) {
-        if (req.nextUrl.pathname === "/home") {
-          const unauthenticatedHomePage = new URL("/", req.nextUrl.origin);
-          return NextResponse.redirect(unauthenticatedHomePage, {
-            status: 301,
-          });
-        } else if (req.nextUrl.pathname.endsWith("/submit")) {
-          return redirectToSignIn({ returnBackUrl: req.url });
-        }
-      } else if (req.nextUrl.searchParams.get("submit") === "community") {
-        return redirectToSignIn({ returnBackUrl: req.url });
-      }
+const isProtectedRoute = createRouteMatcher(["/home(.*)", "/submit(.*)"]);
+
+export default clerkMiddleware(async (auth, req) => {
+  const { userId, redirectToSignIn } = await auth();
+
+  if (!userId && isProtectedRoute(req)) {
+    // Add custom logic to run before redirecting
+
+    if (req.nextUrl.pathname === "/home") {
+      return NextResponse.redirect(new URL("/", req.url), {
+        status: 301,
+      });
     }
-  },
+
+    return redirectToSignIn();
+  }
 });
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

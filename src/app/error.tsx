@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 
-type Params = {
-  error: Error;
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
   reset: () => void;
-};
-
-export default function Error({ error, reset }: Params) {
+}) {
   return (
     <main className="grid min-h-screen place-items-center px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center">

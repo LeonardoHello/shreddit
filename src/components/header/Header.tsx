@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import {
   getFavoriteCommunities,
@@ -18,8 +18,8 @@ import SignInButton from "./SignInButton";
 
 const MenuCommunities = dynamic(() => import("../menu/MenuCommunities"));
 
-export default function Header() {
-  const { userId } = auth();
+export default async function Header() {
+  const { userId } = await auth();
 
   return (
     <header

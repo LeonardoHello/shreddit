@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import { getComments } from "@/api/getComment";
 import { getPostById } from "@/api/getPost";
@@ -10,25 +10,19 @@ import Comments from "@/components/comment/Comments";
 import Post from "@/components/post/Post";
 import RTEComment from "@/components/RTE/RTEComment";
 
-export default async function PostPage(
-  props: {
-    params: Promise<{ postId: string }>;
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-  }
-) {
+export default async function PostPage(props: {
+  params: Promise<{ postId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const searchParams = await props.searchParams;
   const params = await props.params;
 
-  const {
-    postId
-  } = params;
-
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const [user, post, comments] = await Promise.all([
     getUserById.execute({ currentUserId: userId }),
-    getPostById.execute({ postId }),
-    getComments.execute({ postId }),
+    getPostById.execute({ postId: params.postId }),
+    getComments.execute({ postId: params.postId }),
   ]).catch((err) => {
     throw new Error(err);
   });

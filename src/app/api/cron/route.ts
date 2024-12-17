@@ -2,9 +2,6 @@ import { UTApi } from "uploadthing/server";
 
 import { getFiles } from "@/api/getFiles";
 
-export const runtime = "edge";
-export const preferredRegion = ["fra1"];
-
 export async function GET() {
   const utapi = new UTApi();
   const files = await getFiles;

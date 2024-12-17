@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 import { getCommunityByName } from "@/api/getCommunity";
 import CommunityAbout from "@/components/community/CommunityAbout";
@@ -11,23 +11,16 @@ import ScrollToTop from "@/components/feed/ScrollToTop";
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function CommunityLayout(
-  props: {
-    params: Promise<{ communityName: string }>;
-    children: React.ReactNode;
-  }
-) {
+export default async function CommunityLayout(props: {
+  params: Promise<{ communityName: string }>;
+  children: React.ReactNode;
+}) {
   const params = await props.params;
 
-  const {
-    children
-  } = props;
-
-  const { userId } = auth();
-  const { communityName } = params;
+  const { userId } = await auth();
 
   const community = await getCommunityByName.execute({
-    communityName,
+    communityName: params.communityName,
   });
 
   if (community === undefined) return notFound();
@@ -90,7 +83,7 @@ export default async function CommunityLayout(
               <Link
                 href={{
                   pathname: "/submit",
-                  query: { community: communityName },
+                  query: { community: params.communityName },
                 }}
                 className="rounded-full"
               >
@@ -103,7 +96,7 @@ export default async function CommunityLayout(
           <ScrollToTop />
         </div>
 
-        {children}
+        {props.children}
       </div>
     </>
   );
