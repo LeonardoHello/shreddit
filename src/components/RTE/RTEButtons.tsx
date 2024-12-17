@@ -26,7 +26,7 @@ export function RTEButtonsInline({
   children?: React.ReactNode;
   editor: Editor;
 }) {
-  const setActive = (name: string, attributes?: {} | undefined) =>
+  const setActive = (name: string, attributes?: object | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
       "#71717a": !editor.isActive(name, attributes),
@@ -138,7 +138,7 @@ export function RTEButtonsNode({
   children?: React.ReactNode;
   editor: Editor;
 }) {
-  const setActive = (name: string, attributes?: {} | undefined) =>
+  const setActive = (name: string, attributes?: object | undefined) =>
     cn({
       "#d4d4d8": editor.isActive(name, attributes),
       "#71717a": !editor.isActive(name, attributes),
