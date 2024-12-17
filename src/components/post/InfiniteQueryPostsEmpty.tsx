@@ -6,14 +6,14 @@ import {
 } from "@heroicons/react/24/outline";
 
 import type { Community, User } from "@/db/schema";
-import { SortPosts, UserPostsFilter } from "@/types";
+import { FilterPosts, SortPosts } from "@/types";
 
 export default function InfiniteQueryPostsEmpty({
   params,
   searchParams,
 }: {
   params: { userName?: User["name"]; communityName?: Community["name"] };
-  searchParams: { sort?: SortPosts; filter?: UserPostsFilter };
+  searchParams: { sort?: SortPosts; filter?: FilterPosts };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">

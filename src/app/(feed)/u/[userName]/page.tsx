@@ -11,7 +11,7 @@ import InfiniteQueryUserPosts from "@/components/post/InfiniteQueryUserPosts";
 import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";
-import type { QueryInfo, SortPosts, UserPostsFilter } from "@/types";
+import type { FilterPosts, QueryInfo, SortPosts } from "@/types";
 import getUserPosts from "@/utils/getUserPosts";
 
 export const runtime = "edge";
@@ -19,7 +19,7 @@ export const preferredRegion = ["fra1"];
 
 export default async function UserPage(props: {
   params: Promise<{ userName: string }>;
-  searchParams: Promise<{ sort: SortPosts; filter: UserPostsFilter }>;
+  searchParams: Promise<{ sort: SortPosts; filter: FilterPosts }>;
 }) {
   const searchParams = await props.searchParams;
   const params = await props.params;

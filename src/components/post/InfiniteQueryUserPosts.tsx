@@ -9,9 +9,9 @@ import type { Post, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterOutput } from "@/trpc/routers/_app";
 import type {
+  FilterPosts,
   InfiniteQueryPostProcedure,
   QueryInfo,
-  UserPostsFilter,
 } from "@/types";
 import PostsInfiniteQueryLoading from "./InfiniteQueryPostsLoading";
 import PostComponent from "./Post";
@@ -20,7 +20,7 @@ type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
   initialPosts: RouterOutput["infiniteQueryPosts"][T];
   queryInfo: QueryInfo<T>;
-  searchParams: { filter: UserPostsFilter };
+  searchParams: { filter: FilterPosts };
 };
 
 const InfiniteQueryUserPosts = memo(function InfiniteQueryUserPosts({

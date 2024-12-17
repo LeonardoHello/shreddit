@@ -29,7 +29,7 @@ import {
   getUserNewPosts,
 } from "../api/getPosts/getUserPosts";
 import { User } from "../db/schema";
-import { SortPosts, UserPostsFilter } from "../types";
+import { FilterPosts, SortPosts } from "../types";
 
 export default async function getUserPosts({
   userId,
@@ -45,7 +45,7 @@ export default async function getUserPosts({
   sort?: string | string[] | undefined;
 }) {
   switch (filter) {
-    case UserPostsFilter.SAVED:
+    case FilterPosts.SAVED:
       switch (sort) {
         case SortPosts.HOT:
           return getSavedHotPosts.execute({
@@ -72,7 +72,7 @@ export default async function getUserPosts({
           });
       }
 
-    case UserPostsFilter.HIDDEN:
+    case FilterPosts.HIDDEN:
       switch (sort) {
         case SortPosts.HOT:
           return getHiddenHotPosts.execute({
@@ -99,7 +99,7 @@ export default async function getUserPosts({
           });
       }
 
-    case UserPostsFilter.UPVOTED:
+    case FilterPosts.UPVOTED:
       switch (sort) {
         case SortPosts.HOT:
           return getUpvotedHotPosts.execute({
@@ -126,7 +126,7 @@ export default async function getUserPosts({
           });
       }
 
-    case UserPostsFilter.DOWNVOTED:
+    case FilterPosts.DOWNVOTED:
       switch (sort) {
         case SortPosts.HOT:
           return getDownvotedHotPosts.execute({
