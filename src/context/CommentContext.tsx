@@ -4,13 +4,15 @@ import type { RouterOutput } from "@/trpc/routers/_app";
 
 type Comment = NonNullable<RouterOutput["getComment"]>;
 
-const CommentContext = createContext<{
+type CommentContextType = {
   comment: Comment;
   editable: boolean;
   setEditable: React.Dispatch<React.SetStateAction<boolean>>;
   reply: boolean;
   setReply: React.Dispatch<React.SetStateAction<boolean>>;
-} | null>(null);
+};
+
+const CommentContext = createContext<CommentContextType | null>(null);
 
 export default function CommentContextProvider({
   comment,
@@ -23,11 +25,9 @@ export default function CommentContextProvider({
   const [reply, setReply] = useState(false);
 
   return (
-    <CommentContext.Provider
-      value={{ comment, editable, setEditable, reply, setReply }}
-    >
+    <CommentContext value={{ comment, editable, setEditable, reply, setReply }}>
       {children}
-    </CommentContext.Provider>
+    </CommentContext>
   );
 }
 

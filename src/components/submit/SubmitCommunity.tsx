@@ -5,10 +5,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 
-import {
-  REDUCER_ACTION_TYPE,
-  useSubmitContext,
-} from "@/context/SubmitContextProvider";
+import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";

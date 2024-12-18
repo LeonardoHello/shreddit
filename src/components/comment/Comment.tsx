@@ -1,6 +1,6 @@
 "use client";
 
-import CommentContextProvider from "@/context/CommentContextProvider";
+import CommentContextProvider from "@/context/CommentContext";
 import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";

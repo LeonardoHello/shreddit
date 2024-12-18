@@ -1,4 +1,4 @@
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import RTECommentEdit from "../RTE/RTECommentEdit";
 
 export default function CommentContent() {

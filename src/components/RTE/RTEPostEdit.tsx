@@ -17,8 +17,8 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-import { useFilesContext } from "@/context/FilesContextProvider";
-import { usePostContext } from "@/context/PostContextProvider";
+import { useFilesContext } from "@/context/FilesContext";
+import { usePostContext } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";

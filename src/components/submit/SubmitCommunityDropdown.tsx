@@ -8,10 +8,7 @@ import { toast } from "sonner";
 
 import type { getYourCommunities } from "@/api/getCommunities";
 import type { getUserById } from "@/api/getUser";
-import {
-  REDUCER_ACTION_TYPE,
-  useSubmitContext,
-} from "@/context/SubmitContextProvider";
+import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";

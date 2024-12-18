@@ -15,7 +15,7 @@ import {
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";

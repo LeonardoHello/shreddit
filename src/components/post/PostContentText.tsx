@@ -1,6 +1,6 @@
 import { useParams } from "next/navigation";
 
-import { usePostContext } from "@/context/PostContextProvider";
+import { usePostContext } from "@/context/PostContext";
 
 export default function PostContentText() {
   const { postId } = useParams();

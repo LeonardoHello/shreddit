@@ -7,7 +7,7 @@ import {
   ArrowRightCircleIcon,
 } from "@heroicons/react/24/solid";
 
-import { usePostContext } from "@/context/PostContextProvider";
+import { usePostContext } from "@/context/PostContext";
 import cn from "@/utils/cn";
 
 export default memo(function PostContentMedia() {

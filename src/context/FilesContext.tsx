@@ -4,12 +4,14 @@ import type { File } from "../db/schema";
 
 type Files = Omit<File, "id" | "postId">[];
 
-const FilesContext = createContext<{
+type FilesContextType = {
   files: Files;
   setFiles: React.Dispatch<React.SetStateAction<Files>>;
   isUploading: boolean;
   setIsUploading: React.Dispatch<React.SetStateAction<boolean>>;
-} | null>(null);
+};
+
+const FilesContext = createContext<FilesContextType | null>(null);
 
 export default function FilesContextProvider({
   initialFiles,
@@ -22,11 +24,9 @@ export default function FilesContextProvider({
   const [isUploading, setIsUploading] = useState(false);
 
   return (
-    <FilesContext.Provider
-      value={{ files, setFiles, isUploading, setIsUploading }}
-    >
+    <FilesContext value={{ files, setFiles, isUploading, setIsUploading }}>
       {children}
-    </FilesContext.Provider>
+    </FilesContext>
   );
 }
 

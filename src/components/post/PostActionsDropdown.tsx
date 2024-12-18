@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { usePostContext } from "@/context/PostContextProvider";
+import { usePostContext } from "@/context/PostContext";
 import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterInput } from "@/trpc/routers/_app";

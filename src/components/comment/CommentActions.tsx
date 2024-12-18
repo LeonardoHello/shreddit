@@ -3,7 +3,7 @@ import {
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
 
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import type { User } from "@/db/schema";
 import useDropdown from "@/hooks/useDropdown";
 import CommentVote from "./CommentVote";

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 

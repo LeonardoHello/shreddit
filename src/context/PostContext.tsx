@@ -4,11 +4,13 @@ import type { RouterOutput } from "@/trpc/routers/_app";
 
 type Post = NonNullable<RouterOutput["getPost"]>;
 
-const PostContext = createContext<{
+type PostContextType = {
   post: Post;
   editable: boolean;
   setEditable: React.Dispatch<React.SetStateAction<boolean>>;
-} | null>(null);
+};
+
+const PostContext = createContext<PostContextType | null>(null);
 
 export default function PostContextProvider({
   post,
@@ -22,9 +24,9 @@ export default function PostContextProvider({
   const [editable, setEditable] = useState(initialEdit);
 
   return (
-    <PostContext.Provider value={{ post, editable, setEditable }}>
+    <PostContext value={{ post, editable, setEditable }}>
       {children}
-    </PostContext.Provider>
+    </PostContext>
   );
 }
 

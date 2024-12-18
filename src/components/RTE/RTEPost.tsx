@@ -20,10 +20,7 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-import {
-  REDUCER_ACTION_TYPE,
-  useSubmitContext,
-} from "@/context/SubmitContextProvider";
+import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";

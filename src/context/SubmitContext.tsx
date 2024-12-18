@@ -88,10 +88,12 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   }
 }
 
-const SubmitContext = createContext<{
+type SubmitContextType = {
   state: ReducerState;
   dispatch: React.Dispatch<ReducerAction>;
-} | null>(null);
+};
+
+const SubmitContext = createContext<SubmitContextType | null>(null);
 
 export default function SubmitContextProvider({
   initialSelectedCommunity,
@@ -115,11 +117,7 @@ export default function SubmitContextProvider({
     isMediaSubmit: initialSubmit === "media",
   });
 
-  return (
-    <SubmitContext.Provider value={{ state, dispatch }}>
-      {children}
-    </SubmitContext.Provider>
-  );
+  return <SubmitContext value={{ state, dispatch }}>{children}</SubmitContext>;
 }
 
 export function useSubmitContext() {

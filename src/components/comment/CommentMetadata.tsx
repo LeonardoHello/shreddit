@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import dot from "@public/dot.svg";

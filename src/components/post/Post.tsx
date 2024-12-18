@@ -2,7 +2,7 @@
 
 import { memo, Suspense } from "react";
 
-import PostContextProvider from "@/context/PostContextProvider";
+import PostContextProvider from "@/context/PostContext";
 import type { Post, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterOutput } from "@/trpc/routers/_app";

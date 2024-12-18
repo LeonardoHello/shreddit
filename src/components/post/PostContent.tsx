@@ -1,5 +1,5 @@
-import FilesContextProvider from "@/context/FilesContextProvider";
-import { usePostContext } from "@/context/PostContextProvider";
+import FilesContextProvider from "@/context/FilesContext";
+import { usePostContext } from "@/context/PostContext";
 import RTEPostEdit from "../RTE/RTEPostEdit";
 import PostContentMedia from "./PostContentMedia";
 import PostContentText from "./PostContentText";

@@ -10,7 +10,7 @@ import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
 import SubmitContent from "@/components/submit/SubmitContent";
 import SubmitMenu from "@/components/submit/SubmitMenu";
-import SubmitContextProvider from "@/context/SubmitContextProvider";
+import SubmitContextProvider from "@/context/SubmitContext";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";

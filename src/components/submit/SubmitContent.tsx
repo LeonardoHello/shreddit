@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { CheckIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import {
-  REDUCER_ACTION_TYPE,
-  useSubmitContext,
-} from "@/context/SubmitContextProvider";
+import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import RTEPost from "../RTE/RTEPost";

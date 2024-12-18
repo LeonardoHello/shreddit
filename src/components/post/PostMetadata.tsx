@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { usePostContext } from "@/context/PostContextProvider";
+import { usePostContext } from "@/context/PostContext";
 import useHydration from "@/hooks/useHydration";
 import cn from "@/utils/cn";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";

@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContextProvider";
+import { useCommentContext } from "@/context/CommentContext";
 import { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
