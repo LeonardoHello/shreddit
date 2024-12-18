@@ -3,7 +3,7 @@ import {
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
-export default function PostsInfiniteQueryLoading() {
+export default function InfiniteQueryPostsLoading() {
   return (
     <div className="relative h-48">
       <div className="absolute left-0 top-0 flex h-96 w-full cursor-pointer gap-4 rounded border border-zinc-700/70 bg-zinc-900 p-2 hover:border-zinc-500">

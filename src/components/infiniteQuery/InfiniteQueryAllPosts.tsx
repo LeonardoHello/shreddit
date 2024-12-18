@@ -9,8 +9,8 @@ import type { Post, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterOutput } from "@/trpc/routers/_app";
 import type { InfiniteQueryPostProcedure, QueryInfo } from "@/types";
-import PostsInfiniteQueryLoading from "../post/InfiniteQueryPostsLoading";
 import PostComponent from "../post/Post";
+import PostsInfiniteQueryLoading from "./InfiniteQueryPostsLoading";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
