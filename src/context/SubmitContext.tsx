@@ -20,30 +20,43 @@ export enum REDUCER_ACTION_TYPE {
   CHANGED_TEXT,
   CHANGED_FILES,
   ADDED_FILES,
+  SEARCHED_COMMUNITY,
   TOGGLED_MEDIA_SUBMIT,
   TOGGLED_SPOILER,
   TOGGLED_NSFW,
-  SEARCHED_COMMUNITY,
   STARTED_UPLOAD,
   STOPPED_UPLOAD,
   STARTED_MUTATE,
 }
 
-type ReducerAction = {
-  [K in REDUCER_ACTION_TYPE]: K extends REDUCER_ACTION_TYPE.CHANGED_TITLE
-    ? { type: K; nextTitle: ReducerState["title"] }
-    : K extends REDUCER_ACTION_TYPE.CHANGED_COMMUNITY
-      ? { type: K; nextCommunity: ReducerState["community"] }
-      : K extends REDUCER_ACTION_TYPE.CHANGED_TEXT
-        ? { type: K; nextText: ReducerState["text"] }
-        : K extends REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY
-          ? { type: K; nextSearch: string }
-          : K extends REDUCER_ACTION_TYPE.CHANGED_FILES
-            ? { type: K; nextFiles: ReducerState["files"] }
-            : K extends REDUCER_ACTION_TYPE.ADDED_FILES
-              ? { type: K; nextFiles: ReducerState["files"] }
-              : { type: K };
-}[REDUCER_ACTION_TYPE];
+type ReducerAction =
+  | {
+      type: typeof REDUCER_ACTION_TYPE.CHANGED_COMMUNITY;
+      nextCommunity: ReducerState["community"];
+    }
+  | {
+      type: typeof REDUCER_ACTION_TYPE.CHANGED_TITLE;
+      nextTitle: ReducerState["title"];
+    }
+  | {
+      type: typeof REDUCER_ACTION_TYPE.CHANGED_TEXT;
+      nextText: ReducerState["text"];
+    }
+  | {
+      type: typeof REDUCER_ACTION_TYPE.CHANGED_FILES;
+      nextFiles: ReducerState["files"];
+    }
+  | {
+      type: typeof REDUCER_ACTION_TYPE.ADDED_FILES;
+      nextFiles: ReducerState["files"];
+    }
+  | { type: typeof REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY; nextSearch: string }
+  | { type: typeof REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT }
+  | { type: typeof REDUCER_ACTION_TYPE.TOGGLED_SPOILER }
+  | { type: typeof REDUCER_ACTION_TYPE.TOGGLED_NSFW }
+  | { type: typeof REDUCER_ACTION_TYPE.STARTED_UPLOAD }
+  | { type: typeof REDUCER_ACTION_TYPE.STOPPED_UPLOAD }
+  | { type: typeof REDUCER_ACTION_TYPE.STARTED_MUTATE };
 
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
@@ -88,12 +101,10 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   }
 }
 
-type SubmitContextType = {
-  state: ReducerState;
-  dispatch: React.Dispatch<ReducerAction>;
-};
+const SubmitContext = createContext<ReducerState | null>(null);
 
-const SubmitContext = createContext<SubmitContextType | null>(null);
+const SubmitDispatchContext =
+  createContext<React.Dispatch<ReducerAction> | null>(null);
 
 export default function SubmitContextProvider({
   initialSelectedCommunity,
@@ -117,14 +128,28 @@ export default function SubmitContextProvider({
     isMediaSubmit: initialSubmit === "media",
   });
 
-  return <SubmitContext value={{ state, dispatch }}>{children}</SubmitContext>;
+  return (
+    <SubmitContext value={state}>
+      <SubmitDispatchContext value={dispatch}>{children}</SubmitDispatchContext>
+    </SubmitContext>
+  );
 }
 
-export function useSubmitContext() {
+export function useSubmit() {
   const context = useContext(SubmitContext);
 
   if (!context) {
     throw new Error("useSubmitContext is used outside it's provider");
+  }
+
+  return context;
+}
+
+export function useSubmitDispatch() {
+  const context = useContext(SubmitDispatchContext);
+
+  if (!context) {
+    throw new Error("SubmitDispatchContext is used outside it's provider");
   }
 
   return context;

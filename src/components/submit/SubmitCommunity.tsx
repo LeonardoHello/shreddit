@@ -5,7 +5,12 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import { getSelectedCommunity } from "@/api/getCommunity";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmit,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
@@ -16,7 +21,7 @@ export default function SubmitCommunity({
 }: {
   children: React.ReactNode;
 }) {
-  const { state } = useSubmitContext();
+  const state = useSubmit();
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   return (
@@ -55,7 +60,7 @@ export default function SubmitCommunity({
 }
 
 function SearchCommunity() {
-  const { dispatch } = useSubmitContext();
+  const dispatch = useSubmitDispatch();
 
   const utils = trpc.useUtils();
 
@@ -91,7 +96,7 @@ function SelectedCommunity({
   community,
 }: {
   community: NonNullable<
-    ReturnType<typeof useSubmitContext>["state"]["community"]
+    Awaited<ReturnType<typeof getSelectedCommunity.execute>>
   >;
 }) {
   return (

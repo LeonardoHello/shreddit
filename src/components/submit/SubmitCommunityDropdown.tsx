@@ -8,7 +8,11 @@ import { toast } from "sonner";
 
 import type { getYourCommunities } from "@/api/getCommunities";
 import type { getUserById } from "@/api/getUser";
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmit,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
@@ -24,7 +28,7 @@ export default function SubmitCommunityDropdown({
   user,
   yourCommunities,
 }: Props) {
-  const { state, dispatch } = useSubmitContext();
+  const dispatch = useSubmitDispatch();
 
   useEffect(() => {
     return () => {
@@ -62,7 +66,7 @@ export default function SubmitCommunityDropdown({
 
       <hr className="border-zinc-700" />
 
-      {state.search.length > 0 && <SearchedCommunities />}
+      <SearchedCommunities />
     </>
   );
 }
@@ -72,7 +76,8 @@ function YourCommunities({
 }: {
   yourCommunities: YourCommunities;
 }) {
-  const { state, dispatch } = useSubmitContext();
+  const state = useSubmit();
+  const dispatch = useSubmitDispatch();
 
   return (
     <div className="flex flex-col gap-3.5 px-2 pb-3 pt-4">
@@ -141,7 +146,12 @@ function YourCommunities({
 }
 
 function SearchedCommunities() {
-  const { state, dispatch } = useSubmitContext();
+  const state = useSubmit();
+  const dispatch = useSubmitDispatch();
+
+  if (!state.search) {
+    return null;
+  }
 
   const searchedCommunities = trpc.searchCommunities.useQuery(state.search, {
     initialData: [],

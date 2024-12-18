@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { CheckIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmit,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import RTEPost from "../RTE/RTEPost";
@@ -16,7 +20,8 @@ const maxTitleLength = 300;
 export default function SubmitContent() {
   const router = useRouter();
 
-  const { state, dispatch } = useSubmitContext();
+  const state = useSubmit();
+  const dispatch = useSubmitDispatch();
 
   const createFiles = trpc.createFile.useMutation({
     onError: (error) => {

@@ -20,7 +20,10 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
@@ -38,7 +41,7 @@ const extensions = [
 const toastId = "loading_toast";
 
 export default function RTEPost() {
-  const { dispatch } = useSubmitContext();
+  const dispatch = useSubmitDispatch();
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -91,7 +94,7 @@ export default function RTEPost() {
 }
 
 function RTEPostMenu({ editor }: { editor: Editor }) {
-  const { dispatch } = useSubmitContext();
+  const dispatch = useSubmitDispatch();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
@@ -193,7 +196,7 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
 }
 
 function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
-  const { dispatch } = useSubmitContext();
+  const dispatch = useSubmitDispatch();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {

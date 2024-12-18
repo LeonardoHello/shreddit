@@ -1,10 +1,15 @@
 import { toast } from "sonner";
 
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmit,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import { UploadDropzone } from "@/utils/uploadthing";
 
 export default function SubmitDropzone() {
-  const { state, dispatch } = useSubmitContext();
+  const state = useSubmit();
+  const dispatch = useSubmitDispatch();
 
   return (
     <UploadDropzone

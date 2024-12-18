@@ -6,13 +6,19 @@ import {
   PhotoIcon as PhotoIconSolid,
 } from "@heroicons/react/24/solid";
 
-import { REDUCER_ACTION_TYPE, useSubmitContext } from "@/context/SubmitContext";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmit,
+  useSubmitDispatch,
+} from "@/context/SubmitContext";
 import cn from "@/utils/cn";
 
 export default function SubmitMenu() {
-  const { state, dispatch } = useSubmitContext();
+  const state = useSubmit();
+  const dispatch = useSubmitDispatch();
 
   const disabled = state.isMutating || state.isUploading;
+
   return (
     <div className="flex font-bold">
       <button
