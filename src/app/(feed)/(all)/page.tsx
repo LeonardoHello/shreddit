@@ -15,8 +15,8 @@ import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/feed/PremiumButton";
 import ScrollToTop from "@/components/feed/ScrollToTop";
-import InfiniteQueryAllPosts from "@/components/post/InfiniteQueryAllPosts";
-import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
+import InfiniteQueryAllPosts from "@/components/infiniteQuery/InfiniteQueryAllPosts";
+import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
 export const runtime = "edge";

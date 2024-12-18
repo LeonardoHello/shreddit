@@ -13,8 +13,8 @@ import type {
   InfiniteQueryPostProcedure,
   QueryInfo,
 } from "@/types";
+import PostComponent from "../post/Post";
 import PostsInfiniteQueryLoading from "./InfiniteQueryPostsLoading";
-import PostComponent from "./Post";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;

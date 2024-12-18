@@ -9,8 +9,8 @@ import {
 import { getUserById } from "@/api/getUser";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
-import InfiniteQueryCommunityPosts from "@/components/post/InfiniteQueryCommunityPosts";
-import InfiniteQueryPostsEmpty from "@/components/post/InfiniteQueryPostsEmpty";
+import InfiniteQueryCommunityPosts from "@/components/infiniteQuery/InfiniteQueryCommunityPosts";
+import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
 import { SortPosts, type QueryInfo } from "@/types";
 
 export default async function CommunityPage(props: {
