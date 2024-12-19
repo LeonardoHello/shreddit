@@ -4,66 +4,56 @@ import { useRouter } from "next/navigation";
 
 import { CheckIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 
+import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   REDUCER_ACTION_TYPE,
   useSubmit,
   useSubmitDispatch,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
+import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
 import RTEPost from "../RTE/RTEPost";
 import Dropzone from "./SubmitDropzone";
 
 const maxTitleLength = 300;
 
-export default function SubmitContent() {
+export default function SubmitContent({
+  selectedCommunity,
+}: {
+  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
+}) {
   const router = useRouter();
 
   const state = useSubmit();
   const dispatch = useSubmitDispatch();
-
-  const createFiles = trpc.createFile.useMutation({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
   const createPost = trpc.createPost.useMutation({
     onMutate: () => {
       dispatch({ type: REDUCER_ACTION_TYPE.STARTED_MUTATE });
     },
     onSuccess: (data) => {
-      let files = state.files;
+      const [post] = data[0];
 
-      if (!state.isMediaSubmit) {
-        files = state.files.filter((file) =>
-          state.text?.includes(`<img src="${file.url}" alt="${file.name}">`),
-        );
-      }
-
-      if (files.length > 0) {
-        const filesToInsert = files.map((file) => ({
-          ...file,
-          postId: data[0].id,
-        }));
-
-        createFiles.mutate(filesToInsert);
-      }
-
-      router.push(`/r/${state.community?.name}/comments/${data[0].id}`);
+      router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
     },
     onError: (error) => {
       toast.error(error.message);
     },
+    onSettled: () => {
+      dispatch({ type: REDUCER_ACTION_TYPE.STOP_MUTATE });
+    },
   });
 
   const disabled =
+    (state.type === SubmitType.TEXT && state.text === null) ||
+    (state.type === SubmitType.IMAGE && state.files.length === 0) ||
+    !selectedCommunity ||
     state.isMutating ||
     state.isUploading ||
-    !state.community?.id ||
-    state.title.length === 0 ||
-    (!state.text && state.files.length === 0);
+    state.title.length === 0;
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -71,6 +61,7 @@ export default function SubmitContent() {
         <div className="relative flex items-center">
           <input
             placeholder="Title"
+            defaultValue={state.title}
             maxLength={maxTitleLength}
             autoComplete="off"
             className="w-full min-w-0 overflow-y-hidden rounded bg-inherit py-2.5 pl-4 pr-16 text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 focus:ring-zinc-300"
@@ -85,8 +76,9 @@ export default function SubmitContent() {
             {state.title.length}/{maxTitleLength}
           </div>
         </div>
-        {!state.isMediaSubmit && <RTEPost />}
-        {state.isMediaSubmit && <Dropzone />}
+
+        {state.type === SubmitType.TEXT && <RTEPost />}
+        {state.type === SubmitType.IMAGE && <Dropzone />}
       </div>
 
       <div className="flex items-center gap-2 font-bold text-zinc-400">
@@ -127,9 +119,43 @@ export default function SubmitContent() {
         )}
         disabled={disabled}
         onClick={() => {
-          const { community, ...rest } = state;
-          if (community) {
-            createPost.mutate({ ...rest, communityId: community.id });
+          if (!selectedCommunity || disabled) return;
+
+          const postId = uuidv4();
+
+          if (state.type === SubmitType.TEXT) {
+            const filterFiles = state.filesRTE.filter((file) =>
+              state.text?.includes(`<img src="${file.url}" alt="${file.name}"`),
+            );
+
+            const files = filterFiles.map((file) => ({
+              ...file,
+              postId,
+            }));
+
+            createPost.mutate({
+              post: {
+                ...state,
+                id: uuidv4(),
+                communityId: selectedCommunity.id,
+              },
+              files,
+            });
+          } else if (state.type === SubmitType.IMAGE) {
+            const files = state.files.map((file) => ({
+              ...file,
+              postId,
+            }));
+
+            createPost.mutate({
+              post: {
+                ...state,
+                id: uuidv4(),
+                communityId: selectedCommunity.id,
+                text: null,
+              },
+              files,
+            });
           }
         }}
       >

@@ -82,8 +82,7 @@ export default async function CommunityLayout(props: {
             <div>
               <Link
                 href={{
-                  pathname: "/submit",
-                  query: { community: params.communityName },
+                  pathname: `/r/${params.communityName}/submit`,
                 }}
                 className="rounded-full"
               >

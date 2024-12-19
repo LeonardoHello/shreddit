@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ export default function SubmitCommunityDropdown({
   user,
   yourCommunities,
 }: Props) {
+  const state = useSubmit();
   const dispatch = useSubmitDispatch();
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export default function SubmitCommunityDropdown({
 
       <hr className="border-zinc-700" />
 
-      <SearchedCommunities />
+      {state.search.length > 0 && <SearchedCommunities />}
     </>
   );
 }
@@ -76,8 +78,7 @@ function YourCommunities({
 }: {
   yourCommunities: YourCommunities;
 }) {
-  const state = useSubmit();
-  const dispatch = useSubmitDispatch();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col gap-3.5 px-2 pb-3 pt-4">
@@ -101,17 +102,7 @@ function YourCommunities({
             key={yourCommunity.community.id}
             className="flex h-9 cursor-pointer items-center gap-2"
             onClick={() => {
-              if (yourCommunity.community.id === state.community?.id) {
-                dispatch({
-                  type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
-                  nextCommunity: undefined,
-                });
-              } else {
-                dispatch({
-                  type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
-                  nextCommunity: yourCommunity.community,
-                });
-              }
+              router.push(`/r/${yourCommunity.community.name}/submit`);
             }}
           >
             <CommunityImage
@@ -146,12 +137,9 @@ function YourCommunities({
 }
 
 function SearchedCommunities() {
-  const state = useSubmit();
-  const dispatch = useSubmitDispatch();
+  const router = useRouter();
 
-  if (!state.search) {
-    return null;
-  }
+  const state = useSubmit();
 
   const searchedCommunities = trpc.searchCommunities.useQuery(state.search, {
     initialData: [],
@@ -175,17 +163,7 @@ function SearchedCommunities() {
             key={searchedCommunity.id}
             className="flex h-9 cursor-pointer items-center gap-2"
             onClick={() => {
-              if (searchedCommunity.id === state.community?.id) {
-                dispatch({
-                  type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
-                  nextCommunity: undefined,
-                });
-              } else {
-                dispatch({
-                  type: REDUCER_ACTION_TYPE.CHANGED_COMMUNITY,
-                  nextCommunity: searchedCommunity,
-                });
-              }
+              router.push(`/r/${searchedCommunity.name}/submit`);
             }}
           >
             <CommunityImage

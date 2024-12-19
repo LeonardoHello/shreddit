@@ -329,18 +329,36 @@ export const appRouter = createTRPCRouter({
     }),
   createPost: protectedProcedure
     .input(
-      PostSchema.omit({
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        authorId: true,
+      z.object({
+        post: PostSchema.omit({
+          createdAt: true,
+          updatedAt: true,
+          authorId: true,
+        }),
+        files: FileSchema.omit({ id: true, postId: true }).array(),
       }),
     )
-    .mutation(({ input, ctx }) => {
-      return ctx.db
-        .insert(posts)
-        .values({ ...input, authorId: ctx.userId })
-        .returning({ id: posts.id });
+    .mutation(async ({ input, ctx }) => {
+      if (input.files.length === 0) {
+        const postId = await ctx.db
+          .insert(posts)
+          .values({ ...input.post, authorId: ctx.userId })
+          .returning({ id: posts.id });
+
+        return [postId];
+      }
+
+      return ctx.db.batch([
+        ctx.db
+          .insert(posts)
+          .values({ ...input.post, authorId: ctx.userId })
+          .returning({ id: posts.id }),
+        ctx.db
+          .insert(files)
+          .values(
+            input.files.map((file) => ({ ...file, postId: input.post.id })),
+          ),
+      ]);
     }),
   editPost: protectedProcedure
     .input(

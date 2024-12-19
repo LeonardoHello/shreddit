@@ -11,6 +11,7 @@ import {
   useSubmit,
   useSubmitDispatch,
 } from "@/context/SubmitContext";
+import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
 
 export default function SubmitMenu() {
@@ -27,26 +28,26 @@ export default function SubmitMenu() {
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
-              !state.isMediaSubmit,
+              state.type === SubmitType.TEXT,
             "cursor-not-allowed hover:bg-inherit": disabled,
           },
         )}
         onClick={() => {
-          if (state.isMediaSubmit && !disabled) {
+          if (state.type !== SubmitType.TEXT && !disabled) {
             // post state cleanup
             dispatch({
-              type: REDUCER_ACTION_TYPE.CHANGED_FILES,
-              nextFiles: [],
-            });
-
-            dispatch({
-              type: REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT,
+              type: REDUCER_ACTION_TYPE.CHANGED_TYPE,
+              nextType: SubmitType.TEXT,
             });
           }
         }}
       >
-        {state.isMediaSubmit && <DocumentTextIcon className="h-6 w-6" />}
-        {!state.isMediaSubmit && <DocumentTextIconSolid className="h-6 w-6" />}
+        {state.type === SubmitType.TEXT && (
+          <DocumentTextIconSolid className="h-6 w-6" />
+        )}
+        {state.type !== SubmitType.TEXT && (
+          <DocumentTextIcon className="h-6 w-6" />
+        )}
         post
       </button>
 
@@ -56,29 +57,24 @@ export default function SubmitMenu() {
           "flex basis-1/2 items-center justify-center gap-1.5 border-b border-l border-b-zinc-700/70 border-l-zinc-700/70 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
           {
             "border-b-2 border-b-zinc-300 bg-zinc-700/30 text-zinc-300":
-              state.isMediaSubmit,
+              state.type === SubmitType.IMAGE,
             "cursor-not-allowed hover:bg-inherit": disabled,
           },
         )}
         onClick={() => {
-          if (!state.isMediaSubmit && !disabled) {
+          if (state.type !== SubmitType.IMAGE && !disabled) {
             // post state cleanup
             dispatch({
-              type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
-              nextText: null,
-            });
-            dispatch({
-              type: REDUCER_ACTION_TYPE.CHANGED_FILES,
-              nextFiles: [],
-            });
-            dispatch({
-              type: REDUCER_ACTION_TYPE.TOGGLED_MEDIA_SUBMIT,
+              type: REDUCER_ACTION_TYPE.CHANGED_TYPE,
+              nextType: SubmitType.IMAGE,
             });
           }
         }}
       >
-        {state.isMediaSubmit && <PhotoIconSolid className="h-6 w-6" />}
-        {!state.isMediaSubmit && <PhotoIcon className="h-6 w-6" />}
+        {state.type === SubmitType.IMAGE && (
+          <PhotoIconSolid className="h-6 w-6" />
+        )}
+        {state.type !== SubmitType.IMAGE && <PhotoIcon className="h-6 w-6" />}
         images
       </button>
     </div>

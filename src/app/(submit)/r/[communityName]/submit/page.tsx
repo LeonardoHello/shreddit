@@ -10,16 +10,15 @@ import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
 import SubmitContent from "@/components/submit/SubmitContent";
 import SubmitMenu from "@/components/submit/SubmitMenu";
-import SubmitContextProvider from "@/context/SubmitContext";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function SubmitPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+export default async function CommunitySubmitPage(props: {
+  params: Promise<{ communityName: string }>;
 }) {
-  const searchParams = await props.searchParams;
+  const params = await props.params;
 
   const { userId } = await auth();
 
@@ -29,14 +28,14 @@ export default async function SubmitPage(props: {
   const yourCommunitiesData = getYourCommunities.execute({
     currentUserId: userId,
   });
-  const initialSelectedCommunityData = getSelectedCommunity.execute({
-    communityName: searchParams.community,
+  const selectedCommunityData = getSelectedCommunity.execute({
+    communityName: params.communityName,
   });
 
-  const [user, yourCommunities, initialSelectedCommunity] = await Promise.all([
+  const [user, yourCommunities, selectedCommunity] = await Promise.all([
     userData,
     yourCommunitiesData,
-    initialSelectedCommunityData,
+    selectedCommunityData,
   ]).catch(() => {
     throw new Error("There was a problem with loading user information.");
   });
@@ -50,22 +49,14 @@ export default async function SubmitPage(props: {
           Create a post
         </h1>
 
-        <SubmitContextProvider
-          initialSelectedCommunity={initialSelectedCommunity}
-          initialSubmit={searchParams.submit}
-        >
-          <SubmitCommunity>
-            <SubmitCommunityDropdown
-              user={user}
-              yourCommunities={yourCommunities}
-            />
-          </SubmitCommunity>
-
-          <div className="bg-zinc-900 text-sm">
-            <SubmitMenu />
-            <SubmitContent />
-          </div>
-        </SubmitContextProvider>
+        <SubmitCommunity selectedCommunity={selectedCommunity}>
+          <SubmitCommunityDropdown
+            user={user}
+            yourCommunities={yourCommunities}
+          />
+        </SubmitCommunity>
+        <SubmitMenu />
+        <SubmitContent selectedCommunity={selectedCommunity} />
       </div>
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
         <div className="rounded bg-zinc-900 p-4">

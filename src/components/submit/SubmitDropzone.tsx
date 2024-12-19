@@ -26,7 +26,7 @@ export default function SubmitDropzone() {
               <p>Choose files or drag and drop</p>
               {state.files.length > 0 && (
                 <p className="text-gray-400">
-                  Uploaded {state.files.length} files
+                  Uploaded {state.files.length} File(s)
                 </p>
               )}
             </div>

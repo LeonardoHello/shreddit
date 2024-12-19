@@ -8,7 +8,6 @@ import {
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   REDUCER_ACTION_TYPE,
-  useSubmit,
   useSubmitDispatch,
 } from "@/context/SubmitContext";
 import useDropdown from "@/hooks/useDropdown";
@@ -17,11 +16,12 @@ import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunity({
+  selectedCommunity,
   children,
 }: {
+  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
   children: React.ReactNode;
 }) {
-  const state = useSubmit();
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
   return (
@@ -39,9 +39,10 @@ export default function SubmitCommunity({
         onClick={() => !isOpen && setIsOpen(true)}
       >
         {isOpen && <SearchCommunity />}
-        {!isOpen && !state.community && <UnselectedCommunity />}
-        {!isOpen && state.community && (
-          <SelectedCommunity community={state.community} />
+
+        {!isOpen && !selectedCommunity && <UnselectedCommunity />}
+        {!isOpen && selectedCommunity && (
+          <SelectedCommunity selectedCommunity={selectedCommunity} />
         )}
 
         <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
@@ -93,18 +94,18 @@ function SearchCommunity() {
 }
 
 function SelectedCommunity({
-  community,
+  selectedCommunity,
 }: {
-  community: NonNullable<
+  selectedCommunity: NonNullable<
     Awaited<ReturnType<typeof getSelectedCommunity.execute>>
   >;
 }) {
   return (
     <>
-      <CommunityImage imageUrl={community.imageUrl} size={24} />
+      <CommunityImage imageUrl={selectedCommunity.imageUrl} size={24} />
 
       <h1 className="grow truncate text-start text-sm font-medium">
-        r/{community.name}
+        r/{selectedCommunity.name}
       </h1>
     </>
   );

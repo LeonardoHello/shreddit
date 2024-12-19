@@ -23,3 +23,10 @@ export enum FilterPosts {
   UPVOTED = "upvoted",
   DOWNVOTED = "downvoted",
 }
+
+export enum SubmitType {
+  TEXT = "text",
+  IMAGE = "image",
+  VIDEO = "video",
+  LINK = "link",
+}

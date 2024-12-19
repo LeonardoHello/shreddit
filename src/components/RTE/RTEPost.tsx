@@ -22,6 +22,7 @@ import {
 
 import {
   REDUCER_ACTION_TYPE,
+  useSubmit,
   useSubmitDispatch,
 } from "@/context/SubmitContext";
 import cn from "@/utils/cn";
@@ -41,10 +42,12 @@ const extensions = [
 const toastId = "loading_toast";
 
 export default function RTEPost() {
+  const state = useSubmit();
   const dispatch = useSubmitDispatch();
 
   const editor = useEditor({
     immediatelyRender: false,
+    content: state.text || "",
     extensions,
     editorProps: {
       attributes: {
@@ -55,16 +58,12 @@ export default function RTEPost() {
     onUpdate: ({ editor }) => {
       if (editor.isEmpty) {
         dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
-        dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_FILES, nextFiles: [] });
       } else {
         dispatch({
           type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
           nextText: editor.getHTML(),
         });
       }
-    },
-    onDestroy: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
     },
   });
 
@@ -136,13 +135,14 @@ function RTEPostMenu({ editor }: { editor: Editor }) {
       const files = res.map(({ size, serverData, ...rest }) => rest);
 
       dispatch({
-        type: REDUCER_ACTION_TYPE.ADDED_FILES,
+        type: REDUCER_ACTION_TYPE.ADDED_FILES_RTE,
         nextFiles: files,
       });
       dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
       toast.dismiss(toastId);
     },
+
     onUploadError: (e) => {
       dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
@@ -238,7 +238,7 @@ function RTEPostFloatingMenu({ editor }: { editor: Editor }) {
       const files = res.map(({ size, serverData, ...rest }) => rest);
 
       dispatch({
-        type: REDUCER_ACTION_TYPE.ADDED_FILES,
+        type: REDUCER_ACTION_TYPE.ADDED_FILES_RTE,
         nextFiles: files,
       });
       dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
