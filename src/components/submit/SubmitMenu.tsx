@@ -8,15 +8,15 @@ import {
 
 import {
   REDUCER_ACTION_TYPE,
-  useSubmit,
-  useSubmitDispatch,
+  useSubmitContext,
+  useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
 
 export default function SubmitMenu() {
-  const state = useSubmit();
-  const dispatch = useSubmitDispatch();
+  const state = useSubmitContext();
+  const dispatch = useSubmitDispatchContext();
 
   const disabled = state.isMutating || state.isUploading;
 

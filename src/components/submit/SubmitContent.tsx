@@ -9,8 +9,8 @@ import { v4 as uuidv4 } from "uuid";
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   REDUCER_ACTION_TYPE,
-  useSubmit,
-  useSubmitDispatch,
+  useSubmitContext,
+  useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import { SubmitType } from "@/types";
@@ -27,8 +27,8 @@ export default function SubmitContent({
 }) {
   const router = useRouter();
 
-  const state = useSubmit();
-  const dispatch = useSubmitDispatch();
+  const state = useSubmitContext();
+  const dispatch = useSubmitDispatchContext();
 
   const createPost = trpc.createPost.useMutation({
     onMutate: () => {

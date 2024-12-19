@@ -8,7 +8,7 @@ import {
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   REDUCER_ACTION_TYPE,
-  useSubmitDispatch,
+  useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
@@ -61,7 +61,7 @@ export default function SubmitCommunity({
 }
 
 function SearchCommunity() {
-  const dispatch = useSubmitDispatch();
+  const dispatch = useSubmitDispatchContext();
 
   const utils = trpc.useUtils();
 

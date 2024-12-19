@@ -128,21 +128,21 @@ export default function SubmitContextProvider({
   );
 }
 
-export function useSubmit() {
+export function useSubmitContext() {
   const context = useContext(SubmitContext);
 
   if (!context) {
-    throw new Error("useSubmit is used outside it's provider");
+    throw new Error("useSubmitContext is used outside it's provider");
   }
 
   return context;
 }
 
-export function useSubmitDispatch() {
+export function useSubmitDispatchContext() {
   const context = useContext(SubmitDispatchContext);
 
   if (!context) {
-    throw new Error("useSubmitDispatch is used outside it's provider");
+    throw new Error("useSubmitDispatchContext is used outside it's provider");
   }
 
   return context;

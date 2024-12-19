@@ -11,8 +11,8 @@ import type { getYourCommunities } from "@/api/getCommunities";
 import type { getUserById } from "@/api/getUser";
 import {
   REDUCER_ACTION_TYPE,
-  useSubmit,
-  useSubmitDispatch,
+  useSubmitContext,
+  useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
@@ -29,8 +29,8 @@ export default function SubmitCommunityDropdown({
   user,
   yourCommunities,
 }: Props) {
-  const state = useSubmit();
-  const dispatch = useSubmitDispatch();
+  const state = useSubmitContext();
+  const dispatch = useSubmitDispatchContext();
 
   useEffect(() => {
     return () => {
@@ -139,7 +139,7 @@ function YourCommunities({
 function SearchedCommunities() {
   const router = useRouter();
 
-  const state = useSubmit();
+  const state = useSubmitContext();
 
   const searchedCommunities = trpc.searchCommunities.useQuery(state.search, {
     initialData: [],
