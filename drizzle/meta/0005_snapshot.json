@@ -1,10 +1,8 @@
 {
-  "version": "5",
-  "dialect": "pg",
-  "id": "31f6217d-7fa3-454c-b31e-69c7d8f56d72",
-  "prevId": "9251fccd-1120-4152-826c-94dd50163437",
+  "version": "7",
+  "dialect": "postgresql",
   "tables": {
-    "comments": {
+    "public.comments": {
       "name": "comments",
       "schema": "",
       "columns": {
@@ -58,34 +56,37 @@
         "comments_author_id_users_id_fk": {
           "name": "comments_author_id_users_id_fk",
           "tableFrom": "comments",
-          "tableTo": "users",
           "columnsFrom": [
             "author_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         },
         "comments_post_id_posts_id_fk": {
           "name": "comments_post_id_posts_id_fk",
           "tableFrom": "comments",
-          "tableTo": "posts",
           "columnsFrom": [
             "post_id"
           ],
+          "tableTo": "posts",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "communities": {
+    "public.communities": {
       "name": "communities",
       "schema": "",
       "columns": {
@@ -134,29 +135,32 @@
         "communities_author_id_users_id_fk": {
           "name": "communities_author_id_users_id_fk",
           "tableFrom": "communities",
-          "tableTo": "users",
           "columnsFrom": [
             "author_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "communities_name_unique": {
           "name": "communities_name_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "name"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
-      }
+      },
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "posts": {
+    "public.posts": {
       "name": "posts",
       "schema": "",
       "columns": {
@@ -240,34 +244,37 @@
         "posts_author_id_users_id_fk": {
           "name": "posts_author_id_users_id_fk",
           "tableFrom": "posts",
-          "tableTo": "users",
           "columnsFrom": [
             "author_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         },
         "posts_community_id_communities_id_fk": {
           "name": "posts_community_id_communities_id_fk",
           "tableFrom": "posts",
-          "tableTo": "communities",
           "columnsFrom": [
             "community_id"
           ],
+          "tableTo": "communities",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "users": {
+    "public.users": {
       "name": "users",
       "schema": "",
       "columns": {
@@ -300,9 +307,12 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
-    "users_to_communities": {
+    "public.users_to_communities": {
       "name": "users_to_communities",
       "schema": "",
       "columns": {
@@ -338,28 +348,28 @@
         "users_to_communities_author_id_users_id_fk": {
           "name": "users_to_communities_author_id_users_id_fk",
           "tableFrom": "users_to_communities",
-          "tableTo": "users",
           "columnsFrom": [
             "author_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         },
         "users_to_communities_community_id_communities_id_fk": {
           "name": "users_to_communities_community_id_communities_id_fk",
           "tableFrom": "users_to_communities",
-          "tableTo": "communities",
           "columnsFrom": [
             "community_id"
           ],
+          "tableTo": "communities",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -371,7 +381,10 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {},
@@ -380,5 +393,11 @@
     "schemas": {},
     "tables": {},
     "columns": {}
-  }
+  },
+  "id": "31f6217d-7fa3-454c-b31e-69c7d8f56d72",
+  "prevId": "9251fccd-1120-4152-826c-94dd50163437",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }
