@@ -114,6 +114,7 @@ export default function SubmitContextProvider({
     text: null,
     nsfw: false,
     spoiler: false,
+    // TODO
     filesRTE: [],
     files: [],
     search: "",

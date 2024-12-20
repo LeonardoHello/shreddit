@@ -13,8 +13,9 @@ import { toast } from "sonner";
 import { useCommentContext } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
+import RTEMarkButtons from "./RTEMarkButtons";
+import RTENodeButtons from "./RTENodeButtons";
 
 const extensions = [
   StarterKit,
@@ -28,6 +29,7 @@ export default function RTECommentEdit() {
   const { comment } = useCommentContext();
 
   const editor = useEditor({
+    immediatelyRender: false,
     content: comment.text,
     extensions,
     editorProps: {
@@ -50,23 +52,32 @@ export default function RTECommentEdit() {
     >
       <BubbleMenu
         editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
-        <RTEButtonsInline editor={editor} />
+        <RTEMarkButtons editor={editor} />
       </BubbleMenu>
+
       <FloatingMenu
         editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
-        <RTEButtonsNode editor={editor} />
+        <RTENodeButtons editor={editor} />
       </FloatingMenu>
+
+      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
+        <RTEMarkButtons editor={editor} />
+        <div className="h-4 w-px self-center bg-zinc-700/70" />
+        <RTENodeButtons editor={editor} />
+      </div>
+
       <EditorContent editor={editor} />
-      <RTECommentEditMenu editor={editor} />
+
+      <RTECommentEditActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTECommentEditMenu({ editor }: { editor: Editor }) {
+function RTECommentEditActionButtons({ editor }: { editor: Editor }) {
   const utils = trpc.useUtils();
 
   const { comment, setEditable } = useCommentContext();
@@ -95,46 +106,44 @@ function RTECommentEditMenu({ editor }: { editor: Editor }) {
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex h-10 flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
-      <div className="ml-auto flex gap-2">
-        <button
-          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={() => {
-            editor.commands.setContent(comment.text);
-            setEditable(false);
-          }}
-        >
-          Cancel
-        </button>
+    <div className="ml-auto flex gap-2">
+      <button
+        className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
+        onClick={() => {
+          editor.commands.setContent(comment.text);
+          setEditable(false);
+        }}
+      >
+        Cancel
+      </button>
 
-        <button
-          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={() => {
-            editor.commands.clearContent();
-          }}
-        >
-          Clear
-        </button>
+      <button
+        className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
+        onClick={() => {
+          editor.commands.clearContent();
+        }}
+      >
+        Clear
+      </button>
 
-        <button
-          className={cn(
-            "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
-            {
-              "cursor-not-allowed text-zinc-500":
-                isEmpty || editComment.isPending,
-            },
-          )}
-          disabled={isEmpty || editComment.isPending}
-          onClick={() => {
-            editComment.mutate({
-              id: comment.id,
-              text: editor.getHTML(),
-            });
-          }}
-        >
-          Edit
-        </button>
-      </div>
+      <button
+        className={cn(
+          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          {
+            "cursor-not-allowed text-zinc-500":
+              isEmpty || editComment.isPending,
+          },
+        )}
+        disabled={isEmpty || editComment.isPending}
+        onClick={() => {
+          editComment.mutate({
+            id: comment.id,
+            text: editor.getHTML(),
+          });
+        }}
+      >
+        Edit
+      </button>
     </div>
   );
 }

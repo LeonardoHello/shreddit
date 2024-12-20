@@ -15,7 +15,7 @@ import {
 import { trpc } from "@/trpc/client";
 import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
-import RTEPost from "../RTE/RTEPost";
+import RTEPostSubmit from "../RTE/RTEPostSubmit";
 import Dropzone from "./SubmitDropzone";
 
 const maxTitleLength = 300;
@@ -77,7 +77,7 @@ export default function SubmitContent({
           </div>
         </div>
 
-        {state.type === SubmitType.TEXT && <RTEPost />}
+        {state.type === SubmitType.TEXT && <RTEPostSubmit />}
         {state.type === SubmitType.IMAGE && <Dropzone />}
       </div>
 

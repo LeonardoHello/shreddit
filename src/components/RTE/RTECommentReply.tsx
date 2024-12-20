@@ -18,8 +18,9 @@ import { toast } from "sonner";
 import { useCommentContext } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
+import RTEMarkButtons from "./RTEMarkButtons";
+import RTENodeButtons from "./RTENodeButtons";
 
 const extensions = [
   StarterKit,
@@ -37,6 +38,7 @@ export default function RTECommentReply() {
 
 function RTECommentReplyContent() {
   const editor = useEditor({
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
@@ -51,32 +53,39 @@ function RTECommentReplyContent() {
   }
 
   return (
-    <div className="ml-3 border-l-2 border-zinc-700/70 pl-6">
-      <div
-        className={cn("rounded border border-zinc-700/70", {
-          "border-zinc-300": editor.isFocused,
-        })}
+    <div
+      className={cn("ml-3 rounded border border-zinc-700/70", {
+        "border-zinc-300": editor.isFocused,
+      })}
+    >
+      <BubbleMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
-        <BubbleMenu
-          editor={editor}
-          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
-        >
-          <RTEButtonsInline editor={editor} />
-        </BubbleMenu>
-        <FloatingMenu
-          editor={editor}
-          className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1"
-        >
-          <RTEButtonsNode editor={editor} />
-        </FloatingMenu>
-        <EditorContent editor={editor} />
-        <RTECommentReplyMenu editor={editor} />
+        <RTEMarkButtons editor={editor} />
+      </BubbleMenu>
+
+      <FloatingMenu
+        editor={editor}
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
+      >
+        <RTENodeButtons editor={editor} />
+      </FloatingMenu>
+
+      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
+        <RTEMarkButtons editor={editor} />
+        <div className="h-4 w-px self-center bg-zinc-700/70" />
+        <RTENodeButtons editor={editor} />
       </div>
+
+      <EditorContent editor={editor} />
+
+      <RTECommentReplyActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTECommentReplyMenu({ editor }: { editor: Editor }) {
+function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -110,41 +119,32 @@ function RTECommentReplyMenu({ editor }: { editor: Editor }) {
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex h-10 flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
-      <div className="ml-auto flex gap-2">
-        <button
-          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={() => setReply(false)}
-        >
-          Cancel
-        </button>
+    <div className="flex h-10 justify-end gap-2 rounded-b p-1.5">
+      <button
+        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
+        onClick={() => setReply(false)}
+      >
+        Cancel
+      </button>
 
-        <button
-          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={() => editor.commands.clearContent()}
-        >
-          Clear
-        </button>
-
-        <button
-          className={cn(
-            "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
-            {
-              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
-            },
-          )}
-          disabled={isEmpty || isMutating}
-          onClick={() => {
-            createComment.mutate({
-              postId: comment.postId,
-              parentCommentId: comment.id,
-              text: editor.getHTML(),
-            });
-          }}
-        >
-          Reply
-        </button>
-      </div>
+      <button
+        className={cn(
+          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          {
+            "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+          },
+        )}
+        disabled={isEmpty || isMutating}
+        onClick={() => {
+          createComment.mutate({
+            postId: comment.postId,
+            parentCommentId: comment.id,
+            text: editor.getHTML(),
+          });
+        }}
+      >
+        Reply
+      </button>
     </div>
   );
 }

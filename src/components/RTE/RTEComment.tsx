@@ -18,8 +18,9 @@ import { toast } from "sonner";
 import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import RTEButtons, { RTEButtonsInline, RTEButtonsNode } from "./RTEButtons";
 import RTEcommentLoading from "./RTECommentLoading";
+import RTEMarkButtons from "./RTEMarkButtons";
+import RTENodeButtons from "./RTENodeButtons";
 
 const extensions = [
   StarterKit,
@@ -53,23 +54,32 @@ export default function RTEComment({ postId }: { postId: Post["id"] }) {
     >
       <BubbleMenu
         editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
-        <RTEButtonsInline editor={editor} />
+        <RTEMarkButtons editor={editor} />
       </BubbleMenu>
+
       <FloatingMenu
         editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 lg:hidden"
+        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
-        <RTEButtonsNode editor={editor} />
+        <RTENodeButtons editor={editor} />
       </FloatingMenu>
+
+      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
+        <RTEMarkButtons editor={editor} />
+        <div className="h-4 w-px self-center bg-zinc-700/70" />
+        <RTENodeButtons editor={editor} />
+      </div>
+
       <EditorContent editor={editor} />
-      <RTECommentMenu editor={editor} postId={postId} />
+
+      <RTECommentActionButtons editor={editor} postId={postId} />
     </div>
   );
 }
 
-function RTECommentMenu({
+function RTECommentActionButtons({
   editor,
   postId,
 }: {
@@ -105,35 +115,32 @@ function RTECommentMenu({
   const isEmpty = editor.state.doc.textContent.trim().length === 0;
 
   return (
-    <div className="flex h-10 flex-wrap gap-2 rounded-b bg-zinc-800 p-1.5">
-      <RTEButtons editor={editor} />
-      <div className="ml-auto flex gap-2">
-        <button
-          className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-          onClick={() => editor.commands.clearContent()}
-        >
-          Clear
-        </button>
+    <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
+      <button
+        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
+        onClick={() => editor.commands.clearContent()}
+      >
+        Clear
+      </button>
 
-        <button
-          className={cn(
-            "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
-            {
-              "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
-            },
-          )}
-          disabled={isEmpty || isMutating}
-          onClick={() => {
-            createComment.mutate({
-              postId,
-              parentCommentId: null,
-              text: editor.getHTML(),
-            });
-          }}
-        >
-          Comment
-        </button>
-      </div>
+      <button
+        className={cn(
+          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          {
+            "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+          },
+        )}
+        disabled={isEmpty || isMutating}
+        onClick={() => {
+          createComment.mutate({
+            postId,
+            parentCommentId: null,
+            text: editor.getHTML(),
+          });
+        }}
+      >
+        Comment
+      </button>
     </div>
   );
 }

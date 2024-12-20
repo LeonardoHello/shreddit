@@ -1,14 +1,17 @@
+"use client";
+
 import { useCallback } from "react";
 
+import ExtensionBubbleMenu from "@tiptap/extension-bubble-menu";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   BubbleMenu,
-  Editor,
   EditorContent,
   FloatingMenu,
   useEditor,
 } from "@tiptap/react";
+import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
 import { Image as ImageIcon } from "lucide-react";
@@ -18,9 +21,11 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-import { useFilesContext } from "@/context/FilesContext";
-import { usePostContext } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import {
+  REDUCER_ACTION_TYPE,
+  useSubmitContext,
+  useSubmitDispatchContext,
+} from "@/context/SubmitContext";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTEMarkButtons from "./RTEMarkButtons";
@@ -29,31 +34,40 @@ import RTEpostLoading from "./RTEPostLoading";
 
 const extensions = [
   StarterKit,
+  ExtensionBubbleMenu,
   Image.configure({ inline: true }),
   Placeholder.configure({
     placeholder: "Text",
   }),
 ];
 
-const toastId = "loading_toast";
-
-export default function RTEPostEdit() {
-  const { post } = usePostContext();
+export default function RTEPostSubmit() {
+  const state = useSubmitContext();
+  const dispatch = useSubmitDispatchContext();
 
   const editor = useEditor({
-    immediatelyRender: false,
+    content: state.text || "",
     extensions,
-    content: post.text,
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-none",
       },
+    },
+    onUpdate: ({ editor }) => {
+      if (editor.isEmpty) {
+        dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
+      } else {
+        dispatch({
+          type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
+          nextText: editor.getHTML(),
+        });
+      }
     },
   });
 
   if (!editor) {
-    return <RTEpostLoading content={post.text} />;
+    return <RTEpostLoading />;
   }
 
   return (
@@ -74,6 +88,8 @@ export default function RTEPostEdit() {
         className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
         <RTENodeButtons editor={editor} />
+        <div className="h-4 w-px self-center bg-zinc-700/70" />
+        <RTENodeButtonImage editor={editor} />
       </FloatingMenu>
 
       <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
@@ -85,128 +101,18 @@ export default function RTEPostEdit() {
       </div>
 
       <EditorContent editor={editor} />
-
-      <RTEPostEditActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
-  const utils = trpc.useUtils();
-
-  const { post, setEditable } = usePostContext();
-  const { files, isUploading } = useFilesContext();
-
-  const deleteFiles = trpc.deleteFile.useMutation({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const createFiles = trpc.createFile.useMutation({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const editPost = trpc.editPost.useMutation({
-    onMutate: () => {
-      utils["getPost"].setData(post.id, (updater) => {
-        if (!updater) {
-          const post = utils["getPost"].getData();
-
-          return post;
-        }
-
-        return { ...updater, text: editor.getHTML() };
-      });
-
-      setEditable(false);
-    },
-    onSuccess: () => {
-      toast.success("Post successfully edited.");
-
-      const filesToDelete = post.files
-        .filter(
-          (file) =>
-            !editor
-              .getHTML()
-              .includes(`<img src="${file.url}" alt="${file.name}">`),
-        )
-        .map(({ key }) => key);
-
-      if (filesToDelete.length > 0) {
-        deleteFiles.mutate({ postId: post.id, keys: filesToDelete });
-      }
-
-      // set to onConflictDoNothing() in case of duplicated file insert
-      const filesToInsert = files
-        .filter((file) =>
-          editor
-            .getHTML()
-            .includes(`<img src="${file.url}" alt="${file.name}">`),
-        )
-        .map((file) => ({
-          ...file,
-          postId: post.id,
-        }));
-
-      if (filesToInsert.length > 0) {
-        createFiles.mutate(filesToInsert);
-      }
-    },
-    onError: async (error) => {
-      await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-
-      toast.error(error.message);
-    },
-  });
-
-  const disabled =
-    editor.getHTML() === post.text ||
-    editor.isEmpty ||
-    editPost.isPending ||
-    isUploading;
-
-  return (
-    <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
-      <button
-        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
-        onClick={() => {
-          editor.commands.setContent(post.text);
-          setEditable(false);
-        }}
-      >
-        Cancel
-      </button>
-
-      <button
-        className={cn(
-          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
-          {
-            "cursor-not-allowed text-zinc-500": disabled,
-          },
-        )}
-        disabled={disabled}
-        onClick={() => {
-          editPost.mutate({
-            id: post.id,
-            text: editor.getHTML(),
-          });
-        }}
-      >
-        Edit
-      </button>
-    </div>
-  );
-}
+const toastId = "loading_toast";
 
 function RTENodeButtonImage({ editor }: { editor: Editor }) {
-  const { setFiles, setIsUploading } = useFilesContext();
+  const dispatch = useSubmitDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      setIsUploading(true);
+      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
       return files;
     },
     onUploadProgress: (p) => {
@@ -223,7 +129,10 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
             {p < 10 ? 10 : p}%
           </div>
         </div>,
-        { id: toastId, duration: 1000 * 99 },
+        {
+          id: toastId,
+          duration: 1000 * 99,
+        },
       );
     },
     onClientUploadComplete: (res) => {
@@ -240,13 +149,17 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
 
       const files = res.map(({ size, serverData, ...rest }) => rest);
 
-      setFiles((prev) => [...prev, ...files]);
-      setIsUploading(false);
+      dispatch({
+        type: REDUCER_ACTION_TYPE.ADDED_FILES_RTE,
+        nextFiles: files,
+      });
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
       toast.dismiss(toastId);
     },
+
     onUploadError: (e) => {
-      setIsUploading(false);
+      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
 
       toast.error(e.message);
     },
