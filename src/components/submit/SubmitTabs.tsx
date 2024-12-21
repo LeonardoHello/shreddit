@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { createElement } from "react";
+import dynamic from "next/dynamic";
 
 import {
   CheckIcon,
@@ -22,6 +22,17 @@ import {
 import { PostType, SameKeyValuePairRecord } from "@/types";
 import cn from "@/utils/cn";
 
+const SubmitRTE = dynamic(() => import("@/components/submit/SubmitRTE"));
+const SubmitDropzone = dynamic(
+  () => import("@/components/submit/SubmitDropzone"),
+);
+
+// ensures that the correct component will render based on the "type" query parameter
+const componentMap: Record<PostType, React.ComponentType> = {
+  [PostType.TEXT]: SubmitRTE,
+  [PostType.IMAGE]: SubmitDropzone,
+};
+
 const postTypeMap: SameKeyValuePairRecord<PostType> = {
   [PostType.TEXT]: PostType.TEXT,
   [PostType.IMAGE]: PostType.IMAGE,
@@ -41,25 +52,9 @@ const icons: Record<
   },
 };
 
-export default function SubmitTabs({
-  children,
-  postType,
-}: {
-  children: React.ReactNode;
-  postType: PostType;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-
+export default function SubmitTabs() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
-
-  const createQueryString = useCallback((value: string) => {
-    const params = new URLSearchParams();
-    params.set("type", value);
-
-    return params.toString();
-  }, []);
 
   const maxTitleLength = 300;
 
@@ -73,19 +68,23 @@ export default function SubmitTabs({
             className={cn(
               "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 bg-zinc-900 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
               {
-                "border-b-2 border-b-zinc-300 text-zinc-300": postType === type,
+                "border-b-2 border-b-zinc-300 text-zinc-300":
+                  type === state.type,
                 "cursor-not-allowed hover:bg-inherit": state.isDisabled,
                 "rounded-tl": index === 0,
                 "rounded-tr": index === arr.length - 1,
               },
             )}
             onClick={() => {
-              if (postType === type || state.isDisabled) return;
+              if (type === state.type || state.isDisabled) return;
 
-              router.replace(pathname + "?" + createQueryString(type));
+              dispatch({
+                type: REDUCER_ACTION_TYPE.CHANGED_TYPE,
+                nextType: type,
+              });
             }}
           >
-            {postType === type
+            {type === state.type
               ? icons[type]["selected"]
               : icons[type]["unselected"]}
 
@@ -114,7 +113,7 @@ export default function SubmitTabs({
           </div>
         </div>
 
-        {children}
+        {createElement(componentMap[state.type])}
 
         <div className="mt-2 flex items-center gap-2 font-bold text-zinc-400">
           <button

@@ -17,10 +17,8 @@ import cn from "@/utils/cn";
 
 export default function SubmitActionButton({
   selectedCommunity,
-  postType,
 }: {
   selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
-  postType: PostType;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -74,7 +72,7 @@ export default function SubmitActionButton({
     state.isDisabled ||
     state.title.length === 0 ||
     !selectedCommunity ||
-    (postType === PostType.IMAGE && state.files.length === 0);
+    (state.type === PostType.IMAGE && state.files.length === 0);
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -89,14 +87,14 @@ export default function SubmitActionButton({
 
           const { files, ...post } = state;
 
-          if (postType === PostType.TEXT) {
+          if (state.type === PostType.TEXT) {
             createPostText.mutate({
               ...post,
               communityId: selectedCommunity.id,
             });
           }
 
-          if (postType === PostType.IMAGE) {
+          if (state.type === PostType.IMAGE) {
             createPostImage.mutate({
               ...post,
               communityId: selectedCommunity.id,

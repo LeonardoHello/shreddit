@@ -1,17 +1,21 @@
 "use client";
 
 import { createContext, useContext, useReducer } from "react";
+import { useSearchParams } from "next/navigation";
 
 import type { File, Post } from "@/db/schema";
+import { PostType, SameKeyValuePairRecord } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   files: Omit<File, "id" | "postId">[];
   search: string;
   isDisabled: boolean;
+  type: PostType;
 };
 
 export enum REDUCER_ACTION_TYPE {
   SEARCHED_COMMUNITY,
+  CHANGED_TYPE,
   CHANGED_TITLE,
   CHANGED_TEXT,
   CHANGED_FILES,
@@ -23,6 +27,7 @@ export enum REDUCER_ACTION_TYPE {
 
 type ReducerAction =
   | { type: typeof REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY; nextSearch: string }
+  | { type: typeof REDUCER_ACTION_TYPE.CHANGED_TYPE; nextType: PostType }
   | {
       type: typeof REDUCER_ACTION_TYPE.CHANGED_TITLE;
       nextTitle: ReducerState["title"];
@@ -42,6 +47,9 @@ type ReducerAction =
 
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
+    case REDUCER_ACTION_TYPE.CHANGED_TYPE:
+      return { ...state, type: action.nextType };
+
     case REDUCER_ACTION_TYPE.CHANGED_TITLE:
       return { ...state, title: action.nextTitle };
 
@@ -76,18 +84,28 @@ const SubmitContext = createContext<ReducerState | null>(null);
 const SubmitDispatchContext =
   createContext<React.Dispatch<ReducerAction> | null>(null);
 
+const postTypeMap: SameKeyValuePairRecord<PostType> = {
+  [PostType.TEXT]: PostType.TEXT,
+  [PostType.IMAGE]: PostType.IMAGE,
+};
+
 export default function SubmitContextProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const searchParams = useSearchParams();
+
+  const type = searchParams.get("type");
+
   const [state, dispatch] = useReducer(reducer, {
+    type: postTypeMap[type as PostType] || PostType.TEXT,
+    search: "",
     title: "",
     text: null,
+    files: [],
     nsfw: false,
     spoiler: false,
-    files: [],
-    search: "",
     isDisabled: false,
   });
 

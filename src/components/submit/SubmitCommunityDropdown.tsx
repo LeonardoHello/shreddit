@@ -10,22 +10,17 @@ import { toast } from "sonner";
 import type { getYourCommunities } from "@/api/getCommunities";
 import { useSubmitContext } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
-import { PostType } from "@/types";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
-
-type Router = ReturnType<typeof useRouter>;
 
 export default function SubmitCommunityDropdown({
   username,
   imageUrl,
   yourCommunities,
-  searchParams,
 }: {
   username: User["username"];
   imageUrl: User["imageUrl"];
   yourCommunities: Awaited<ReturnType<typeof getYourCommunities.execute>>;
-  searchParams: { type: PostType };
 }) {
   const router = useRouter();
 
@@ -75,7 +70,7 @@ export default function SubmitCommunityDropdown({
               key={yourCommunity.community.id}
               className="flex h-9 cursor-pointer items-center gap-2"
               onClick={() => {
-                const params = new URLSearchParams(searchParams);
+                const params = new URLSearchParams({ type: state.type });
 
                 router.push(
                   `/r/${yourCommunity.community.name}/submit?${params.toString()}`,
@@ -113,26 +108,16 @@ export default function SubmitCommunityDropdown({
 
       <hr className="border-zinc-700" />
 
-      {state.search.length > 0 && (
-        <SearchedCommunities
-          search={state.search}
-          router={router}
-          searchParams={searchParams}
-        />
-      )}
+      {state.search.length > 0 && <SearchedCommunities search={state.search} />}
     </>
   );
 }
 
-function SearchedCommunities({
-  search,
-  router,
-  searchParams,
-}: {
-  search: string;
-  router: Router;
-  searchParams: { type: PostType };
-}) {
+function SearchedCommunities({ search }: { search: string }) {
+  const router = useRouter();
+
+  const state = useSubmitContext();
+
   const searchedCommunities = trpc.searchCommunities.useQuery(search, {
     initialData: [],
     refetchOnWindowFocus: false,
@@ -155,7 +140,7 @@ function SearchedCommunities({
             key={searchedCommunity.id}
             className="flex h-9 cursor-pointer items-center gap-2"
             onClick={() => {
-              const params = new URLSearchParams(searchParams);
+              const params = new URLSearchParams({ type: state.type });
 
               router.push(
                 `/r/${searchedCommunity.name}/submit?${params.toString()}`,
