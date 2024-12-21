@@ -17,13 +17,13 @@ import PremiumButton from "@/components/feed/PremiumButton";
 import ScrollToTop from "@/components/feed/ScrollToTop";
 import InfiniteQueryPostsHome from "@/components/infiniteQuery/InfiniteQueryHomePosts";
 import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
-import { SortPosts, type QueryInfo } from "@/types";
+import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function HomePage(props: {
-  searchParams: Promise<{ sort: SortPosts }>;
+  searchParams: Promise<{ sort: PostSort }>;
 }) {
   const searchParams = await props.searchParams;
 
@@ -33,21 +33,21 @@ export default async function HomePage(props: {
 
   let postsData;
   switch (searchParams.sort) {
-    case SortPosts.HOT:
+    case PostSort.HOT:
       postsData = getHomeHotPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
 
-    case SortPosts.NEW:
+    case PostSort.NEW:
       postsData = getHomeNewPosts.execute({
         offset: 0,
         currentUserId: userId,
       });
       break;
 
-    case SortPosts.CONTROVERSIAL:
+    case PostSort.CONTROVERSIAL:
       postsData = getHomeControversialPosts.execute({
         offset: 0,
         currentUserId: userId,

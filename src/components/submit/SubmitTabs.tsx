@@ -19,19 +19,19 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { SubmitType } from "@/types";
+import { PostType } from "@/types";
 import cn from "@/utils/cn";
-import { submitTypeMap } from "./Submit";
+import { postTypeMap } from "./Submit";
 
 const icons: Record<
-  SubmitType,
+  PostType,
   { selected: React.JSX.Element; unselected: React.JSX.Element }
 > = {
-  [SubmitType.TEXT]: {
+  [PostType.TEXT]: {
     selected: <DocumentTextIconSolid className="size-6" />,
     unselected: <DocumentTextIcon className="size-6" />,
   },
-  [SubmitType.IMAGE]: {
+  [PostType.IMAGE]: {
     selected: <PhotoIconSolid className="size-6" />,
     unselected: <PhotoIcon className="size-6" />,
   },
@@ -39,10 +39,10 @@ const icons: Record<
 
 export default function SubmitTabs({
   children,
-  currentType,
+  postType,
 }: {
   children: React.ReactNode;
-  currentType: SubmitType;
+  postType: PostType;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -62,27 +62,26 @@ export default function SubmitTabs({
   return (
     <div className="flex flex-col">
       <div className="flex gap-px rounded-t bg-zinc-800 font-bold">
-        {Object.values(submitTypeMap).map((type, index, arr) => (
+        {Object.values(postTypeMap).map((type, index, arr) => (
           <button
             key={type}
             disabled={state.isDisabled}
             className={cn(
               "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 bg-zinc-900 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
               {
-                "border-b-2 border-b-zinc-300 text-zinc-300":
-                  currentType === type,
+                "border-b-2 border-b-zinc-300 text-zinc-300": postType === type,
                 "cursor-not-allowed hover:bg-inherit": state.isDisabled,
                 "rounded-tl": index === 0,
                 "rounded-tr": index === arr.length - 1,
               },
             )}
             onClick={() => {
-              if (currentType === type || state.isDisabled) return;
+              if (postType === type || state.isDisabled) return;
 
               router.replace(pathname + "?" + createQueryString(type));
             }}
           >
-            {currentType === type
+            {postType === type
               ? icons[type]["selected"]
               : icons[type]["unselected"]}
 

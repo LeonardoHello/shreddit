@@ -12,15 +12,15 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
-import { SubmitType } from "@/types";
+import { PostType } from "@/types";
 import cn from "@/utils/cn";
 
 export default function SubmitActionButton({
   selectedCommunity,
-  currentType,
+  postType,
 }: {
   selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
-  currentType: SubmitType;
+  postType: PostType;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -74,7 +74,7 @@ export default function SubmitActionButton({
     state.isDisabled ||
     state.title.length === 0 ||
     !selectedCommunity ||
-    (currentType === SubmitType.IMAGE && state.files.length === 0);
+    (postType === PostType.IMAGE && state.files.length === 0);
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -89,14 +89,14 @@ export default function SubmitActionButton({
 
           const { files, ...post } = state;
 
-          if (currentType === SubmitType.TEXT) {
+          if (postType === PostType.TEXT) {
             createPostText.mutate({
               ...post,
               communityId: selectedCommunity.id,
             });
           }
 
-          if (currentType === SubmitType.IMAGE) {
+          if (postType === PostType.IMAGE) {
             createPostImage.mutate({
               ...post,
               communityId: selectedCommunity.id,

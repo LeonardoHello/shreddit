@@ -15,7 +15,7 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
-import { SubmitType } from "@/types";
+import { PostType } from "@/types";
 import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
@@ -30,7 +30,7 @@ export default function SubmitCommunityDropdown({
   username: User["username"];
   imageUrl: User["imageUrl"];
   yourCommunities: Awaited<ReturnType<typeof getYourCommunities.execute>>;
-  searchParams: { type: SubmitType };
+  searchParams: { type: PostType };
 }) {
   const router = useRouter();
 
@@ -146,7 +146,7 @@ function SearchedCommunities({
 }: {
   search: string;
   router: Router;
-  searchParams: { type: SubmitType };
+  searchParams: { type: PostType };
 }) {
   const searchedCommunities = trpc.searchCommunities.useQuery(search, {
     initialData: [],

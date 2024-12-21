@@ -6,7 +6,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { getYourCommunities } from "@/api/getCommunities";
 import { getSelectedCommunity } from "@/api/getCommunity";
 import Submit from "@/components/submit/Submit";
-import { SubmitType } from "@/types";
+import { PostType } from "@/types";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
@@ -14,7 +14,7 @@ export const preferredRegion = ["fra1"];
 
 export default async function CommunitySubmitPage(props: {
   params: Promise<{ communityName: string }>;
-  searchParams: Promise<{ type: SubmitType }>;
+  searchParams: Promise<{ type: PostType }>;
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;

@@ -8,7 +8,7 @@ import { getSelectedCommunity } from "@/api/getCommunity";
 import SubmitActionButton from "@/components/submit/SubmitActionButton";
 import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitTabs from "@/components/submit/SubmitTabs";
-import { SameKeyValuePairRecord, SubmitType } from "@/types";
+import { PostType, SameKeyValuePairRecord } from "@/types";
 
 const SubmitRTE = dynamic(() => import("@/components/submit/SubmitRTE"));
 const SubmitDropzone = dynamic(
@@ -18,15 +18,15 @@ const SubmitCommunityDropdown = dynamic(
   () => import("@/components/submit/SubmitCommunityDropdown"),
 );
 
-export const submitTypeMap: SameKeyValuePairRecord<SubmitType> = {
-  [SubmitType.TEXT]: SubmitType.TEXT,
-  [SubmitType.IMAGE]: SubmitType.IMAGE,
+export const postTypeMap: SameKeyValuePairRecord<PostType> = {
+  [PostType.TEXT]: PostType.TEXT,
+  [PostType.IMAGE]: PostType.IMAGE,
 };
 
 // ensures that the correct component will render based on the "type" query parameter
-const componentMap: Record<SubmitType, React.ComponentType> = {
-  [SubmitType.TEXT]: SubmitRTE,
-  [SubmitType.IMAGE]: SubmitDropzone,
+const componentMap: Record<PostType, React.ComponentType> = {
+  [PostType.TEXT]: SubmitRTE,
+  [PostType.IMAGE]: SubmitDropzone,
 };
 
 export default async function Submit({
@@ -36,13 +36,13 @@ export default async function Submit({
   selectedCommunity,
 }: {
   user: User;
-  searchParams: { type: SubmitType };
+  searchParams: { type: PostType };
   yourCommunities: Awaited<ReturnType<typeof getYourCommunities.execute>>;
   selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
 }) {
   // ensures that the TEXT tab is selected by default incase the "type" query parameter is not provided
 
-  const currentType = submitTypeMap[searchParams.type] || SubmitType.TEXT;
+  const postType = postTypeMap[searchParams.type] || PostType.TEXT;
 
   return (
     <>
@@ -56,13 +56,13 @@ export default async function Submit({
       </SubmitCommunity>
 
       <div className="flex flex-col rounded bg-zinc-900">
-        <SubmitTabs currentType={currentType}>
-          {createElement(componentMap[currentType] || SubmitRTE)}
+        <SubmitTabs postType={postType}>
+          {createElement(componentMap[postType] || SubmitRTE)}
         </SubmitTabs>
         <hr className="border-zinc-700/70" />
         <SubmitActionButton
           selectedCommunity={selectedCommunity}
-          currentType={currentType}
+          postType={postType}
         />
       </div>
     </>

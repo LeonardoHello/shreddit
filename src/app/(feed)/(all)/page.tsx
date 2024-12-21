@@ -17,13 +17,13 @@ import PremiumButton from "@/components/feed/PremiumButton";
 import ScrollToTop from "@/components/feed/ScrollToTop";
 import InfiniteQueryAllPosts from "@/components/infiniteQuery/InfiniteQueryAllPosts";
 import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
-import { SortPosts, type QueryInfo } from "@/types";
+import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function AllPage(props: {
-  searchParams: Promise<{ sort: SortPosts }>;
+  searchParams: Promise<{ sort: PostSort }>;
 }) {
   const searchParams = await props.searchParams;
 
@@ -31,19 +31,19 @@ export default async function AllPage(props: {
 
   let postsData;
   switch (searchParams.sort) {
-    case SortPosts.HOT:
+    case PostSort.HOT:
       postsData = getAllHotPosts.execute({
         offset: 0,
       });
       break;
 
-    case SortPosts.NEW:
+    case PostSort.NEW:
       postsData = getAllNewPosts.execute({
         offset: 0,
       });
       break;
 
-    case SortPosts.CONTROVERSIAL:
+    case PostSort.CONTROVERSIAL:
       postsData = getAllControversialPosts.execute({
         offset: 0,
       });

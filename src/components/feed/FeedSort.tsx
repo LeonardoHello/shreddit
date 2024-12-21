@@ -16,7 +16,7 @@ import {
   TagIcon as SolidTagIcon,
 } from "@heroicons/react/24/solid";
 
-import { SortPosts } from "@/types";
+import { PostSort } from "@/types";
 import cn from "@/utils/cn";
 
 export default function FeedSort({
@@ -29,9 +29,9 @@ export default function FeedSort({
   const { sort, filter } = searchParams;
 
   const defaultSort = !(
-    sort === SortPosts.HOT ||
-    sort === SortPosts.NEW ||
-    sort === SortPosts.CONTROVERSIAL
+    sort === PostSort.HOT ||
+    sort === PostSort.NEW ||
+    sort === PostSort.CONTROVERSIAL
   );
 
   return (
@@ -41,7 +41,7 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: SortPosts.BEST, ...(filter && { filter }) },
+              query: { sort: PostSort.BEST, ...(filter && { filter }) },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
@@ -63,17 +63,17 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: SortPosts.HOT, ...(filter && { filter }) },
+              query: { sort: PostSort.HOT, ...(filter && { filter }) },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === SortPosts.HOT,
+                  sort === PostSort.HOT,
               },
             )}
           >
-            {sort === SortPosts.HOT ? (
+            {sort === PostSort.HOT ? (
               <SolidFireIcon className="h-6 w-6" />
             ) : (
               <FireIcon className="h-6 w-6" />
@@ -85,17 +85,17 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: SortPosts.NEW, ...(filter && { filter }) },
+              query: { sort: PostSort.NEW, ...(filter && { filter }) },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === SortPosts.NEW,
+                  sort === PostSort.NEW,
               },
             )}
           >
-            {sort === SortPosts.NEW ? (
+            {sort === PostSort.NEW ? (
               <SolidTagIcon className="h-6 w-6" />
             ) : (
               <TagIcon className="h-6 w-6" />
@@ -108,7 +108,7 @@ export default function FeedSort({
             href={{
               pathname,
               query: {
-                sort: SortPosts.CONTROVERSIAL,
+                sort: PostSort.CONTROVERSIAL,
                 ...(filter && { filter }),
               },
             }}
@@ -116,11 +116,11 @@ export default function FeedSort({
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
               {
                 "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === SortPosts.CONTROVERSIAL,
+                  sort === PostSort.CONTROVERSIAL,
               },
             )}
           >
-            {sort === SortPosts.CONTROVERSIAL ? (
+            {sort === PostSort.CONTROVERSIAL ? (
               <SolidChatBubbleBottomCenterTextIcon className="h-6 w-6" />
             ) : (
               <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />

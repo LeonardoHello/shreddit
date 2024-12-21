@@ -11,7 +11,7 @@ import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import InfiniteQueryCommunityPosts from "@/components/infiniteQuery/InfiniteQueryCommunityPosts";
 import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
-import { SortPosts, type QueryInfo } from "@/types";
+import { PostSort, type QueryInfo } from "@/types";
 
 export default async function CommunityPage(props: {
   params: Promise<{ communityName: string }>;
@@ -27,21 +27,21 @@ export default async function CommunityPage(props: {
 
   let postsData;
   switch (sort) {
-    case SortPosts.HOT:
+    case PostSort.HOT:
       postsData = getCommunityHotPosts.execute({
         offset: 0,
         communityName,
       });
       break;
 
-    case SortPosts.NEW:
+    case PostSort.NEW:
       postsData = getCommunityNewPosts.execute({
         offset: 0,
         communityName,
       });
       break;
 
-    case SortPosts.CONTROVERSIAL:
+    case PostSort.CONTROVERSIAL:
       postsData = getCommunityControversialPosts.execute({
         offset: 0,
         communityName,

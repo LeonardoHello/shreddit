@@ -48,7 +48,7 @@ import {
   UserToCommunitySchema,
   UserToPostSchema,
 } from "@/db/schema";
-import { SortPosts } from "@/types";
+import { PostSort } from "@/types";
 import getUserPosts from "@/utils/getUserPosts";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
@@ -60,27 +60,27 @@ export const appRouter = createTRPCRouter({
           // cursor input needed to expose useInfiniteQuery hook
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
-          sort: z.nativeEnum(SortPosts),
+          sort: z.nativeEnum(PostSort),
         }),
       )
       .query(async ({ input, ctx }) => {
         let posts;
         switch (input.sort) {
-          case SortPosts.HOT:
+          case PostSort.HOT:
             posts = await getHomeHotPosts.execute({
               offset: input.cursor,
               currentUserId: ctx.userId,
             });
             break;
 
-          case SortPosts.NEW:
+          case PostSort.NEW:
             posts = await getHomeNewPosts.execute({
               offset: input.cursor,
               currentUserId: ctx.userId,
             });
             break;
 
-          case SortPosts.CONTROVERSIAL:
+          case PostSort.CONTROVERSIAL:
             posts = await getHomeControversialPosts.execute({
               offset: input.cursor,
               currentUserId: ctx.userId,
@@ -112,19 +112,19 @@ export const appRouter = createTRPCRouter({
       .query(async ({ input }) => {
         let posts;
         switch (input.sort) {
-          case SortPosts.HOT:
+          case PostSort.HOT:
             posts = await getAllHotPosts.execute({
               offset: input.cursor,
             });
             break;
 
-          case SortPosts.NEW:
+          case PostSort.NEW:
             posts = await getAllNewPosts.execute({
               offset: input.cursor,
             });
             break;
 
-          case SortPosts.CONTROVERSIAL:
+          case PostSort.CONTROVERSIAL:
             posts = await getAllControversialPosts.execute({
               offset: input.cursor,
             });
@@ -156,21 +156,21 @@ export const appRouter = createTRPCRouter({
       .query(async ({ input: { cursor, sort, communityName } }) => {
         let posts;
         switch (sort) {
-          case SortPosts.HOT:
+          case PostSort.HOT:
             posts = await getCommunityHotPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
-          case SortPosts.NEW:
+          case PostSort.NEW:
             posts = await getCommunityNewPosts.execute({
               offset: cursor,
               communityName,
             });
             break;
 
-          case SortPosts.CONTROVERSIAL:
+          case PostSort.CONTROVERSIAL:
             posts = await getCommunityControversialPosts.execute({
               offset: cursor,
               communityName,

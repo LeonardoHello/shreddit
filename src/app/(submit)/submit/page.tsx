@@ -5,14 +5,14 @@ import { currentUser } from "@clerk/nextjs/server";
 
 import { getYourCommunities } from "@/api/getCommunities";
 import Submit from "@/components/submit/Submit";
-import { SubmitType } from "@/types";
+import { PostType } from "@/types";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function SubmitPage(props: {
-  searchParams: Promise<{ type: SubmitType }>;
+  searchParams: Promise<{ type: PostType }>;
 }) {
   const searchParams = await props.searchParams;
 
