@@ -1,6 +1,5 @@
-import { type InferSelectModel, relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import {
-  type AnyPgColumn,
   boolean,
   index,
   pgEnum,
@@ -10,6 +9,7 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
@@ -27,10 +27,10 @@ export const users = pgTable(
     name: text("name").unique().notNull(),
     imageUrl: text("image_url").notNull(),
   },
-  (t) => ({
-    idIdx: uniqueIndex("user_id_idx").on(t.id),
-    nameIdx: uniqueIndex("user_name_idx").on(t.name),
-  }),
+  (t) => [
+    uniqueIndex("user_id_idx").on(t.id),
+    uniqueIndex("user_name_idx").on(t.name),
+  ],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -56,10 +56,10 @@ export const communities = pgTable(
       })
       .notNull(),
   },
-  (t) => ({
-    idIdx: uniqueIndex("community_id_idx").on(t.id),
-    nameIdx: uniqueIndex("community_name_idx").on(t.name),
-  }),
+  (t) => [
+    uniqueIndex("community_id_idx").on(t.id),
+    uniqueIndex("community_name_idx").on(t.name),
+  ],
 );
 
 export const communitiesRelations = relations(communities, ({ one, many }) => ({
@@ -85,10 +85,10 @@ export const usersToCommunities = pgTable(
     favorite: boolean("favorite").notNull().default(false),
     member: boolean("member").notNull().default(true),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.communityId] }),
-    userIdIdx: index("user_to_community_user_id_idx").on(t.userId),
-  }),
+  (t) => [
+    primaryKey({ columns: [t.userId, t.communityId] }),
+    index("user_to_community_user_id_idx").on(t.userId),
+  ],
 );
 
 export const usersToCommunitiesRelations = relations(
@@ -125,9 +125,7 @@ export const posts = pgTable(
       .notNull(),
   },
 
-  (t) => ({
-    idIdx: uniqueIndex("post_id_idx").on(t.id),
-  }),
+  (t) => [uniqueIndex("post_id_idx").on(t.id)],
 );
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -158,11 +156,11 @@ export const usersToPosts = pgTable(
     saved: boolean("saved").notNull().default(false),
     hidden: boolean("hidden").notNull().default(false),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.postId] }),
-    userIdIdx: index("user_to_post_user_id_idx").on(t.userId),
-    postIdIdx: index("user_to_post_post_id_idx").on(t.postId),
-  }),
+  (t) => [
+    primaryKey({ columns: [t.userId, t.postId] }),
+    index("user_to_post_user_id_idx").on(t.userId),
+    index("user_to_post_post_id_idx").on(t.postId),
+  ],
 );
 
 export const usersToPostsRelations = relations(usersToPosts, ({ one }) => ({
@@ -215,9 +213,7 @@ export const comments = pgTable(
       .references(() => posts.id, { onDelete: "cascade" })
       .notNull(),
   },
-  (t) => ({
-    idIdx: uniqueIndex("comment_id_idx").on(t.id),
-  }),
+  (t) => [uniqueIndex("comment_id_idx").on(t.id)],
 );
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -248,11 +244,11 @@ export const usersToComments = pgTable(
       .notNull(),
     voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.userId, t.commentId] }),
-    userIdIdx: index("user_to_comment_user_id_idx").on(t.userId),
-    commentIdIdx: index("user_to_comment_comment_id_idx").on(t.commentId),
-  }),
+  (t) => [
+    primaryKey({ columns: [t.userId, t.commentId] }),
+    index("user_to_comment_user_id_idx").on(t.userId),
+    index("user_to_comment_comment_id_idx").on(t.commentId),
+  ],
 );
 
 export const usersToCommentsRelations = relations(
