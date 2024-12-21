@@ -19,13 +19,9 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { SameKeyValuePairRecord, SubmitType } from "@/types";
+import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
-
-const tabs: SameKeyValuePairRecord<SubmitType> = {
-  [SubmitType.TEXT]: SubmitType.TEXT,
-  [SubmitType.IMAGE]: SubmitType.IMAGE,
-};
+import { submitTypeMap } from "./Submit";
 
 const icons: Record<
   SubmitType,
@@ -68,7 +64,7 @@ export default function SubmitTabs({
   return (
     <div className="flex flex-col">
       <div className="flex gap-px rounded-t bg-zinc-800 font-bold">
-        {Object.values(tabs).map((type, index, arr) => (
+        {Object.values(submitTypeMap).map((type, index, arr) => (
           <button
             key={type}
             disabled={disabled}
