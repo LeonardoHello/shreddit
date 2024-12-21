@@ -5,6 +5,7 @@ import { PhotoIcon } from "@heroicons/react/24/outline";
 
 import type { getUserById } from "@/api/getUser";
 import { Community } from "@/db/schema";
+import { PostType } from "@/types";
 
 export default function FeedInput({
   user,
@@ -28,8 +29,8 @@ export default function FeedInput({
 
       <Link
         href={{
-          pathname: "/submit",
-          ...(communityName && { query: { community: communityName } }),
+          pathname: communityName ? `/r/${communityName}/submit` : "/submit",
+          query: { type: PostType.TEXT },
         }}
         className="flex grow rounded"
       >
@@ -42,11 +43,8 @@ export default function FeedInput({
 
       <Link
         href={{
-          pathname: "/submit",
-          query: {
-            submit: "media",
-            ...(communityName && { community: communityName }),
-          },
+          pathname: communityName ? `/r/${communityName}/submit` : "/submit",
+          query: { type: PostType.IMAGE },
         }}
         className="rounded p-1.5 hover:bg-zinc-700/50"
       >
