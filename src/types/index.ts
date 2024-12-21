@@ -27,6 +27,6 @@ export enum PostFilter {
 }
 
 export enum PostType {
-  TEXT = "text",
-  IMAGE = "image",
+  TEXT = "TEXT",
+  IMAGE = "IMAGE",
 }

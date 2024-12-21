@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import dynamic from "next/dynamic";
 
-import { User } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 import { getYourCommunities } from "@/api/getCommunities";
 import { getSelectedCommunity } from "@/api/getCommunity";
@@ -18,7 +18,7 @@ const SubmitCommunityDropdown = dynamic(
   () => import("@/components/submit/SubmitCommunityDropdown"),
 );
 
-export const postTypeMap: SameKeyValuePairRecord<PostType> = {
+const postTypeMap: SameKeyValuePairRecord<PostType> = {
   [PostType.TEXT]: PostType.TEXT,
   [PostType.IMAGE]: PostType.IMAGE,
 };
@@ -30,18 +30,31 @@ const componentMap: Record<PostType, React.ComponentType> = {
 };
 
 export default async function Submit({
-  user,
+  params,
   searchParams,
-  yourCommunities,
-  selectedCommunity,
 }: {
-  user: User;
+  params: { communityName?: string };
   searchParams: { type: PostType };
-  yourCommunities: Awaited<ReturnType<typeof getYourCommunities.execute>>;
-  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
 }) {
-  // ensures that the TEXT tab is selected by default incase the "type" query parameter is not provided
+  const user = await currentUser();
 
+  if (!user) throw new Error("Cannot read current user information.");
+
+  const yourCommunitiesData = getYourCommunities.execute({
+    currentUserId: user.id,
+  });
+  const selectedCommunityData = getSelectedCommunity.execute({
+    communityName: params.communityName,
+  });
+
+  const [yourCommunities, selectedCommunity] = await Promise.all([
+    yourCommunitiesData,
+    selectedCommunityData,
+  ]).catch(() => {
+    throw new Error("There was a problem with loading user information.");
+  });
+
+  // ensures that the TEXT tab is selected by default incase the "type" query parameter is not provided
   const postType = postTypeMap[searchParams.type] || PostType.TEXT;
 
   return (

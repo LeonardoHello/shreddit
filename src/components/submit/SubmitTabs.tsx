@@ -19,9 +19,13 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { PostType } from "@/types";
+import { PostType, SameKeyValuePairRecord } from "@/types";
 import cn from "@/utils/cn";
-import { postTypeMap } from "./Submit";
+
+const postTypeMap: SameKeyValuePairRecord<PostType> = {
+  [PostType.TEXT]: PostType.TEXT,
+  [PostType.IMAGE]: PostType.IMAGE,
+};
 
 const icons: Record<
   PostType,

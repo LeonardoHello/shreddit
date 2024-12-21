@@ -1,10 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs/server";
-
-import { getYourCommunities } from "@/api/getCommunities";
-import { getSelectedCommunity } from "@/api/getCommunity";
 import Submit from "@/components/submit/Submit";
 import { PostType } from "@/types";
 import ogre from "@public/logo-green.svg";
@@ -19,24 +15,6 @@ export default async function CommunitySubmitPage(props: {
   const params = await props.params;
   const searchParams = await props.searchParams;
 
-  const user = await currentUser();
-
-  if (!user) throw new Error("Cannot read current user information.");
-
-  const yourCommunitiesData = getYourCommunities.execute({
-    currentUserId: user.id,
-  });
-  const selectedCommunityData = getSelectedCommunity.execute({
-    communityName: params.communityName,
-  });
-
-  const [yourCommunities, selectedCommunity] = await Promise.all([
-    yourCommunitiesData,
-    selectedCommunityData,
-  ]).catch(() => {
-    throw new Error("There was a problem with loading user information.");
-  });
-
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2">
@@ -44,12 +22,7 @@ export default async function CommunitySubmitPage(props: {
           Create a post
         </h1>
 
-        <Submit
-          user={user}
-          searchParams={searchParams}
-          yourCommunities={yourCommunities}
-          selectedCommunity={selectedCommunity}
-        />
+        <Submit params={params} searchParams={searchParams} />
       </div>
 
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">

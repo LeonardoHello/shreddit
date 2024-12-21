@@ -1,9 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs/server";
-
-import { getYourCommunities } from "@/api/getCommunities";
 import Submit from "@/components/submit/Submit";
 import { PostType } from "@/types";
 import ogre from "@public/logo-green.svg";
@@ -12,21 +9,12 @@ export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function SubmitPage(props: {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  params: Promise<{}>;
   searchParams: Promise<{ type: PostType }>;
 }) {
+  const params = await props.params;
   const searchParams = await props.searchParams;
-
-  const user = await currentUser();
-
-  if (!user) throw new Error("Cannot read current user information.");
-
-  const yourCommunities = await getYourCommunities
-    .execute({
-      currentUserId: user.id,
-    })
-    .catch(() => {
-      throw new Error("There was a problem with loading some information.");
-    });
 
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
@@ -35,11 +23,7 @@ export default async function SubmitPage(props: {
           Create a post
         </h1>
 
-        <Submit
-          user={user}
-          searchParams={searchParams}
-          yourCommunities={yourCommunities}
-        />
+        <Submit params={params} searchParams={searchParams} />
       </div>
 
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
