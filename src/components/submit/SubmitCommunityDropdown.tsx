@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,11 +8,7 @@ import { User } from "@clerk/nextjs/server";
 import { toast } from "sonner";
 
 import type { getYourCommunities } from "@/api/getCommunities";
-import {
-  REDUCER_ACTION_TYPE,
-  useSubmitContext,
-  useSubmitDispatchContext,
-} from "@/context/SubmitContext";
+import { useSubmitContext } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import { PostType } from "@/types";
 import cn from "@/utils/cn";
@@ -35,16 +30,6 @@ export default function SubmitCommunityDropdown({
   const router = useRouter();
 
   const state = useSubmitContext();
-  const dispatch = useSubmitDispatchContext();
-
-  useEffect(() => {
-    return () => {
-      dispatch({
-        type: REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY,
-        nextSearch: "",
-      });
-    };
-  }, [dispatch]);
 
   return (
     <>

@@ -8,6 +8,7 @@ import {
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   REDUCER_ACTION_TYPE,
+  useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import useDropdown from "@/hooks/useDropdown";
@@ -58,6 +59,7 @@ export default function SubmitCommunity({
 }
 
 function SearchCommunity() {
+  const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
   const utils = trpc.useUtils();
@@ -84,6 +86,7 @@ function SearchCommunity() {
         className="truncate bg-inherit text-sm font-medium outline-none placeholder:text-zinc-300"
         placeholder="Search communities"
         autoFocus
+        defaultValue={state.search}
         onChange={onInputChange}
       />
     </>
