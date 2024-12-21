@@ -92,9 +92,7 @@ export default function SubmitActionButton({
               ...post,
               communityId: selectedCommunity.id,
             });
-          }
-
-          if (state.type === PostType.IMAGE) {
+          } else if (state.type === PostType.IMAGE) {
             createPostImage.mutate({
               ...post,
               communityId: selectedCommunity.id,
