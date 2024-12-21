@@ -41,7 +41,7 @@ const extensions = [
   }),
 ];
 
-export default function RTEPostSubmit() {
+export default function SubmitRTE() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
@@ -113,7 +113,7 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
+      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
       return files;
     },
     onUploadProgress: (p) => {
@@ -148,19 +148,13 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
         })
         .run();
 
-      const files = res.map(({ size, serverData, ...rest }) => rest);
-
-      dispatch({
-        type: REDUCER_ACTION_TYPE.ADDED_FILES_RTE,
-        nextFiles: files,
-      });
-      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
+      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
 
       toast.dismiss(toastId);
     },
 
     onUploadError: (e) => {
-      dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
+      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
 
       toast.error(e.message);
     },

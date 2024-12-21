@@ -1,9 +1,9 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
@@ -23,34 +23,58 @@ export default function SubmitActionButton({
   currentType: SubmitType;
 }) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
-  const createPost = trpc.createPost.useMutation({
+  const createPostText = trpc.createPostText.useMutation({
     onMutate: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.STARTED_MUTATE });
+      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
     },
     onSuccess: (data) => {
-      const [post] = data[0];
+      const post = data[0];
 
-      router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
+      startTransition(() => {
+        router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
+      });
     },
     onError: (error) => {
       toast.error(error.message);
     },
     onSettled: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.STOP_MUTATE });
+      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
     },
   });
 
+  const createPostImage = trpc.createPostImage.useMutation({
+    onMutate: () => {
+      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
+    },
+    onSuccess: (data) => {
+      const post = data[0][0];
+
+      startTransition(() => {
+        router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+    },
+  });
+
+  const isMutating =
+    createPostText.isPending || createPostImage.isPending || isPending;
+
   const disabled =
-    (currentType === SubmitType.TEXT && state.text === null) ||
-    (currentType === SubmitType.IMAGE && state.files.length === 0) ||
+    isMutating ||
+    state.isDisabled ||
+    state.title.length === 0 ||
     !selectedCommunity ||
-    state.isMutating ||
-    state.isUploading ||
-    state.title.length === 0;
+    (currentType === SubmitType.IMAGE && state.files.length === 0);
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -63,45 +87,25 @@ export default function SubmitActionButton({
         onClick={() => {
           if (!selectedCommunity || disabled) return;
 
-          const postId = uuidv4();
+          const { files, ...post } = state;
 
           if (currentType === SubmitType.TEXT) {
-            const filterFiles = state.filesRTE.filter((file) =>
-              state.text?.includes(`<img src="${file.url}" alt="${file.name}"`),
-            );
-
-            const files = filterFiles.map((file) => ({
-              ...file,
-              postId,
-            }));
-
-            createPost.mutate({
-              post: {
-                ...state,
-                id: uuidv4(),
-                communityId: selectedCommunity.id,
-              },
-              files,
+            createPostText.mutate({
+              ...post,
+              communityId: selectedCommunity.id,
             });
-          } else if (currentType === SubmitType.IMAGE) {
-            const files = state.files.map((file) => ({
-              ...file,
-              postId,
-            }));
+          }
 
-            createPost.mutate({
-              post: {
-                ...state,
-                id: uuidv4(),
-                communityId: selectedCommunity.id,
-                text: null,
-              },
+          if (currentType === SubmitType.IMAGE) {
+            createPostImage.mutate({
+              ...post,
+              communityId: selectedCommunity.id,
               files,
             });
           }
         }}
       >
-        {state.isMutating ? "posting..." : "post"}
+        {isMutating ? "posting..." : "post"}
       </button>
     </div>
   );

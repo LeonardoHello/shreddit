@@ -1,5 +1,6 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import { getComment } from "@/api/getComment";
@@ -327,37 +328,47 @@ export const appRouter = createTRPCRouter({
         })
         .returning({ muted: usersToCommunities.muted });
     }),
-  createPost: protectedProcedure
+  createPostText: protectedProcedure
     .input(
-      z.object({
-        post: PostSchema.omit({
-          createdAt: true,
-          updatedAt: true,
-          authorId: true,
-        }),
-        files: FileSchema.omit({ id: true, postId: true }).array(),
+      PostSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
       }),
     )
-    .mutation(async ({ input, ctx }) => {
-      if (input.files.length === 0) {
-        const postId = await ctx.db
-          .insert(posts)
-          .values({ ...input.post, authorId: ctx.userId })
-          .returning({ id: posts.id });
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .insert(posts)
+        .values({ ...input, authorId: ctx.userId })
+        .returning({ id: posts.id });
+    }),
+  createPostImage: protectedProcedure
+    .input(
+      PostSchema.omit({
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
+      }).and(
+        z.object({
+          files: FileSchema.omit({ id: true, postId: true }).array(),
+        }),
+      ),
+    )
+    .mutation(({ input, ctx }) => {
+      const { files: postFiles, ...post } = input;
 
-        return [postId];
-      }
+      const postId = uuidv4();
 
       return ctx.db.batch([
         ctx.db
           .insert(posts)
-          .values({ ...input.post, authorId: ctx.userId })
+          .values({ ...post, text: null, id: postId, authorId: ctx.userId })
           .returning({ id: posts.id }),
         ctx.db
           .insert(files)
-          .values(
-            input.files.map((file) => ({ ...file, postId: input.post.id })),
-          ),
+          .values(postFiles.map((file) => ({ ...file, postId }))),
       ]);
     }),
   editPost: protectedProcedure

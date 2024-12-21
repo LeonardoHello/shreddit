@@ -17,7 +17,7 @@ export default function SubmitDropzone() {
     <UploadDropzone
       endpoint="imageUploader"
       onBeforeUploadBegin={(files) => {
-        dispatch({ type: REDUCER_ACTION_TYPE.STARTED_UPLOAD });
+        dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
 
         return files;
       }}
@@ -37,13 +37,17 @@ export default function SubmitDropzone() {
       }}
       className="mt-0 min-h-[18rem] rounded border border-zinc-700/70"
       onClientUploadComplete={(res) => {
-        const files = res.map(({ size, serverData, ...rest }) => rest);
+        const files = res.map((file) => ({
+          name: file.name,
+          key: file.key,
+          url: file.url,
+        }));
 
         dispatch({
           type: REDUCER_ACTION_TYPE.CHANGED_FILES,
           nextFiles: files,
         });
-        dispatch({ type: REDUCER_ACTION_TYPE.STOPPED_UPLOAD });
+        dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
       }}
       onUploadError={(e) => {
         toast.error(e.message);

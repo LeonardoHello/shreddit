@@ -57,8 +57,6 @@ export default function SubmitTabs({
     return params.toString();
   }, []);
 
-  const disabled = state.isMutating || state.isUploading;
-
   const maxTitleLength = 300;
 
   return (
@@ -67,19 +65,19 @@ export default function SubmitTabs({
         {Object.values(submitTypeMap).map((type, index, arr) => (
           <button
             key={type}
-            disabled={disabled}
+            disabled={state.isDisabled}
             className={cn(
               "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 bg-zinc-900 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
               {
                 "border-b-2 border-b-zinc-300 text-zinc-300":
                   currentType === type,
-                "cursor-not-allowed hover:bg-inherit": disabled,
+                "cursor-not-allowed hover:bg-inherit": state.isDisabled,
                 "rounded-tl": index === 0,
                 "rounded-tr": index === arr.length - 1,
               },
             )}
             onClick={() => {
-              if (currentType === type || disabled) return;
+              if (currentType === type || state.isDisabled) return;
 
               router.replace(pathname + "?" + createQueryString(type));
             }}
