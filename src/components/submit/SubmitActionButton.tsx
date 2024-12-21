@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 
-import { CheckIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 
@@ -15,15 +14,13 @@ import {
 import { trpc } from "@/trpc/client";
 import { SubmitType } from "@/types";
 import cn from "@/utils/cn";
-import RTEPostSubmit from "../RTE/RTEPostSubmit";
-import Dropzone from "./SubmitDropzone";
 
-const maxTitleLength = 300;
-
-export default function SubmitContent({
+export default function SubmitActionButton({
   selectedCommunity,
+  currentType,
 }: {
   selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
+  currentType: SubmitType;
 }) {
   const router = useRouter();
 
@@ -48,8 +45,8 @@ export default function SubmitContent({
   });
 
   const disabled =
-    (state.type === SubmitType.TEXT && state.text === null) ||
-    (state.type === SubmitType.IMAGE && state.files.length === 0) ||
+    (currentType === SubmitType.TEXT && state.text === null) ||
+    (currentType === SubmitType.IMAGE && state.files.length === 0) ||
     !selectedCommunity ||
     state.isMutating ||
     state.isUploading ||
@@ -57,61 +54,6 @@ export default function SubmitContent({
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="flex flex-col gap-2">
-        <div className="relative flex items-center">
-          <input
-            placeholder="Title"
-            defaultValue={state.title}
-            maxLength={maxTitleLength}
-            autoComplete="off"
-            className="w-full min-w-0 overflow-y-hidden rounded bg-inherit py-2.5 pl-4 pr-16 text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 focus:ring-zinc-300"
-            onChange={(e) => {
-              dispatch({
-                type: REDUCER_ACTION_TYPE.CHANGED_TITLE,
-                nextTitle: e.currentTarget.value,
-              });
-            }}
-          />
-          <div className="absolute right-3 text-2xs font-bold text-zinc-500">
-            {state.title.length}/{maxTitleLength}
-          </div>
-        </div>
-
-        {state.type === SubmitType.TEXT && <RTEPostSubmit />}
-        {state.type === SubmitType.IMAGE && <Dropzone />}
-      </div>
-
-      <div className="flex items-center gap-2 font-bold text-zinc-400">
-        <button
-          className={cn(
-            "flex items-center gap-1.5 rounded-full border border-zinc-500 px-3.5 py-1 capitalize tracking-wide",
-            { "border-zinc-950 bg-zinc-950 text-zinc-300": state.spoiler },
-          )}
-          onClick={() => {
-            dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_SPOILER });
-          }}
-        >
-          {state.spoiler && <CheckIcon className="h-6 w-6 rotate-6" />}
-          {!state.spoiler && <PlusIcon className="h-6 w-6" />}
-          spoiler
-        </button>
-        <button
-          className={cn(
-            "flex items-center gap-1.5 rounded-full border border-zinc-500 px-3.5 py-1 uppercase tracking-wide",
-            { "border-rose-500 bg-rose-500 text-zinc-900": state.nsfw },
-          )}
-          onClick={() => {
-            dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_NSFW });
-          }}
-        >
-          {state.nsfw && <CheckIcon className="h-6 w-6 rotate-6" />}
-          {!state.nsfw && <PlusIcon className="h-6 w-6" />}
-          nsfw
-        </button>
-      </div>
-
-      <hr className="border-zinc-700/70" />
-
       <button
         className={cn(
           "self-end rounded-full bg-zinc-300 px-5 py-1.5 font-bold capitalize tracking-wide text-zinc-900 transition-colors hover:bg-zinc-400",
@@ -123,7 +65,7 @@ export default function SubmitContent({
 
           const postId = uuidv4();
 
-          if (state.type === SubmitType.TEXT) {
+          if (currentType === SubmitType.TEXT) {
             const filterFiles = state.filesRTE.filter((file) =>
               state.text?.includes(`<img src="${file.url}" alt="${file.name}"`),
             );
@@ -141,7 +83,7 @@ export default function SubmitContent({
               },
               files,
             });
-          } else if (state.type === SubmitType.IMAGE) {
+          } else if (currentType === SubmitType.IMAGE) {
             const files = state.files.map((file) => ({
               ...file,
               postId,

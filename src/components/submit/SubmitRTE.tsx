@@ -28,9 +28,9 @@ import {
 } from "@/context/SubmitContext";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEMarkButtons from "./RTEMarkButtons";
-import RTENodeButtons from "./RTENodeButtons";
-import RTEpostLoading from "./RTEPostLoading";
+import RTEMarkButtons from "../RTE/RTEMarkButtons";
+import RTENodeButtons from "../RTE/RTENodeButtons";
+import RTEpostLoading from "../RTE/RTEPostLoading";
 
 const extensions = [
   StarterKit,
@@ -46,6 +46,7 @@ export default function RTEPostSubmit() {
   const dispatch = useSubmitDispatchContext();
 
   const editor = useEditor({
+    immediatelyRender: false,
     content: state.text || "",
     extensions,
     editorProps: {

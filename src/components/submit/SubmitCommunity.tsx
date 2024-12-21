@@ -16,11 +16,11 @@ import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunity({
-  selectedCommunity,
   children,
+  selectedCommunity,
 }: {
-  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
   children: React.ReactNode;
+  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
 }) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
@@ -40,10 +40,7 @@ export default function SubmitCommunity({
       >
         {isOpen && <SearchCommunity />}
 
-        {!isOpen && !selectedCommunity && <UnselectedCommunity />}
-        {!isOpen && selectedCommunity && (
-          <SelectedCommunity selectedCommunity={selectedCommunity} />
-        )}
+        {!isOpen && <SelectedComunity selectedCommunity={selectedCommunity} />}
 
         <ChevronDownIcon className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500" />
       </button>
@@ -93,30 +90,28 @@ function SearchCommunity() {
   );
 }
 
-function SelectedCommunity({
+function SelectedComunity({
   selectedCommunity,
 }: {
-  selectedCommunity: NonNullable<
-    Awaited<ReturnType<typeof getSelectedCommunity.execute>>
-  >;
+  selectedCommunity: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
 }) {
+  if (!selectedCommunity) {
+    return (
+      <>
+        <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
+        <h1 className="grow truncate text-start text-sm font-medium">
+          Choose a community
+        </h1>
+      </>
+    );
+  }
+
   return (
     <>
       <CommunityImage imageUrl={selectedCommunity.imageUrl} size={24} />
 
       <h1 className="grow truncate text-start text-sm font-medium">
         r/{selectedCommunity.name}
-      </h1>
-    </>
-  );
-}
-
-function UnselectedCommunity() {
-  return (
-    <>
-      <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
-      <h1 className="grow truncate text-start text-sm font-medium">
-        Choose a community
       </h1>
     </>
   );

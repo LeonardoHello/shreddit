@@ -2,6 +2,8 @@ import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
 
 export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
 
+export type SameKeyValuePairRecord<K extends SubmitType> = { [P in K]: P };
+
 export type InfiniteQueryPostProcedure =
   keyof RouterOutput["infiniteQueryPosts"];
 
@@ -25,8 +27,6 @@ export enum FilterPosts {
 }
 
 export enum SubmitType {
-  TEXT = "text",
-  IMAGE = "image",
-  VIDEO = "video",
-  LINK = "link",
+  TEXT = "TEXT",
+  IMAGE = "IMAGE",
 }

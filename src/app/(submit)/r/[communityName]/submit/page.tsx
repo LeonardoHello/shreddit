@@ -1,15 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 import { getYourCommunities } from "@/api/getCommunities";
 import { getSelectedCommunity } from "@/api/getCommunity";
-import { getUserById } from "@/api/getUser";
-import SubmitCommunity from "@/components/submit/SubmitCommunity";
-import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
-import SubmitContent from "@/components/submit/SubmitContent";
-import SubmitMenu from "@/components/submit/SubmitMenu";
+import Submit from "@/components/submit/Submit";
+import { SubmitType } from "@/types";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
@@ -17,30 +14,28 @@ export const preferredRegion = ["fra1"];
 
 export default async function CommunitySubmitPage(props: {
   params: Promise<{ communityName: string }>;
+  searchParams: Promise<{ type: SubmitType }>;
 }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
 
-  const { userId } = await auth();
+  const user = await currentUser();
 
-  if (!userId) throw new Error("Cannot read current user information.");
+  if (!user) throw new Error("Cannot read current user information.");
 
-  const userData = getUserById.execute({ currentUserId: userId });
   const yourCommunitiesData = getYourCommunities.execute({
-    currentUserId: userId,
+    currentUserId: user.id,
   });
   const selectedCommunityData = getSelectedCommunity.execute({
     communityName: params.communityName,
   });
 
-  const [user, yourCommunities, selectedCommunity] = await Promise.all([
-    userData,
+  const [yourCommunities, selectedCommunity] = await Promise.all([
     yourCommunitiesData,
     selectedCommunityData,
   ]).catch(() => {
     throw new Error("There was a problem with loading user information.");
   });
-
-  if (!user) throw new Error("Cannot read current user information.");
 
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
@@ -49,15 +44,14 @@ export default async function CommunitySubmitPage(props: {
           Create a post
         </h1>
 
-        <SubmitCommunity selectedCommunity={selectedCommunity}>
-          <SubmitCommunityDropdown
-            user={user}
-            yourCommunities={yourCommunities}
-          />
-        </SubmitCommunity>
-        <SubmitMenu />
-        <SubmitContent selectedCommunity={selectedCommunity} />
+        <Submit
+          user={user}
+          searchParams={searchParams}
+          yourCommunities={yourCommunities}
+          selectedCommunity={selectedCommunity}
+        />
       </div>
+
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
         <div className="rounded bg-zinc-900 p-4">
           <div className="mb-2 flex items-center gap-2">

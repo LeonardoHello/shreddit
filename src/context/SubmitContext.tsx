@@ -3,7 +3,6 @@
 import { createContext, useContext, useReducer } from "react";
 
 import type { File, Post } from "@/db/schema";
-import { SubmitType } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   files: Omit<File, "id" | "postId">[];
@@ -11,12 +10,10 @@ type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   search: string;
   isMutating: boolean;
   isUploading: boolean;
-  type: SubmitType;
 };
 
 export enum REDUCER_ACTION_TYPE {
   SEARCHED_COMMUNITY,
-  CHANGED_TYPE,
   CHANGED_TITLE,
   CHANGED_TEXT,
   CHANGED_FILES,
@@ -31,7 +28,6 @@ export enum REDUCER_ACTION_TYPE {
 
 type ReducerAction =
   | { type: typeof REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY; nextSearch: string }
-  | { type: typeof REDUCER_ACTION_TYPE.CHANGED_TYPE; nextType: SubmitType }
   | {
       type: typeof REDUCER_ACTION_TYPE.CHANGED_TITLE;
       nextTitle: ReducerState["title"];
@@ -57,9 +53,6 @@ type ReducerAction =
 
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
-    case REDUCER_ACTION_TYPE.CHANGED_TYPE:
-      return { ...state, type: action.nextType };
-
     case REDUCER_ACTION_TYPE.CHANGED_TITLE:
       return { ...state, title: action.nextTitle };
 
@@ -109,7 +102,6 @@ export default function SubmitContextProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(reducer, {
-    type: SubmitType.TEXT,
     title: "",
     text: null,
     nsfw: false,

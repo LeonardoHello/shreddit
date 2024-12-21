@@ -1,53 +1,45 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 import { getYourCommunities } from "@/api/getCommunities";
-import { getUserById } from "@/api/getUser";
-import SubmitCommunity from "@/components/submit/SubmitCommunity";
-import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
-import SubmitContent from "@/components/submit/SubmitContent";
-import SubmitMenu from "@/components/submit/SubmitMenu";
+import Submit from "@/components/submit/Submit";
+import { SubmitType } from "@/types";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function SubmitPage() {
-  const { userId } = await auth();
+export default async function SubmitPage(props: {
+  searchParams: Promise<{ type: SubmitType }>;
+}) {
+  const searchParams = await props.searchParams;
 
-  if (!userId) throw new Error("Cannot read current user information.");
-
-  const userData = getUserById.execute({ currentUserId: userId });
-  const yourCommunitiesData = getYourCommunities.execute({
-    currentUserId: userId,
-  });
-
-  const [user, yourCommunities] = await Promise.all([
-    userData,
-    yourCommunitiesData,
-  ]).catch(() => {
-    throw new Error("There was a problem with loading user information.");
-  });
+  const user = await currentUser();
 
   if (!user) throw new Error("Cannot read current user information.");
+
+  const yourCommunities = await getYourCommunities
+    .execute({
+      currentUserId: user.id,
+    })
+    .catch(() => {
+      throw new Error("There was a problem with loading some information.");
+    });
 
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2">
-        <h1 className="mb-2 border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
+        <h1 className="border-b border-zinc-700/70 py-2 text-lg font-medium tracking-wide">
           Create a post
         </h1>
 
-        <SubmitCommunity>
-          <SubmitCommunityDropdown
-            user={user}
-            yourCommunities={yourCommunities}
-          />
-        </SubmitCommunity>
-        <SubmitMenu />
-        <SubmitContent />
+        <Submit
+          user={user}
+          searchParams={searchParams}
+          yourCommunities={yourCommunities}
+        />
       </div>
 
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
