@@ -45,7 +45,7 @@ export const getJoinedCommunities = db.query.usersToCommunities
   })
   .prepare("get_joined_communities");
 
-export const getYourCommunities = db.query.usersToCommunities
+export const getMyCommunities = db.query.usersToCommunities
   .findMany({
     where: (userToCommunity, { sql, and, eq }) =>
       and(

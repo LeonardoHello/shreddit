@@ -1,20 +1,28 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import Submit from "@/components/submit/Submit";
-import { PostType } from "@/types";
+import { currentUser } from "@clerk/nextjs/server";
+
+import { getMyCommunities } from "@/api/getCommunities";
+import SubmitCommunity from "@/components/submit/SubmitCommunity";
+import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
+import SubmitCommunitySearch from "@/components/submit/SubmitCommunitySearch";
+import SubmitTabs from "@/components/submit/SubmitTabs";
+import DropdownContextProvider from "@/context/dropdownContext";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
-export default async function SubmitPage(props: {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  params: Promise<{}>;
-  searchParams: Promise<{ type: PostType }>;
-}) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
+export default async function SubmitPage() {
+  const user = await currentUser();
+
+  if (!user) throw new Error("Cannot read current user information.");
+
+  const myCommunitiesPromise = getMyCommunities.execute({
+    currentUserId: user.id,
+  });
 
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
@@ -23,7 +31,31 @@ export default async function SubmitPage(props: {
           Create a post
         </h1>
 
-        <Submit params={params} searchParams={searchParams} />
+        <DropdownContextProvider className="relative max-w-min bg-zinc-900">
+          <SubmitCommunity>
+            <SubmitCommunitySearch />
+            <Suspense fallback={<p>Loading...</p>}>
+              <SubmitCommunityDropdown
+                username={user.username}
+                imageUrl={user.imageUrl}
+                myCommunitiesPromise={myCommunitiesPromise}
+              />
+            </Suspense>
+          </SubmitCommunity>
+        </DropdownContextProvider>
+
+        <div className="flex flex-col rounded bg-zinc-900">
+          <SubmitTabs />
+          <hr className="border-zinc-700/70" />
+          <div className="flex flex-col gap-4 p-4">
+            <button
+              className="cursor-not-allowed self-end rounded-full bg-zinc-400 px-5 py-1.5 font-bold capitalize tracking-wide text-zinc-900 transition-colors"
+              disabled
+            >
+              Post
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">

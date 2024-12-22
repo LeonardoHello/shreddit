@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { use, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
@@ -15,11 +15,16 @@ import { trpc } from "@/trpc/client";
 import { PostType } from "@/types";
 import cn from "@/utils/cn";
 
-export default function SubmitActionButton({
-  selectedCommunity,
+export default function SubmitButton({
+  selectedCommunityPromise,
 }: {
-  selectedCommunity?: Awaited<ReturnType<typeof getSelectedCommunity.execute>>;
+  selectedCommunityPromise: ReturnType<typeof getSelectedCommunity.execute>;
 }) {
+  const selectedCommunity = use(selectedCommunityPromise);
+
+  if (!selectedCommunity)
+    throw new Error("There was a problem with a community selection.");
+
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -34,7 +39,7 @@ export default function SubmitActionButton({
       const post = data[0];
 
       startTransition(() => {
-        router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
+        router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
       });
     },
     onError: (error) => {
@@ -53,7 +58,7 @@ export default function SubmitActionButton({
       const post = data[0][0];
 
       startTransition(() => {
-        router.push(`/r/${selectedCommunity?.name}/comments/${post.id}`);
+        router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
       });
     },
     onError: (error) => {
@@ -71,7 +76,6 @@ export default function SubmitActionButton({
     isMutating ||
     state.isDisabled ||
     state.title.length === 0 ||
-    !selectedCommunity ||
     (state.type === PostType.IMAGE && state.files.length === 0);
 
   return (
@@ -83,7 +87,7 @@ export default function SubmitActionButton({
         )}
         disabled={disabled}
         onClick={() => {
-          if (!selectedCommunity || disabled) return;
+          if (disabled) return;
 
           const { files, ...post } = state;
 

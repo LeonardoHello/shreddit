@@ -1,15 +1,19 @@
 "use client";
 
-import React from "react";
+import { use } from "react";
 
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
+import { getSelectedCommunity } from "@/api/getCommunity";
 import { useDropdownContext } from "@/context/dropdownContext";
+import CommunityImage from "../community/CommunityImage";
 
-export default function SubmitCommunity({
+export default function SubmitCommunitySelected({
   children,
+  selectedCommunityPromise,
 }: {
   children: React.ReactNode;
+  selectedCommunityPromise: ReturnType<typeof getSelectedCommunity.execute>;
 }) {
   const { isOpen, setIsOpen } = useDropdownContext();
 
@@ -17,15 +21,20 @@ export default function SubmitCommunity({
     return children;
   }
 
+  const selectedCommunity = use(selectedCommunityPromise);
+
+  if (!selectedCommunity) throw new Error("Community doesn't exist");
+
   return (
-    <div className="relative flex w-72 flex-col rounded bg-zinc-900">
+    <div className="relative flex w-72 flex-col rounded bg-inherit bg-zinc-900">
       <button
         className="flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2"
         onClick={() => setIsOpen(true)}
       >
-        <div className="aspect-square h-6 rounded-full border border-dashed border-zinc-500" />
+        <CommunityImage imageUrl={selectedCommunity.imageUrl} size={24} />
+
         <h1 className="grow truncate text-start text-sm font-medium">
-          Choose a community
+          r/{selectedCommunity.name}
         </h1>
 
         <ChevronDownIcon

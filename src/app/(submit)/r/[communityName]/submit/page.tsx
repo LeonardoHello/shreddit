@@ -1,8 +1,17 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import Submit from "@/components/submit/Submit";
-import { PostType } from "@/types";
+import { currentUser } from "@clerk/nextjs/server";
+
+import { getMyCommunities } from "@/api/getCommunities";
+import { getSelectedCommunity } from "@/api/getCommunity";
+import SubmitButton from "@/components/submit/SubmitButton";
+import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
+import SubmitCommunitySearch from "@/components/submit/SubmitCommunitySearch";
+import SubmitCommunitySelected from "@/components/submit/SubmitCommunitySelected";
+import SubmitTabs from "@/components/submit/SubmitTabs";
+import DropdownContextProvider from "@/context/dropdownContext";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";
@@ -10,10 +19,20 @@ export const preferredRegion = ["fra1"];
 
 export default async function CommunitySubmitPage(props: {
   params: Promise<{ communityName: string }>;
-  searchParams: Promise<{ type: PostType }>;
 }) {
+  const user = await currentUser();
+
+  if (!user) throw new Error("Cannot read current user information.");
+
+  const myCommunitiesPromise = getMyCommunities.execute({
+    currentUserId: user.id,
+  });
+
   const params = await props.params;
-  const searchParams = await props.searchParams;
+
+  const selectedCommunityPromise = getSelectedCommunity.execute({
+    communityName: params.communityName,
+  });
 
   return (
     <div className="container mx-auto grid grid-cols-1 gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
@@ -22,7 +41,31 @@ export default async function CommunitySubmitPage(props: {
           Create a post
         </h1>
 
-        <Submit params={params} searchParams={searchParams} />
+        <DropdownContextProvider className="relative max-w-min">
+          <Suspense fallback={<p>Loading...</p>}>
+            <SubmitCommunitySelected
+              selectedCommunityPromise={selectedCommunityPromise}
+            >
+              <SubmitCommunitySearch />
+              <Suspense fallback={<p>Loading...</p>}>
+                <SubmitCommunityDropdown
+                  username={user.username}
+                  imageUrl={user.imageUrl}
+                  myCommunitiesPromise={myCommunitiesPromise}
+                />
+              </Suspense>
+            </SubmitCommunitySelected>
+          </Suspense>
+          <Suspense fallback={<p>Loading...</p>}></Suspense>
+        </DropdownContextProvider>
+
+        <div className="flex flex-col rounded bg-zinc-900">
+          <SubmitTabs />
+          <hr className="border-zinc-700/70" />
+          <Suspense fallback={<p>Loading...</p>}>
+            <SubmitButton selectedCommunityPromise={selectedCommunityPromise} />
+          </Suspense>
+        </div>
       </div>
 
       <div className="my-8 hidden flex-col gap-4 text-sm lg:flex">
