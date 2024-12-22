@@ -4,7 +4,7 @@ import { createContext, useContext, useReducer } from "react";
 import { useSearchParams } from "next/navigation";
 
 import type { File, Post } from "@/db/schema";
-import { PostType, SameKeyValuePairRecord } from "@/types";
+import { PostType } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   files: Omit<File, "id" | "postId">[];
@@ -19,7 +19,6 @@ export enum ReducerAction {
   SET_TITLE,
   SET_TEXT,
   SET_FILES,
-  ADD_FILES,
   TOGGLE_SPOILER,
   TOGGLE_NSFW,
   DISABLE_SUBMIT,
@@ -39,10 +38,6 @@ type ReducerActionType =
     }
   | {
       type: typeof ReducerAction.SET_FILES;
-      nextFiles: ReducerState["files"];
-    }
-  | {
-      type: typeof ReducerAction.ADD_FILES;
       nextFiles: ReducerState["files"];
     }
   | { type: typeof ReducerAction.TOGGLE_SPOILER }
@@ -70,9 +65,6 @@ const reducer = (
     case ReducerAction.SET_FILES:
       return { ...state, files: action.nextFiles };
 
-    case ReducerAction.ADD_FILES:
-      return { ...state, files: state.files.concat(action.nextFiles) };
-
     case ReducerAction.TOGGLE_SPOILER:
       return { ...state, spoiler: !state.spoiler };
 
@@ -95,10 +87,7 @@ const SubmitContext = createContext<ReducerState | null>(null);
 const SubmitDispatchContext =
   createContext<React.Dispatch<ReducerActionType> | null>(null);
 
-const postTypeMap: SameKeyValuePairRecord<PostType> = {
-  [PostType.TEXT]: PostType.TEXT,
-  [PostType.IMAGE]: PostType.IMAGE,
-};
+const defaultType = PostType.TEXT;
 
 export default function SubmitContextProvider({
   children,
@@ -107,10 +96,10 @@ export default function SubmitContextProvider({
 }) {
   const searchParams = useSearchParams();
 
-  const type = searchParams.get("type");
-
   const [state, dispatch] = useReducer(reducer, {
-    type: postTypeMap[type as PostType] || PostType.TEXT,
+    type:
+      PostType[(searchParams.get("type") ?? defaultType) as PostType] ??
+      defaultType,
     communitySearch: "",
     title: "",
     text: null,

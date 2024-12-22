@@ -19,7 +19,7 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { PostType, SameKeyValuePairRecord } from "@/types";
+import { PostType } from "@/types";
 import cn from "@/utils/cn";
 
 const SubmitRTE = dynamic(() => import("@/components/submit/SubmitRTE"));
@@ -27,15 +27,9 @@ const SubmitDropzone = dynamic(
   () => import("@/components/submit/SubmitDropzone"),
 );
 
-// ensures that the correct component will render based on the "type" query parameter
 const componentMap: Record<PostType, React.ComponentType> = {
   [PostType.TEXT]: SubmitRTE,
   [PostType.IMAGE]: SubmitDropzone,
-};
-
-const postTypeMap: SameKeyValuePairRecord<PostType> = {
-  [PostType.TEXT]: PostType.TEXT,
-  [PostType.IMAGE]: PostType.IMAGE,
 };
 
 const icons: Record<
@@ -52,16 +46,16 @@ const icons: Record<
   },
 };
 
+const maxTitleLength = 300;
+
 export default function SubmitTabs() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
-  const maxTitleLength = 300;
-
   return (
     <div className="flex flex-col">
       <div className="flex gap-px rounded-t bg-zinc-800 font-bold">
-        {Object.values(postTypeMap).map((type, index, arr) => (
+        {Object.values(PostType).map((type, index, arr) => (
           <button
             key={type}
             disabled={state.isDisabled}
@@ -84,9 +78,8 @@ export default function SubmitTabs() {
               });
             }}
           >
-            {type === state.type
-              ? icons[type]["selected"]
-              : icons[type]["unselected"]}
+            {type === state.type && icons[type]["selected"]}
+            {type !== state.type && icons[type]["unselected"]}
 
             <span className="capitalize">{type.toLowerCase()}</span>
           </button>

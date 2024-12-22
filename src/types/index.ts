@@ -2,8 +2,6 @@ import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
 
 export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
 
-export type SameKeyValuePairRecord<K extends PostType> = { [P in K]: P };
-
 export type InfiniteQueryPostProcedure =
   keyof RouterOutput["infiniteQueryPosts"];
 
