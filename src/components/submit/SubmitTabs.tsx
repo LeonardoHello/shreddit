@@ -15,7 +15,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import {
-  REDUCER_ACTION_TYPE,
+  ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
@@ -79,7 +79,7 @@ export default function SubmitTabs() {
               if (type === state.type || state.isDisabled) return;
 
               dispatch({
-                type: REDUCER_ACTION_TYPE.CHANGED_TYPE,
+                type: ReducerAction.SET_TYPE,
                 nextType: type,
               });
             }}
@@ -103,7 +103,7 @@ export default function SubmitTabs() {
             className="w-full min-w-0 overflow-y-hidden rounded bg-inherit py-2.5 pl-4 pr-16 text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 focus:ring-zinc-300"
             onChange={(e) => {
               dispatch({
-                type: REDUCER_ACTION_TYPE.CHANGED_TITLE,
+                type: ReducerAction.SET_TITLE,
                 nextTitle: e.currentTarget.value,
               });
             }}
@@ -122,7 +122,7 @@ export default function SubmitTabs() {
               { "border-zinc-950 bg-zinc-950 text-zinc-300": state.spoiler },
             )}
             onClick={() => {
-              dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_SPOILER });
+              dispatch({ type: ReducerAction.TOGGLE_SPOILER });
             }}
           >
             {state.spoiler && <CheckIcon className="h-6 w-6" />}
@@ -135,7 +135,7 @@ export default function SubmitTabs() {
               { "border-rose-500 bg-rose-500 text-zinc-900": state.nsfw },
             )}
             onClick={() => {
-              dispatch({ type: REDUCER_ACTION_TYPE.TOGGLED_NSFW });
+              dispatch({ type: ReducerAction.TOGGLE_NSFW });
             }}
           >
             {state.nsfw && <CheckIcon className="h-6 w-6" />}

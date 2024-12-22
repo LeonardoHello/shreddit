@@ -108,7 +108,9 @@ export default function SubmitCommunityDropdown({
 
       <hr className="border-zinc-700" />
 
-      {state.search.length > 0 && <SearchedCommunities search={state.search} />}
+      {state.communitySearch.length > 0 && (
+        <SearchedCommunities search={state.communitySearch} />
+      )}
     </>
   );
 }

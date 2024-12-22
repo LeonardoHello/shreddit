@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
-  REDUCER_ACTION_TYPE,
+  ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
@@ -28,7 +28,7 @@ export default function SubmitActionButton({
 
   const createPostText = trpc.createPostText.useMutation({
     onMutate: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
+      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
     },
     onSuccess: (data) => {
       const post = data[0];
@@ -41,13 +41,13 @@ export default function SubmitActionButton({
       toast.error(error.message);
     },
     onSettled: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
     },
   });
 
   const createPostImage = trpc.createPostImage.useMutation({
     onMutate: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
+      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
     },
     onSuccess: (data) => {
       const post = data[0][0];
@@ -60,7 +60,7 @@ export default function SubmitActionButton({
       toast.error(error.message);
     },
     onSettled: () => {
-      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
     },
   });
 

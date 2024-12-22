@@ -8,81 +8,92 @@ import { PostType, SameKeyValuePairRecord } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   files: Omit<File, "id" | "postId">[];
-  search: string;
+  communitySearch: string;
   isDisabled: boolean;
   type: PostType;
 };
 
-export enum REDUCER_ACTION_TYPE {
-  SEARCHED_COMMUNITY,
-  CHANGED_TYPE,
-  CHANGED_TITLE,
-  CHANGED_TEXT,
-  CHANGED_FILES,
-  TOGGLED_SPOILER,
-  TOGGLED_NSFW,
-  DISABLED_UPLOAD,
-  ENABLED_UPLOAD,
+export enum ReducerAction {
+  SEARCH_COMMUNITY,
+  SET_TYPE,
+  SET_TITLE,
+  SET_TEXT,
+  SET_FILES,
+  ADD_FILES,
+  TOGGLE_SPOILER,
+  TOGGLE_NSFW,
+  DISABLE_SUBMIT,
+  ENABLE_SUBMIT,
 }
 
-type ReducerAction =
-  | { type: typeof REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY; nextSearch: string }
-  | { type: typeof REDUCER_ACTION_TYPE.CHANGED_TYPE; nextType: PostType }
+type ReducerActionType =
+  | { type: typeof ReducerAction.SEARCH_COMMUNITY; nextCommunitySearch: string }
+  | { type: typeof ReducerAction.SET_TYPE; nextType: PostType }
   | {
-      type: typeof REDUCER_ACTION_TYPE.CHANGED_TITLE;
+      type: typeof ReducerAction.SET_TITLE;
       nextTitle: ReducerState["title"];
     }
   | {
-      type: typeof REDUCER_ACTION_TYPE.CHANGED_TEXT;
+      type: typeof ReducerAction.SET_TEXT;
       nextText: ReducerState["text"];
     }
   | {
-      type: typeof REDUCER_ACTION_TYPE.CHANGED_FILES;
+      type: typeof ReducerAction.SET_FILES;
       nextFiles: ReducerState["files"];
     }
-  | { type: typeof REDUCER_ACTION_TYPE.TOGGLED_SPOILER }
-  | { type: typeof REDUCER_ACTION_TYPE.TOGGLED_NSFW }
-  | { type: typeof REDUCER_ACTION_TYPE.DISABLED_UPLOAD }
-  | { type: typeof REDUCER_ACTION_TYPE.ENABLED_UPLOAD };
+  | {
+      type: typeof ReducerAction.ADD_FILES;
+      nextFiles: ReducerState["files"];
+    }
+  | { type: typeof ReducerAction.TOGGLE_SPOILER }
+  | { type: typeof ReducerAction.TOGGLE_NSFW }
+  | { type: typeof ReducerAction.DISABLE_SUBMIT }
+  | { type: typeof ReducerAction.ENABLE_SUBMIT };
 
-function reducer(state: ReducerState, action: ReducerAction): ReducerState {
+const reducer = (
+  state: ReducerState,
+  action: ReducerActionType,
+): ReducerState => {
   switch (action.type) {
-    case REDUCER_ACTION_TYPE.CHANGED_TYPE:
+    case ReducerAction.SEARCH_COMMUNITY:
+      return { ...state, communitySearch: action.nextCommunitySearch };
+
+    case ReducerAction.SET_TYPE:
       return { ...state, type: action.nextType };
 
-    case REDUCER_ACTION_TYPE.CHANGED_TITLE:
+    case ReducerAction.SET_TITLE:
       return { ...state, title: action.nextTitle };
 
-    case REDUCER_ACTION_TYPE.CHANGED_TEXT:
+    case ReducerAction.SET_TEXT:
       return { ...state, text: action.nextText };
 
-    case REDUCER_ACTION_TYPE.CHANGED_FILES:
+    case ReducerAction.SET_FILES:
       return { ...state, files: action.nextFiles };
 
-    case REDUCER_ACTION_TYPE.TOGGLED_SPOILER:
+    case ReducerAction.ADD_FILES:
+      return { ...state, files: state.files.concat(action.nextFiles) };
+
+    case ReducerAction.TOGGLE_SPOILER:
       return { ...state, spoiler: !state.spoiler };
 
-    case REDUCER_ACTION_TYPE.TOGGLED_NSFW:
+    case ReducerAction.TOGGLE_NSFW:
       return { ...state, nsfw: !state.nsfw };
 
-    case REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY:
-      return { ...state, search: action.nextSearch };
-
-    case REDUCER_ACTION_TYPE.DISABLED_UPLOAD:
+    case ReducerAction.DISABLE_SUBMIT:
       return { ...state, isDisabled: true };
 
-    case REDUCER_ACTION_TYPE.ENABLED_UPLOAD:
+    case ReducerAction.ENABLE_SUBMIT:
       return { ...state, isDisabled: false };
 
     default:
       throw Error("Unknown action");
   }
-}
+};
 
 const SubmitContext = createContext<ReducerState | null>(null);
 
 const SubmitDispatchContext =
-  createContext<React.Dispatch<ReducerAction> | null>(null);
+  createContext<React.Dispatch<ReducerActionType> | null>(null);
 
 const postTypeMap: SameKeyValuePairRecord<PostType> = {
   [PostType.TEXT]: PostType.TEXT,
@@ -100,7 +111,7 @@ export default function SubmitContextProvider({
 
   const [state, dispatch] = useReducer(reducer, {
     type: postTypeMap[type as PostType] || PostType.TEXT,
-    search: "",
+    communitySearch: "",
     title: "",
     text: null,
     files: [],

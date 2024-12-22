@@ -3,7 +3,7 @@
 import { toast } from "sonner";
 
 import {
-  REDUCER_ACTION_TYPE,
+  ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
@@ -17,7 +17,7 @@ export default function SubmitDropzone() {
     <UploadDropzone
       endpoint="imageUploader"
       onBeforeUploadBegin={(files) => {
-        dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
+        dispatch({ type: ReducerAction.DISABLE_SUBMIT });
 
         return files;
       }}
@@ -44,10 +44,10 @@ export default function SubmitDropzone() {
         }));
 
         dispatch({
-          type: REDUCER_ACTION_TYPE.CHANGED_FILES,
+          type: ReducerAction.SET_FILES,
           nextFiles: files,
         });
-        dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
       }}
       onUploadError={(e) => {
         toast.error(e.message);

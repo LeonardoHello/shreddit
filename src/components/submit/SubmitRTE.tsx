@@ -22,7 +22,7 @@ import {
 } from "uploadthing/client";
 
 import {
-  REDUCER_ACTION_TYPE,
+  ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
@@ -57,10 +57,10 @@ export default function SubmitRTE() {
     },
     onUpdate: ({ editor }) => {
       if (editor.isEmpty) {
-        dispatch({ type: REDUCER_ACTION_TYPE.CHANGED_TEXT, nextText: null });
+        dispatch({ type: ReducerAction.SET_TEXT, nextText: null });
       } else {
         dispatch({
-          type: REDUCER_ACTION_TYPE.CHANGED_TEXT,
+          type: ReducerAction.SET_TEXT,
           nextText: editor.getHTML(),
         });
       }
@@ -113,7 +113,7 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      dispatch({ type: REDUCER_ACTION_TYPE.DISABLED_UPLOAD });
+      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
       return files;
     },
     onUploadProgress: (p) => {
@@ -148,13 +148,13 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
         })
         .run();
 
-      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
 
       toast.dismiss(toastId);
     },
 
     onUploadError: (e) => {
-      dispatch({ type: REDUCER_ACTION_TYPE.ENABLED_UPLOAD });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
 
       toast.error(e.message);
     },

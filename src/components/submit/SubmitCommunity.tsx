@@ -7,7 +7,7 @@ import {
 
 import { getSelectedCommunity } from "@/api/getCommunity";
 import {
-  REDUCER_ACTION_TYPE,
+  ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
@@ -74,8 +74,8 @@ function SearchCommunity() {
     await utils.searchCommunities.cancel();
 
     dispatch({
-      type: REDUCER_ACTION_TYPE.SEARCHED_COMMUNITY,
-      nextSearch: searchedValue,
+      type: ReducerAction.SEARCH_COMMUNITY,
+      nextCommunitySearch: searchedValue,
     });
   };
 
@@ -86,7 +86,7 @@ function SearchCommunity() {
         className="truncate bg-inherit text-sm font-medium outline-none placeholder:text-zinc-300"
         placeholder="Search communities"
         autoFocus
-        defaultValue={state.search}
+        defaultValue={state.communitySearch}
         onChange={onInputChange}
       />
     </>
