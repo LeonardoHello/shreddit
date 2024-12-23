@@ -9,7 +9,7 @@ import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
 import SubmitCommunitySearch from "@/components/submit/SubmitCommunitySearch";
 import SubmitTabs from "@/components/submit/SubmitTabs";
-import DropdownContextProvider from "@/context/dropdownContext";
+import DropdownContextProvider from "@/context/DropdownContext";
 import ogre from "@public/logo-green.svg";
 
 export const runtime = "edge";

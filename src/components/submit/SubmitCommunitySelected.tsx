@@ -5,7 +5,7 @@ import { use } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 import { getSelectedCommunity } from "@/api/getCommunity";
-import { useDropdownContext } from "@/context/dropdownContext";
+import { useDropdownContext } from "@/context/DropdownContext";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunitySelected({

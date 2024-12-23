@@ -5,7 +5,7 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 
-import { useDropdownContext } from "@/context/dropdownContext";
+import { useDropdownContext } from "@/context/DropdownContext";
 import {
   ReducerAction,
   useSubmitContext,
