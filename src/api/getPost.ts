@@ -1,10 +1,10 @@
 import db from "@/db";
-import { postQueryConfig } from "../utils/getPostsQueryConfig";
+import { postsQueryConfig } from "../utils/postsQueryConfig";
 
 export const getPostById = db.query.posts
   .findFirst({
     where: (post, { sql, eq }) => eq(post.id, sql.placeholder("postId")),
-    with: postQueryConfig().with,
-    extras: postQueryConfig().extras,
+    with: postsQueryConfig({}).with,
+    extras: postsQueryConfig({}).extras,
   })
-  .prepare("get_post_by_id");
+  .prepare("post_by_id");
