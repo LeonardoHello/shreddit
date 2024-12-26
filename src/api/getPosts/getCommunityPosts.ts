@@ -1,32 +1,19 @@
 import db from "@/db";
 import { communities } from "@/db/schema";
-import { PostSort } from "@/types";
-import { monthAgo } from "@/utils/getLastMonthDate";
-import { postQueryConfig } from "@/utils/getPostsQueryConfig";
+import {
+  bestPosts,
+  controversialPosts,
+  hotPosts,
+  newPosts,
+} from "@/utils/postsQueryConfig";
 
 export const getCommunityBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(),
-    where: (post, { exists, and, eq, sql }) =>
-      exists(
-        db
-          .select()
-          .from(communities)
-          .where(
-            and(
-              eq(communities.id, post.communityId),
-              eq(communities.name, sql.placeholder("communityName")),
-            ),
-          ),
-      ),
-  })
-  .prepare("get_community_best_posts");
+    ...bestPosts,
+    where: (post, filter) => {
+      const { and, exists, eq, sql } = filter;
 
-export const getCommunityHotPosts = db.query.posts
-  .findMany({
-    ...postQueryConfig(PostSort.HOT),
-    where: (post, { sql, exists, and, eq, gt }) =>
-      and(
+      return and(
         exists(
           db
             .select()
@@ -38,43 +25,79 @@ export const getCommunityHotPosts = db.query.posts
               ),
             ),
         ),
-        gt(post.createdAt, monthAgo),
-      ),
+        bestPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_community_hot_posts");
+  .prepare("community_best_posts");
+
+export const getCommunityHotPosts = db.query.posts
+  .findMany({
+    ...hotPosts,
+    where: (post, filter) => {
+      const { and, exists, eq, sql } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(communities)
+            .where(
+              and(
+                eq(communities.id, post.communityId),
+                eq(communities.name, sql.placeholder("communityName")),
+              ),
+            ),
+        ),
+        hotPosts.where(post, filter),
+      );
+    },
+  })
+  .prepare("community_hot_posts");
 
 export const getCommunityNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.NEW),
-    where: (post, { exists, and, eq, sql }) =>
-      exists(
-        db
-          .select()
-          .from(communities)
-          .where(
-            and(
-              eq(communities.id, post.communityId),
-              eq(communities.name, sql.placeholder("communityName")),
+    ...newPosts,
+    where: (post, filter) => {
+      const { exists, and, eq, sql } = filter;
+      return and(
+        exists(
+          db
+            .select()
+            .from(communities)
+            .where(
+              and(
+                eq(communities.id, post.communityId),
+                eq(communities.name, sql.placeholder("communityName")),
+              ),
             ),
-          ),
-      ),
+        ),
+        newPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_community_new_posts");
+  .prepare("community_new_posts");
 
 export const getCommunityControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.CONTROVERSIAL),
-    where: (post, { exists, and, eq, sql }) =>
-      exists(
-        db
-          .select()
-          .from(communities)
-          .where(
-            and(
-              eq(communities.id, post.communityId),
-              eq(communities.name, sql.placeholder("communityName")),
+    ...controversialPosts,
+    where: (post, filter) => {
+      const { exists, and, eq, sql } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(communities)
+            .where(
+              and(
+                eq(communities.id, post.communityId),
+                eq(communities.name, sql.placeholder("communityName")),
+              ),
             ),
-          ),
-      ),
+        ),
+        controversialPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_community_controversial_posts");
+  .prepare("community_controversial_posts");

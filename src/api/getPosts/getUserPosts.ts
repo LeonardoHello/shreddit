@@ -1,32 +1,19 @@
 import db from "@/db";
 import { users } from "@/db/schema";
-import { PostSort } from "@/types";
-import { monthAgo } from "@/utils/getLastMonthDate";
-import { postQueryConfig } from "@/utils/getPostsQueryConfig";
+import {
+  bestPosts,
+  controversialPosts,
+  hotPosts,
+  newPosts,
+} from "@/utils/postsQueryConfig";
 
 export const getUserBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(users)
-          .where(
-            and(
-              eq(users.id, post.authorId),
-              eq(users.name, sql.placeholder("userName")),
-            ),
-          ),
-      ),
-  })
-  .prepare("get_user_best_posts");
+    ...bestPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
 
-export const getUserHotPosts = db.query.posts
-  .findMany({
-    ...postQueryConfig(PostSort.HOT),
-    where: (post, { sql, exists, and, eq, gt }) =>
-      and(
+      return and(
         exists(
           db
             .select()
@@ -34,51 +21,84 @@ export const getUserHotPosts = db.query.posts
             .where(
               and(
                 eq(users.id, post.authorId),
-                eq(users.name, sql.placeholder("userName")),
+                eq(users.name, sql.placeholder("username")),
               ),
             ),
         ),
-        gt(post.createdAt, monthAgo),
-      ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
+        bestPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_user_hot_posts");
+  .prepare("user_best_posts");
+
+export const getUserHotPosts = db.query.posts
+  .findMany({
+    ...hotPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(users)
+            .where(
+              and(
+                eq(users.id, post.authorId),
+                eq(users.name, sql.placeholder("username")),
+              ),
+            ),
+        ),
+        hotPosts.where(post, filter),
+      );
+    },
+  })
+  .prepare("user_hot_posts");
 
 export const getUserNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.NEW),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(users)
-          .where(
-            and(
-              eq(users.id, post.authorId),
-              eq(users.name, sql.placeholder("userName")),
+    ...newPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(users)
+            .where(
+              and(
+                eq(users.id, post.authorId),
+                eq(users.name, sql.placeholder("username")),
+              ),
             ),
-          ),
-      ),
+        ),
+        newPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_user_new_posts");
+  .prepare("user_new_posts");
 
 export const getUserControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.CONTROVERSIAL),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(users)
-          .where(
-            and(
-              eq(users.id, post.authorId),
-              eq(users.name, sql.placeholder("userName")),
+    ...controversialPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(users)
+            .where(
+              and(
+                eq(users.id, post.authorId),
+                eq(users.name, sql.placeholder("username")),
+              ),
             ),
-          ),
-      ),
+        ),
+        controversialPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_user_controversial_posts");
+  .prepare("user_controversial_posts");

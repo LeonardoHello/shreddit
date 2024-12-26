@@ -1,33 +1,19 @@
 import db from "@/db";
 import { usersToPosts } from "@/db/schema";
-import { PostSort } from "@/types";
-import { monthAgo } from "@/utils/getLastMonthDate";
-import { postQueryConfig } from "@/utils/getPostsQueryConfig";
+import {
+  bestPosts,
+  controversialPosts,
+  hotPosts,
+  newPosts,
+} from "@/utils/postsQueryConfig";
 
 export const getUpvotedBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToPosts)
-          .where(
-            and(
-              eq(usersToPosts.postId, post.id),
-              eq(usersToPosts.userId, sql.placeholder("userId")),
-              eq(usersToPosts.voteStatus, "upvoted"),
-            ),
-          ),
-      ),
-  })
-  .prepare("get_upvoted_best_posts");
+    ...bestPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
 
-export const getUpvotedHotPosts = db.query.posts
-  .findMany({
-    ...postQueryConfig(PostSort.HOT),
-    where: (post, { sql, exists, and, eq, gt }) =>
-      and(
+      return and(
         exists(
           db
             .select()
@@ -40,45 +26,83 @@ export const getUpvotedHotPosts = db.query.posts
               ),
             ),
         ),
-        gt(post.createdAt, monthAgo),
-      ),
+        bestPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_upvoted_hot_posts");
+  .prepare("upvoted_best_posts");
+
+export const getUpvotedHotPosts = db.query.posts
+  .findMany({
+    ...hotPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToPosts)
+            .where(
+              and(
+                eq(usersToPosts.postId, post.id),
+                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.voteStatus, "upvoted"),
+              ),
+            ),
+        ),
+        hotPosts.where(post, filter),
+      );
+    },
+  })
+  .prepare("upvoted_hot_posts");
 
 export const getUpvotedNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.NEW),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToPosts)
-          .where(
-            and(
-              eq(usersToPosts.postId, post.id),
-              eq(usersToPosts.userId, sql.placeholder("userId")),
-              eq(usersToPosts.voteStatus, "upvoted"),
+    ...newPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToPosts)
+            .where(
+              and(
+                eq(usersToPosts.postId, post.id),
+                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.voteStatus, "upvoted"),
+              ),
             ),
-          ),
-      ),
+        ),
+        newPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_upvoted_new_posts");
+  .prepare("upvoted_new_posts");
 
 export const getUpvotedControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.CONTROVERSIAL),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToPosts)
-          .where(
-            and(
-              eq(usersToPosts.postId, post.id),
-              eq(usersToPosts.userId, sql.placeholder("userId")),
-              eq(usersToPosts.voteStatus, "upvoted"),
+    ...controversialPosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToPosts)
+            .where(
+              and(
+                eq(usersToPosts.postId, post.id),
+                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.voteStatus, "upvoted"),
+              ),
             ),
-          ),
-      ),
+        ),
+        controversialPosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_upvoted_controversial_posts");
+  .prepare("upvoted_controversial_posts");

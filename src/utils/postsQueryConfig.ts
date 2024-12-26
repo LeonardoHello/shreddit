@@ -1,7 +1,9 @@
 import { DBQueryConfig, ExtractTablesWithRelations, sql } from "drizzle-orm";
 
+import db from "@/db";
 import { PostSort } from "@/types";
 import * as schema from "../db/schema";
+import { monthAgo } from "./getLastMonthDate";
 
 export type PostsQueryConfig = DBQueryConfig<
   "many",
@@ -10,7 +12,15 @@ export type PostsQueryConfig = DBQueryConfig<
   ExtractTablesWithRelations<typeof schema>["posts"]
 >;
 
-export const postQueryConfig = (sort?: PostSort) =>
+export const postsQueryConfig = ({
+  sort,
+  showHidden,
+  hideMuted,
+}: {
+  sort?: PostSort;
+  showHidden?: boolean;
+  hideMuted?: boolean;
+}) =>
   ({
     limit: 10,
     offset: sql.placeholder("offset"),
@@ -25,6 +35,44 @@ export const postQueryConfig = (sort?: PostSort) =>
       author: { columns: { name: true } },
       files: true,
     },
+    where: (post, { eq, and, notExists, gt }) =>
+      and(
+        !showHidden
+          ? notExists(
+              db
+                .select()
+                .from(schema.usersToPosts)
+                .where(
+                  and(
+                    eq(schema.usersToPosts.postId, post.id),
+                    eq(
+                      schema.usersToPosts.userId,
+                      sql.placeholder("currentUserId"),
+                    ),
+                    eq(schema.usersToPosts.hidden, true),
+                  ),
+                ),
+            )
+          : undefined,
+        hideMuted
+          ? notExists(
+              db
+                .select()
+                .from(schema.usersToCommunities)
+                .where(
+                  and(
+                    eq(schema.usersToCommunities.communityId, post.communityId),
+                    eq(
+                      schema.usersToCommunities.userId,
+                      sql.placeholder("currentUserId"),
+                    ),
+                    eq(schema.usersToCommunities.muted, true),
+                  ),
+                ),
+            )
+          : undefined,
+        sort === PostSort.HOT ? gt(post.createdAt, monthAgo) : undefined,
+      ),
     extras: (post) => ({
       voteCount: sql<number>`
 				 (
@@ -63,3 +111,10 @@ export const postQueryConfig = (sort?: PostSort) =>
       }
     },
   }) satisfies PostsQueryConfig;
+
+export const bestPosts = postsQueryConfig({});
+export const hotPosts = postsQueryConfig({ sort: PostSort.HOT });
+export const newPosts = postsQueryConfig({ sort: PostSort.NEW });
+export const controversialPosts = postsQueryConfig({
+  sort: PostSort.CONTROVERSIAL,
+});

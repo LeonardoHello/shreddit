@@ -1,37 +1,29 @@
 import db from "@/db";
 import { usersToCommunities } from "@/db/schema";
 import { PostSort } from "@/types";
-import { postQueryConfig } from "@/utils/getPostsQueryConfig";
+import { postsQueryConfig } from "@/utils/postsQueryConfig";
+
+const bestHomePosts = postsQueryConfig({
+  hideMuted: true,
+});
+const hotHomePosts = postsQueryConfig({
+  sort: PostSort.HOT,
+  hideMuted: true,
+});
+const newHomePosts = postsQueryConfig({
+  sort: PostSort.NEW,
+  hideMuted: true,
+});
+const controversialHomePosts = postsQueryConfig({
+  sort: PostSort.CONTROVERSIAL,
+  hideMuted: true,
+});
 
 export const getHomeBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToCommunities)
-          .where(
-            and(
-              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-              eq(usersToCommunities.member, true),
-              eq(usersToCommunities.userId, post.authorId),
-            ),
-          ),
-      ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
-  })
-  .prepare("get_home_best_posts");
-
-export const getHomeHotPosts = db.query.posts
-  .findMany({
-    ...postQueryConfig(PostSort.HOT),
-    where: (post, { sql, exists, and, eq, gt }) => {
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
+    ...bestHomePosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
 
       return and(
         exists(
@@ -46,46 +38,83 @@ export const getHomeHotPosts = db.query.posts
               ),
             ),
         ),
-        gt(post.createdAt, monthAgo),
+        bestHomePosts.where(post, filter),
       );
     },
   })
-  .prepare("get_home_hot_posts");
+  .prepare("home_best_posts");
+
+export const getHomeHotPosts = db.query.posts
+  .findMany({
+    ...hotHomePosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToCommunities)
+            .where(
+              and(
+                eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
+                eq(usersToCommunities.member, true),
+                eq(usersToCommunities.userId, post.authorId),
+              ),
+            ),
+        ),
+        hotHomePosts.where(post, filter),
+      );
+    },
+  })
+  .prepare("home_hot_posts");
 
 export const getHomeNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.NEW),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToCommunities)
-          .where(
-            and(
-              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-              eq(usersToCommunities.member, true),
-              eq(usersToCommunities.userId, post.authorId),
+    ...newHomePosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToCommunities)
+            .where(
+              and(
+                eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
+                eq(usersToCommunities.member, true),
+                eq(usersToCommunities.userId, post.authorId),
+              ),
             ),
-          ),
-      ),
+        ),
+        newHomePosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_home_new_posts");
+  .prepare("home_new_posts");
 
 export const getHomeControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig(PostSort.CONTROVERSIAL),
-    where: (post, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(usersToCommunities)
-          .where(
-            and(
-              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-              eq(usersToCommunities.member, true),
-              eq(usersToCommunities.userId, post.authorId),
+    ...controversialHomePosts,
+    where: (post, filter) => {
+      const { sql, exists, and, eq } = filter;
+
+      return and(
+        exists(
+          db
+            .select()
+            .from(usersToCommunities)
+            .where(
+              and(
+                eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
+                eq(usersToCommunities.member, true),
+                eq(usersToCommunities.userId, post.authorId),
+              ),
             ),
-          ),
-      ),
+        ),
+        controversialHomePosts.where(post, filter),
+      );
+    },
   })
-  .prepare("get_home_controversial_posts");
+  .prepare("home_controversial_posts");
