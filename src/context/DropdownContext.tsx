@@ -21,8 +21,6 @@ export default function DropdownContextProvider({
 
   useEffect(() => {
     const clickListener = (event: MouseEvent) => {
-      console.log("ayoo");
-
       if (ref.current && !ref.current.contains(event.target as Node)) {
         setIsOpen(false);
       }

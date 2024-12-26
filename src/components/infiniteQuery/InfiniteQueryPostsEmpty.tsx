@@ -12,7 +12,7 @@ export default function InfiniteQueryPostsEmpty({
   params,
   searchParams,
 }: {
-  params: { userName?: User["name"]; communityName?: Community["name"] };
+  params: { username?: User["name"]; communityName?: Community["name"] };
   searchParams: { sort?: PostSort; filter?: PostFilter };
 }) {
   return (
@@ -39,7 +39,7 @@ export default function InfiniteQueryPostsEmpty({
           hmm... looks like nothing has been {searchParams.filter || "posted"}{" "}
           yet
         </h1>
-        {!(params.userName || searchParams.filter) && (
+        {!(params.username || searchParams.filter) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
             <Link

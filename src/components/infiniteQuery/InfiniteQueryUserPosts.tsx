@@ -1,74 +1,38 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
-import type { Post, User } from "@/db/schema";
+import PostContextProvider from "@/context/PostContext";
+import type { Post as PostSchema, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterOutput } from "@/trpc/routers/_app";
-import type {
-  InfiniteQueryPostProcedure,
-  PostFilter,
-  QueryInfo,
-} from "@/types";
-import PostComponent from "../post/Post";
+import type { InfiniteQueryPostProcedure, QueryInfo } from "@/types";
+import Post from "../post/Post";
 import PostsInfiniteQueryLoading from "./InfiniteQueryPostsLoading";
 
 type Props<T extends InfiniteQueryPostProcedure> = {
   currentUserId: User["id"] | null;
   initialPosts: RouterOutput["infiniteQueryPosts"][T];
   queryInfo: QueryInfo<T>;
-  searchParams: { filter: PostFilter };
 };
 
-const InfiniteQueryUserPosts = memo(function InfiniteQueryUserPosts({
+export default function InfiniteQueryUserPosts({
   currentUserId,
   initialPosts,
   queryInfo,
-  searchParams,
 }: Props<"getUserPosts">) {
   const router = useRouter();
-  const targetRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const utils = trpc.useUtils();
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } = trpc[
     "infiniteQueryPosts"
   ][queryInfo.procedure].useInfiniteQuery(queryInfo.input, {
-    // filter muted communities and hidden posts
-    select: (data) => {
-      if (!currentUserId || searchParams.filter) {
-        return data;
-      }
-
-      return {
-        ...data,
-        pages: data.pages.map((page) => ({
-          ...page,
-          posts: page.posts
-            .filter(
-              (post) =>
-                !post.community.usersToCommunities.some(
-                  (userToCommunity) =>
-                    userToCommunity.muted &&
-                    userToCommunity.userId === currentUserId,
-                ),
-            )
-            .filter(
-              (post) =>
-                !post.usersToPosts.some(
-                  (userToPost) =>
-                    userToPost.hidden === true &&
-                    userToPost.userId === currentUserId,
-                ),
-            ),
-        })),
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage?.nextCursor,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialData: { pages: [initialPosts], pageParams: [0] },
-    staleTime: 0,
     refetchOnWindowFocus: false,
   });
 
@@ -77,25 +41,24 @@ const InfiniteQueryUserPosts = memo(function InfiniteQueryUserPosts({
   }
 
   useEffect(() => {
-    if (!targetRef.current || !hasNextPage || isFetchingNextPage) return;
+    if (!ref.current || !hasNextPage || isFetchingNextPage) return;
 
     const observer = new IntersectionObserver((entries) => {
       const entry = entries[0];
 
       if (entry.isIntersecting) {
-        observer.unobserve(entry.target);
         fetchNextPage();
       }
     });
 
-    observer.observe(targetRef.current);
+    observer.observe(ref.current);
 
     return () => {
       observer.disconnect();
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const removePostFromQuery = async (postId: Post["id"]) => {
+  const removePostFromQuery = async (postId: PostSchema["id"]) => {
     await utils["infiniteQueryPosts"][queryInfo.procedure].cancel();
 
     utils["infiniteQueryPosts"][queryInfo.procedure].setInfiniteData(
@@ -124,26 +87,25 @@ const InfiniteQueryUserPosts = memo(function InfiniteQueryUserPosts({
   return (
     <div className="flex flex-col gap-2.5">
       {data.pages.map((page) =>
-        page.posts.map((post, postI, posts) => (
+        page.posts.map((post) => (
           <div
             key={post.id}
-            ref={postI === posts.length - 1 ? targetRef : undefined}
             className="cursor-pointer rounded border border-zinc-700/70 hover:border-zinc-500"
             onClick={() =>
               router.push(`/r/${post.community.name}/comments/${post.id}`)
             }
           >
-            <PostComponent
-              currentUserId={currentUserId}
-              initialData={post}
-              removePostFromQuery={removePostFromQuery}
-            />
+            <PostContextProvider post={post}>
+              <Post
+                currentUserId={currentUserId}
+                removePostFromQuery={removePostFromQuery}
+              />
+            </PostContextProvider>
           </div>
         )),
       )}
       {isFetchingNextPage && <PostsInfiniteQueryLoading />}
+      <div ref={ref} className="sr-only bottom-0 h-[550px]" />
     </div>
   );
-});
-
-export default InfiniteQueryUserPosts;
+}

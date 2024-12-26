@@ -19,7 +19,11 @@ import {
 } from "uploadthing/client";
 
 import { useFilesContext } from "@/context/FilesContext";
-import { usePostContext } from "@/context/PostContext";
+import {
+  ReducerAction,
+  usePostContext,
+  usePostDispatchContext,
+} from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
@@ -38,12 +42,12 @@ const extensions = [
 const toastId = "loading_toast";
 
 export default function RTEPostEdit() {
-  const { post } = usePostContext();
+  const post = usePostContext();
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions,
-    content: post.text,
+    content: post.text || "",
     editorProps: {
       attributes: {
         class:
@@ -61,6 +65,9 @@ export default function RTEPostEdit() {
       className={cn("rounded border border-zinc-700/70", {
         "border-zinc-300": editor.isFocused,
       })}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
     >
       <BubbleMenu
         editor={editor}
@@ -94,20 +101,8 @@ export default function RTEPostEdit() {
 function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
   const utils = trpc.useUtils();
 
-  const { post, setEditable } = usePostContext();
-  const { files, isUploading } = useFilesContext();
-
-  const deleteFiles = trpc.deleteFile.useMutation({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const createFiles = trpc.createFile.useMutation({
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const post = usePostContext();
+  const dispatch = usePostDispatchContext();
 
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
@@ -121,39 +116,10 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
         return { ...updater, text: editor.getHTML() };
       });
 
-      setEditable(false);
+      dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
     onSuccess: () => {
       toast.success("Post successfully edited.");
-
-      const filesToDelete = post.files
-        .filter(
-          (file) =>
-            !editor
-              .getHTML()
-              .includes(`<img src="${file.url}" alt="${file.name}">`),
-        )
-        .map(({ key }) => key);
-
-      if (filesToDelete.length > 0) {
-        deleteFiles.mutate({ postId: post.id, keys: filesToDelete });
-      }
-
-      // set to onConflictDoNothing() in case of duplicated file insert
-      const filesToInsert = files
-        .filter((file) =>
-          editor
-            .getHTML()
-            .includes(`<img src="${file.url}" alt="${file.name}">`),
-        )
-        .map((file) => ({
-          ...file,
-          postId: post.id,
-        }));
-
-      if (filesToInsert.length > 0) {
-        createFiles.mutate(filesToInsert);
-      }
     },
     onError: async (error) => {
       await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
@@ -162,11 +128,7 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
     },
   });
 
-  const disabled =
-    editor.getHTML() === post.text ||
-    editor.isEmpty ||
-    editPost.isPending ||
-    isUploading;
+  const disabled = editPost.isPending || post.title.length === 0;
 
   return (
     <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
@@ -174,7 +136,7 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
         className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
         onClick={() => {
           editor.commands.setContent(post.text);
-          setEditable(false);
+          dispatch({ type: ReducerAction.CANCEL_EDIT });
         }}
       >
         Cancel
