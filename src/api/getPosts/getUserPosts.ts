@@ -1,10 +1,12 @@
 import db from "@/db";
 import { users } from "@/db/schema";
+import { PostSort } from "@/types";
+import { monthAgo } from "@/utils/getLastMonthDate";
 import { postQueryConfig } from "@/utils/getPostsQueryConfig";
 
 export const getUserBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -17,21 +19,14 @@ export const getUserBestPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_user_best_posts");
 
 export const getUserHotPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
-    where: (post, { sql, exists, and, eq, gt }) => {
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-
-      return and(
+    ...postQueryConfig(PostSort.HOT),
+    where: (post, { sql, exists, and, eq, gt }) =>
+      and(
         exists(
           db
             .select()
@@ -44,8 +39,7 @@ export const getUserHotPosts = db.query.posts
             ),
         ),
         gt(post.createdAt, monthAgo),
-      );
-    },
+      ),
     orderBy: (post, { sql, asc, desc }) => [
       desc(sql`vote_count`),
       asc(post.createdAt),
@@ -55,7 +49,7 @@ export const getUserHotPosts = db.query.posts
 
 export const getUserNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.NEW),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -68,13 +62,12 @@ export const getUserNewPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_user_new_posts");
 
 export const getUserControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.CONTROVERSIAL),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -87,9 +80,5 @@ export const getUserControversialPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`comment_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_user_controversial_posts");

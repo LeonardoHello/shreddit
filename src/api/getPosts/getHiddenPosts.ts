@@ -1,10 +1,11 @@
 import db from "@/db";
 import { usersToPosts } from "@/db/schema";
+import { PostSort } from "@/types";
 import { postQueryConfig } from "@/utils/getPostsQueryConfig";
 
 export const getHiddenBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -18,16 +19,12 @@ export const getHiddenBestPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_hidden_best_posts");
 
 export const getHiddenHotPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.HOT),
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -48,16 +45,12 @@ export const getHiddenHotPosts = db.query.posts
         gt(post.createdAt, monthAgo),
       );
     },
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_hidden_hot_posts");
 
 export const getHiddenNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.NEW),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -71,13 +64,12 @@ export const getHiddenNewPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_hidden_new_posts");
 
 export const getHiddenControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.CONTROVERSIAL),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -91,9 +83,5 @@ export const getHiddenControversialPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`comment_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_hidden_controversial_posts");

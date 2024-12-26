@@ -1,10 +1,12 @@
 import db from "@/db";
 import { usersToPosts } from "@/db/schema";
+import { PostSort } from "@/types";
+import { monthAgo } from "@/utils/getLastMonthDate";
 import { postQueryConfig } from "@/utils/getPostsQueryConfig";
 
 export const getDownvotedBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -18,21 +20,14 @@ export const getDownvotedBestPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_downvoted_best_posts");
 
 export const getDownvotedHotPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
-    where: (post, { sql, exists, and, eq, gt }) => {
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-
-      return and(
+    ...postQueryConfig(PostSort.HOT),
+    where: (post, { sql, exists, and, eq, gt }) =>
+      and(
         exists(
           db
             .select()
@@ -46,18 +41,13 @@ export const getDownvotedHotPosts = db.query.posts
             ),
         ),
         gt(post.createdAt, monthAgo),
-      );
-    },
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
+      ),
   })
   .prepare("get_downvoted_hot_posts");
 
 export const getDownvotedNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.NEW),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -71,13 +61,12 @@ export const getDownvotedNewPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_downvoted_new_posts");
 
 export const getDownvotedControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.CONTROVERSIAL),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -91,9 +80,5 @@ export const getDownvotedControversialPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`comment_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_downvoted_controversial_posts");

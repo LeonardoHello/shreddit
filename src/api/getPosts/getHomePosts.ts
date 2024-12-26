@@ -1,10 +1,11 @@
 import db from "@/db";
 import { usersToCommunities } from "@/db/schema";
+import { PostSort } from "@/types";
 import { postQueryConfig } from "@/utils/getPostsQueryConfig";
 
 export const getHomeBestPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -27,7 +28,7 @@ export const getHomeBestPosts = db.query.posts
 
 export const getHomeHotPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.HOT),
     where: (post, { sql, exists, and, eq, gt }) => {
       const monthAgo = new Date();
       monthAgo.setMonth(monthAgo.getMonth() - 1);
@@ -48,16 +49,12 @@ export const getHomeHotPosts = db.query.posts
         gt(post.createdAt, monthAgo),
       );
     },
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`vote_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_home_hot_posts");
 
 export const getHomeNewPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.NEW),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -71,13 +68,12 @@ export const getHomeNewPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { desc }) => [desc(post.createdAt)],
   })
   .prepare("get_home_new_posts");
 
 export const getHomeControversialPosts = db.query.posts
   .findMany({
-    ...postQueryConfig,
+    ...postQueryConfig(PostSort.CONTROVERSIAL),
     where: (post, { sql, exists, and, eq }) =>
       exists(
         db
@@ -91,9 +87,5 @@ export const getHomeControversialPosts = db.query.posts
             ),
           ),
       ),
-    orderBy: (post, { sql, asc, desc }) => [
-      desc(sql`comment_count`),
-      asc(post.createdAt),
-    ],
   })
   .prepare("get_home_controversial_posts");
