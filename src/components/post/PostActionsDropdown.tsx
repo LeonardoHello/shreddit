@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import {
@@ -8,21 +7,26 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { usePostContext } from "@/context/PostContext";
+import {
+  ReducerAction,
+  usePostContext,
+  usePostDispatchContext,
+} from "@/context/PostContext";
 import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterInput } from "@/trpc/routers/_app";
 import cn from "@/utils/cn";
 
-type Props = {
+export default function PostActionsDropdown({
+  removePostFromQuery,
+}: {
   removePostFromQuery?: (postId: Post["id"]) => void;
-};
-
-export default function PostActionsDropdown({ removePostFromQuery }: Props) {
+}) {
   const router = useRouter();
   const utils = trpc.useUtils();
 
-  const { post, setEditable } = usePostContext();
+  const post = usePostContext();
+  const dispatch = usePostDispatchContext();
 
   const queryConfig = {
     onMutate: async (
@@ -113,6 +117,7 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
         />
         Mark As Spoiler
       </div>
+
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
@@ -132,26 +137,15 @@ export default function PostActionsDropdown({ removePostFromQuery }: Props) {
         />
         Mark As NSFW
       </div>
-      {/* the value of removePostFromQuery will determine where Post component is located */}
-      {post.text && removePostFromQuery && (
-        <Link
-          href={{
-            pathname: `/r/${post.community.name}/comments/${post.id}`,
-            query: { edit: "true" },
-          }}
-          className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
-        >
-          <PencilSquareIcon className="h-5 w-5" /> Edit
-        </Link>
-      )}
-      {post.text && !removePostFromQuery && (
-        <div
-          className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
-          onClick={() => setEditable((prev) => !prev)}
-        >
-          <PencilSquareIcon className="h-5 w-5" /> Edit
-        </div>
-      )}
+
+      <div
+        className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
+        onClick={() => {
+          dispatch({ type: ReducerAction.TOGGLE_EDIT });
+        }}
+      >
+        <PencilSquareIcon className="h-5 w-5" /> Edit
+      </div>
 
       <div
         className="flex items-center gap-2 px-1.5 py-2 hover:bg-zinc-700/50"

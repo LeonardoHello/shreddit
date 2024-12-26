@@ -15,22 +15,18 @@ export default memo(function PostContentMedia() {
 
   const [currentIndex, setCurrentIndex] = useState(1);
 
-  const {
-    post: { files, spoiler, nsfw },
-  } = usePostContext();
+  const post = usePostContext();
 
-  if (files.length === 0) return null;
-
-  if (files.length === 1) {
+  if (post.files.length === 1) {
     return (
       <div
         className={cn("relative h-96", {
-          "blur-2xl": !postId && (nsfw || spoiler),
+          "blur-2xl": !postId && (post.nsfw || post.spoiler),
         })}
       >
         <Image
-          src={files[0].url}
-          alt={files[0].name}
+          src={post.files[0].url}
+          alt={post.files[0].name}
           fill
           sizes="(max-width: 768px) 90vw, (max-width: 1024px) 700px, (max-width: 1280px) 610px, 740px"
           className="object-contain"
@@ -42,12 +38,12 @@ export default memo(function PostContentMedia() {
   return (
     <div className="relative flex flex-col justify-center overflow-hidden">
       <div className="flex items-center">
-        {files.map((image, i) => (
+        {post.files.map((image, i) => (
           <div
             key={image.id}
             className={cn("relative order-2 h-96 min-w-full", {
               "order-1": currentIndex === i + 1,
-              "blur-2xl": !postId && (nsfw || spoiler),
+              "blur-2xl": !postId && (post.nsfw || post.spoiler),
             })}
           >
             <Image
@@ -60,10 +56,10 @@ export default memo(function PostContentMedia() {
           </div>
         ))}
       </div>
-      {(postId || (!nsfw && !spoiler)) && (
+      {(postId || (!post.nsfw && !post.spoiler)) && (
         <>
           <div className="absolute right-2 top-4 rounded-full bg-zinc-950/70 px-2 py-1 text-xs font-semibold tracking-[0.075em]">
-            {currentIndex}/{files.length}
+            {currentIndex}/{post.files.length}
           </div>
           <ArrowLeftCircleIcon
             className="absolute left-2 h-12 w-12 cursor-pointer rounded-full"
@@ -72,7 +68,7 @@ export default memo(function PostContentMedia() {
 
               setCurrentIndex((prev) => {
                 if (prev === 1) {
-                  return files.length;
+                  return post.files.length;
                 }
 
                 return prev - 1;
@@ -85,7 +81,7 @@ export default memo(function PostContentMedia() {
               e.stopPropagation();
 
               setCurrentIndex((prev) => {
-                if (prev === files.length) {
+                if (prev === post.files.length) {
                   return 1;
                 }
 

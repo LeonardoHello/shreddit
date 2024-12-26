@@ -64,9 +64,11 @@ export default async function HomePage(props: {
 
   const userData = getUserById.execute({ currentUserId: userId });
 
-  const [user, posts] = await Promise.all([userData, postsData]).catch(() => {
-    throw new Error("There was a problem with loading user information.");
-  });
+  const [user, posts] = await Promise.all([userData, postsData]).catch(
+    (err) => {
+      throw new Error(err);
+    },
+  );
 
   let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
@@ -75,7 +77,7 @@ export default async function HomePage(props: {
 
   const queryInfo: QueryInfo<"getHomePosts"> = {
     procedure: "getHomePosts",
-    input: { sort: searchParams.sort },
+    input: { sort: searchParams.sort, currentUserId: userId },
   };
 
   return (
@@ -127,6 +129,7 @@ export default async function HomePage(props: {
         <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryPostsHome
+          key={searchParams.sort}
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

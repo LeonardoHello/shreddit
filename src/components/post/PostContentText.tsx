@@ -5,7 +5,7 @@ import { usePostContext } from "@/context/PostContext";
 export default function PostContentText() {
   const { postId } = useParams();
 
-  const { post } = usePostContext();
+  const post = usePostContext();
 
   if (!post.text) {
     return null;

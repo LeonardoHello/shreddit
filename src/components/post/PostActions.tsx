@@ -15,7 +15,6 @@ import { usePostContext } from "@/context/PostContext";
 import type { Post, User } from "@/db/schema";
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
-import type { RouterInput } from "@/trpc/routers/_app";
 
 type Props = {
   currentUserId: User["id"] | null;
@@ -32,63 +31,20 @@ export default function PostActions({
   const utils = trpc.useUtils();
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
-  const { post } = usePostContext();
+  const post = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,
   );
 
-  const mutationConfig = {
-    onError: async ({ message }: { message: string }) => {
-      if (message !== "UNAUTHORIZED") {
+  const savePost = trpc.savePost.useMutation({
+    onError: async (error) => {
+      if (error.message !== "UNAUTHORIZED") {
         await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
       }
 
-      toast.error(message);
+      toast.error(error.message);
     },
-    onMutate: async (variables: RouterInput["savePost" | "hidePost"]) => {
-      if (!currentUserId) return;
-
-      await utils["getPost"].cancel();
-
-      utils["getPost"].setData(post.id, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return post;
-        }
-
-        let usersToPosts = structuredClone(data.usersToPosts);
-
-        if (!userToPost) {
-          usersToPosts.push({
-            userId: currentUserId,
-            saved: false,
-            hidden: false,
-            voteStatus: "none",
-            ...variables,
-          });
-        } else {
-          const index = usersToPosts.findLastIndex(
-            (_userToPost) => _userToPost.userId === currentUserId,
-          );
-
-          usersToPosts = usersToPosts.with(index, {
-            ...userToPost,
-            ...variables,
-          });
-        }
-
-        return {
-          ...data,
-          usersToPosts,
-        };
-      });
-    },
-  };
-
-  const savePost = trpc.savePost.useMutation({
-    ...mutationConfig,
     onSuccess: (data) => {
       if (data[0].saved) {
         toast.success("Post saved successfully.");
@@ -99,7 +55,13 @@ export default function PostActions({
   });
 
   const hidePost = trpc.hidePost.useMutation({
-    ...mutationConfig,
+    onError: async (error) => {
+      if (error.message !== "UNAUTHORIZED") {
+        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
+      }
+
+      toast.error(error.message);
+    },
     onSuccess: (data) => {
       if (removePostFromQuery !== undefined && !searchParams.get("filter")) {
         removePostFromQuery(post.id);

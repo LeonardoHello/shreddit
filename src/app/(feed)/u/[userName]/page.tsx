@@ -18,7 +18,7 @@ export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function UserPage(props: {
-  params: Promise<{ userName: string }>;
+  params: Promise<{ username: string }>;
   searchParams: Promise<{ sort: PostSort; filter: PostFilter }>;
 }) {
   const searchParams = await props.searchParams;
@@ -26,10 +26,10 @@ export default async function UserPage(props: {
 
   const user = await getUserByName
     .execute({
-      userName: params.userName,
+      username: params.username,
     })
-    .catch(() => {
-      throw new Error("There was a problem with loading user information.");
+    .catch((err) => {
+      throw new Error(err);
     });
 
   if (user === undefined) notFound();
@@ -37,18 +37,19 @@ export default async function UserPage(props: {
   const { userId } = await auth();
 
   if (user.id !== userId && searchParams.filter === "hidden")
-    permanentRedirect(`/u/${params.userName}`);
+    permanentRedirect(`/u/${params.username}`);
 
   const posts = await getUserPosts({
+    currentUserId: userId,
     userId: user.id,
-    userName: params.userName,
+    username: params.username,
     filter: searchParams.filter,
     sort: searchParams.sort,
-  }).catch(() => {
-    throw new Error("There was a problem with loading post information.");
+  }).catch((err) => {
+    throw new Error(err);
   });
 
-  let nextCursor: QueryInfo<"getUserPosts">["input"]["cursor"] = null;
+  let nextCursor: QueryInfo<"getUserPosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
     nextCursor = 10;
   }
@@ -56,8 +57,9 @@ export default async function UserPage(props: {
   const queryInfo: QueryInfo<"getUserPosts"> = {
     procedure: "getUserPosts",
     input: {
+      currentUserId: userId,
       userId: user.id,
-      userName: params.userName,
+      username: params.username,
       filter: searchParams.filter,
       sort: searchParams.sort,
     },
@@ -66,7 +68,7 @@ export default async function UserPage(props: {
   return (
     <>
       <UserNavigation
-        userName={params.userName}
+        username={params.username}
         filter={searchParams.filter}
         isCurrentUser={user.id === userId}
       />
@@ -90,10 +92,10 @@ export default async function UserPage(props: {
           />
         ) : (
           <InfiniteQueryUserPosts
+            key={searchParams.sort}
             currentUserId={userId}
             initialPosts={{ posts, nextCursor }}
             queryInfo={queryInfo}
-            searchParams={searchParams}
           />
         )}
       </div>

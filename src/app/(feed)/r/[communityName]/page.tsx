@@ -15,7 +15,7 @@ import { PostSort, type QueryInfo } from "@/types";
 
 export default async function CommunityPage(props: {
   params: Promise<{ communityName: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ sort: PostSort }>;
 }) {
   const params = await props.params;
   const searchParams = await props.searchParams;
@@ -29,29 +29,33 @@ export default async function CommunityPage(props: {
   switch (sort) {
     case PostSort.HOT:
       postsData = getCommunityHotPosts.execute({
-        offset: 0,
+        currentUserId: userId,
         communityName,
+        offset: 0,
       });
       break;
 
     case PostSort.NEW:
       postsData = getCommunityNewPosts.execute({
-        offset: 0,
+        currentUserId: userId,
         communityName,
+        offset: 0,
       });
       break;
 
     case PostSort.CONTROVERSIAL:
       postsData = getCommunityControversialPosts.execute({
-        offset: 0,
+        currentUserId: userId,
         communityName,
+        offset: 0,
       });
       break;
 
     default:
       postsData = getCommunityBestPosts.execute({
-        offset: 0,
+        currentUserId: userId,
         communityName,
+        offset: 0,
       });
       break;
   }
@@ -62,14 +66,14 @@ export default async function CommunityPage(props: {
     throw new Error("There was a problem with loading community information.");
   });
 
-  let nextCursor: QueryInfo<"getCommunityPosts">["input"]["cursor"] = null;
+  let nextCursor: QueryInfo<"getCommunityPosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
     nextCursor = 10;
   }
 
   const queryInfo: QueryInfo<"getCommunityPosts"> = {
     procedure: "getCommunityPosts",
-    input: { communityName, sort },
+    input: { communityName, sort, currentUserId: userId },
   };
 
   return (
@@ -83,6 +87,7 @@ export default async function CommunityPage(props: {
         <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryCommunityPosts
+          key={searchParams.sort}
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

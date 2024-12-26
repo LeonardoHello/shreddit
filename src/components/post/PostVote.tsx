@@ -9,14 +9,14 @@ import type { UserToPost } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
-type Props = {
+const PostVote = function PostVote({
+  currentUserId,
+}: {
   currentUserId: UserToPost["userId"] | null;
-};
-
-const PostVote = function PostVote({ currentUserId }: Props) {
+}) {
   const utils = trpc.useUtils();
 
-  const { post } = usePostContext();
+  const post = usePostContext();
 
   const userToPost = post.usersToPosts.findLast(
     (userToPost) => userToPost.userId === currentUserId,

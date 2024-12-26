@@ -33,24 +33,28 @@ export default async function AllPage(props: {
   switch (searchParams.sort) {
     case PostSort.HOT:
       postsData = getAllHotPosts.execute({
+        currentUserId: userId,
         offset: 0,
       });
       break;
 
     case PostSort.NEW:
       postsData = getAllNewPosts.execute({
+        currentUserId: userId,
         offset: 0,
       });
       break;
 
     case PostSort.CONTROVERSIAL:
       postsData = getAllControversialPosts.execute({
+        currentUserId: userId,
         offset: 0,
       });
       break;
 
     default:
       postsData = getAllBestPosts.execute({
+        currentUserId: userId,
         offset: 0,
       });
       break;
@@ -60,14 +64,14 @@ export default async function AllPage(props: {
 
   const [user, posts] = await Promise.all([userData, postsData]);
 
-  let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = null;
+  let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
     nextCursor = 10;
   }
 
   const queryInfo: QueryInfo<"getAllPosts"> = {
     procedure: "getAllPosts",
-    input: { sort: searchParams.sort },
+    input: { sort: searchParams.sort, currentUserId: userId },
   };
 
   return (
@@ -123,6 +127,7 @@ export default async function AllPage(props: {
         <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
       ) : (
         <InfiniteQueryAllPosts
+          key={searchParams.sort}
           currentUserId={userId}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}

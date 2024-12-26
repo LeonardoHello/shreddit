@@ -13,7 +13,7 @@ export default function PostMetadata() {
   const { communityName, postId } = useParams();
 
   const hydrated = useHydration();
-  const { post } = usePostContext();
+  const post = usePostContext();
 
   return (
     <>

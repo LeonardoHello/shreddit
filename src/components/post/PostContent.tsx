@@ -5,9 +5,9 @@ import PostContentMedia from "./PostContentMedia";
 import PostContentText from "./PostContentText";
 
 export default function PostContent() {
-  const { post, editable } = usePostContext();
+  const post = usePostContext();
 
-  if (editable) {
+  if (post.edit) {
     const initialFiles = post.files.map(({ id, postId, ...rest }) => rest);
     return (
       <FilesContextProvider initialFiles={initialFiles}>
@@ -16,5 +16,5 @@ export default function PostContent() {
     );
   }
 
-  return post.text ? <PostContentText /> : <PostContentMedia />;
+  return post.files.length === 0 ? <PostContentText /> : <PostContentMedia />;
 }
