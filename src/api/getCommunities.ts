@@ -19,7 +19,7 @@ export const getModeratedCommunities = db.query.usersToCommunities
     columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { id: true, name: true, imageUrl: true } } },
   })
-  .prepare("get_moderated_communities");
+  .prepare("moderated_communities");
 
 export const getFavoriteCommunities = db.query.usersToCommunities
   .findMany({
@@ -31,7 +31,7 @@ export const getFavoriteCommunities = db.query.usersToCommunities
     columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { id: true, name: true, imageUrl: true } } },
   })
-  .prepare("get_favorite_communities");
+  .prepare("favorite_communities");
 
 export const getJoinedCommunities = db.query.usersToCommunities
   .findMany({
@@ -43,7 +43,7 @@ export const getJoinedCommunities = db.query.usersToCommunities
     columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { id: true, name: true, imageUrl: true } } },
   })
-  .prepare("get_joined_communities");
+  .prepare("joined_communities");
 
 export const getMyCommunities = db.query.usersToCommunities
   .findMany({
@@ -66,4 +66,4 @@ export const getMyCommunities = db.query.usersToCommunities
       },
     },
   })
-  .prepare("get_selectable_communities");
+  .prepare("selectable_communities");

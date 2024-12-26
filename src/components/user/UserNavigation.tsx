@@ -3,11 +3,11 @@ import Link from "next/link";
 import cn from "@/utils/cn";
 
 export default function UserNavigation({
-  userName,
+  username,
   filter,
   isCurrentUser,
 }: {
-  userName: string;
+  username: string;
   isCurrentUser: boolean;
   filter?: string | string[] | undefined;
 }) {
@@ -18,7 +18,7 @@ export default function UserNavigation({
     filter === "downvoted"
   );
 
-  const href = `/u/${userName}`;
+  const href = `/u/${username}`;
 
   return (
     <div className="flex justify-center border-b border-zinc-700/70 bg-zinc-900">

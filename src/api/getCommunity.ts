@@ -8,7 +8,7 @@ export const getCommunityByName = db.query.communities
       usersToCommunities: true,
     },
   })
-  .prepare("get_community_by_name");
+  .prepare("community_by_name");
 
 export const getSelectedCommunity = db.query.communities
   .findFirst({
@@ -22,7 +22,7 @@ export const getSelectedCommunity = db.query.communities
       },
     },
   })
-  .prepare("get_community_by_name");
+  .prepare("selected_community");
 
 export const getUserToCommunity = db.query.usersToCommunities
   .findFirst({
@@ -33,7 +33,7 @@ export const getUserToCommunity = db.query.usersToCommunities
       ),
     columns: { favorite: true, muted: true, member: true },
   })
-  .prepare("get_user_to_community");
+  .prepare("user_to_community");
 
 export const getCommunityImage = db.query.communities
   .findFirst({
@@ -41,4 +41,4 @@ export const getCommunityImage = db.query.communities
       eq(community.name, sql.placeholder("name")),
     columns: { imageUrl: true },
   })
-  .prepare("get_community_imageUrl");
+  .prepare("community_imageUrl");

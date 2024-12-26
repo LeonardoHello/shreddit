@@ -10,7 +10,7 @@ export const getComments = db.query.comments
       post: { columns: { authorId: true } },
     },
   })
-  .prepare("get_comment");
+  .prepare("comment");
 
 export const getComment = db.query.comments
   .findFirst({
@@ -22,4 +22,4 @@ export const getComment = db.query.comments
       post: { columns: { authorId: true } },
     },
   })
-  .prepare("get_comment");
+  .prepare("comment");

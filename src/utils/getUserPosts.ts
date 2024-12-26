@@ -32,14 +32,16 @@ import { User } from "../db/schema";
 import { PostFilter, PostSort } from "../types";
 
 export default async function getUserPosts({
+  currentUserId,
   userId,
-  userName,
+  username,
   cursor,
   filter,
   sort,
 }: {
+  currentUserId: User["id"] | null;
   userId: User["id"];
-  userName: User["name"];
+  username: User["name"];
   cursor?: number | null | undefined;
   filter?: string | string[] | undefined;
   sort?: string | string[] | undefined;
@@ -49,26 +51,30 @@ export default async function getUserPosts({
       switch (sort) {
         case PostSort.HOT:
           return getSavedHotPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.NEW:
           return getSavedNewPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.CONTROVERSIAL:
           return getSavedControversialPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         default:
           return getSavedBestPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
       }
 
@@ -76,26 +82,30 @@ export default async function getUserPosts({
       switch (sort) {
         case PostSort.HOT:
           return getHiddenHotPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.NEW:
           return getHiddenNewPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.CONTROVERSIAL:
           return getHiddenControversialPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         default:
           return getHiddenBestPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
       }
 
@@ -103,26 +113,30 @@ export default async function getUserPosts({
       switch (sort) {
         case PostSort.HOT:
           return getUpvotedHotPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.NEW:
           return getUpvotedNewPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.CONTROVERSIAL:
           return getUpvotedControversialPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         default:
           return getUpvotedBestPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
       }
 
@@ -130,26 +144,30 @@ export default async function getUserPosts({
       switch (sort) {
         case PostSort.HOT:
           return getDownvotedHotPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.NEW:
           return getDownvotedNewPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         case PostSort.CONTROVERSIAL:
           return getDownvotedControversialPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
 
         default:
           return getDownvotedBestPosts.execute({
-            offset: cursor,
+            currentUserId,
             userId,
+            offset: cursor,
           });
       }
 
@@ -157,26 +175,30 @@ export default async function getUserPosts({
       switch (sort) {
         case PostSort.HOT:
           return getUserHotPosts.execute({
+            currentUserId,
+            username,
             offset: cursor,
-            userName,
           });
 
         case PostSort.NEW:
           return getUserNewPosts.execute({
+            currentUserId,
+            username,
             offset: cursor,
-            userName,
           });
 
         case PostSort.CONTROVERSIAL:
           return getUserControversialPosts.execute({
+            currentUserId,
+            username,
             offset: cursor,
-            userName,
           });
 
         default:
           return getUserBestPosts.execute({
+            currentUserId,
+            username,
             offset: cursor,
-            userName,
           });
       }
   }

@@ -14,7 +14,7 @@ import CommunityImage from "../community/CommunityImage";
 
 export default function Menu({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { communityName, userName } = useParams();
+  const { communityName, username } = useParams();
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
@@ -40,8 +40,8 @@ export default function Menu({ children }: { children: React.ReactNode }) {
           },
         )}
       >
-        {typeof userName === "string" && (
-          <CurrentUserFeed userName={userName} />
+        {typeof username === "string" && (
+          <CurrentUserFeed username={username} />
         )}
 
         {typeof communityName === "string" && (
@@ -50,7 +50,7 @@ export default function Menu({ children }: { children: React.ReactNode }) {
 
         {pathname === "/submit" && <SubmitFeed />}
 
-        {!userName && !communityName && pathname !== "/submit" && (
+        {!username && !communityName && pathname !== "/submit" && (
           <HomeFeed pathname={pathname} />
         )}
 
@@ -62,8 +62,8 @@ export default function Menu({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CurrentUserFeed({ userName }: { userName: string }) {
-  const userImageUrl = trpc.getUserImage.useQuery(userName, {
+function CurrentUserFeed({ username }: { username: string }) {
+  const userImageUrl = trpc.getUserImage.useQuery(username, {
     refetchOnWindowFocus: false,
   });
 
@@ -81,7 +81,7 @@ function CurrentUserFeed({ userName }: { userName: string }) {
         <UserIcon className="h-5 w-5 animate-pulse rounded bg-zinc-300 p-0.5 text-zinc-800 opacity-80" />
       )}
       <h1 className="hidden truncate text-center text-sm font-medium lg:block">
-        u/{userName}
+        u/{username}
       </h1>
     </>
   );

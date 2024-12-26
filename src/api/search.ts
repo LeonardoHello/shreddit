@@ -29,7 +29,7 @@ export const searchUsers = db.query.users
       },
     },
   })
-  .prepare("get_searched_users");
+  .prepare("searched_users");
 
 export const searchCommunities = db.query.communities
   .findMany({
@@ -44,4 +44,4 @@ export const searchCommunities = db.query.communities
       },
     },
   })
-  .prepare("get_searched_communities");
+  .prepare("searched_communities");

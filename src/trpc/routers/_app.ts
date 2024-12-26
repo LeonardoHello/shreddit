@@ -54,58 +54,13 @@ import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const appRouter = createTRPCRouter({
   infiniteQueryPosts: createTRPCRouter({
-    getHomePosts: protectedProcedure
+    getAllPosts: baseProcedure
       .input(
         z.object({
           // cursor input needed to expose useInfiniteQuery hook
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
-          sort: z.nativeEnum(PostSort),
-        }),
-      )
-      .query(async ({ input, ctx }) => {
-        let posts;
-        switch (input.sort) {
-          case PostSort.HOT:
-            posts = await getHomeHotPosts.execute({
-              offset: input.cursor,
-              currentUserId: ctx.userId,
-            });
-            break;
-
-          case PostSort.NEW:
-            posts = await getHomeNewPosts.execute({
-              offset: input.cursor,
-              currentUserId: ctx.userId,
-            });
-            break;
-
-          case PostSort.CONTROVERSIAL:
-            posts = await getHomeControversialPosts.execute({
-              offset: input.cursor,
-              currentUserId: ctx.userId,
-            });
-            break;
-
-          default:
-            posts = await getHomeBestPosts.execute({
-              offset: input.cursor,
-              currentUserId: ctx.userId,
-            });
-            break;
-        }
-
-        let nextCursor: typeof input.cursor = undefined;
-        if (posts.length === 10) {
-          nextCursor = input.cursor! + 10;
-        }
-
-        return { posts, nextCursor };
-      }),
-    getAllPosts: baseProcedure
-      .input(
-        z.object({
-          cursor: z.number().nullish(),
+          currentUserId: UserSchema.shape.id.nullable(),
           sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
@@ -114,80 +69,135 @@ export const appRouter = createTRPCRouter({
         switch (input.sort) {
           case PostSort.HOT:
             posts = await getAllHotPosts.execute({
+              currentUserId: input.currentUserId,
               offset: input.cursor,
             });
             break;
 
           case PostSort.NEW:
             posts = await getAllNewPosts.execute({
+              currentUserId: input.currentUserId,
               offset: input.cursor,
             });
             break;
 
           case PostSort.CONTROVERSIAL:
             posts = await getAllControversialPosts.execute({
+              currentUserId: input.currentUserId,
               offset: input.cursor,
             });
             break;
 
           default:
             posts = await getAllBestPosts.execute({
+              currentUserId: input.currentUserId,
               offset: input.cursor,
             });
             break;
         }
 
-        let nextCursor: typeof input.cursor = null;
+        let nextCursor: typeof input.cursor = undefined;
         if (posts.length === 10) {
-          nextCursor = input.cursor! + 10;
+          nextCursor = input.cursor ? input.cursor + 10 : 10;
         }
 
         return { posts, nextCursor };
       }),
+    getHomePosts: protectedProcedure
+      .input(
+        z.object({
+          cursor: z.number().nullish(),
+          currentUserId: UserSchema.shape.id,
+          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+        }),
+      )
+      .query(async ({ input, ctx }) => {
+        let posts;
+        switch (input.sort) {
+          case PostSort.HOT:
+            posts = await getHomeHotPosts.execute({
+              currentUserId: ctx.userId,
+              offset: input.cursor,
+            });
+            break;
 
+          case PostSort.NEW:
+            posts = await getHomeNewPosts.execute({
+              currentUserId: ctx.userId,
+              offset: input.cursor,
+            });
+            break;
+
+          case PostSort.CONTROVERSIAL:
+            posts = await getHomeControversialPosts.execute({
+              currentUserId: ctx.userId,
+              offset: input.cursor,
+            });
+            break;
+
+          default:
+            posts = await getHomeBestPosts.execute({
+              currentUserId: ctx.userId,
+              offset: input.cursor,
+            });
+            break;
+        }
+
+        let nextCursor: typeof input.cursor = undefined;
+        if (posts.length === 10) {
+          nextCursor = input.cursor ? input.cursor + 10 : 10;
+        }
+
+        return { posts, nextCursor };
+      }),
     getCommunityPosts: baseProcedure
       .input(
         z.object({
           cursor: z.number().nullish(),
-          communityName: z.string(),
+          currentUserId: UserSchema.shape.id.nullable(),
+          communityName: CommunitySchema.shape.name,
           sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
       )
-      .query(async ({ input: { cursor, sort, communityName } }) => {
+      .query(async ({ input }) => {
         let posts;
-        switch (sort) {
+        switch (input.sort) {
           case PostSort.HOT:
             posts = await getCommunityHotPosts.execute({
-              offset: cursor,
-              communityName,
+              currentUserId: input.currentUserId,
+              communityName: input.communityName,
+              offset: input.cursor,
             });
             break;
 
           case PostSort.NEW:
             posts = await getCommunityNewPosts.execute({
-              offset: cursor,
-              communityName,
+              currentUserId: input.currentUserId,
+              communityName: input.communityName,
+              offset: input.cursor,
             });
             break;
 
           case PostSort.CONTROVERSIAL:
             posts = await getCommunityControversialPosts.execute({
-              offset: cursor,
-              communityName,
+              currentUserId: input.currentUserId,
+              communityName: input.communityName,
+              offset: input.cursor,
             });
             break;
 
           default:
             posts = await getCommunityBestPosts.execute({
-              offset: cursor,
-              communityName,
+              currentUserId: input.currentUserId,
+              communityName: input.communityName,
+              offset: input.cursor,
             });
             break;
         }
 
-        let nextCursor: typeof cursor = null;
+        let nextCursor: typeof input.cursor = undefined;
         if (posts.length === 10) {
-          nextCursor = cursor! + 10;
+          nextCursor = input.cursor ? input.cursor + 10 : 10;
         }
 
         return { posts, nextCursor };
@@ -196,8 +206,9 @@ export const appRouter = createTRPCRouter({
       .input(
         z.object({
           cursor: z.number().nullish(),
+          currentUserId: UserSchema.shape.id.nullable(),
           userId: UserSchema.shape.id,
-          userName: UserSchema.shape.name,
+          username: UserSchema.shape.name,
           filter: z.union([z.string(), z.array(z.string()), z.undefined()]),
           sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
         }),
@@ -205,9 +216,9 @@ export const appRouter = createTRPCRouter({
       .query(async ({ input }) => {
         const posts = await getUserPosts(input);
 
-        let nextCursor: typeof input.cursor = null;
+        let nextCursor: typeof input.cursor = undefined;
         if (posts.length === 10) {
-          nextCursor = input.cursor! + 10;
+          nextCursor = input.cursor ? input.cursor + 10 : 10;
         }
 
         return { posts, nextCursor };
