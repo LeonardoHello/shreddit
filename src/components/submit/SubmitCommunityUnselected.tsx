@@ -6,7 +6,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 import { useDropdownContext } from "@/context/DropdownContext";
 
-export default function SubmitCommunity({
+export default function SubmitCommunityUnselected({
   children,
 }: {
   children: React.ReactNode;

@@ -5,9 +5,8 @@ import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 
 import { getMyCommunities } from "@/api/getCommunities";
-import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
-import SubmitCommunitySearch from "@/components/submit/SubmitCommunitySearch";
+import SubmitCommunityUnselected from "@/components/submit/SubmitCommunityUnselected";
 import SubmitTabs from "@/components/submit/SubmitTabs";
 import DropdownContextProvider from "@/context/DropdownContext";
 import ogre from "@public/logo-green.svg";
@@ -32,8 +31,7 @@ export default async function SubmitPage() {
         </h1>
 
         <DropdownContextProvider className="relative max-w-min bg-zinc-900">
-          <SubmitCommunity>
-            <SubmitCommunitySearch />
+          <SubmitCommunityUnselected>
             <Suspense fallback={<p>Loading...</p>}>
               <SubmitCommunityDropdown
                 username={user.username}
@@ -41,7 +39,7 @@ export default async function SubmitPage() {
                 myCommunitiesPromise={myCommunitiesPromise}
               />
             </Suspense>
-          </SubmitCommunity>
+          </SubmitCommunityUnselected>
         </DropdownContextProvider>
 
         <div className="flex flex-col rounded bg-zinc-900">

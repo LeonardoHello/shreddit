@@ -8,7 +8,6 @@ import { getMyCommunities } from "@/api/getCommunities";
 import { getSelectedCommunity } from "@/api/getCommunity";
 import SubmitButton from "@/components/submit/SubmitButton";
 import SubmitCommunityDropdown from "@/components/submit/SubmitCommunityDropdown";
-import SubmitCommunitySearch from "@/components/submit/SubmitCommunitySearch";
 import SubmitCommunitySelected from "@/components/submit/SubmitCommunitySelected";
 import SubmitTabs from "@/components/submit/SubmitTabs";
 import DropdownContextProvider from "@/context/DropdownContext";
@@ -46,7 +45,6 @@ export default async function CommunitySubmitPage(props: {
             <SubmitCommunitySelected
               selectedCommunityPromise={selectedCommunityPromise}
             >
-              <SubmitCommunitySearch />
               <Suspense fallback={<p>Loading...</p>}>
                 <SubmitCommunityDropdown
                   username={user.username}
@@ -56,7 +54,6 @@ export default async function CommunitySubmitPage(props: {
               </Suspense>
             </SubmitCommunitySelected>
           </Suspense>
-          <Suspense fallback={<p>Loading...</p>}></Suspense>
         </DropdownContextProvider>
 
         <div className="flex flex-col rounded bg-zinc-900">
