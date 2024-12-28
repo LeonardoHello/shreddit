@@ -10,28 +10,26 @@ import {
   TagIcon,
 } from "@heroicons/react/24/outline";
 import {
-  ChatBubbleBottomCenterTextIcon as SolidChatBubbleBottomCenterTextIcon,
-  FireIcon as SolidFireIcon,
-  RocketLaunchIcon as SolidRocketLaunchIcon,
-  TagIcon as SolidTagIcon,
+  ChatBubbleBottomCenterTextIcon as ChatBubbleBottomCenterTextIconSolid,
+  FireIcon as FireIconSolid,
+  RocketLaunchIcon as RocketLaunchIconSolid,
+  TagIcon as TagIconSolid,
 } from "@heroicons/react/24/solid";
 
-import { PostSort } from "@/types";
+import { PostFilter, PostSort } from "@/types";
 import cn from "@/utils/cn";
 
 export default function FeedSort({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { sort?: PostSort; filter?: PostFilter };
 }) {
   const pathname = usePathname();
 
   const { sort, filter } = searchParams;
 
   const defaultSort = !(
-    sort === PostSort.HOT ||
-    sort === PostSort.NEW ||
-    sort === PostSort.CONTROVERSIAL
+    sort && [PostSort.HOT, PostSort.NEW, PostSort.CONTROVERSIAL].includes(sort)
   );
 
   return (
@@ -51,11 +49,8 @@ export default function FeedSort({
               },
             )}
           >
-            {defaultSort ? (
-              <SolidRocketLaunchIcon className="h-6 w-6" />
-            ) : (
-              <RocketLaunchIcon className="h-6 w-6" />
-            )}
+            {defaultSort && <RocketLaunchIconSolid className="h-6 w-6" />}
+            {!defaultSort && <RocketLaunchIcon className="h-6 w-6" />}
             <span className="hidden sm:inline-block">Best</span>
           </Link>
         </li>
@@ -73,11 +68,8 @@ export default function FeedSort({
               },
             )}
           >
-            {sort === PostSort.HOT ? (
-              <SolidFireIcon className="h-6 w-6" />
-            ) : (
-              <FireIcon className="h-6 w-6" />
-            )}
+            {sort === PostSort.HOT && <FireIconSolid className="h-6 w-6" />}
+            {sort !== PostSort.HOT && <FireIcon className="h-6 w-6" />}
             <span className="hidden sm:inline-block">Hot</span>
           </Link>
         </li>
@@ -95,11 +87,8 @@ export default function FeedSort({
               },
             )}
           >
-            {sort === PostSort.NEW ? (
-              <SolidTagIcon className="h-6 w-6" />
-            ) : (
-              <TagIcon className="h-6 w-6" />
-            )}
+            {sort === PostSort.NEW && <TagIconSolid className="h-6 w-6" />}
+            {sort !== PostSort.NEW && <TagIcon className="h-6 w-6" />}
             <span className="hidden sm:inline-block">New</span>
           </Link>
         </li>
@@ -120,9 +109,10 @@ export default function FeedSort({
               },
             )}
           >
-            {sort === PostSort.CONTROVERSIAL ? (
-              <SolidChatBubbleBottomCenterTextIcon className="h-6 w-6" />
-            ) : (
+            {sort === PostSort.CONTROVERSIAL && (
+              <ChatBubbleBottomCenterTextIconSolid className="h-6 w-6" />
+            )}
+            {sort !== PostSort.CONTROVERSIAL && (
               <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
             )}
             <span className="hidden sm:inline-block">Controversial</span>

@@ -1,4 +1,4 @@
-import { useSearchParams } from "next/navigation";
+"use client";
 
 import {
   BookmarkIcon,
@@ -11,39 +11,30 @@ import {
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { usePostContext } from "@/context/PostContext";
-import type { Post, User } from "@/db/schema";
+import {
+  ReducerAction,
+  usePostContext,
+  usePostDispatchContext,
+} from "@/context/PostContext";
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
 
-type Props = {
-  currentUserId: User["id"] | null;
-  removePostFromQuery?: (postId: Post["id"]) => void;
-  children: React.ReactNode;
-};
-
 export default function PostActions({
-  currentUserId,
-  removePostFromQuery,
   children,
-}: Props) {
-  const searchParams = useSearchParams();
-  const utils = trpc.useUtils();
-
+}: {
+  children: React.ReactNode;
+}) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
-  const post = usePostContext();
 
-  const userToPost = post.usersToPosts.findLast(
-    (userToPost) => userToPost.userId === currentUserId,
-  );
+  const state = usePostContext();
+  const dispatch = usePostDispatchContext();
 
   const savePost = trpc.savePost.useMutation({
-    onError: async (error) => {
-      if (error.message !== "UNAUTHORIZED") {
-        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-      }
-
-      toast.error(error.message);
+    onMutate: (variables) => {
+      dispatch({
+        type: ReducerAction.CHANGE_SAVED,
+        nextSaved: variables.saved,
+      });
     },
     onSuccess: (data) => {
       if (data[0].saved) {
@@ -52,26 +43,27 @@ export default function PostActions({
         toast.success("Post unsaved successfully.");
       }
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const hidePost = trpc.hidePost.useMutation({
-    onError: async (error) => {
-      if (error.message !== "UNAUTHORIZED") {
-        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-      }
-
-      toast.error(error.message);
+    onMutate: (variables) => {
+      dispatch({
+        type: ReducerAction.CHANGE_HIDDEN,
+        nextHidden: variables.hidden,
+      });
     },
     onSuccess: (data) => {
-      if (removePostFromQuery !== undefined && !searchParams.get("filter")) {
-        removePostFromQuery(post.id);
-      }
-
-      if (data[0].saved) {
+      if (data[0].hidden) {
         toast.success("Post hidden successfully.");
       } else {
         toast.success("Post unhidden successfully.");
       }
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -81,7 +73,7 @@ export default function PostActions({
       : "http://localhost:3000";
 
     await navigator.clipboard.writeText(
-      `${origin}/r/${post.community.name}/comments/${postId}`,
+      `${origin}/r/${state.community.name}/comments/${postId}`,
     );
     toast.success("Copied link!");
   };
@@ -93,14 +85,14 @@ export default function PostActions({
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
-        }).format(post.commentCount)}{" "}
+        }).format(state.commentCount)}{" "}
         <span className="hidden sm:block">comments</span>
       </div>
       <div
         className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 hover:bg-zinc-700/50"
         onClick={(e) => {
           e.stopPropagation();
-          copyLink(post.id);
+          copyLink(state.id);
         }}
       >
         <LinkIcon className="h-6 w-6" />
@@ -112,12 +104,12 @@ export default function PostActions({
           e.stopPropagation();
 
           savePost.mutate({
-            postId: post.id,
-            saved: !userToPost?.saved,
+            postId: state.id,
+            saved: !state.saved,
           });
         }}
       >
-        {userToPost?.saved ? (
+        {state.saved ? (
           <>
             <BookmarkSlashIcon className="h-6 w-6" />
             <div className="hidden sm:block">unsave</div>
@@ -135,12 +127,12 @@ export default function PostActions({
           e.stopPropagation();
 
           hidePost.mutate({
-            postId: post.id,
-            hidden: !userToPost?.hidden,
+            postId: state.id,
+            hidden: !state.hidden,
           });
         }}
       >
-        {userToPost?.hidden ? (
+        {state.hidden ? (
           <>
             <EyeSlashIcon className="h-6 w-6" />
             <div className="hidden sm:block">unhide</div>
@@ -152,19 +144,17 @@ export default function PostActions({
           </>
         )}
       </div>
-      {post.authorId === currentUserId && (
-        <div
-          ref={dropdownRef}
-          className="cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOpen((prev) => !prev);
-          }}
-        >
-          <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
-          {isOpen && children}
-        </div>
-      )}
+      <div
+        ref={dropdownRef}
+        className="cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen((prev) => !prev);
+        }}
+      >
+        <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
+        {isOpen && children}
+      </div>
     </div>
   );
 }

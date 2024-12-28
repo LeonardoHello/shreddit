@@ -1,0 +1,87 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
+import PostContextProvider from "@/context/PostContext";
+import type { User } from "@/db/schema";
+import { trpc } from "@/trpc/client";
+import type { RouterOutput } from "@/trpc/routers/_app";
+import type {
+  InfiniteQueryPostProcedure,
+  PostFilter,
+  QueryInfo,
+} from "@/types";
+import FeedLoading from "./FeedLoading";
+import FeedPost from "./FeedPost";
+
+type Props<T extends InfiniteQueryPostProcedure> = {
+  currentUserId: User["id"] | null;
+  initialPosts: RouterOutput["infiniteQueryPosts"][T];
+  queryInfo: QueryInfo<T>;
+  username: string;
+  filter: PostFilter | undefined;
+};
+
+export default function FeedUserPosts({
+  currentUserId,
+  initialPosts,
+  queryInfo,
+  username,
+  filter,
+}: Props<"getUserPosts">) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
+    trpc.infiniteQueryPosts[queryInfo.procedure].useInfiniteQuery(
+      queryInfo.input,
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+        initialData: { pages: [initialPosts], pageParams: [0] },
+        refetchOnWindowFocus: false,
+      },
+    );
+
+  if (data === undefined) {
+    throw new Error("Couldn't fetch posts");
+  }
+
+  useEffect(() => {
+    if (!ref.current || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+
+      if (entry.isIntersecting) {
+        fetchNextPage();
+      }
+    });
+
+    observer.observe(ref.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  return (
+    <div className="relative flex flex-col gap-2.5">
+      {data.pages.map((page) =>
+        page.posts.map((post) => (
+          <PostContextProvider
+            key={post.id}
+            post={post}
+            currentUserId={currentUserId}
+          >
+            <FeedPost
+              currentUserId={currentUserId}
+              username={username}
+              filter={filter}
+            />
+          </PostContextProvider>
+        )),
+      )}
+      {isFetchingNextPage && <FeedLoading />}
+      <div ref={ref} className="sr-only bottom-0 h-[550px]" />
+    </div>
+  );
+}

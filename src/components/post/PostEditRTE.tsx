@@ -18,7 +18,6 @@ import {
   generatePermittedFileTypes,
 } from "uploadthing/client";
 
-import { useFilesContext } from "@/context/FilesContext";
 import {
   ReducerAction,
   usePostContext,
@@ -27,9 +26,9 @@ import {
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEMarkButtons from "./RTEMarkButtons";
-import RTENodeButtons from "./RTENodeButtons";
-import RTEpostLoading from "./RTEPostLoading";
+import RTEMarkButtons from "../RTE/RTEMarkButtons";
+import RTENodeButtons from "../RTE/RTENodeButtons";
+import RTEPostLoading from "../RTE/RTEPostLoading";
 
 const extensions = [
   StarterKit,
@@ -41,7 +40,7 @@ const extensions = [
 
 const toastId = "loading_toast";
 
-export default function RTEPostEdit() {
+export default function PostEditRTE() {
   const post = usePostContext();
 
   const editor = useEditor({
@@ -57,12 +56,12 @@ export default function RTEPostEdit() {
   });
 
   if (!editor) {
-    return <RTEpostLoading content={post.text} />;
+    return <RTEPostLoading content={post.text} />;
   }
 
   return (
     <div
-      className={cn("rounded border border-zinc-700/70", {
+      className={cn("cursor-auto rounded border border-zinc-700/70", {
         "border-zinc-300": editor.isFocused,
       })}
       onClick={(e) => {
@@ -99,43 +98,31 @@ export default function RTEPostEdit() {
 }
 
 function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
-  const utils = trpc.useUtils();
-
-  const post = usePostContext();
+  const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
-      utils["getPost"].setData(post.id, (updater) => {
-        if (!updater) {
-          const post = utils["getPost"].getData();
-
-          return post;
-        }
-
-        return { ...updater, text: editor.getHTML() };
-      });
-
+      dispatch({ type: ReducerAction.CHANGE_TEXT, nextText: editor.getHTML() });
       dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
     onSuccess: () => {
       toast.success("Post successfully edited.");
     },
     onError: async (error) => {
-      await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-
       toast.error(error.message);
     },
   });
 
-  const disabled = editPost.isPending || post.title.length === 0;
+  const disabled =
+    state.disabled || editPost.isPending || state.title.length === 0;
 
   return (
     <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
       <button
         className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
         onClick={() => {
-          editor.commands.setContent(post.text);
+          editor.commands.setContent(state.text);
           dispatch({ type: ReducerAction.CANCEL_EDIT });
         }}
       >
@@ -152,7 +139,7 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
         disabled={disabled}
         onClick={() => {
           editPost.mutate({
-            id: post.id,
+            id: state.id,
             text: editor.getHTML(),
           });
         }}
@@ -164,11 +151,11 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
 }
 
 function RTENodeButtonImage({ editor }: { editor: Editor }) {
-  const { setFiles, setIsUploading } = useFilesContext();
+  const dispatch = usePostDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      setIsUploading(true);
+      dispatch({ type: ReducerAction.DISABLE_EDIT });
       return files;
     },
     onUploadProgress: (p) => {
@@ -200,15 +187,12 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
         })
         .run();
 
-      const files = res.map(({ size, serverData, ...rest }) => rest);
-
-      setFiles((prev) => [...prev, ...files]);
-      setIsUploading(false);
+      dispatch({ type: ReducerAction.ENABLE_EDIT });
 
       toast.dismiss(toastId);
     },
     onUploadError: (e) => {
-      setIsUploading(false);
+      dispatch({ type: ReducerAction.ENABLE_EDIT });
 
       toast.error(e.message);
     },

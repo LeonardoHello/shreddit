@@ -1,24 +1,26 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { User } from "@clerk/nextjs/server";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
-import type { getUserById } from "@/api/getUser";
 import { Community } from "@/db/schema";
 import { PostType } from "@/types";
 
 export default function FeedInput({
-  user,
+  username,
+  imageUrl,
   communityName,
 }: {
-  user: NonNullable<Awaited<ReturnType<typeof getUserById.execute>>>;
+  username: User["username"];
+  imageUrl: User["imageUrl"];
   communityName?: Community["name"];
 }) {
   return (
     <div className="flex gap-2 rounded border border-zinc-700/70 bg-zinc-900 p-2">
-      <Link href={`/u/${user.name}`} className="rounded-full">
+      <Link href={`/u/${username}`} className="rounded-full">
         <Image
-          src={user.imageUrl}
+          src={imageUrl}
           alt="user image"
           width={38}
           height={38}

@@ -1,4 +1,6 @@
-import { useRouter } from "next/navigation";
+"use client";
+
+import { useParams, useRouter } from "next/navigation";
 
 import {
   CheckIcon,
@@ -12,49 +14,23 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
-import type { RouterInput } from "@/trpc/routers/_app";
 import cn from "@/utils/cn";
 
-export default function PostActionsDropdown({
-  removePostFromQuery,
-}: {
-  removePostFromQuery?: (postId: Post["id"]) => void;
-}) {
+export default function PostActionsDropdown() {
+  const { postId } = useParams();
   const router = useRouter();
-  const utils = trpc.useUtils();
 
   const post = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const queryConfig = {
-    onMutate: async (
-      variables: RouterInput["setPostSpoilerTag" | "setPostNSFWTag"],
-    ) => {
-      await utils["getPost"].cancel();
-
-      utils["getPost"].setData(post.id, (data) => {
-        if (!data) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-
-          return post;
-        }
-
-        return { ...data, ...variables };
+  const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
+    onMutate: (variables) => {
+      dispatch({
+        type: ReducerAction.CHANGE_SPOILER,
+        nextSpoiler: variables.spoiler,
       });
     },
-    onError: async ({ message }: { message: string }) => {
-      if (message !== "UNAUTHORIZED") {
-        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-      }
-
-      toast.error(message);
-    },
-  };
-
-  const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
-    ...queryConfig,
     onSuccess: (data) => {
       if (data[0].spoiler) {
         toast.success("Post has been marked as spoiler");
@@ -62,10 +38,18 @@ export default function PostActionsDropdown({
         toast.success("Post has been un-marked as a spoiler");
       }
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
-    ...queryConfig,
+    onMutate: (variables) => {
+      dispatch({
+        type: ReducerAction.CHANGE_NSFW,
+        nextNsfw: variables.nsfw,
+      });
+    },
     onSuccess: (data) => {
       if (data[0].nsfw) {
         toast.success("Post has been marked as spoiler");
@@ -73,21 +57,24 @@ export default function PostActionsDropdown({
         toast.success("Post has been un-marked as a spoiler");
       }
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const deletedPost = trpc.deletePost.useMutation({
-    onError: queryConfig.onError,
     onMutate: () => {
-      if (removePostFromQuery !== undefined) {
-        removePostFromQuery(post.id);
-      }
+      dispatch({ type: ReducerAction.DELETE });
     },
     onSuccess: () => {
-      if (removePostFromQuery === undefined) {
+      if (postId) {
         router.replace("/");
       }
 
       toast.success("Post deleted successfully.");
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 

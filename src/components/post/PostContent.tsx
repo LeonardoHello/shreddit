@@ -1,20 +1,20 @@
-import FilesContextProvider from "@/context/FilesContext";
+"use client";
+
 import { usePostContext } from "@/context/PostContext";
-import RTEPostEdit from "../RTE/RTEPostEdit";
 import PostContentMedia from "./PostContentMedia";
 import PostContentText from "./PostContentText";
+import PostEditRTE from "./PostEditRTE";
 
 export default function PostContent() {
-  const post = usePostContext();
+  const state = usePostContext();
 
-  if (post.edit) {
-    const initialFiles = post.files.map(({ id, postId, ...rest }) => rest);
-    return (
-      <FilesContextProvider initialFiles={initialFiles}>
-        <RTEPostEdit />
-      </FilesContextProvider>
-    );
+  if (state.edit) {
+    return <PostEditRTE />;
   }
 
-  return post.files.length === 0 ? <PostContentText /> : <PostContentMedia />;
+  if (state.files.length === 0) {
+    return <PostContentText />;
+  }
+
+  return <PostContentMedia />;
 }

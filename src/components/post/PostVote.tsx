@@ -1,85 +1,34 @@
+"use client";
+
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { usePostContext } from "@/context/PostContext";
-import type { UserToPost } from "@/db/schema";
+import {
+  ReducerAction,
+  usePostContext,
+  usePostDispatchContext,
+} from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
-const PostVote = function PostVote({
-  currentUserId,
-}: {
-  currentUserId: UserToPost["userId"] | null;
-}) {
-  const utils = trpc.useUtils();
-
-  const post = usePostContext();
-
-  const userToPost = post.usersToPosts.findLast(
-    (userToPost) => userToPost.userId === currentUserId,
-  );
+export default function PostVote() {
+  const state = usePostContext();
+  const dispatch = usePostDispatchContext();
 
   const votePost = trpc.votePost.useMutation({
-    onMutate: async (variables) => {
-      if (!currentUserId) return;
-
-      await utils["getPost"].cancel();
-
-      utils["getPost"].setData(post.id, (data) => {
-        if (!data) {
-          toast.error("Failed to upvote post.");
-
-          return post;
-        }
-
-        let usersToPosts = structuredClone(data.usersToPosts);
-
-        if (!userToPost) {
-          usersToPosts.push({
-            userId: currentUserId,
-            saved: false,
-            hidden: false,
-            ...variables,
-          });
-        } else {
-          const index = usersToPosts.findLastIndex(
-            (_userToPost) => _userToPost.userId === currentUserId,
-          );
-
-          usersToPosts = usersToPosts.with(index, {
-            ...userToPost,
-            ...variables,
-          });
-        }
-
-        return {
-          ...data,
-          usersToPosts,
-        };
+    onMutate: (variables) => {
+      dispatch({
+        type: ReducerAction.CHANGE_VOTE,
+        nextVote: variables.voteStatus,
       });
     },
     onError: async ({ message }) => {
-      if (message !== "UNAUTHORIZED") {
-        await utils["getPost"].refetch(post.id, {}, { throwOnError: true });
-      }
-
       toast.error(message);
     },
   });
-
-  const votes = post.usersToPosts.reduce((accumulator, currentValue) => {
-    return (
-      accumulator +
-      (currentValue.voteStatus === "upvoted"
-        ? 1
-        : currentValue.voteStatus === "downvoted"
-          ? -1
-          : 0)
-    );
-  }, 0);
 
   return (
     <div className="flex select-none flex-col gap-0.5 text-center text-zinc-500">
@@ -88,50 +37,46 @@ const PostVote = function PostVote({
         className={cn(
           "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
-            "text-rose-500": userToPost?.voteStatus === "upvoted",
+            "text-rose-500": state.voted === "upvoted",
           },
         )}
         onClick={(e) => {
           e.stopPropagation();
 
           votePost.mutate({
-            postId: post.id,
-            voteStatus:
-              userToPost?.voteStatus === "upvoted" ? "none" : "upvoted",
+            postId: state.id,
+            voteStatus: state.voted === "upvoted" ? "none" : "upvoted",
           });
         }}
       />
       <div
         className={cn("text-xs font-bold text-zinc-300 transition-colors", {
-          "text-rose-500": userToPost?.voteStatus === "upvoted",
-          "text-blue-500": userToPost?.voteStatus === "downvoted",
+          "text-rose-500": state.voted === "upvoted",
+          "text-blue-500": state.voted === "downvoted",
         })}
       >
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
-        }).format(votes)}
+        }).format(state.voteCount)}
       </div>
       <ArrowDownCircleIcon
         viewBox="2.25 2.25 19.5 19.5"
         className={cn(
           "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
-            "text-blue-500": userToPost?.voteStatus === "downvoted",
+            "text-blue-500": state.voted === "downvoted",
           },
         )}
         onClick={(e) => {
           e.stopPropagation();
 
           votePost.mutate({
-            postId: post.id,
-            voteStatus:
-              userToPost?.voteStatus === "downvoted" ? "none" : "downvoted",
+            postId: state.id,
+            voteStatus: state.voted === "downvoted" ? "none" : "downvoted",
           });
         }}
       />
     </div>
   );
-};
-
-export default PostVote;
+}

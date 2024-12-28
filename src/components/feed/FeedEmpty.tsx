@@ -8,7 +8,7 @@ import {
 import type { Community, User } from "@/db/schema";
 import { PostFilter, PostSort } from "@/types";
 
-export default function InfiniteQueryPostsEmpty({
+export default function FeedEmpty({
   params,
   searchParams,
 }: {
@@ -17,8 +17,8 @@ export default function InfiniteQueryPostsEmpty({
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
-      {Array.of(4).map((_) => (
-        <div key={_} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
           <div className="flex select-none flex-col items-center gap-4 text-zinc-500">
             <ArrowUpCircleIcon className="h-8 w-8 rounded" />
             <ArrowDownCircleIcon className="h-8 w-8 rounded" />
@@ -42,13 +42,7 @@ export default function InfiniteQueryPostsEmpty({
         {!(params.username || searchParams.filter) && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
-            <Link
-              href={{
-                pathname: "/submit",
-                query: { community: params.communityName },
-              }}
-              className="rounded-full"
-            >
+            <Link href="/submit" className="rounded-full">
               <button className="w-full rounded-full bg-zinc-300 p-1.5 px-12 text-sm font-bold text-zinc-900 transition-colors hover:bg-zinc-400">
                 Create Post
               </button>
