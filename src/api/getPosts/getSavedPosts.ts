@@ -1,15 +1,27 @@
 import db from "@/db";
 import { usersToPosts } from "@/db/schema";
-import {
-  bestPosts,
-  controversialPosts,
-  hotPosts,
-  newPosts,
-} from "@/utils/postsQueryConfig";
+import { PostSort } from "@/types";
+import { postsQueryConfig } from "@/utils/postsQueryConfig";
+
+const bestSavedPosts = postsQueryConfig({
+  showHidden: true,
+});
+const hotSavedPosts = postsQueryConfig({
+  sort: PostSort.HOT,
+  showHidden: true,
+});
+const newSavedPosts = postsQueryConfig({
+  sort: PostSort.NEW,
+  showHidden: true,
+});
+const controversialSavedPosts = postsQueryConfig({
+  sort: PostSort.CONTROVERSIAL,
+  showHidden: true,
+});
 
 export const getSavedBestPosts = db.query.posts
   .findMany({
-    ...bestPosts,
+    ...bestSavedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -26,7 +38,7 @@ export const getSavedBestPosts = db.query.posts
               ),
             ),
         ),
-        bestPosts.where(post, filter),
+        bestSavedPosts.where(post, filter),
       );
     },
   })
@@ -34,7 +46,7 @@ export const getSavedBestPosts = db.query.posts
 
 export const getSavedHotPosts = db.query.posts
   .findMany({
-    ...hotPosts,
+    ...hotSavedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -51,7 +63,7 @@ export const getSavedHotPosts = db.query.posts
               ),
             ),
         ),
-        hotPosts.where(post, filter),
+        hotSavedPosts.where(post, filter),
       );
     },
   })
@@ -59,7 +71,7 @@ export const getSavedHotPosts = db.query.posts
 
 export const getSavedNewPosts = db.query.posts
   .findMany({
-    ...newPosts,
+    ...newSavedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -76,7 +88,7 @@ export const getSavedNewPosts = db.query.posts
               ),
             ),
         ),
-        newPosts.where(post, filter),
+        newSavedPosts.where(post, filter),
       );
     },
   })
@@ -84,7 +96,7 @@ export const getSavedNewPosts = db.query.posts
 
 export const getSavedControversialPosts = db.query.posts
   .findMany({
-    ...controversialPosts,
+    ...controversialSavedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -101,7 +113,7 @@ export const getSavedControversialPosts = db.query.posts
               ),
             ),
         ),
-        controversialPosts.where(post, filter),
+        controversialSavedPosts.where(post, filter),
       );
     },
   })

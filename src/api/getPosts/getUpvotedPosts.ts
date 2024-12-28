@@ -1,15 +1,27 @@
 import db from "@/db";
 import { usersToPosts } from "@/db/schema";
-import {
-  bestPosts,
-  controversialPosts,
-  hotPosts,
-  newPosts,
-} from "@/utils/postsQueryConfig";
+import { PostSort } from "@/types";
+import { postsQueryConfig } from "@/utils/postsQueryConfig";
+
+const bestUpvotedPosts = postsQueryConfig({
+  showHidden: true,
+});
+const hotUpvotedPosts = postsQueryConfig({
+  sort: PostSort.HOT,
+  showHidden: true,
+});
+const newUpvotedPosts = postsQueryConfig({
+  sort: PostSort.NEW,
+  showHidden: true,
+});
+const controversialUpvotedPosts = postsQueryConfig({
+  sort: PostSort.CONTROVERSIAL,
+  showHidden: true,
+});
 
 export const getUpvotedBestPosts = db.query.posts
   .findMany({
-    ...bestPosts,
+    ...bestUpvotedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -26,7 +38,7 @@ export const getUpvotedBestPosts = db.query.posts
               ),
             ),
         ),
-        bestPosts.where(post, filter),
+        bestUpvotedPosts.where(post, filter),
       );
     },
   })
@@ -34,7 +46,7 @@ export const getUpvotedBestPosts = db.query.posts
 
 export const getUpvotedHotPosts = db.query.posts
   .findMany({
-    ...hotPosts,
+    ...hotUpvotedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -51,7 +63,7 @@ export const getUpvotedHotPosts = db.query.posts
               ),
             ),
         ),
-        hotPosts.where(post, filter),
+        hotUpvotedPosts.where(post, filter),
       );
     },
   })
@@ -59,7 +71,7 @@ export const getUpvotedHotPosts = db.query.posts
 
 export const getUpvotedNewPosts = db.query.posts
   .findMany({
-    ...newPosts,
+    ...newUpvotedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -76,7 +88,7 @@ export const getUpvotedNewPosts = db.query.posts
               ),
             ),
         ),
-        newPosts.where(post, filter),
+        newUpvotedPosts.where(post, filter),
       );
     },
   })
@@ -84,7 +96,7 @@ export const getUpvotedNewPosts = db.query.posts
 
 export const getUpvotedControversialPosts = db.query.posts
   .findMany({
-    ...controversialPosts,
+    ...controversialUpvotedPosts,
     where: (post, filter) => {
       const { sql, exists, and, eq } = filter;
 
@@ -101,7 +113,7 @@ export const getUpvotedControversialPosts = db.query.posts
               ),
             ),
         ),
-        controversialPosts.where(post, filter),
+        controversialUpvotedPosts.where(post, filter),
       );
     },
   })
