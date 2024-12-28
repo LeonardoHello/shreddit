@@ -74,7 +74,7 @@ export default function SubmitButton({
 
   const disabled =
     isMutating ||
-    state.isDisabled ||
+    state.disabled ||
     state.title.length === 0 ||
     (state.type === PostType.IMAGE && state.files.length === 0);
 

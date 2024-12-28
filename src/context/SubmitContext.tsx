@@ -9,7 +9,7 @@ import { PostType } from "@/types";
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   files: Omit<File, "id" | "postId">[];
   communitySearch: string;
-  isDisabled: boolean;
+  disabled: boolean;
   type: PostType;
 };
 
@@ -72,10 +72,10 @@ const reducer = (
       return { ...state, nsfw: !state.nsfw };
 
     case ReducerAction.DISABLE_SUBMIT:
-      return { ...state, isDisabled: true };
+      return { ...state, disabled: true };
 
     case ReducerAction.ENABLE_SUBMIT:
-      return { ...state, isDisabled: false };
+      return { ...state, disabled: false };
 
     default:
       throw Error("Unknown action");
@@ -106,7 +106,7 @@ export default function SubmitContextProvider({
     files: [],
     nsfw: false,
     spoiler: false,
-    isDisabled: false,
+    disabled: false,
   });
 
   return (

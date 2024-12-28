@@ -58,19 +58,19 @@ export default function SubmitTabs() {
         {Object.values(PostType).map((type, index, arr) => (
           <button
             key={type}
-            disabled={state.isDisabled}
+            disabled={state.disabled}
             className={cn(
               "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 bg-zinc-900 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
               {
                 "border-b-2 border-b-zinc-300 text-zinc-300":
                   type === state.type,
-                "cursor-not-allowed hover:bg-inherit": state.isDisabled,
+                "cursor-not-allowed hover:bg-inherit": state.disabled,
                 "rounded-tl": index === 0,
                 "rounded-tr": index === arr.length - 1,
               },
             )}
             onClick={() => {
-              if (type === state.type || state.isDisabled) return;
+              if (type === state.type || state.disabled) return;
 
               dispatch({
                 type: ReducerAction.SET_TYPE,
