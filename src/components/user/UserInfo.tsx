@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import type { getUserByName } from "@/api/getUser";
 import getOnions from "@/utils/getOnions";
@@ -7,12 +8,13 @@ import cake from "@public/cake.svg";
 import dot from "@public/dot.svg";
 import onion from "@public/onion.svg";
 import userBackground from "@public/userBackground.jpg";
+import CommunityImage from "../community/CommunityImage";
 
 type user = NonNullable<Awaited<ReturnType<typeof getUserByName.execute>>>;
 
 export default function UserInfo({ user }: { user: user }) {
   return (
-    <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2 shadow-lg shadow-zinc-950">
+    <div className="sticky top-4 flex flex-col gap-3 scroll-auto rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2 shadow-lg shadow-zinc-950">
       <Image
         src={userBackground}
         alt="galaxy"
@@ -46,7 +48,9 @@ export default function UserInfo({ user }: { user: user }) {
           </time>
         </h2>
       </div>
+
       <hr className="border-zinc-700/70" />
+
       <div className="flex justify-between">
         <div className="space-y-1">
           <div className="font-medium">Onions</div>
@@ -74,6 +78,39 @@ export default function UserInfo({ user }: { user: user }) {
           </div>
         </div>
         <div />
+      </div>
+
+      <hr className="border-zinc-700/70" />
+
+      <div>
+        <h1 className="mb-4 max-w-[15rem] font-bold tracking-wide text-zinc-500">
+          Moderator of these communities
+        </h1>
+        <div className="flex h-56 flex-col gap-3.5 overflow-y-scroll">
+          {user.communities.map((community) => (
+            <div key={community.id} className="flex items-center gap-1.5">
+              <CommunityImage imageUrl={community.imageUrl} size={32} />
+
+              <div className="truncate text-xs tracking-wide">
+                <Link
+                  href={`/r/${community.name}`}
+                  className="max-w-[15rem] cursor-pointer font-medium lowercase hover:underline"
+                >
+                  r/{community.name}
+                </Link>
+                <div>
+                  {new Intl.NumberFormat("en-US", {
+                    notation: "compact",
+                    maximumFractionDigits: 1,
+                  }).format(community.usersToCommunities.length)}{" "}
+                  {community.usersToCommunities.length === 1
+                    ? "member"
+                    : "members"}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

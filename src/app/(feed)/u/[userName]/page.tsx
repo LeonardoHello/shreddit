@@ -7,7 +7,6 @@ import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedSort from "@/components/feed/FeedSort";
 import FeedUserPosts from "@/components/feed/FeedUserPosts";
 import ScrollToTop from "@/components/sidebar/ScrollToTop";
-import ModeratedCommunities from "@/components/user/ModeratedCommunities";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";
 import type { PostFilter, PostSort, QueryInfo } from "@/types";
@@ -78,7 +77,6 @@ export default async function UserPage(props: {
 
         <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
           <UserInfo user={user} />
-          <ModeratedCommunities communities={user.communities} />
           <ScrollToTop />
         </div>
 
