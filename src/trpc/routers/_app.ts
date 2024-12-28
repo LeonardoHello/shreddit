@@ -48,7 +48,7 @@ import {
   UserToCommunitySchema,
   UserToPostSchema,
 } from "@/db/schema";
-import { PostSort } from "@/types";
+import { PostFilter, PostSort } from "@/types";
 import getUserPosts from "@/utils/getUserPosts";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
@@ -61,7 +61,7 @@ export const appRouter = createTRPCRouter({
           // value of the cursor is what's returned from getNextPageParam
           cursor: z.number().nullish(),
           currentUserId: UserSchema.shape.id.nullable(),
-          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          sort: z.nativeEnum(PostSort).optional(),
         }),
       )
       .query(async ({ input }) => {
@@ -108,7 +108,7 @@ export const appRouter = createTRPCRouter({
         z.object({
           cursor: z.number().nullish(),
           currentUserId: UserSchema.shape.id,
-          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          sort: z.nativeEnum(PostSort).optional(),
         }),
       )
       .query(async ({ input, ctx }) => {
@@ -156,7 +156,7 @@ export const appRouter = createTRPCRouter({
           cursor: z.number().nullish(),
           currentUserId: UserSchema.shape.id.nullable(),
           communityName: CommunitySchema.shape.name,
-          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          sort: z.nativeEnum(PostSort).optional(),
         }),
       )
       .query(async ({ input }) => {
@@ -209,8 +209,8 @@ export const appRouter = createTRPCRouter({
           currentUserId: UserSchema.shape.id.nullable(),
           userId: UserSchema.shape.id,
           username: UserSchema.shape.name,
-          filter: z.union([z.string(), z.array(z.string()), z.undefined()]),
-          sort: z.union([z.string(), z.array(z.string()), z.undefined()]),
+          filter: z.nativeEnum(PostFilter).optional(),
+          sort: z.nativeEnum(PostSort).optional(),
         }),
       )
       .query(async ({ input }) => {
@@ -436,7 +436,7 @@ export const appRouter = createTRPCRouter({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { hidden: input.hidden },
         })
-        .returning({ saved: usersToPosts.saved });
+        .returning({ hidden: usersToPosts.hidden });
     }),
   votePost: protectedProcedure
     .input(UserToPostSchema.pick({ postId: true, voteStatus: true }))

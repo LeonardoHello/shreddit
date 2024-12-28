@@ -1,21 +1,21 @@
 import Link from "next/link";
 
+import { PostFilter } from "@/types";
 import cn from "@/utils/cn";
 
 export default function UserNavigation({
   username,
-  filter,
   isCurrentUser,
+  searchParams,
 }: {
   username: string;
   isCurrentUser: boolean;
-  filter?: string | string[] | undefined;
+  searchParams: { filter?: PostFilter };
 }) {
-  const defaultNav = !(
-    filter === "saved" ||
-    filter === "hidden" ||
-    filter === "upvoted" ||
-    filter === "downvoted"
+  const { filter } = searchParams;
+
+  const defaultNavigation = !(
+    filter && Object.values(PostFilter).includes(filter)
   );
 
   const href = `/u/${username}`;
@@ -26,8 +26,8 @@ export default function UserNavigation({
         <Link
           href={href}
           className={cn("border-b-2 border-transparent", {
-            "border-zinc-300": defaultNav,
-            "hover:border-zinc-300/40": !defaultNav,
+            "border-zinc-300": defaultNavigation,
+            "hover:border-zinc-300/40": !defaultNavigation,
           })}
         >
           overview

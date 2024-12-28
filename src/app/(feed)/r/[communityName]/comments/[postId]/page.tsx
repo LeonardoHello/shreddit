@@ -1,11 +1,13 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 import { currentUser } from "@clerk/nextjs/server";
 
 import { getComments } from "@/api/getComment";
 import { getPostById } from "@/api/getPost";
 import Comments from "@/components/comment/Comments";
-import PostPageComponent from "@/components/post/PostPage";
+import Post from "@/components/post/Post";
+import RTEComment from "@/components/RTE/RTEComment";
 
 export default async function PostPage(props: {
   params: Promise<{ postId: string }>;
@@ -24,17 +26,36 @@ export default async function PostPage(props: {
   const comments = await getComments.execute({ postId: params.postId });
 
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <PostPageComponent
-        postPromise={postPromise}
-        userId={user && user.id}
-        username={user && user.username}
-      >
-        <Comments
-          comments={comments.filter((comment) => !comment.parentCommentId)}
-          replies={comments.filter((comment) => comment.parentCommentId)}
-        />
-      </PostPageComponent>
-    </Suspense>
+    <div className="-order-1 row-span-2 bg-zinc-900">
+      <Suspense fallback={<p>Loading...</p>}>
+        <Post currentUserId={user && user.id} postPromise={postPromise} />
+      </Suspense>
+
+      <div className="flex flex-col gap-4 p-4 pb-8">
+        <div className="flex flex-col gap-2 lg:ml-8">
+          {user && (
+            <div className="text-xs">
+              Comment as{" "}
+              <Link
+                href={`/u/${user.username}`}
+                className="text-sky-500 hover:underline"
+              >
+                {user.username}
+              </Link>
+            </div>
+          )}
+          <RTEComment postId={params.postId} />
+        </div>
+
+        <hr className="border-zinc-700/70 lg:ml-8" />
+
+        <div className="flex grow flex-col gap-6 bg-zinc-900">
+          <Comments
+            comments={comments.filter((comment) => !comment.parentCommentId)}
+            replies={comments.filter((comment) => comment.parentCommentId)}
+          />
+        </div>
+      </div>
+    </div>
   );
 }

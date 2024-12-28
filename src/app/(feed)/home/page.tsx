@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
 import {
@@ -10,65 +10,60 @@ import {
   getHomeHotPosts,
   getHomeNewPosts,
 } from "@/api/getPosts/getHomePosts";
-import { getUserById } from "@/api/getUser";
+import FeedEmpty from "@/components/feed/FeedEmpty";
+import FeedHomePosts from "@/components/feed/FeedHomePosts";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
-import PremiumButton from "@/components/feed/PremiumButton";
-import ScrollToTop from "@/components/feed/ScrollToTop";
-import InfiniteQueryPostsHome from "@/components/infiniteQuery/InfiniteQueryHomePosts";
-import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
+import PremiumButton from "@/components/sidebar/PremiumButton";
+import ScrollToTop from "@/components/sidebar/ScrollToTop";
 import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function HomePage(props: {
-  searchParams: Promise<{ sort: PostSort }>;
+  searchParams: Promise<{ sort?: PostSort }>;
 }) {
-  const searchParams = await props.searchParams;
+  const searchParamsPromise = props.searchParams;
+  const userPromise = currentUser();
 
-  const { userId } = await auth();
+  const [searchParams, user] = await Promise.all([
+    searchParamsPromise,
+    userPromise,
+  ]);
 
-  if (userId === null) throw new Error("Could not load home page information.");
+  if (user === null) throw new Error("Could not load home page information.");
 
-  let postsData;
+  let posts;
   switch (searchParams.sort) {
     case PostSort.HOT:
-      postsData = getHomeHotPosts.execute({
+      posts = await getHomeHotPosts.execute({
         offset: 0,
-        currentUserId: userId,
+        currentUserId: user.id,
       });
       break;
 
     case PostSort.NEW:
-      postsData = getHomeNewPosts.execute({
+      posts = await getHomeNewPosts.execute({
         offset: 0,
-        currentUserId: userId,
+        currentUserId: user.id,
       });
       break;
 
     case PostSort.CONTROVERSIAL:
-      postsData = getHomeControversialPosts.execute({
+      posts = await getHomeControversialPosts.execute({
         offset: 0,
-        currentUserId: userId,
+        currentUserId: user.id,
       });
       break;
 
     default:
-      postsData = getHomeBestPosts.execute({
+      posts = await getHomeBestPosts.execute({
         offset: 0,
-        currentUserId: userId,
+        currentUserId: user.id,
       });
       break;
   }
-
-  const userData = getUserById.execute({ currentUserId: userId });
-
-  const [user, posts] = await Promise.all([userData, postsData]).catch(
-    (err) => {
-      throw new Error(err);
-    },
-  );
 
   let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
@@ -77,13 +72,15 @@ export default async function HomePage(props: {
 
   const queryInfo: QueryInfo<"getHomePosts"> = {
     procedure: "getHomePosts",
-    input: { sort: searchParams.sort, currentUserId: userId },
+    input: { sort: searchParams.sort, currentUserId: user.id },
   };
 
   return (
     <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2.5">
-        {user && <FeedInput user={user} />}
+        {user && (
+          <FeedInput username={user.username} imageUrl={user.imageUrl} />
+        )}
         <FeedSort searchParams={searchParams} />
       </div>
 
@@ -126,11 +123,11 @@ export default async function HomePage(props: {
       </div>
 
       {posts.length === 0 ? (
-        <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
+        <FeedEmpty params={{}} searchParams={searchParams} />
       ) : (
-        <InfiniteQueryPostsHome
+        <FeedHomePosts
           key={searchParams.sort}
-          currentUserId={userId}
+          currentUserId={user.id}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}
         />

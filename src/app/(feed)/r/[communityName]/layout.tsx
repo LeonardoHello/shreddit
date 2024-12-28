@@ -6,18 +6,23 @@ import { auth } from "@clerk/nextjs/server";
 import { getCommunityByName } from "@/api/getCommunity";
 import CommunityAbout from "@/components/community/CommunityAbout";
 import CommunityHeader from "@/components/community/CommunityHeader";
-import ScrollToTop from "@/components/feed/ScrollToTop";
+import ScrollToTop from "@/components/sidebar/ScrollToTop";
+import { monthAgo } from "@/utils/getLastMonthDate";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function CommunityLayout(props: {
-  params: Promise<{ communityName: string }>;
   children: React.ReactNode;
+  params: Promise<{ communityName: string }>;
 }) {
-  const params = await props.params;
+  const paramsPromise = props.params;
+  const currentAuthPromise = auth();
 
-  const { userId } = await auth();
+  const [params, currentAuth] = await Promise.all([
+    paramsPromise,
+    currentAuthPromise,
+  ]);
 
   const community = await getCommunityByName.execute({
     communityName: params.communityName,
@@ -26,14 +31,11 @@ export default async function CommunityLayout(props: {
   if (community === undefined) return notFound();
 
   const userToCommunity = community.usersToCommunities.find(
-    (userToCommunity) => userToCommunity.userId === userId,
+    (userToCommunity) => userToCommunity.userId === currentAuth.userId,
   );
 
   const newMemberCount = community.usersToCommunities.filter(
     (userToCommunity) => {
-      const monthAgo = new Date();
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-
       return monthAgo < userToCommunity.createdAt;
     },
   ).length;
@@ -41,7 +43,7 @@ export default async function CommunityLayout(props: {
   return (
     <>
       <CommunityHeader
-        currentUserId={userId}
+        currentUserId={currentAuth.userId}
         community={community}
         initialData={userToCommunity}
       />
@@ -49,7 +51,10 @@ export default async function CommunityLayout(props: {
       <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
         <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
           <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
-            <CommunityAbout community={community} currentUserId={userId} />
+            <CommunityAbout
+              community={community}
+              currentUserId={currentAuth.userId}
+            />
             <hr className="border-zinc-700/70" />
             <div className="flex items-center justify-between">
               <div className="flex flex-col">

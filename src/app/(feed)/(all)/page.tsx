@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
 import {
@@ -10,59 +10,58 @@ import {
   getAllHotPosts,
   getAllNewPosts,
 } from "@/api/getPosts/getAllPosts";
-import { getUserById } from "@/api/getUser";
+import FeedAllPosts from "@/components/feed/FeedAllPosts";
+import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
-import PremiumButton from "@/components/feed/PremiumButton";
-import ScrollToTop from "@/components/feed/ScrollToTop";
-import InfiniteQueryAllPosts from "@/components/infiniteQuery/InfiniteQueryAllPosts";
-import InfiniteQueryPostsEmpty from "@/components/infiniteQuery/InfiniteQueryPostsEmpty";
+import PremiumButton from "@/components/sidebar/PremiumButton";
+import ScrollToTop from "@/components/sidebar/ScrollToTop";
 import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
 
 export default async function AllPage(props: {
-  searchParams: Promise<{ sort: PostSort }>;
+  searchParams: Promise<{ sort?: PostSort }>;
 }) {
-  const searchParams = await props.searchParams;
+  const searchParamsPromise = props.searchParams;
+  const userPromise = currentUser();
 
-  const { userId } = await auth();
+  const [searchParams, user] = await Promise.all([
+    searchParamsPromise,
+    userPromise,
+  ]);
 
-  let postsData;
+  let posts;
   switch (searchParams.sort) {
     case PostSort.HOT:
-      postsData = getAllHotPosts.execute({
-        currentUserId: userId,
+      posts = await getAllHotPosts.execute({
+        currentUserId: user && user.id,
         offset: 0,
       });
       break;
 
     case PostSort.NEW:
-      postsData = getAllNewPosts.execute({
-        currentUserId: userId,
+      posts = await getAllNewPosts.execute({
+        currentUserId: user && user.id,
         offset: 0,
       });
       break;
 
     case PostSort.CONTROVERSIAL:
-      postsData = getAllControversialPosts.execute({
-        currentUserId: userId,
+      posts = await getAllControversialPosts.execute({
+        currentUserId: user && user.id,
         offset: 0,
       });
       break;
 
     default:
-      postsData = getAllBestPosts.execute({
-        currentUserId: userId,
+      posts = await getAllBestPosts.execute({
+        currentUserId: user && user.id,
         offset: 0,
       });
       break;
   }
-
-  const userData = getUserById.execute({ currentUserId: userId });
-
-  const [user, posts] = await Promise.all([userData, postsData]);
 
   let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = undefined;
   if (posts.length === 10) {
@@ -71,13 +70,15 @@ export default async function AllPage(props: {
 
   const queryInfo: QueryInfo<"getAllPosts"> = {
     procedure: "getAllPosts",
-    input: { sort: searchParams.sort, currentUserId: userId },
+    input: { sort: searchParams.sort, currentUserId: user && user.id },
   };
 
   return (
     <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2.5">
-        {user && <FeedInput user={user} />}
+        {user && (
+          <FeedInput username={user.username} imageUrl={user.imageUrl} />
+        )}
         <FeedSort searchParams={searchParams} />
       </div>
 
@@ -124,11 +125,11 @@ export default async function AllPage(props: {
       </div>
 
       {posts.length === 0 ? (
-        <InfiniteQueryPostsEmpty params={{}} searchParams={searchParams} />
+        <FeedEmpty params={{}} searchParams={searchParams} />
       ) : (
-        <InfiniteQueryAllPosts
+        <FeedAllPosts
           key={searchParams.sort}
-          currentUserId={userId}
+          currentUserId={user && user.id}
           initialPosts={{ posts, nextCursor }}
           queryInfo={queryInfo}
         />

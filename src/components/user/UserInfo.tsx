@@ -12,7 +12,7 @@ type user = NonNullable<Awaited<ReturnType<typeof getUserByName.execute>>>;
 
 export default function UserInfo({ user }: { user: user }) {
   return (
-    <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2 shadow-lg shadow-zinc-950">
+    <div className="relative flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2 shadow-lg shadow-zinc-950">
       <Image
         src={userBackground}
         alt="galaxy"
