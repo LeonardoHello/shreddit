@@ -75,25 +75,25 @@ export const postsQueryConfig = ({
       ),
     extras: (post) => ({
       voteCount: sql<number>`
-				 (
-					 SELECT COUNT(*)
-					 FROM users_to_posts
-					 WHERE users_to_posts.post_id = ${post.id}
-						 AND users_to_posts.vote_status = 'upvoted'
-				 ) - (
-					 SELECT COUNT(*)
-					 FROM users_to_posts
-					 WHERE users_to_posts.post_id = ${post.id}
-						 AND users_to_posts.vote_status = 'downvoted'
-				 )
-			 `.as("vote_count"),
+        (
+          SELECT COUNT(*)
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.vote_status = 'upvoted'
+        ) - (
+          SELECT COUNT(*)
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.vote_status = 'downvoted'
+        )
+      `.as("vote_count"),
       commentCount: sql<number>`
-				 (
-					 SELECT COUNT(*)
-					 FROM comments
-					 WHERE comments.post_id = ${post.id}
-				 )
-			 `.as("comment_count"),
+        (
+          SELECT COUNT(*)
+          FROM comments
+          WHERE comments.post_id = ${post.id}
+        )
+      `.as("comment_count"),
     }),
     orderBy: (post, { desc, asc }) => {
       switch (sort) {
