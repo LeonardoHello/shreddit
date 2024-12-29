@@ -1,14 +1,17 @@
+"use client";
+
 import { useCallback } from "react";
 
+import ExtensionBubbleMenu from "@tiptap/extension-bubble-menu";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   BubbleMenu,
-  Editor,
   EditorContent,
   FloatingMenu,
   useEditor,
 } from "@tiptap/react";
+import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
 import { Image as ImageIcon } from "lucide-react";
@@ -20,53 +23,56 @@ import {
 
 import {
   ReducerAction,
-  usePostContext,
-  usePostDispatchContext,
-} from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+  useSubmitContext,
+  useSubmitDispatchContext,
+} from "@/context/SubmitContext";
 import cn from "@/utils/cn";
+import { prettifyHTML } from "@/utils/prettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEMarkButtons from "../RTE/RTEMarkButtons";
-import RTENodeButtons from "../RTE/RTENodeButtons";
-import RTEPostLoading from "../RTE/RTEPostLoading";
+import RTEpostLoading from "./RTELoading";
+import RTEMarkButtons from "./RTEMarkButtons";
+import RTENodeButtons from "./RTENodeButtons";
 
 const extensions = [
   StarterKit,
+  ExtensionBubbleMenu,
   Image.configure({ inline: true }),
   Placeholder.configure({
     placeholder: "Text",
   }),
 ];
 
-const toastId = "loading_toast";
-
-export default function PostEditRTE() {
-  const post = usePostContext();
+export default function RTEPostSubmit() {
+  const state = useSubmitContext();
+  const dispatch = useSubmitDispatchContext();
 
   const editor = useEditor({
     immediatelyRender: false,
+    content: state.text ?? undefined,
     extensions,
-    content: post.text || "",
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-none",
       },
+    },
+    onUpdate: ({ editor }) => {
+      dispatch({
+        type: ReducerAction.SET_TEXT,
+        nextText: prettifyHTML(editor.getHTML()),
+      });
     },
   });
 
   if (!editor) {
-    return <RTEPostLoading content={post.text} />;
+    return <RTEpostLoading />;
   }
 
   return (
     <div
-      className={cn("cursor-auto rounded border border-zinc-700/70", {
+      className={cn("rounded border border-zinc-700/70", {
         "border-zinc-300": editor.isFocused,
       })}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
     >
       <BubbleMenu
         editor={editor}
@@ -80,6 +86,8 @@ export default function PostEditRTE() {
         className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
       >
         <RTENodeButtons editor={editor} />
+        <div className="h-4 w-px self-center bg-zinc-700/70" />
+        <RTENodeButtonImage editor={editor} />
       </FloatingMenu>
 
       <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
@@ -91,71 +99,18 @@ export default function PostEditRTE() {
       </div>
 
       <EditorContent editor={editor} />
-
-      <RTEPostEditActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
-  const state = usePostContext();
-  const dispatch = usePostDispatchContext();
-
-  const editPost = trpc.editPost.useMutation({
-    onMutate: () => {
-      dispatch({ type: ReducerAction.CHANGE_TEXT, nextText: editor.getHTML() });
-      dispatch({ type: ReducerAction.CANCEL_EDIT });
-    },
-    onSuccess: () => {
-      toast.success("Post successfully edited.");
-    },
-    onError: async (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const disabled =
-    state.disabled || editPost.isPending || state.title.length === 0;
-
-  return (
-    <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
-      <button
-        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
-        onClick={() => {
-          editor.commands.setContent(state.text);
-          dispatch({ type: ReducerAction.CANCEL_EDIT });
-        }}
-      >
-        Cancel
-      </button>
-
-      <button
-        className={cn(
-          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
-          {
-            "cursor-not-allowed text-zinc-500": disabled,
-          },
-        )}
-        disabled={disabled}
-        onClick={() => {
-          editPost.mutate({
-            id: state.id,
-            text: editor.getHTML(),
-          });
-        }}
-      >
-        Edit
-      </button>
-    </div>
-  );
-}
+const toastId = "loading_toast";
 
 function RTENodeButtonImage({ editor }: { editor: Editor }) {
-  const dispatch = usePostDispatchContext();
+  const dispatch = useSubmitDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      dispatch({ type: ReducerAction.DISABLE_EDIT });
+      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
       return files;
     },
     onUploadProgress: (p) => {
@@ -172,7 +127,10 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
             {p < 10 ? 10 : p}%
           </div>
         </div>,
-        { id: toastId, duration: 1000 * 99 },
+        {
+          id: toastId,
+          duration: 1000 * 99,
+        },
       );
     },
     onClientUploadComplete: (res) => {
@@ -187,12 +145,13 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
         })
         .run();
 
-      dispatch({ type: ReducerAction.ENABLE_EDIT });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
 
       toast.dismiss(toastId);
     },
+
     onUploadError: (e) => {
-      dispatch({ type: ReducerAction.ENABLE_EDIT });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
 
       toast.error(e.message);
     },

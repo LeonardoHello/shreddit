@@ -20,24 +20,28 @@ export default function PostMetadata() {
   return (
     <>
       <div className="flex items-center gap-1 text-xs">
-        {/* checks if the post component is rendered by a community page */}
+        {/* checks if the post component is rendered by the community page */}
         {!communityName && (
-          <Link
-            href={`/r/${state.community.name}`}
-            className="flex items-center gap-1"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CommunityImage imageUrl={state.community.imageUrl} size={20} />
-            <div className="font-bold hover:underline">
-              r/{state.community.name}
-            </div>
+          <>
+            <Link
+              href={`/r/${state.community.name}`}
+              className="flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CommunityImage imageUrl={state.community.imageUrl} size={20} />
+              <div className="font-bold hover:underline">
+                r/{state.community.name}
+              </div>
+            </Link>
+
             <Image src={dot} alt="dot" height={2} width={2} />
-          </Link>
+          </>
         )}
-        <div className="flex gap-1 text-zinc-500">
-          {/* checks if the post component is rendered by a user page */}
-          {!username && (
-            <span>
+
+        {/* checks if the post component is rendered by the user page */}
+        {!username && (
+          <>
+            <div className="text-zinc-500">
               Posted by{" "}
               <Link
                 href={`/u/${state.author.name}`}
@@ -46,19 +50,23 @@ export default function PostMetadata() {
               >
                 u/{state.author.name}
               </Link>
-            </span>
-          )}
-          {hydrated ? (
-            <time
-              dateTime={state.createdAt.toISOString()}
-              title={state.createdAt.toLocaleDateString("hr-HR")}
-            >
-              {getRelativeTimeString(state.createdAt)}
-            </time>
-          ) : (
-            "Calculating..."
-          )}
-        </div>
+            </div>
+
+            <Image src={dot} alt="dot" height={2} width={2} />
+          </>
+        )}
+
+        {hydrated ? (
+          <time
+            dateTime={state.createdAt.toISOString()}
+            title={state.createdAt.toLocaleDateString("hr-HR")}
+            className="text-zinc-500"
+          >
+            {getRelativeTimeString(state.createdAt)}
+          </time>
+        ) : (
+          <span className="text-zinc-500">Calculating...</span>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

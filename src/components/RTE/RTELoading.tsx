@@ -1,10 +1,9 @@
-import { Post } from "@/db/schema";
 import cn from "@/utils/cn";
 
 export default function RTEPostLoading({
   content,
 }: {
-  content?: Post["text"];
+  content?: string | TrustedHTML;
 }) {
   return (
     <div className="animate-pulse rounded border border-zinc-700/70">

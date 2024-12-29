@@ -1,15 +1,15 @@
 "use client";
 
 import { usePostContext } from "@/context/PostContext";
+import RTEPostEdit from "../RTE/RTEPostEdit";
 import PostContentMedia from "./PostContentMedia";
 import PostContentText from "./PostContentText";
-import PostEditRTE from "./PostEditRTE";
 
 export default function PostContent() {
   const state = usePostContext();
 
   if (state.edit) {
-    return <PostEditRTE />;
+    return <RTEPostEdit />;
   }
 
   if (state.files.length === 0) {
