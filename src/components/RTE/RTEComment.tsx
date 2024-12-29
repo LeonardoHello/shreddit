@@ -10,15 +10,18 @@ import {
   EditorContent,
   FloatingMenu,
   useEditor,
+  useEditorState,
   type Editor,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import RTEcommentLoading from "./RTECommentLoading";
+import { prettifyHTML } from "@/utils/RTEprettifyHTML";
+import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
 
@@ -43,7 +46,7 @@ export default function RTEComment({ postId }: { postId: Post["id"] }) {
   });
 
   if (!editor) {
-    return <RTEcommentLoading />;
+    return <RTELoading />;
   }
 
   return (
@@ -112,34 +115,49 @@ function RTECommentActionButtons({
 
   const isMutating = isPending || createComment.isPending;
 
-  const isEmpty = editor.state.doc.textContent.trim().length === 0;
+  const editorState = useEditorState({
+    editor,
+    // This function will be called every time the editor state changes
+    selector: ({ editor }: { editor: Editor }) => ({
+      // It will only re-render if the text content state's length is 0
+      isEmpty: editor.state.doc.textContent.trim().length === 0,
+    }),
+  });
+
+  const isDisabled = editorState.isEmpty || isMutating;
 
   return (
     <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
       <button
         className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
-        onClick={() => editor.commands.clearContent()}
+        onClick={() => {
+          editor.commands.clearContent();
+        }}
       >
         Clear
       </button>
 
       <button
         className={cn(
-          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          "inline-flex w-[88px] items-center justify-center gap-2 rounded-full bg-zinc-300 text-xs font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
           {
-            "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
           },
         )}
-        disabled={isEmpty || isMutating}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
         onClick={() => {
+          if (isDisabled) return;
+
           createComment.mutate({
             postId,
             parentCommentId: null,
-            text: editor.getHTML(),
+            text: prettifyHTML(editor.getHTML()),
           });
         }}
       >
-        Comment
+        {isMutating && <Loader2 className="size-4 animate-spin" />}
+        {!isMutating && "Comment"}
       </button>
     </div>
   );

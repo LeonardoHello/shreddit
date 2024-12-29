@@ -25,7 +25,7 @@ import {
 } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import { prettifyHTML } from "@/utils/prettifyHTML";
+import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
@@ -104,7 +104,10 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
 
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
-      dispatch({ type: ReducerAction.CHANGE_TEXT, nextText: editor.getHTML() });
+      dispatch({
+        type: ReducerAction.CHANGE_TEXT,
+        nextText: prettifyHTML(editor.getHTML()),
+      });
       dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
     onSuccess: () => {

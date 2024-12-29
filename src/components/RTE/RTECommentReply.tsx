@@ -10,15 +10,22 @@ import {
   EditorContent,
   FloatingMenu,
   useEditor,
+  useEditorState,
   type Editor,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContext";
+import {
+  ReducerAction,
+  useCommentContext,
+  useCommentDispatchContext,
+} from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import RTEcommentLoading from "./RTECommentLoading";
+import { prettifyHTML } from "@/utils/RTEprettifyHTML";
+import RTEcommentLoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
 
@@ -31,12 +38,6 @@ const extensions = [
 ];
 
 export default function RTECommentReply() {
-  const { reply } = useCommentContext();
-
-  return reply && <RTECommentReplyContent />;
-}
-
-function RTECommentReplyContent() {
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
@@ -89,11 +90,8 @@ function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const { comment, setReply } = useCommentContext();
-
-  if (!editor) {
-    return <RTEcommentLoading />;
-  }
+  const state = useCommentContext();
+  const dispatch = useCommentDispatchContext();
 
   const createComment = trpc.createComment.useMutation({
     onMutate: () => {
@@ -104,7 +102,7 @@ function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
         router.refresh();
       });
 
-      setReply(false);
+      dispatch({ type: ReducerAction.CANCEL_REPLY });
 
       toast.success("Reply successfully posted.");
     },
@@ -114,36 +112,51 @@ function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
     },
   });
 
+  const editorState = useEditorState({
+    editor,
+    // This function will be called every time the editor state changes
+    selector: ({ editor }: { editor: Editor }) => ({
+      // It will only re-render if the text content state's length is 0
+      isEmpty: editor.state.doc.textContent.trim().length === 0,
+    }),
+  });
+
   const isMutating = isPending || createComment.isPending;
 
-  const isEmpty = editor.state.doc.textContent.trim().length === 0;
+  const isDisabled = editorState.isEmpty || isMutating;
 
   return (
     <div className="flex h-10 justify-end gap-2 rounded-b p-1.5">
       <button
         className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
-        onClick={() => setReply(false)}
+        onClick={() => {
+          dispatch({ type: ReducerAction.CANCEL_REPLY });
+        }}
       >
         Cancel
       </button>
 
       <button
         className={cn(
-          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          "inline-flex w-16 items-center justify-center gap-2 rounded-full bg-zinc-300 text-xs font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
           {
-            "cursor-not-allowed text-zinc-500": isEmpty || isMutating,
+            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
           },
         )}
-        disabled={isEmpty || isMutating}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
         onClick={() => {
+          if (isDisabled) return;
+
           createComment.mutate({
-            postId: comment.postId,
-            parentCommentId: comment.id,
-            text: editor.getHTML(),
+            postId: state.postId,
+            parentCommentId: state.id,
+            text: prettifyHTML(editor.getHTML()),
           });
         }}
       >
-        Reply
+        {isMutating && <Loader2 className="size-4 animate-spin" />}
+        {!isMutating && "Reply"}
       </button>
     </div>
   );

@@ -5,15 +5,21 @@ import {
   EditorContent,
   FloatingMenu,
   useEditor,
+  useEditorState,
   type Editor,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContext";
+import {
+  ReducerAction,
+  useCommentContext,
+  useCommentDispatchContext,
+} from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
-import RTEcommentLoading from "./RTECommentLoading";
+import { prettifyHTML } from "@/utils/RTEprettifyHTML";
+import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
 
@@ -26,11 +32,11 @@ const extensions = [
 ];
 
 export default function RTECommentEdit() {
-  const { comment } = useCommentContext();
+  const state = useCommentContext();
 
   const editor = useEditor({
     immediatelyRender: false,
-    content: comment.text,
+    content: state.text,
     extensions,
     editorProps: {
       attributes: {
@@ -41,7 +47,7 @@ export default function RTECommentEdit() {
   });
 
   if (!editor) {
-    return <RTEcommentLoading content={comment.text} />;
+    return <RTELoading content={state.text} />;
   }
 
   return (
@@ -78,67 +84,60 @@ export default function RTECommentEdit() {
 }
 
 function RTECommentEditActionButtons({ editor }: { editor: Editor }) {
-  const utils = trpc.useUtils();
-
-  const { comment, setEditable } = useCommentContext();
+  const state = useCommentContext();
+  const dispatch = useCommentDispatchContext();
 
   const editComment = trpc.editComment.useMutation({
     onMutate: () => {
-      utils["getComment"].setData(comment.id, (updater) => {
-        if (!updater) {
-          return comment;
-        }
-
-        return { ...comment, text: editor.getHTML() };
-      });
-      setEditable(false);
+      editor.setEditable(false);
+      dispatch({ type: ReducerAction.CHANGE_TEXT, nextText: editor.getHTML() });
+      dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
     onSuccess: () => {
       toast.success("Comment successfully edited.");
     },
-    onError: async (error) => {
-      await utils["getComment"].refetch(comment.id, {}, { throwOnError: true });
-
+    onError: (error) => {
+      editor.setEditable(true);
       toast.error(error.message);
     },
   });
 
-  const isEmpty = editor.state.doc.textContent.trim().length === 0;
+  const editorState = useEditorState({
+    editor,
+    // This function will be called every time the editor state changes
+    selector: ({ editor }: { editor: Editor }) => ({
+      // It will only re-render if the text content state's length is 0
+      isEmpty: editor.state.doc.textContent.trim().length === 0,
+    }),
+  });
 
   return (
-    <div className="ml-auto flex gap-2">
+    <div className="flex h-10 justify-end gap-2 rounded-b p-1.5">
       <button
-        className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
+        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
         onClick={() => {
-          editor.commands.setContent(comment.text);
-          setEditable(false);
+          editor.commands.setContent(state.text);
+          dispatch({ type: ReducerAction.CANCEL_EDIT });
         }}
       >
         Cancel
       </button>
 
       <button
-        className="rounded-full px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700/50"
-        onClick={() => {
-          editor.commands.clearContent();
-        }}
-      >
-        Clear
-      </button>
-
-      <button
         className={cn(
-          "rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity hover:opacity-80",
+          "inline-flex items-center justify-center gap-2 rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
           {
-            "cursor-not-allowed text-zinc-500":
-              isEmpty || editComment.isPending,
+            "cursor-not-allowed bg-zinc-400 text-zinc-700": editorState.isEmpty,
           },
         )}
-        disabled={isEmpty || editComment.isPending}
+        disabled={editorState.isEmpty}
+        aria-disabled={editorState.isEmpty}
         onClick={() => {
+          if (editorState.isEmpty) return;
+
           editComment.mutate({
-            id: comment.id,
-            text: editor.getHTML(),
+            id: state.id,
+            text: prettifyHTML(editor.getHTML()),
           });
         }}
       >

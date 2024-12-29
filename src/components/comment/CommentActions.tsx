@@ -3,7 +3,11 @@ import {
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
 
-import { useCommentContext } from "@/context/CommentContext";
+import {
+  ReducerAction,
+  useCommentContext,
+  useCommentDispatchContext,
+} from "@/context/CommentContext";
 import type { User } from "@/db/schema";
 import useDropdown from "@/hooks/useDropdown";
 import CommentVote from "./CommentVote";
@@ -12,24 +16,28 @@ export default function CommentActions({
   currentUserId,
   children,
 }: {
-  currentUserId: User["id"] | null;
+  currentUserId: User["id"];
   children: React.ReactNode;
 }) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
-  const { comment, setReply } = useCommentContext();
+  const state = useCommentContext();
+  const dispatch = useCommentDispatchContext();
 
   return (
     <div className="flex items-center gap-1 text-xs font-bold text-zinc-500">
-      <CommentVote currentUserId={currentUserId} />
+      <CommentVote />
       <div
         className="flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 transition-colors hover:bg-zinc-700/50"
-        onClick={() => setReply((prev) => !prev)}
+        onClick={() => {
+          dispatch({ type: ReducerAction.TOGGLE_REPLY });
+        }}
       >
         <ChatBubbleLeftIcon className="h-6 w-6" />
         <span className="hidden sm:block">Relpy</span>
       </div>
-      {comment.authorId === currentUserId && (
+
+      {state.authorId === currentUserId && (
         <div
           ref={dropdownRef}
           className="cursor-pointer"

@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
-import { useCommentContext } from "@/context/CommentContext";
+import {
+  ReducerAction,
+  useCommentContext,
+  useCommentDispatchContext,
+} from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import cn from "@/utils/cn";
 
@@ -12,7 +16,8 @@ export default function CommentActionsDropdown() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const { comment, setEditable } = useCommentContext();
+  const state = useCommentContext();
+  const dispatch = useCommentDispatchContext();
 
   const deleteComment = trpc.deleteComment.useMutation({
     onError: async ({ message }: { message: string }) => {
@@ -38,7 +43,9 @@ export default function CommentActionsDropdown() {
     >
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
-        onClick={() => setEditable((prev) => !prev)}
+        onClick={() => {
+          dispatch({ type: ReducerAction.TOGGLE_EDIT });
+        }}
       >
         <PencilSquareIcon className="h-5 w-5" /> Edit
       </div>
@@ -48,7 +55,7 @@ export default function CommentActionsDropdown() {
         onClick={() => {
           if (isMutating) return;
 
-          deleteComment.mutate(comment.id);
+          deleteComment.mutate(state.id);
         }}
       >
         <TrashIcon className="h-5 w-5" /> Delete

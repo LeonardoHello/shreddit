@@ -27,7 +27,7 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import cn from "@/utils/cn";
-import { prettifyHTML } from "@/utils/prettifyHTML";
+import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTEpostLoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";

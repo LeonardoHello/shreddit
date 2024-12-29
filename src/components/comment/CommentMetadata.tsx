@@ -8,13 +8,13 @@ import dot from "@public/dot.svg";
 
 export default function CommentMetadata() {
   const hydrated = useHydration();
-  const { comment } = useCommentContext();
+  const state = useCommentContext();
 
   return (
     <div className="flex items-center gap-1 text-xs">
-      <Link href={`/u/${comment.author.name}`} className="rounded-full">
+      <Link href={`/u/${state.author.name}`} className="rounded-full">
         <Image
-          src={comment.author.imageUrl}
+          src={state.author.imageUrl}
           alt="user background"
           priority
           width={28}
@@ -23,13 +23,13 @@ export default function CommentMetadata() {
         />
       </Link>
       <Link
-        href={`/u/${comment.author.name}`}
+        href={`/u/${state.author.name}`}
         className="font-medium hover:underline"
       >
-        {comment.author.name}
+        {state.author.name}
       </Link>
 
-      {comment.authorId === comment.post.authorId && (
+      {state.authorId === state.post.authorId && (
         <div className="font-bold uppercase text-blue-500">op</div>
       )}
       <Image src={dot} alt="dot" height={2} width={2} />
@@ -37,27 +37,27 @@ export default function CommentMetadata() {
       {hydrated ? (
         <>
           <time
-            dateTime={comment.createdAt.toISOString()}
-            title={comment.createdAt.toLocaleDateString("hr-HR")}
+            dateTime={state.createdAt.toISOString()}
+            title={state.createdAt.toLocaleDateString("hr-HR")}
             className="text-zinc-500"
           >
-            {getRelativeTimeString(comment.createdAt)}
+            {getRelativeTimeString(state.createdAt)}
           </time>
-          {comment.updatedAt > comment.createdAt && (
+          {state.updatedAt > state.createdAt && (
             <>
               <Image src={dot} alt="dot" height={2} width={2} />
               <time
-                dateTime={comment.updatedAt.toISOString()}
-                title={comment.updatedAt.toLocaleDateString("hr-HR")}
+                dateTime={state.updatedAt.toISOString()}
+                title={state.updatedAt.toLocaleDateString("hr-HR")}
                 className="italic text-zinc-500"
               >
-                edited {getRelativeTimeString(comment.updatedAt)}
+                edited {getRelativeTimeString(state.updatedAt)}
               </time>
             </>
           )}
         </>
       ) : (
-        <span className="text-zinc-500">Time in progress...</span>
+        <span className="text-zinc-500">Calculating...</span>
       )}
     </div>
   );

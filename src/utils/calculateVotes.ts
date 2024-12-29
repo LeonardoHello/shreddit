@@ -2,12 +2,12 @@ import { UserToPost } from "@/db/schema";
 
 export const calculateVotes = ({
   voteCount,
-  voted,
-  nextVote,
+  voteStatus,
+  newVoteStatus,
 }: {
   voteCount: number;
-  voted: UserToPost["voteStatus"];
-  nextVote: UserToPost["voteStatus"];
+  voteStatus: UserToPost["voteStatus"];
+  newVoteStatus: UserToPost["voteStatus"];
 }) => {
   const voteCounter: Record<UserToPost["voteStatus"], number> = {
     downvoted: -1,
@@ -15,5 +15,7 @@ export const calculateVotes = ({
     upvoted: 1,
   };
 
-  return Number(voteCount) + (-voteCounter[voted] + voteCounter[nextVote]);
+  return (
+    Number(voteCount) + (-voteCounter[voteStatus] + voteCounter[newVoteStatus])
+  );
 };
