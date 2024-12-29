@@ -8,7 +8,7 @@ import PostContentText from "./PostContentText";
 export default function PostContent() {
   const state = usePostContext();
 
-  if (state.edit) {
+  if (state.isEditing) {
     return <RTEPostEdit />;
   }
 

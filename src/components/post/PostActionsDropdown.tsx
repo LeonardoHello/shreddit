@@ -27,8 +27,8 @@ export default function PostActionsDropdown() {
   const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_SPOILER,
-        nextSpoiler: variables.spoiler,
+        type: ReducerAction.SET_SPOILER,
+        spoiler: variables.spoiler,
       });
     },
     onSuccess: (data) => {
@@ -46,8 +46,8 @@ export default function PostActionsDropdown() {
   const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_NSFW,
-        nextNsfw: variables.nsfw,
+        type: ReducerAction.SET_NSFW,
+        nsfw: variables.nsfw,
       });
     },
     onSuccess: (data) => {

@@ -13,13 +13,6 @@ export default function PostVotePlaceholder() {
 
   return (
     <div className="flex select-none flex-col gap-0.5 text-center text-zinc-500">
-      <div className="order-2 text-xs font-bold text-zinc-300 transition-colors">
-        {new Intl.NumberFormat("en-US", {
-          notation: "compact",
-          maximumFractionDigits: 1,
-        }).format(state.voteCount)}
-      </div>
-
       <ClerkLoading>
         <ArrowUpCircleIcon
           viewBox="2.25 2.25 19.5 19.5"
@@ -57,6 +50,13 @@ export default function PostVotePlaceholder() {
           />
         </SignInButton>
       </ClerkLoaded>
+
+      <div className="order-2 text-xs font-bold text-zinc-300 transition-colors">
+        {new Intl.NumberFormat("en-US", {
+          notation: "compact",
+          maximumFractionDigits: 1,
+        }).format(state.voteCount)}
+      </div>
     </div>
   );
 }

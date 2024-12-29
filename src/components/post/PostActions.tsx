@@ -32,8 +32,8 @@ export default function PostActions({
   const savePost = trpc.savePost.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_SAVED,
-        nextSaved: variables.saved,
+        type: ReducerAction.SET_SAVE,
+        save: variables.saved,
       });
     },
     onSuccess: (data) => {
@@ -51,8 +51,8 @@ export default function PostActions({
   const hidePost = trpc.hidePost.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_HIDDEN,
-        nextHidden: variables.hidden,
+        type: ReducerAction.SET_HIDE,
+        hide: variables.hidden,
       });
     },
     onSuccess: (data) => {
@@ -105,11 +105,11 @@ export default function PostActions({
 
           savePost.mutate({
             postId: state.id,
-            saved: !state.saved,
+            saved: !state.isSaved,
           });
         }}
       >
-        {state.saved ? (
+        {state.isSaved ? (
           <>
             <BookmarkSlashIcon className="h-6 w-6" />
             <div className="hidden sm:block">unsave</div>
@@ -128,11 +128,11 @@ export default function PostActions({
 
           hidePost.mutate({
             postId: state.id,
-            hidden: !state.hidden,
+            hidden: !state.isHidden,
           });
         }}
       >
-        {state.hidden ? (
+        {state.isHidden ? (
           <>
             <EyeSlashIcon className="h-6 w-6" />
             <div className="hidden sm:block">unhide</div>

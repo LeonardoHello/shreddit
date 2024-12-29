@@ -11,22 +11,22 @@ import { calculateVotes } from "@/utils/calculateVotes";
 type Post = NonNullable<RouterOutput["getPost"]>;
 
 type ReducerState = Post & {
-  voted: UserToPost["voteStatus"];
-  saved: UserToPost["saved"];
-  hidden: UserToPost["hidden"];
-  edit: boolean;
-  disabled: boolean;
-  deleted: boolean;
+  voteStatus: UserToPost["voteStatus"];
+  isSaved: UserToPost["saved"];
+  isHidden: UserToPost["hidden"];
+  isEditing: boolean;
+  isDisabled: boolean;
+  isDeleted: boolean;
 };
 
 export enum ReducerAction {
-  CHANGE_TITLE,
-  CHANGE_TEXT,
-  CHANGE_VOTE,
-  CHANGE_SPOILER,
-  CHANGE_NSFW,
-  CHANGE_HIDDEN,
-  CHANGE_SAVED,
+  SET_TITLE,
+  SET_TEXT,
+  SET_VOTE,
+  SET_SPOILER,
+  SET_NSFW,
+  SET_HIDE,
+  SET_SAVE,
   DELETE,
   TOGGLE_EDIT,
   CANCEL_EDIT,
@@ -36,32 +36,32 @@ export enum ReducerAction {
 
 type ReducerActionType =
   | {
-      type: typeof ReducerAction.CHANGE_TITLE;
-      nextTitle: ReducerState["title"];
+      type: typeof ReducerAction.SET_TITLE;
+      title: ReducerState["title"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_TEXT;
-      nextText: ReducerState["text"];
+      type: typeof ReducerAction.SET_TEXT;
+      text: ReducerState["text"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_VOTE;
-      nextVote: ReducerState["voted"];
+      type: typeof ReducerAction.SET_VOTE;
+      vote: ReducerState["voteStatus"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_SAVED;
-      nextSaved: ReducerState["saved"];
+      type: typeof ReducerAction.SET_SAVE;
+      save: ReducerState["isSaved"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_HIDDEN;
-      nextHidden: ReducerState["hidden"];
+      type: typeof ReducerAction.SET_HIDE;
+      hide: ReducerState["isHidden"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_SPOILER;
-      nextSpoiler: ReducerState["spoiler"];
+      type: typeof ReducerAction.SET_SPOILER;
+      spoiler: ReducerState["spoiler"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_NSFW;
-      nextNsfw: ReducerState["nsfw"];
+      type: typeof ReducerAction.SET_NSFW;
+      nsfw: ReducerState["nsfw"];
     }
   | { type: typeof ReducerAction.DELETE }
   | { type: typeof ReducerAction.TOGGLE_EDIT }
@@ -71,49 +71,49 @@ type ReducerActionType =
 
 function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
   switch (action.type) {
-    case ReducerAction.CHANGE_TITLE:
-      return { ...state, title: action.nextTitle };
+    case ReducerAction.SET_TITLE:
+      return { ...state, title: action.title };
 
-    case ReducerAction.CHANGE_TEXT:
-      return { ...state, text: action.nextText };
+    case ReducerAction.SET_TEXT:
+      return { ...state, text: action.text };
 
-    case ReducerAction.CHANGE_VOTE:
+    case ReducerAction.SET_VOTE:
       return {
         ...state,
-        voted: action.nextVote,
+        voteStatus: action.vote,
         voteCount: calculateVotes({
           voteCount: state.voteCount,
-          voted: state.voted,
-          nextVote: action.nextVote,
+          voteStatus: state.voteStatus,
+          newVoteStatus: action.vote,
         }),
       };
 
-    case ReducerAction.CHANGE_SAVED:
-      return { ...state, saved: action.nextSaved };
+    case ReducerAction.SET_SAVE:
+      return { ...state, isSaved: action.save };
 
-    case ReducerAction.CHANGE_HIDDEN:
-      return { ...state, hidden: action.nextHidden };
+    case ReducerAction.SET_HIDE:
+      return { ...state, isHidden: action.hide };
 
-    case ReducerAction.CHANGE_SPOILER:
-      return { ...state, spoiler: action.nextSpoiler };
+    case ReducerAction.SET_SPOILER:
+      return { ...state, spoiler: action.spoiler };
 
-    case ReducerAction.CHANGE_NSFW:
-      return { ...state, nsfw: action.nextNsfw };
+    case ReducerAction.SET_NSFW:
+      return { ...state, nsfw: action.nsfw };
 
     case ReducerAction.DELETE:
-      return { ...state, deleted: true };
+      return { ...state, isDeleted: true };
 
     case ReducerAction.TOGGLE_EDIT:
-      return { ...state, edit: !state.edit };
+      return { ...state, isEditing: !state.isEditing };
 
     case ReducerAction.CANCEL_EDIT:
-      return { ...state, edit: false };
+      return { ...state, isEditing: false };
 
     case ReducerAction.ENABLE_EDIT:
-      return { ...state, disabled: false };
+      return { ...state, isDisabled: false };
 
     case ReducerAction.DISABLE_EDIT:
-      return { ...state, disabled: true };
+      return { ...state, isDisabled: true };
 
     default:
       throw Error("Unknown action");
@@ -140,12 +140,12 @@ export default function PostContextProvider({
 
   const [state, dispatch] = useReducer(reducer, {
     ...post,
-    voted: userToPost ? userToPost.voteStatus : "none",
-    saved: userToPost ? userToPost.saved : false,
-    hidden: userToPost ? userToPost.hidden : false,
-    edit: false,
-    disabled: false,
-    deleted: false,
+    voteStatus: userToPost ? userToPost.voteStatus : "none",
+    isSaved: userToPost ? userToPost.saved : false,
+    isHidden: userToPost ? userToPost.hidden : false,
+    isEditing: false,
+    isDisabled: false,
+    isDeleted: false,
   });
 
   return (
