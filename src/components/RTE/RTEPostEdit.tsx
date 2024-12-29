@@ -105,8 +105,8 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
   const editPost = trpc.editPost.useMutation({
     onMutate: () => {
       dispatch({
-        type: ReducerAction.CHANGE_TEXT,
-        nextText: prettifyHTML(editor.getHTML()),
+        type: ReducerAction.SET_TEXT,
+        text: prettifyHTML(editor.getHTML()),
       });
       dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
@@ -118,7 +118,7 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
     },
   });
 
-  const isDisabled = editPost.isPending || state.disabled;
+  const isDisabled = editPost.isPending || state.isDisabled;
 
   return (
     <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
