@@ -59,7 +59,7 @@ export default function RTEPostSubmit() {
     onUpdate: ({ editor }) => {
       dispatch({
         type: ReducerAction.SET_TEXT,
-        nextText: prettifyHTML(editor.getHTML()),
+        text: prettifyHTML(editor.getHTML()),
       });
     },
   });

@@ -26,7 +26,7 @@ export default function FeedPost({
 
   const state = usePostContext();
 
-  if (state.deleted) {
+  if (state.isDeleted) {
     return (
       <div className="flex h-20 items-center gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-4">
         <div className="font-semibold capitalize">post deleted</div>
@@ -36,7 +36,7 @@ export default function FeedPost({
 
   // show hidden files only on user filter feed
   if (
-    state.hidden &&
+    state.isHidden &&
     !(username && filter && Object.values(PostFilter).includes(filter))
   ) {
     return <FeedPostHidden />;

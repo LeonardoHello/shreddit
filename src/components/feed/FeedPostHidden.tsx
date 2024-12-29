@@ -14,8 +14,8 @@ export default function FeedPostHidden() {
   const hidePost = trpc.hidePost.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_HIDDEN,
-        nextHidden: variables.hidden,
+        type: ReducerAction.SET_HIDE,
+        hide: variables.hidden,
       });
     },
     onSuccess: (data) => {

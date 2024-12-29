@@ -3,6 +3,7 @@
 import { use, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { getSelectedCommunity } from "@/api/getCommunity";
@@ -70,33 +71,36 @@ export default function SubmitButton({
   });
 
   const isMutating =
-    createPostText.isPending || createPostImage.isPending || isPending;
+    isPending || createPostText.isPending || createPostImage.isPending;
 
-  const disabled =
+  const isDisabled =
     isMutating ||
-    state.disabled ||
+    state.isDisabled ||
     state.title.length === 0 ||
-    (state.type === PostType.IMAGE && state.files.length === 0);
+    (state.postType === PostType.IMAGE && state.files.length === 0);
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col items-end gap-4 p-4">
       <button
         className={cn(
-          "self-end rounded-full bg-zinc-300 px-5 py-1.5 font-bold capitalize tracking-wide text-zinc-900 transition-colors hover:bg-zinc-400",
-          { "cursor-not-allowed bg-zinc-400": disabled },
+          "inline-flex h-8 w-16 items-center justify-center gap-2 rounded-full bg-zinc-300 text-sm font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
+          {
+            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
+          },
         )}
-        disabled={disabled}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
         onClick={() => {
-          if (disabled) return;
+          if (isDisabled) return;
 
           const { files, ...post } = state;
 
-          if (state.type === PostType.TEXT) {
+          if (state.postType === PostType.TEXT) {
             createPostText.mutate({
               ...post,
               communityId: selectedCommunity.id,
             });
-          } else if (state.type === PostType.IMAGE) {
+          } else if (state.postType === PostType.IMAGE) {
             createPostImage.mutate({
               ...post,
               communityId: selectedCommunity.id,
@@ -105,7 +109,8 @@ export default function SubmitButton({
           }
         }}
       >
-        {isMutating ? "posting..." : "post"}
+        {isMutating && <Loader2 className="size-4 animate-spin" />}
+        {!isMutating && "Post"}
       </button>
     </div>
   );

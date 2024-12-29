@@ -76,7 +76,7 @@ export default function SubmitCommunityDropdown({
                 key={myCommunity.community.id}
                 className="flex h-9 cursor-pointer items-center gap-2"
                 onClick={() => {
-                  const params = new URLSearchParams({ type: state.type });
+                  const params = new URLSearchParams({ type: state.postType });
 
                   router.push(
                     `/r/${myCommunity.community.name}/submit?${params.toString()}`,
@@ -149,7 +149,7 @@ function SearchedCommunities({ search }: { search: string }) {
             key={searchedCommunity.id}
             className="flex h-9 cursor-pointer items-center gap-2"
             onClick={() => {
-              const params = new URLSearchParams({ type: state.type });
+              const params = new URLSearchParams({ type: state.postType });
 
               router.push(
                 `/r/${searchedCommunity.name}/submit?${params.toString()}`,

@@ -7,15 +7,15 @@ import type { File, Post } from "@/db/schema";
 import { PostType } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
-  files: Omit<File, "id" | "postId">[];
   communitySearch: string;
-  disabled: boolean;
-  type: PostType;
+  postType: PostType;
+  files: Omit<File, "id" | "postId">[];
+  isDisabled: boolean;
 };
 
 export enum ReducerAction {
   SEARCH_COMMUNITY,
-  SET_TYPE,
+  SET_POST_TYPE,
   SET_TITLE,
   SET_TEXT,
   SET_FILES,
@@ -27,14 +27,14 @@ export enum ReducerAction {
 
 type ReducerActionType =
   | { type: typeof ReducerAction.SEARCH_COMMUNITY; nextCommunitySearch: string }
-  | { type: typeof ReducerAction.SET_TYPE; nextType: PostType }
+  | { type: typeof ReducerAction.SET_POST_TYPE; postType: PostType }
   | {
       type: typeof ReducerAction.SET_TITLE;
-      nextTitle: ReducerState["title"];
+      title: ReducerState["title"];
     }
   | {
       type: typeof ReducerAction.SET_TEXT;
-      nextText: ReducerState["text"];
+      text: ReducerState["text"];
     }
   | {
       type: typeof ReducerAction.SET_FILES;
@@ -53,14 +53,14 @@ const reducer = (
     case ReducerAction.SEARCH_COMMUNITY:
       return { ...state, communitySearch: action.nextCommunitySearch };
 
-    case ReducerAction.SET_TYPE:
-      return { ...state, type: action.nextType };
+    case ReducerAction.SET_POST_TYPE:
+      return { ...state, postType: action.postType };
 
     case ReducerAction.SET_TITLE:
-      return { ...state, title: action.nextTitle };
+      return { ...state, title: action.title };
 
     case ReducerAction.SET_TEXT:
-      return { ...state, text: action.nextText };
+      return { ...state, text: action.text };
 
     case ReducerAction.SET_FILES:
       return { ...state, files: action.nextFiles };
@@ -72,10 +72,10 @@ const reducer = (
       return { ...state, nsfw: !state.nsfw };
 
     case ReducerAction.DISABLE_SUBMIT:
-      return { ...state, disabled: true };
+      return { ...state, isDisabled: true };
 
     case ReducerAction.ENABLE_SUBMIT:
-      return { ...state, disabled: false };
+      return { ...state, isDisabled: false };
 
     default:
       throw Error("Unknown action");
@@ -97,16 +97,16 @@ export default function SubmitContextProvider({
   const searchParams = useSearchParams();
 
   const [state, dispatch] = useReducer(reducer, {
-    type:
+    communitySearch: "",
+    postType:
       PostType[(searchParams.get("type") ?? defaultType) as PostType] ??
       defaultType,
-    communitySearch: "",
     title: "",
     text: null,
     files: [],
     nsfw: false,
     spoiler: false,
-    disabled: false,
+    isDisabled: false,
   });
 
   return (

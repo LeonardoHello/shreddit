@@ -22,13 +22,13 @@ import {
 import { PostType } from "@/types";
 import cn from "@/utils/cn";
 
-const SubmitRTE = dynamic(() => import("@/components/submit/SubmitRTE"));
+const RTEPost = dynamic(() => import("@/components/RTE/RTEPost"));
 const SubmitDropzone = dynamic(
   () => import("@/components/submit/SubmitDropzone"),
 );
 
 const componentMap: Record<PostType, React.ComponentType> = {
-  [PostType.TEXT]: SubmitRTE,
+  [PostType.TEXT]: RTEPost,
   [PostType.IMAGE]: SubmitDropzone,
 };
 
@@ -58,28 +58,28 @@ export default function SubmitTabs() {
         {Object.values(PostType).map((type, index, arr) => (
           <button
             key={type}
-            disabled={state.disabled}
+            disabled={state.isDisabled}
             className={cn(
               "flex basis-1/2 items-center justify-center gap-1.5 border-b border-b-zinc-700/70 bg-zinc-900 py-3 capitalize text-zinc-500 hover:bg-zinc-700/30",
               {
                 "border-b-2 border-b-zinc-300 text-zinc-300":
-                  type === state.type,
-                "cursor-not-allowed hover:bg-inherit": state.disabled,
+                  type === state.postType,
+                "cursor-not-allowed hover:bg-inherit": state.isDisabled,
                 "rounded-tl": index === 0,
                 "rounded-tr": index === arr.length - 1,
               },
             )}
             onClick={() => {
-              if (type === state.type || state.disabled) return;
+              if (type === state.postType || state.isDisabled) return;
 
               dispatch({
-                type: ReducerAction.SET_TYPE,
-                nextType: type,
+                type: ReducerAction.SET_POST_TYPE,
+                postType: type,
               });
             }}
           >
-            {type === state.type && icons[type]["selected"]}
-            {type !== state.type && icons[type]["unselected"]}
+            {type === state.postType && icons[type]["selected"]}
+            {type !== state.postType && icons[type]["unselected"]}
 
             <span className="capitalize">{type.toLowerCase()}</span>
           </button>
@@ -97,7 +97,7 @@ export default function SubmitTabs() {
             onChange={(e) => {
               dispatch({
                 type: ReducerAction.SET_TITLE,
-                nextTitle: e.currentTarget.value,
+                title: e.currentTarget.value,
               });
             }}
           />
@@ -106,7 +106,7 @@ export default function SubmitTabs() {
           </div>
         </div>
 
-        {createElement(componentMap[state.type])}
+        {createElement(componentMap[state.postType])}
 
         <div className="mt-2 flex items-center gap-2 font-bold text-zinc-400">
           <button
