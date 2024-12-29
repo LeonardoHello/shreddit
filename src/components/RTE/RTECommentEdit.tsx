@@ -90,7 +90,7 @@ function RTECommentEditActionButtons({ editor }: { editor: Editor }) {
   const editComment = trpc.editComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
-      dispatch({ type: ReducerAction.CHANGE_TEXT, nextText: editor.getHTML() });
+      dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });
       dispatch({ type: ReducerAction.CANCEL_EDIT });
     },
     onSuccess: () => {

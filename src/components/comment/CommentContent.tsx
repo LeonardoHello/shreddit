@@ -4,7 +4,7 @@ import RTECommentEdit from "../RTE/RTECommentEdit";
 export default function CommentContent() {
   const state = useCommentContext();
 
-  if (state.edit) {
+  if (state.isEditing) {
     return <RTECommentEdit />;
   }
 

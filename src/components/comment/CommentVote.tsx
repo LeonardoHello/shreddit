@@ -21,8 +21,8 @@ export default function CommentVote() {
   const voteComment = trpc.voteComment.useMutation({
     onMutate: (variables) => {
       dispatch({
-        type: ReducerAction.CHANGE_VOTE,
-        nextVote: variables.voteStatus,
+        type: ReducerAction.SET_VOTE,
+        vote: variables.voteStatus,
       });
     },
     onError: (error) => {
@@ -36,20 +36,20 @@ export default function CommentVote() {
         className={cn(
           "h-7 w-7 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
-            "text-rose-500": state.voted === "upvoted",
+            "text-rose-500": state.voteStatus === "upvoted",
           },
         )}
         onClick={() => {
           voteComment.mutate({
             commentId: state.id,
-            voteStatus: state.voted === "upvoted" ? "none" : "upvoted",
+            voteStatus: state.voteStatus === "upvoted" ? "none" : "upvoted",
           });
         }}
       />
       <div
         className={cn("text-xs font-bold text-zinc-300 transition-colors", {
-          "text-rose-500": state.voted === "upvoted",
-          "text-blue-500": state.voted === "downvoted",
+          "text-rose-500": state.voteStatus === "upvoted",
+          "text-blue-500": state.voteStatus === "downvoted",
         })}
       >
         {new Intl.NumberFormat("en-US", {
@@ -61,13 +61,13 @@ export default function CommentVote() {
         className={cn(
           "h-7 w-7 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
-            "text-blue-500": state.voted === "downvoted",
+            "text-blue-500": state.voteStatus === "downvoted",
           },
         )}
         onClick={() => {
           voteComment.mutate({
             commentId: state.id,
-            voteStatus: state.voted === "downvoted" ? "none" : "downvoted",
+            voteStatus: state.voteStatus === "downvoted" ? "none" : "downvoted",
           });
         }}
       />

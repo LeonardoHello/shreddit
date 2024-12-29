@@ -10,14 +10,14 @@ import { calculateVotes } from "@/utils/calculateVotes";
 type Comment = ArrElement<Awaited<ReturnType<typeof getComments.execute>>>;
 
 type ReducerState = Comment & {
-  voted: UserToComments["voteStatus"];
-  edit: boolean;
-  reply: boolean;
+  voteStatus: UserToComments["voteStatus"];
+  isEditing: boolean;
+  isReplying: boolean;
 };
 
 export enum ReducerAction {
-  CHANGE_TEXT,
-  CHANGE_VOTE,
+  SET_TEXT,
+  SET_VOTE,
   TOGGLE_EDIT,
   CANCEL_EDIT,
   TOGGLE_REPLY,
@@ -26,12 +26,12 @@ export enum ReducerAction {
 
 type ReducerActionType =
   | {
-      type: typeof ReducerAction.CHANGE_TEXT;
-      nextText: ReducerState["text"];
+      type: typeof ReducerAction.SET_TEXT;
+      text: ReducerState["text"];
     }
   | {
-      type: typeof ReducerAction.CHANGE_VOTE;
-      nextVote: ReducerState["voted"];
+      type: typeof ReducerAction.SET_VOTE;
+      vote: ReducerState["voteStatus"];
     }
   | { type: typeof ReducerAction.TOGGLE_EDIT }
   | { type: typeof ReducerAction.CANCEL_EDIT }
@@ -40,31 +40,31 @@ type ReducerActionType =
 
 function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
   switch (action.type) {
-    case ReducerAction.CHANGE_TEXT:
-      return { ...state, text: action.nextText };
+    case ReducerAction.SET_TEXT:
+      return { ...state, text: action.text };
 
-    case ReducerAction.CHANGE_VOTE:
+    case ReducerAction.SET_VOTE:
       return {
         ...state,
-        voted: action.nextVote,
+        voteStatus: action.vote,
         voteCount: calculateVotes({
           voteCount: state.voteCount,
-          voteStatus: state.voted,
-          newVoteStatus: action.nextVote,
+          voteStatus: state.voteStatus,
+          newVoteStatus: action.vote,
         }),
       };
 
     case ReducerAction.TOGGLE_EDIT:
-      return { ...state, edit: !state.edit };
+      return { ...state, isEditing: !state.isEditing };
 
     case ReducerAction.CANCEL_EDIT:
-      return { ...state, edit: false };
+      return { ...state, isEditing: false };
 
     case ReducerAction.TOGGLE_REPLY:
-      return { ...state, reply: !state.reply };
+      return { ...state, isReplying: !state.isReplying };
 
     case ReducerAction.CANCEL_REPLY:
-      return { ...state, reply: false };
+      return { ...state, isReplying: false };
 
     default:
       throw Error("Unknown action");
@@ -93,9 +93,9 @@ export default function CommentContextProvider({
 
   const [state, dispatch] = useReducer(reducer, {
     ...comment,
-    voted: userToComment ? userToComment.voteStatus : "none",
-    edit: false,
-    reply: false,
+    voteStatus: userToComment ? userToComment.voteStatus : "none",
+    isEditing: false,
+    isReplying: false,
   });
 
   return (

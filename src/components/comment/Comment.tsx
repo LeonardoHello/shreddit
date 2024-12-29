@@ -34,7 +34,7 @@ export default function Comment({
         </div>
 
         {/* create reply */}
-        {state.reply && <RTECommentReply />}
+        {state.isReplying && <RTECommentReply />}
 
         {/* Replies */}
         {children}
