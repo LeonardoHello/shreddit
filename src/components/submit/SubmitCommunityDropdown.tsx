@@ -130,6 +130,7 @@ function SearchedCommunities({ search }: { search: string }) {
   const searchedCommunities = trpc.searchCommunities.useQuery(search, {
     initialData: [],
     refetchOnWindowFocus: false,
+    staleTime: 0,
     retry: 2,
     throwOnError: () => {
       toast.error("There was a problem with fetching the communities");
