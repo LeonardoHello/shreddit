@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { BellSlashIcon } from "@heroicons/react/24/outline";
 import { BellIcon } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
@@ -9,6 +11,7 @@ import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
 import cn from "@/utils/cn";
+import communityBanner from "@public/communityBanner.jpg";
 import CommunityImage from "./CommunityImage";
 
 export default function CommunityHeader({
@@ -22,7 +25,7 @@ export default function CommunityHeader({
   >;
   initialData: RouterOutput["getUserToCommunity"];
 }) {
-  const { data: userToCommunity, refetch } = trpc.getUserToCommunity.useQuery(
+  const { data: userToCommunity } = trpc.getUserToCommunity.useQuery(
     community.id,
     {
       initialData: initialData ?? {
@@ -52,7 +55,6 @@ export default function CommunityHeader({
     },
     onError: ({ message }: { message: string }) => {
       toast.error(message);
-      refetch({ throwOnError: true });
     },
   };
 
@@ -64,6 +66,9 @@ export default function CommunityHeader({
       } else {
         toast.success(`Successfully left r/${community.name}`);
       }
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -78,11 +83,19 @@ export default function CommunityHeader({
         toast.success("Followed! Now you'll get updates on new activity.");
       }
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   return (
     <>
-      <div className="-z-10 h-12 bg-sky-600 md:h-20" />
+      <Image
+        src={communityBanner}
+        alt="shrek themed community banner"
+        className="-z-10 h-20 object-cover md:h-24"
+        placeholder="blur"
+      />
       <div className="flex justify-center bg-zinc-900 px-4 py-2">
         <div className="flex w-[72rem] items-center gap-4">
           <CommunityImage

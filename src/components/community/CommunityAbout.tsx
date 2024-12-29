@@ -109,7 +109,7 @@ export default function CommunityAbout({
                 });
               }}
             >
-              {isMutating ? "editing..." : "save"}
+              {isMutating ? "editing..." : "edit"}
             </button>
           </div>
         </>
