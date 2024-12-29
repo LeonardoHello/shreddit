@@ -3,7 +3,6 @@ import { and, eq, inArray } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
-import { getComment } from "@/api/getComment";
 import {
   getFavoriteCommunities,
   getJoinedCommunities,
@@ -514,12 +513,6 @@ export const appRouter = createTRPCRouter({
           target: [usersToComments.userId, usersToComments.commentId],
           set: { voteStatus: input.voteStatus },
         });
-    }),
-  getComment: baseProcedure
-    .input(CommentSchema.shape.id)
-    .query(async ({ input }) => {
-      const comment = await getComment.execute({ commentId: input });
-      return comment ?? null;
     }),
   deleteComment: protectedProcedure
     .input(CommentSchema.shape.id)
