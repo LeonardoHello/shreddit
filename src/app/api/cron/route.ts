@@ -2,6 +2,7 @@ import { UTApi } from "uploadthing/server";
 
 import { getFiles } from "@/api/getFiles";
 
+// TODO: Add cron job to delete files from uploadthing that are not in the database
 export async function GET() {
   const utapi = new UTApi();
   const files = await getFiles;
