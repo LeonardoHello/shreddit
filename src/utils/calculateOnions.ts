@@ -1,8 +1,8 @@
 import { RouterOutput } from "@/trpc/routers/_app";
 import type { ArrElement } from "@/types";
 
-export default function getOnions(
-  user: ArrElement<RouterOutput["searchUsers"]>,
+export default function calculateOnions(
+  user: ArrElement<RouterOutput["user"]["searchUsers"]>,
 ) {
   // +1 onion for each upvoted comment
   const commentUpvotes = user.usersToComments.reduce(

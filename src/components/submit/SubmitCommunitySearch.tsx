@@ -28,7 +28,7 @@ export default function SubmitCommunitySearch() {
       "",
     );
 
-    await utils.searchCommunities.cancel();
+    await utils.community.searchCommunities.cancel();
 
     dispatch({
       type: ReducerAction.SEARCH_COMMUNITY,

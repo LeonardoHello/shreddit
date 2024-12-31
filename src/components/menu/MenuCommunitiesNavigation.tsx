@@ -12,7 +12,7 @@ import cn from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
 type CommunityRelation = ArrElement<
-  RouterOutput[
+  RouterOutput["community"][
     | "getFavoriteCommunities"
     | "getModeratedCommunities"
     | "getJoinedCommunities"]
@@ -25,11 +25,11 @@ export default function MenuCommunitiesNavigation({
 }) {
   const utils = trpc.useUtils();
 
-  const setFavorite = trpc.setFavoriteCommunity.useMutation({
+  const setFavorite = trpc.community.setFavoriteCommunity.useMutation({
     onMutate: (variables) => {
       const { communityId, favorite } = variables;
 
-      utils.getFavoriteCommunities.setData(undefined, (data) => {
+      utils.community.getFavoriteCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -44,7 +44,7 @@ export default function MenuCommunitiesNavigation({
         }
       });
 
-      utils.getModeratedCommunities.setData(undefined, (data) => {
+      utils.community.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -58,7 +58,7 @@ export default function MenuCommunitiesNavigation({
         });
       });
 
-      utils.getJoinedCommunities.setData(undefined, (data) => {
+      utils.community.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
           toast.error("Oops, something went wrong.");
           return [];
@@ -74,9 +74,9 @@ export default function MenuCommunitiesNavigation({
     },
     onError: async ({ message }) => {
       await Promise.all([
-        utils.getFavoriteCommunities.refetch(),
-        utils.getModeratedCommunities.refetch(),
-        utils.getJoinedCommunities.refetch(),
+        utils.community.getFavoriteCommunities.refetch(),
+        utils.community.getModeratedCommunities.refetch(),
+        utils.community.getJoinedCommunities.refetch(),
       ]).catch(() => {
         throw new Error("Could not load menu information.");
       });

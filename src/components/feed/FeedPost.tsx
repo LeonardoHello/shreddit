@@ -1,9 +1,8 @@
-import { useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 
 import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
-import { PostFilter } from "@/types";
 import PostActions from "../post/PostActions";
 import PostActionsDropdown from "../post/PostActionsDropdown";
 import PostActionsPlaceholder from "../post/PostActionsPlaceholder";
@@ -15,14 +14,12 @@ import FeedPostHidden from "./FeedPostHidden";
 
 export default function FeedPost({
   currentUserId,
-  username,
-  filter,
 }: {
   currentUserId: User["id"] | null;
-  username?: string;
-  filter?: PostFilter;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { username } = useParams();
 
   const state = usePostContext();
 
@@ -35,10 +32,7 @@ export default function FeedPost({
   }
 
   // show hidden files only on user filter feed
-  if (
-    state.isHidden &&
-    !(username && filter && Object.values(PostFilter).includes(filter))
-  ) {
+  if (state.isHidden && !(username && !pathname.endsWith(`u/${username}`))) {
     return <FeedPostHidden />;
   }
 

@@ -35,8 +35,8 @@ export default function Search() {
     );
 
     await Promise.all([
-      utils.searchCommunities.cancel(),
-      utils.searchUsers.cancel(),
+      utils.community.searchCommunities.cancel(),
+      utils.user.searchUsers.cancel(),
     ]);
 
     setSearchedValue(searchedValue);

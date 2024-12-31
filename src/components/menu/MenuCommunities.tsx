@@ -10,9 +10,9 @@ import type { RouterOutput } from "@/trpc/routers/_app";
 import MenuCommunitiesNavigation from "./MenuCommunitiesNavigation";
 
 type Props = {
-  initialFavoriteCommunities: RouterOutput["getFavoriteCommunities"];
-  initialModeratedCommunities: RouterOutput["getModeratedCommunities"];
-  initialJoinedCommunities: RouterOutput["getJoinedCommunities"];
+  initialFavoriteCommunities: RouterOutput["community"]["getFavoriteCommunities"];
+  initialModeratedCommunities: RouterOutput["community"]["getModeratedCommunities"];
+  initialJoinedCommunities: RouterOutput["community"]["getJoinedCommunities"];
 };
 
 export default function MenuCommunities({
@@ -32,27 +32,21 @@ export default function MenuCommunities({
         .toSorted((a, b) => (a.community.name < b.community.name ? -1 : 1)),
   };
 
-  const { data: favoriteCommunities } = trpc.getFavoriteCommunities.useQuery(
-    undefined,
-    {
+  const { data: favoriteCommunities } =
+    trpc.community.getFavoriteCommunities.useQuery(undefined, {
       ...queryOptions,
       initialData: initialFavoriteCommunities,
-    },
-  );
-  const { data: moderatedCommunities } = trpc.getModeratedCommunities.useQuery(
-    undefined,
-    {
+    });
+  const { data: moderatedCommunities } =
+    trpc.community.getModeratedCommunities.useQuery(undefined, {
       ...queryOptions,
       initialData: initialModeratedCommunities,
-    },
-  );
-  const { data: joinedCommunities } = trpc.getJoinedCommunities.useQuery(
-    undefined,
-    {
+    });
+  const { data: joinedCommunities } =
+    trpc.community.getJoinedCommunities.useQuery(undefined, {
       ...queryOptions,
       initialData: initialJoinedCommunities,
-    },
-  );
+    });
 
   const onFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.currentTarget.value);
@@ -73,7 +67,7 @@ export default function MenuCommunities({
 
       {favoriteCommunities.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
+          <h2 className="text-2xs px-6 uppercase text-zinc-300/60">
             favorites
           </h2>
           <menu className="w-full self-center">
@@ -88,7 +82,7 @@ export default function MenuCommunities({
       )}
 
       <div className="flex flex-col gap-2.5">
-        <h2 className="px-6 text-2xs uppercase text-zinc-300/60">moderating</h2>
+        <h2 className="text-2xs px-6 uppercase text-zinc-300/60">moderating</h2>
         <menu className="w-full self-center">
           {moderatedCommunities.map((communityRelation) => (
             <MenuCommunitiesNavigation
@@ -111,7 +105,7 @@ export default function MenuCommunities({
 
       {joinedCommunities.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <h2 className="px-6 text-2xs uppercase text-zinc-300/60">
+          <h2 className="text-2xs px-6 uppercase text-zinc-300/60">
             joined communities
           </h2>
           <menu className="w-full self-center">

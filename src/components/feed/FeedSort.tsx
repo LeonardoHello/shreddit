@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import {
   ChatBubbleBottomCenterTextIcon,
@@ -16,17 +16,13 @@ import {
   TagIcon as TagIconSolid,
 } from "@heroicons/react/24/solid";
 
-import { PostFilter, PostSort } from "@/types";
+import { PostSort } from "@/types";
 import cn from "@/utils/cn";
 
-export default function FeedSort({
-  searchParams,
-}: {
-  searchParams: { sort?: PostSort; filter?: PostFilter };
-}) {
+export default function FeedSort() {
   const pathname = usePathname();
-
-  const { sort, filter } = searchParams;
+  const searchParams = useSearchParams();
+  const sort = searchParams.get("sort") as PostSort | undefined;
 
   const defaultSort = !(
     sort && [PostSort.HOT, PostSort.NEW, PostSort.CONTROVERSIAL].includes(sort)
@@ -39,7 +35,7 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: PostSort.BEST, ...(filter && { filter }) },
+              query: { sort: PostSort.BEST },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
@@ -58,7 +54,7 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: PostSort.HOT, ...(filter && { filter }) },
+              query: { sort: PostSort.HOT },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
@@ -77,7 +73,7 @@ export default function FeedSort({
           <Link
             href={{
               pathname,
-              query: { sort: PostSort.NEW, ...(filter && { filter }) },
+              query: { sort: PostSort.NEW },
             }}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
@@ -98,7 +94,6 @@ export default function FeedSort({
               pathname,
               query: {
                 sort: PostSort.CONTROVERSIAL,
-                ...(filter && { filter }),
               },
             }}
             className={cn(

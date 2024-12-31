@@ -33,7 +33,7 @@ export const getUpvotedBestPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "upvoted"),
               ),
             ),
@@ -58,7 +58,7 @@ export const getUpvotedHotPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "upvoted"),
               ),
             ),
@@ -83,7 +83,7 @@ export const getUpvotedNewPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "upvoted"),
               ),
             ),
@@ -108,7 +108,7 @@ export const getUpvotedControversialPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "upvoted"),
               ),
             ),

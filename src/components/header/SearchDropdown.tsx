@@ -5,7 +5,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
-import calculateOnions from "@/utils/getOnions";
+import calculateOnions from "@/utils/calculateOnions";
 import dot from "@public/dot.svg";
 import CommunityImage from "../community/CommunityImage";
 
@@ -14,18 +14,21 @@ export default function SearchDropdown({
 }: {
   searchedValue: string;
 }) {
-  const searchedCommunities = trpc.searchCommunities.useQuery(searchedValue, {
-    initialData: [],
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-    retry: 2,
-    throwOnError: () => {
-      toast.error("There was a problem with fetching the communities");
-      return false;
+  const searchedCommunities = trpc.community.searchCommunities.useQuery(
+    searchedValue,
+    {
+      initialData: [],
+      refetchOnWindowFocus: false,
+      staleTime: 0,
+      retry: 2,
+      throwOnError: () => {
+        toast.error("There was a problem with fetching the communities");
+        return false;
+      },
     },
-  });
+  );
 
-  const searchedUsers = trpc.searchUsers.useQuery(searchedValue, {
+  const searchedUsers = trpc.user.searchUsers.useQuery(searchedValue, {
     initialData: [],
     refetchOnWindowFocus: false,
     staleTime: 0,

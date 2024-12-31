@@ -102,7 +102,7 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const editPost = trpc.editPost.useMutation({
+  const editPost = trpc.post.editPost.useMutation({
     onMutate: () => {
       dispatch({
         type: ReducerAction.SET_TEXT,

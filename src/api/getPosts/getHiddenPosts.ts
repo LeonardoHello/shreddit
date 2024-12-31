@@ -33,7 +33,7 @@ export const getHiddenBestPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.hidden, true),
               ),
             ),
@@ -58,7 +58,7 @@ export const getHiddenHotPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.hidden, true),
               ),
             ),
@@ -83,7 +83,7 @@ export const getHiddenNewPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.hidden, true),
               ),
             ),
@@ -108,7 +108,7 @@ export const getHiddenControversialPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.hidden, true),
               ),
             ),

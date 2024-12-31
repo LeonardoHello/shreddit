@@ -6,13 +6,13 @@ import PostContextProvider from "@/context/PostContext";
 import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterOutput } from "@/trpc/routers/_app";
-import type { InfiniteQueryPostProcedure, QueryInfo } from "@/types";
+import type { PostFeedProcedures, QueryInfo } from "@/types";
 import FeedLoading from "./FeedLoading";
 import FeedPost from "./FeedPost";
 
-type Props<T extends InfiniteQueryPostProcedure> = {
+type Props<T extends PostFeedProcedures> = {
   currentUserId: User["id"] | null;
-  initialPosts: RouterOutput["infiniteQueryPosts"][T];
+  initialPosts: RouterOutput["postFeed"][T];
   queryInfo: QueryInfo<T>;
 };
 
@@ -24,14 +24,11 @@ export default function FeedCommunityPosts({
   const ref = useRef<HTMLDivElement>(null);
 
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    trpc.infiniteQueryPosts[queryInfo.procedure].useInfiniteQuery(
-      queryInfo.input,
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-        initialData: { pages: [initialPosts], pageParams: [0] },
-        refetchOnWindowFocus: false,
-      },
-    );
+    trpc.postFeed[queryInfo.procedure].useInfiniteQuery(queryInfo.input, {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      initialData: { pages: [initialPosts], pageParams: [0] },
+      refetchOnWindowFocus: false,
+    });
 
   if (data === undefined) {
     throw new Error("Couldn't fetch posts");

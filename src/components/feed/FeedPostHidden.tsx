@@ -11,7 +11,7 @@ export default function FeedPostHidden() {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const hidePost = trpc.hidePost.useMutation({
+  const hidePost = trpc.post.hidePost.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_HIDE,

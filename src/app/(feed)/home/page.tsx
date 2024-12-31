@@ -4,18 +4,13 @@ import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
-import {
-  getHomeBestPosts,
-  getHomeControversialPosts,
-  getHomeHotPosts,
-  getHomeNewPosts,
-} from "@/api/getPosts/getHomePosts";
 import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedHomePosts from "@/components/feed/FeedHomePosts";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/sidebar/PremiumButton";
 import ScrollToTop from "@/components/sidebar/ScrollToTop";
+import { trpc } from "@/trpc/server";
 import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
@@ -34,45 +29,13 @@ export default async function HomePage(props: {
 
   if (user === null) throw new Error("Could not load home page information.");
 
-  let posts;
-  switch (searchParams.sort) {
-    case PostSort.HOT:
-      posts = await getHomeHotPosts.execute({
-        offset: 0,
-        currentUserId: user.id,
-      });
-      break;
-
-    case PostSort.NEW:
-      posts = await getHomeNewPosts.execute({
-        offset: 0,
-        currentUserId: user.id,
-      });
-      break;
-
-    case PostSort.CONTROVERSIAL:
-      posts = await getHomeControversialPosts.execute({
-        offset: 0,
-        currentUserId: user.id,
-      });
-      break;
-
-    default:
-      posts = await getHomeBestPosts.execute({
-        offset: 0,
-        currentUserId: user.id,
-      });
-      break;
-  }
-
-  let nextCursor: QueryInfo<"getHomePosts">["input"]["cursor"] = undefined;
-  if (posts.length === 10) {
-    nextCursor = 10;
-  }
+  const infiniteQueryPosts = await trpc.postFeed.getHomePosts({
+    sort: searchParams.sort,
+  });
 
   const queryInfo: QueryInfo<"getHomePosts"> = {
     procedure: "getHomePosts",
-    input: { sort: searchParams.sort, currentUserId: user.id },
+    input: { cursor: infiniteQueryPosts.nextCursor, sort: searchParams.sort },
   };
 
   return (
@@ -81,7 +44,7 @@ export default async function HomePage(props: {
         {user && (
           <FeedInput username={user.username} imageUrl={user.imageUrl} />
         )}
-        <FeedSort searchParams={searchParams} />
+        <FeedSort />
       </div>
 
       <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
@@ -122,13 +85,13 @@ export default async function HomePage(props: {
         <ScrollToTop />
       </div>
 
-      {posts.length === 0 ? (
-        <FeedEmpty params={{}} searchParams={searchParams} />
+      {infiniteQueryPosts.posts.length === 0 ? (
+        <FeedEmpty params={{}} />
       ) : (
         <FeedHomePosts
           key={searchParams.sort}
           currentUserId={user.id}
-          initialPosts={{ posts, nextCursor }}
+          initialPosts={infiniteQueryPosts}
           queryInfo={queryInfo}
         />
       )}

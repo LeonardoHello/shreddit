@@ -8,7 +8,7 @@ import { UserToPost } from "@/db/schema";
 import { RouterOutput } from "@/trpc/routers/_app";
 import { calculateVotes } from "@/utils/calculateVotes";
 
-type Post = NonNullable<RouterOutput["getPost"]>;
+type Post = NonNullable<RouterOutput["post"]["getPost"]>;
 
 type ReducerState = Post & {
   voteStatus: UserToPost["voteStatus"];

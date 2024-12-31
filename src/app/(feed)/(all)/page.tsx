@@ -4,18 +4,13 @@ import Link from "next/link";
 import { currentUser } from "@clerk/nextjs/server";
 import { ChartBarIcon } from "@heroicons/react/24/solid";
 
-import {
-  getAllBestPosts,
-  getAllControversialPosts,
-  getAllHotPosts,
-  getAllNewPosts,
-} from "@/api/getPosts/getAllPosts";
 import FeedAllPosts from "@/components/feed/FeedAllPosts";
 import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/sidebar/PremiumButton";
 import ScrollToTop from "@/components/sidebar/ScrollToTop";
+import { trpc } from "@/trpc/server";
 import { PostSort, type QueryInfo } from "@/types";
 
 export const runtime = "edge";
@@ -32,45 +27,16 @@ export default async function AllPage(props: {
     userPromise,
   ]);
 
-  let posts;
-  switch (searchParams.sort) {
-    case PostSort.HOT:
-      posts = await getAllHotPosts.execute({
-        currentUserId: user && user.id,
-        offset: 0,
-      });
-      break;
-
-    case PostSort.NEW:
-      posts = await getAllNewPosts.execute({
-        currentUserId: user && user.id,
-        offset: 0,
-      });
-      break;
-
-    case PostSort.CONTROVERSIAL:
-      posts = await getAllControversialPosts.execute({
-        currentUserId: user && user.id,
-        offset: 0,
-      });
-      break;
-
-    default:
-      posts = await getAllBestPosts.execute({
-        currentUserId: user && user.id,
-        offset: 0,
-      });
-      break;
-  }
-
-  let nextCursor: QueryInfo<"getAllPosts">["input"]["cursor"] = undefined;
-  if (posts.length === 10) {
-    nextCursor = 10;
-  }
+  const infiniteQueryPosts = await trpc.postFeed.getAllPosts({
+    sort: searchParams.sort,
+  });
 
   const queryInfo: QueryInfo<"getAllPosts"> = {
     procedure: "getAllPosts",
-    input: { sort: searchParams.sort, currentUserId: user && user.id },
+    input: {
+      cursor: infiniteQueryPosts.nextCursor,
+      sort: searchParams.sort,
+    },
   };
 
   return (
@@ -79,7 +45,7 @@ export default async function AllPage(props: {
         {user && (
           <FeedInput username={user.username} imageUrl={user.imageUrl} />
         )}
-        <FeedSort searchParams={searchParams} />
+        <FeedSort />
       </div>
 
       <div className="row-span-2 hidden max-w-80 flex-col gap-4 text-sm lg:flex">
@@ -124,13 +90,13 @@ export default async function AllPage(props: {
         <ScrollToTop />
       </div>
 
-      {posts.length === 0 ? (
-        <FeedEmpty params={{}} searchParams={searchParams} />
+      {infiniteQueryPosts.posts.length === 0 ? (
+        <FeedEmpty params={{}} />
       ) : (
         <FeedAllPosts
           key={searchParams.sort}
           currentUserId={user && user.id}
-          initialPosts={{ posts, nextCursor }}
+          initialPosts={infiniteQueryPosts}
           queryInfo={queryInfo}
         />
       )}

@@ -32,7 +32,7 @@ export default function SubmitButton({
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
-  const createPostText = trpc.createPostText.useMutation({
+  const createPostText = trpc.post.createTextPost.useMutation({
     onMutate: () => {
       dispatch({ type: ReducerAction.DISABLE_SUBMIT });
     },
@@ -51,7 +51,7 @@ export default function SubmitButton({
     },
   });
 
-  const createPostImage = trpc.createPostImage.useMutation({
+  const createPostImage = trpc.post.createImagePost.useMutation({
     onMutate: () => {
       dispatch({ type: ReducerAction.DISABLE_SUBMIT });
     },

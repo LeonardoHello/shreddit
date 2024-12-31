@@ -18,7 +18,7 @@ export default function PostVote() {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const votePost = trpc.votePost.useMutation({
+  const votePost = trpc.post.votePost.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_VOTE,

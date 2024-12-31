@@ -23,9 +23,9 @@ export default function CommunityHeader({
   community: NonNullable<
     Awaited<ReturnType<typeof getCommunityByName.execute>>
   >;
-  initialData: RouterOutput["getUserToCommunity"];
+  initialData: RouterOutput["community"]["getUserToCommunity"];
 }) {
-  const { data: userToCommunity } = trpc.getUserToCommunity.useQuery(
+  const { data: userToCommunity } = trpc.community.getUserToCommunity.useQuery(
     community.id,
     {
       initialData: initialData ?? {
@@ -41,24 +41,29 @@ export default function CommunityHeader({
   const utils = trpc.useUtils();
 
   const queryConfig = {
-    onMutate: (variables: RouterInput["joinCommunity" | "muteCommunity"]) => {
+    onMutate: (
+      variables: RouterInput["community"]["joinCommunity" | "muteCommunity"],
+    ) => {
       if (!currentUserId) return;
 
-      utils["getUserToCommunity"].setData(community.id, (updater) => {
-        if (!updater) {
-          toast.error("Oops, it seemes that data can't be loaded.");
-          return userToCommunity;
-        }
+      utils["community"]["getUserToCommunity"].setData(
+        community.id,
+        (updater) => {
+          if (!updater) {
+            toast.error("Oops, it seemes that data can't be loaded.");
+            return userToCommunity;
+          }
 
-        return { ...updater, ...variables };
-      });
+          return { ...updater, ...variables };
+        },
+      );
     },
     onError: ({ message }: { message: string }) => {
       toast.error(message);
     },
   };
 
-  const joinCommunity = trpc.joinCommunity.useMutation({
+  const joinCommunity = trpc.community.joinCommunity.useMutation({
     ...queryConfig,
     onSuccess: (data) => {
       if (data[0].member) {
@@ -72,7 +77,7 @@ export default function CommunityHeader({
     },
   });
 
-  const muteCommunity = trpc.muteCommunity.useMutation({
+  const muteCommunity = trpc.community.muteCommunity.useMutation({
     ...queryConfig,
     onSuccess: (data) => {
       if (data[0].muted) {

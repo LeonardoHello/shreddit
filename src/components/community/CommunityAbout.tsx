@@ -30,7 +30,7 @@ export default function CommunityAbout({
 
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
-  const setAboutCommunity = trpc.setAboutCommunity.useMutation({
+  const setAboutCommunity = trpc.community.setAboutCommunity.useMutation({
     onSuccess: () => {
       startTransition(() => {
         router.refresh();

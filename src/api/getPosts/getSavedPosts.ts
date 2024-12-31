@@ -33,7 +33,7 @@ export const getSavedBestPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.saved, true),
               ),
             ),
@@ -58,7 +58,7 @@ export const getSavedHotPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.saved, true),
               ),
             ),
@@ -83,7 +83,7 @@ export const getSavedNewPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.saved, true),
               ),
             ),
@@ -108,7 +108,7 @@ export const getSavedControversialPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.saved, true),
               ),
             ),

@@ -29,7 +29,7 @@ function CommunityCreateContent() {
     maxCommunityNameLength,
   );
 
-  const createCommunity = trpc.createCommunity.useMutation({
+  const createCommunity = trpc.community.createCommunity.useMutation({
     onSuccess: (data) => {
       startTransition(() => {
         router.replace(`/r/${data[0].name}`);

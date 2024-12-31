@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 
 import { getCommunityByName } from "@/api/getCommunity";
 import CommunityAbout from "@/components/community/CommunityAbout";
@@ -17,12 +17,9 @@ export default async function CommunityLayout(props: {
   params: Promise<{ communityName: string }>;
 }) {
   const paramsPromise = props.params;
-  const currentAuthPromise = auth();
+  const userPromise = currentUser();
 
-  const [params, currentAuth] = await Promise.all([
-    paramsPromise,
-    currentAuthPromise,
-  ]);
+  const [params, user] = await Promise.all([paramsPromise, userPromise]);
 
   const community = await getCommunityByName.execute({
     communityName: params.communityName,
@@ -31,7 +28,7 @@ export default async function CommunityLayout(props: {
   if (community === undefined) return notFound();
 
   const userToCommunity = community.usersToCommunities.find(
-    (userToCommunity) => userToCommunity.userId === currentAuth.userId,
+    (userToCommunity) => user && userToCommunity.userId === user.id,
   );
 
   const newMemberCount = community.usersToCommunities.filter(
@@ -43,7 +40,7 @@ export default async function CommunityLayout(props: {
   return (
     <>
       <CommunityHeader
-        currentUserId={currentAuth.userId}
+        currentUserId={user && user.id}
         community={community}
         initialData={userToCommunity}
       />
@@ -53,7 +50,7 @@ export default async function CommunityLayout(props: {
           <div className="sticky top-4 flex flex-col gap-3 rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2">
             <CommunityAbout
               community={community}
-              currentUserId={currentAuth.userId}
+              currentUserId={user && user.id}
             />
             <hr className="border-zinc-700/70" />
             <div className="flex items-center justify-between">

@@ -19,7 +19,7 @@ export default function CommentActionsDropdown() {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const deleteComment = trpc.deleteComment.useMutation({
+  const deleteComment = trpc.comment.deleteComment.useMutation({
     onError: async ({ message }: { message: string }) => {
       toast.error(message);
     },

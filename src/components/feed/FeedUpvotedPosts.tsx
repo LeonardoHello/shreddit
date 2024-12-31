@@ -16,11 +16,11 @@ type Props<T extends PostFeedProcedures> = {
   queryInfo: QueryInfo<T>;
 };
 
-export default function FeedUserPosts({
+export default function FeedUpvotedPosts({
   currentUserId,
   initialPosts,
   queryInfo,
-}: Props<"getUserPosts">) {
+}: Props<"getUpvotedPosts">) {
   const ref = useRef<HTMLDivElement>(null);
 
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
@@ -28,7 +28,6 @@ export default function FeedUserPosts({
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       initialData: { pages: [initialPosts], pageParams: [0] },
       refetchOnWindowFocus: false,
-      staleTime: 0,
     });
 
   if (data === undefined) {

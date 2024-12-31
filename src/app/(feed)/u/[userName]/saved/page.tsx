@@ -1,11 +1,13 @@
+import { notFound } from "next/navigation";
+
 import { auth } from "@clerk/nextjs/server";
 
 import FeedEmpty from "@/components/feed/FeedEmpty";
-import FeedUserPosts from "@/components/feed/FeedUserPosts";
+import FeedSavedPosts from "@/components/feed/FeedSavedPosts";
 import { trpc } from "@/trpc/server";
 import { PostSort, QueryInfo } from "@/types";
 
-export default async function UserPage(props: {
+export default async function SavedPage(props: {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ sort?: PostSort }>;
 }) {
@@ -19,17 +21,17 @@ export default async function UserPage(props: {
     currentAuthPromise,
   ]);
 
-  const infiniteQueryPosts = await trpc.postFeed.getUserPosts({
+  if (!currentAuth.userId) notFound();
+
+  const infiniteQueryPosts = await trpc.postFeed.getSavedPosts({
     sort: searchParams.sort,
-    username: params.username,
   });
 
-  const queryInfo: QueryInfo<"getUserPosts"> = {
-    procedure: "getUserPosts",
+  const queryInfo: QueryInfo<"getSavedPosts"> = {
+    procedure: "getSavedPosts",
     input: {
       cursor: infiniteQueryPosts.nextCursor,
       sort: searchParams.sort,
-      username: params.username,
     },
   };
 
@@ -38,7 +40,7 @@ export default async function UserPage(props: {
   }
 
   return (
-    <FeedUserPosts
+    <FeedSavedPosts
       key={searchParams.sort}
       currentUserId={currentAuth.userId}
       initialPosts={infiniteQueryPosts}

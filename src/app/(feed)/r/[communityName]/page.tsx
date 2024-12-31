@@ -1,15 +1,10 @@
 import { currentUser } from "@clerk/nextjs/server";
 
-import {
-  getCommunityBestPosts,
-  getCommunityControversialPosts,
-  getCommunityHotPosts,
-  getCommunityNewPosts,
-} from "@/api/getPosts/getCommunityPosts";
 import FeedCommunityPosts from "@/components/feed/FeedCommunityPosts";
 import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
+import { trpc } from "@/trpc/server";
 import { PostSort, type QueryInfo } from "@/types";
 
 export default async function CommunityPage(props: {
@@ -26,52 +21,17 @@ export default async function CommunityPage(props: {
     userPromise,
   ]);
 
-  let posts;
-  switch (searchParams.sort) {
-    case PostSort.HOT:
-      posts = await getCommunityHotPosts.execute({
-        currentUserId: user && user.id,
-        communityName: params.communityName,
-        offset: 0,
-      });
-      break;
-
-    case PostSort.NEW:
-      posts = await getCommunityNewPosts.execute({
-        currentUserId: user && user.id,
-        communityName: params.communityName,
-        offset: 0,
-      });
-      break;
-
-    case PostSort.CONTROVERSIAL:
-      posts = await getCommunityControversialPosts.execute({
-        currentUserId: user && user.id,
-        communityName: params.communityName,
-        offset: 0,
-      });
-      break;
-
-    default:
-      posts = await getCommunityBestPosts.execute({
-        currentUserId: user && user.id,
-        communityName: params.communityName,
-        offset: 0,
-      });
-      break;
-  }
-
-  let nextCursor: QueryInfo<"getCommunityPosts">["input"]["cursor"] = undefined;
-  if (posts.length === 10) {
-    nextCursor = 10;
-  }
+  const infiniteQueryPosts = await trpc.postFeed.getCommunityPosts({
+    sort: searchParams.sort,
+    communityName: params.communityName,
+  });
 
   const queryInfo: QueryInfo<"getCommunityPosts"> = {
     procedure: "getCommunityPosts",
     input: {
-      communityName: params.communityName,
+      cursor: infiniteQueryPosts.nextCursor,
       sort: searchParams.sort,
-      currentUserId: user && user.id,
+      communityName: params.communityName,
     },
   };
 
@@ -85,16 +45,16 @@ export default async function CommunityPage(props: {
             communityName={params.communityName}
           />
         )}
-        <FeedSort searchParams={searchParams} />
+        <FeedSort />
       </div>
 
-      {posts.length === 0 ? (
-        <FeedEmpty params={{}} searchParams={searchParams} />
+      {infiniteQueryPosts.posts.length === 0 ? (
+        <FeedEmpty params={{}} />
       ) : (
         <FeedCommunityPosts
           key={searchParams.sort}
           currentUserId={user && user.id}
-          initialPosts={{ posts, nextCursor }}
+          initialPosts={infiniteQueryPosts}
           queryInfo={queryInfo}
         />
       )}

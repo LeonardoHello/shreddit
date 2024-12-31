@@ -33,7 +33,7 @@ export const getDownvotedBestPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "downvoted"),
               ),
             ),
@@ -58,7 +58,7 @@ export const getDownvotedHotPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "downvoted"),
               ),
             ),
@@ -83,7 +83,7 @@ export const getDownvotedNewPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "downvoted"),
               ),
             ),
@@ -108,7 +108,7 @@ export const getDownvotedControversialPosts = db.query.posts
             .where(
               and(
                 eq(usersToPosts.postId, post.id),
-                eq(usersToPosts.userId, sql.placeholder("userId")),
+                eq(usersToPosts.userId, sql.placeholder("currentUserId")),
                 eq(usersToPosts.voteStatus, "downvoted"),
               ),
             ),

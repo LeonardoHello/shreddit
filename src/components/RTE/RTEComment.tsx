@@ -92,7 +92,7 @@ function RTECommentActionButtons({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const createComment = trpc.createComment.useMutation({
+  const createComment = trpc.comment.createComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
     },

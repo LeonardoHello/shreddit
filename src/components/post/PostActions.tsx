@@ -29,7 +29,7 @@ export default function PostActions({
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const savePost = trpc.savePost.useMutation({
+  const savePost = trpc.post.savePost.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_SAVE,
@@ -48,7 +48,7 @@ export default function PostActions({
     },
   });
 
-  const hidePost = trpc.hidePost.useMutation({
+  const hidePost = trpc.post.hidePost.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_HIDE,

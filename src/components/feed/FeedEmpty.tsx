@@ -6,14 +6,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 import type { Community, User } from "@/db/schema";
-import { PostFilter, PostSort } from "@/types";
 
 export default function FeedEmpty({
   params,
-  searchParams,
 }: {
   params: { username?: User["name"]; communityName?: Community["name"] };
-  searchParams: { sort?: PostSort; filter?: PostFilter };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
@@ -36,10 +33,9 @@ export default function FeedEmpty({
       ))}
       <div className="absolute top-1/4 flex flex-col items-center gap-2 self-center p-12 text-center">
         <h1 className="text-lg font-medium">
-          hmm... looks like nothing has been {searchParams.filter || "posted"}{" "}
-          yet
+          hmm... looks like nothing has been posted yet
         </h1>
-        {!(params.username || searchParams.filter) && (
+        {params.username && (
           <>
             <h2 className="text-sm">Be the first to till this fertile land.</h2>
             <Link href="/submit" className="rounded-full">

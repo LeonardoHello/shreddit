@@ -18,7 +18,7 @@ export default function CommentVote() {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const voteComment = trpc.voteComment.useMutation({
+  const voteComment = trpc.comment.voteComment.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_VOTE,

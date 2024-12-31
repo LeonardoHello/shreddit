@@ -87,7 +87,7 @@ function RTECommentEditActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const editComment = trpc.editComment.useMutation({
+  const editComment = trpc.comment.editComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
       dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });

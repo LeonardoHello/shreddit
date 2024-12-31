@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { getUserByName } from "@/api/getUser";
-import getOnions from "@/utils/getOnions";
+import getOnions from "@/utils/calculateOnions";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import cake from "@public/cake.svg";
 import dot from "@public/dot.svg";
@@ -65,7 +65,7 @@ export default function UserInfo({ user }: { user: user }) {
           </div>
         </div>
         <div className="space-y-1">
-          <div className="font-medium">Cake day</div>
+          <div className="font-medium">Onion day</div>
           <div className="flex items-center gap-1">
             <Image src={cake} alt="cake" />
             <div className="text-xs text-zinc-500">

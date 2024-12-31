@@ -93,7 +93,7 @@ function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const createComment = trpc.createComment.useMutation({
+  const createComment = trpc.comment.createComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
     },

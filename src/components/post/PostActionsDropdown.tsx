@@ -24,7 +24,7 @@ export default function PostActionsDropdown() {
   const post = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const updateSpoilerTag = trpc.setPostSpoilerTag.useMutation({
+  const updateSpoiler = trpc.post.setPostSpoiler.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_SPOILER,
@@ -43,7 +43,7 @@ export default function PostActionsDropdown() {
     },
   });
 
-  const updateNSFWTag = trpc.setPostNSFWTag.useMutation({
+  const updateNSFW = trpc.post.setPostNSFW.useMutation({
     onMutate: (variables) => {
       dispatch({
         type: ReducerAction.SET_NSFW,
@@ -62,7 +62,7 @@ export default function PostActionsDropdown() {
     },
   });
 
-  const deletedPost = trpc.deletePost.useMutation({
+  const deletedPost = trpc.post.deletePost.useMutation({
     onMutate: () => {
       dispatch({ type: ReducerAction.DELETE });
     },
@@ -88,9 +88,9 @@ export default function PostActionsDropdown() {
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
-          if (updateSpoilerTag.isPending) return;
+          if (updateSpoiler.isPending) return;
 
-          updateSpoilerTag.mutate({
+          updateSpoiler.mutate({
             id: post.id,
             spoiler: !post.spoiler,
           });
@@ -108,9 +108,9 @@ export default function PostActionsDropdown() {
       <div
         className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
         onClick={() => {
-          if (updateNSFWTag.isPending) return;
+          if (updateNSFW.isPending) return;
 
-          updateNSFWTag.mutate({
+          updateNSFW.mutate({
             id: post.id,
             nsfw: !post.nsfw,
           });
