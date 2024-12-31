@@ -241,6 +241,7 @@ export const postFeedRouter = createTRPCRouter({
             offset: input.cursor,
             username: input.username,
           });
+          break;
       }
 
       let nextCursor: typeof input.cursor = undefined;
@@ -286,6 +287,7 @@ export const postFeedRouter = createTRPCRouter({
             currentUserId: ctx.userId,
             offset: input.cursor,
           });
+          break;
       }
 
       let nextCursor: typeof input.cursor = undefined;
@@ -331,6 +333,7 @@ export const postFeedRouter = createTRPCRouter({
             currentUserId: ctx.userId,
             offset: input.cursor,
           });
+          break;
       }
 
       let nextCursor: typeof input.cursor = undefined;
@@ -376,6 +379,7 @@ export const postFeedRouter = createTRPCRouter({
             currentUserId: ctx.userId,
             offset: input.cursor,
           });
+          break;
       }
 
       let nextCursor: typeof input.cursor = undefined;
@@ -421,6 +425,7 @@ export const postFeedRouter = createTRPCRouter({
             currentUserId: ctx.userId,
             offset: input.cursor,
           });
+          break;
       }
 
       let nextCursor: typeof input.cursor = undefined;
