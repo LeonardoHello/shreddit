@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
-import { auth } from "@clerk/nextjs/server";
+import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 
 import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedUpvotedPosts from "@/components/feed/FeedUpvotedPosts";
@@ -11,17 +11,16 @@ export default async function UpvotedPage(props: {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ sort?: PostSort }>;
 }) {
-  const paramsPromise = props.params;
-  const searchParamsPromise = props.searchParams;
-  const currentAuthPromise = auth();
-
-  const [params, searchParams, currentAuth] = await Promise.all([
-    paramsPromise,
-    searchParamsPromise,
-    currentAuthPromise,
+  const [params, searchParams, currentUser] = await Promise.all([
+    props.params,
+    props.searchParams,
+    currentUserPromise(),
   ]);
 
-  if (!currentAuth.userId) notFound();
+  if (!currentUser) permanentRedirect(`/u/${params.username}`);
+
+  if (currentUser.username !== params.username)
+    permanentRedirect(`/u/${params.username}`);
 
   const infiniteQueryPosts = await trpc.postFeed.getUpvotedPosts({
     sort: searchParams.sort,
@@ -42,7 +41,7 @@ export default async function UpvotedPage(props: {
   return (
     <FeedUpvotedPosts
       key={searchParams.sort}
-      currentUserId={currentAuth.userId}
+      currentUserId={currentUser && currentUser.id}
       initialPosts={infiniteQueryPosts}
       queryInfo={queryInfo}
     />

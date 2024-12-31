@@ -1,6 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
+import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 
 import FeedEmpty from "@/components/feed/FeedEmpty";
+import FeedInput from "@/components/feed/FeedInput";
+import FeedSort from "@/components/feed/FeedSort";
 import FeedUserPosts from "@/components/feed/FeedUserPosts";
 import { trpc } from "@/trpc/server";
 import { PostSort, QueryInfo } from "@/types";
@@ -9,14 +11,10 @@ export default async function UserPage(props: {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ sort?: PostSort }>;
 }) {
-  const paramsPromise = props.params;
-  const searchParamsPromise = props.searchParams;
-  const currentAuthPromise = auth();
-
-  const [params, searchParams, currentAuth] = await Promise.all([
-    paramsPromise,
-    searchParamsPromise,
-    currentAuthPromise,
+  const [params, searchParams, currentUser] = await Promise.all([
+    props.params,
+    props.searchParams,
+    currentUserPromise(),
   ]);
 
   const infiniteQueryPosts = await trpc.postFeed.getUserPosts({
@@ -38,11 +36,27 @@ export default async function UserPage(props: {
   }
 
   return (
-    <FeedUserPosts
-      key={searchParams.sort}
-      currentUserId={currentAuth.userId}
-      initialPosts={infiniteQueryPosts}
-      queryInfo={queryInfo}
-    />
+    <>
+      <div className="flex flex-col gap-2.5">
+        {currentUser && currentUser.username === params.username && (
+          <FeedInput
+            username={currentUser.username}
+            imageUrl={currentUser.imageUrl}
+          />
+        )}
+        <FeedSort />
+      </div>
+
+      {infiniteQueryPosts.posts.length === 0 ? (
+        <FeedEmpty params={params} />
+      ) : (
+        <FeedUserPosts
+          key={searchParams.sort}
+          currentUserId={currentUser && currentUser.id}
+          initialPosts={infiniteQueryPosts}
+          queryInfo={queryInfo}
+        />
+      )}
+    </>
   );
 }
