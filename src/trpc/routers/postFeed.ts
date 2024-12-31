@@ -226,8 +226,6 @@ export const postFeedRouter = createTRPCRouter({
           break;
 
         case PostSort.CONTROVERSIAL:
-          console.log(input.sort);
-
           posts = await getUserControversialPosts.execute({
             currentUserId: ctx.userId,
             offset: input.cursor,
