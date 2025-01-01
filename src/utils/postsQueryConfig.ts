@@ -25,14 +25,14 @@ export const postsQueryConfig = ({
     limit: 10,
     offset: sql.placeholder("offset"),
     with: {
-      usersToPosts: { columns: { postId: false, createdAt: false } },
+      usersToPosts: { columns: { postId: false } },
       community: {
         columns: { name: true, imageUrl: true },
         with: {
           usersToCommunities: { columns: { muted: true, userId: true } },
         },
       },
-      author: { columns: { name: true } },
+      author: { columns: { username: true } },
       files: true,
     },
     where: (post, { eq, and, notExists, gt }) =>

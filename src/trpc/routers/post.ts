@@ -42,7 +42,7 @@ export const postRouter = createTRPCRouter({
         authorId: true,
       }).and(
         z.object({
-          files: FileSchema.omit({ id: true, postId: true }).array(),
+          files: FileSchema.pick({ key: true, url: true, name: true }).array(),
         }),
       ),
     )
@@ -71,7 +71,7 @@ export const postRouter = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(posts)
-        .set({ ...input, updatedAt: new Date() })
+        .set({ ...input })
         .where(eq(posts.id, input.id))
         .returning();
     }),

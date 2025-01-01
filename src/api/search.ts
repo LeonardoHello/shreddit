@@ -3,7 +3,7 @@ import db from "../db";
 export const searchUsers = db.query.users
   .findMany({
     where: (user, { ilike, sql }) =>
-      ilike(user.name, sql.placeholder("search")),
+      ilike(user.username, sql.placeholder("search")),
     columns: { id: false },
     limit: 4,
     with: {

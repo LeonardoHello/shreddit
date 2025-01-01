@@ -13,6 +13,14 @@ import {
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
+const timestamps = {
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp()
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+};
+
 export const voteStatusEnum = pgEnum("vote_status", [
   "upvoted",
   "downvoted",
@@ -22,15 +30,12 @@ export const voteStatusEnum = pgEnum("vote_status", [
 export const users = pgTable(
   "users",
   {
-    id: text("id").primaryKey(), // clerk user id
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    name: text("name").unique().notNull(),
-    imageUrl: text("image_url").notNull(),
+    id: text().primaryKey(), // clerk user id
+    username: text().unique().notNull(),
+    imageUrl: text().notNull(),
+    ...timestamps,
   },
-  (t) => [
-    uniqueIndex("user_id_idx").on(t.id),
-    uniqueIndex("user_name_idx").on(t.name),
-  ],
+  (t) => [uniqueIndex().on(t.id), uniqueIndex().on(t.username)],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -45,21 +50,18 @@ export const usersRelations = relations(users, ({ many }) => ({
 export const communities = pgTable(
   "communities",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    name: text("name").unique().notNull(),
-    imageUrl: text("image_url"),
-    about: text("about").notNull().default(""),
-    moderatorId: text("moderator_id")
+    id: uuid().primaryKey().defaultRandom(),
+    name: text().unique().notNull(),
+    imageUrl: text(),
+    about: text().notNull().default(""),
+    moderatorId: text()
       .references(() => users.id, {
         onDelete: "cascade",
       })
       .notNull(),
+    ...timestamps,
   },
-  (t) => [
-    uniqueIndex("community_id_idx").on(t.id),
-    uniqueIndex("community_name_idx").on(t.name),
-  ],
+  (t) => [uniqueIndex().on(t.id), uniqueIndex().on(t.name)],
 );
 
 export const communitiesRelations = relations(communities, ({ one, many }) => ({
@@ -74,20 +76,19 @@ export const communitiesRelations = relations(communities, ({ one, many }) => ({
 export const usersToCommunities = pgTable(
   "users_to_communities",
   {
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    userId: text("user_id")
+    userId: text()
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    communityId: uuid("community_id")
+    communityId: uuid()
       .references(() => communities.id, { onDelete: "cascade" })
       .notNull(),
-    muted: boolean("muted").notNull().default(false),
-    favorite: boolean("favorite").notNull().default(false),
-    member: boolean("member").notNull().default(true),
+    muted: boolean().notNull().default(false),
+    favorite: boolean().notNull().default(false),
+    member: boolean().notNull().default(true),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.communityId] }),
-    index("user_to_community_user_id_idx").on(t.userId),
+    index().on(t.userId),
   ],
 );
 
@@ -108,24 +109,23 @@ export const usersToCommunitiesRelations = relations(
 export const posts = pgTable(
   "posts",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-    title: text("title").notNull(),
-    text: text("text"),
-    nsfw: boolean("nsfw").notNull().default(false),
-    spoiler: boolean("spoiler").notNull().default(false),
-    authorId: text("author_id")
+    id: uuid().primaryKey().defaultRandom(),
+    title: text().notNull(),
+    text: text(),
+    nsfw: boolean().notNull().default(false),
+    spoiler: boolean().notNull().default(false),
+    authorId: text()
       .references(() => users.id, {
         onDelete: "cascade",
       })
       .notNull(),
-    communityId: uuid("community_id")
+    communityId: uuid()
       .references(() => communities.id, { onDelete: "cascade" })
       .notNull(),
+    ...timestamps,
   },
 
-  (t) => [uniqueIndex("post_id_idx").on(t.id)],
+  (t) => [uniqueIndex().on(t.id)],
 );
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -145,21 +145,20 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 export const usersToPosts = pgTable(
   "users_to_posts",
   {
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    userId: text("user_id")
+    userId: text()
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    postId: uuid("post_id")
+    postId: uuid()
       .references(() => posts.id, { onDelete: "cascade" })
       .notNull(),
-    voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
-    saved: boolean("saved").notNull().default(false),
-    hidden: boolean("hidden").notNull().default(false),
+    voteStatus: voteStatusEnum().notNull().default("none"),
+    saved: boolean().notNull().default(false),
+    hidden: boolean().notNull().default(false),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.postId] }),
-    index("user_to_post_user_id_idx").on(t.userId),
-    index("user_to_post_post_id_idx").on(t.postId),
+    index().on(t.userId),
+    index().on(t.postId),
   ],
 );
 
@@ -175,13 +174,14 @@ export const usersToPostsRelations = relations(usersToPosts, ({ one }) => ({
 }));
 
 export const files = pgTable("files", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  key: text("key").unique().notNull(),
-  url: text("url").unique().notNull(),
-  postId: uuid("post_id")
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  key: text().unique().notNull(),
+  url: text().unique().notNull(),
+  postId: uuid()
     .references(() => posts.id, { onDelete: "cascade" })
     .notNull(),
+  ...timestamps,
 });
 
 export const filesRelations = relations(files, ({ one }) => ({
@@ -194,26 +194,22 @@ export const filesRelations = relations(files, ({ one }) => ({
 export const comments = pgTable(
   "comments",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
-    text: text("text").notNull(),
-    parentCommentId: uuid("parent_comment_id").references(
-      (): AnyPgColumn => comments.id,
-      {
-        onDelete: "cascade",
-      },
-    ),
-    authorId: text("author_id")
+    id: uuid().primaryKey().defaultRandom(),
+    text: text().notNull(),
+    parentCommentId: uuid().references((): AnyPgColumn => comments.id, {
+      onDelete: "cascade",
+    }),
+    authorId: text()
       .references(() => users.id, {
         onDelete: "cascade",
       })
       .notNull(),
-    postId: uuid("post_id")
+    postId: uuid()
       .references(() => posts.id, { onDelete: "cascade" })
       .notNull(),
+    ...timestamps,
   },
-  (t) => [uniqueIndex("comment_id_idx").on(t.id)],
+  (t) => [uniqueIndex().on(t.id)],
 );
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -235,19 +231,18 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 export const usersToComments = pgTable(
   "users_to_comments",
   {
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    userId: text("user_id")
+    userId: text()
       .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
-    commentId: uuid("comment_id")
+    commentId: uuid()
       .references(() => comments.id, { onDelete: "cascade" })
       .notNull(),
-    voteStatus: voteStatusEnum("vote_status").notNull().default("none"),
+    voteStatus: voteStatusEnum().notNull().default("none"),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.commentId] }),
-    index("user_to_comment_user_id_idx").on(t.userId),
-    index("user_to_comment_comment_id_idx").on(t.commentId),
+    index().on(t.userId),
+    index().on(t.commentId),
   ],
 );
 

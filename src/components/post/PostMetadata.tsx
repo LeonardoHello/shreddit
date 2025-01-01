@@ -44,11 +44,11 @@ export default function PostMetadata() {
             <div className="text-zinc-500">
               Posted by{" "}
               <Link
-                href={`/u/${state.author.name}`}
+                href={`/u/${state.author.username}`}
                 className="hover:underline"
                 onClick={(e) => e.stopPropagation()}
               >
-                u/{state.author.name}
+                u/{state.author.username}
               </Link>
             </div>
 

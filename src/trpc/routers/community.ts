@@ -23,7 +23,7 @@ export const communityRouter = createTRPCRouter({
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(({ input }) => {
-      return getCommunityImage.execute({ name: input });
+      return getCommunityImage.execute({ communityName: input });
     }),
   getFavoriteCommunities: protectedProcedure.query(({ ctx }) => {
     return getFavoriteCommunities.execute({ currentUserId: ctx.userId });

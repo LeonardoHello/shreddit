@@ -10,7 +10,7 @@ import type { Community, User } from "@/db/schema";
 export default function FeedEmpty({
   params,
 }: {
-  params: { username?: User["name"]; communityName?: Community["name"] };
+  params: { username?: User["username"]; communityName?: Community["name"] };
 }) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">

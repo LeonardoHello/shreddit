@@ -32,11 +32,11 @@ export default function UserInfo({ user }: { user: user }) {
       />
       <div className="flex flex-col items-center gap-0.5">
         <h1 className="max-w-[302px] text-nowrap break-words text-center text-2xl">
-          {user.name}
+          {user.username}
         </h1>
         <h2 className="flex items-center gap-1 text-xs text-zinc-500">
           <span className="max-w-[10rem] break-words text-center">
-            u/{user.name}
+            u/{user.username}
           </span>
 
           <Image src={dot} alt="dot" height={4} width={4} />

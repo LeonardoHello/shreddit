@@ -31,11 +31,10 @@ export default async function CommunityLayout(props: {
     (userToCommunity) => user && userToCommunity.userId === user.id,
   );
 
-  const newMemberCount = community.usersToCommunities.filter(
-    (userToCommunity) => {
-      return monthAgo < userToCommunity.createdAt;
-    },
-  ).length;
+  // TODO
+  const newMemberCount = community.usersToCommunities.filter(() => {
+    return monthAgo < new Date();
+  }).length;
 
   return (
     <>
@@ -74,7 +73,7 @@ export default async function CommunityLayout(props: {
                   {new Intl.NumberFormat("en-US", {
                     notation: "compact",
                     maximumFractionDigits: 1,
-                  }).format(newMemberCount)}
+                  }).format(0)}
                 </div>
                 <div className="text-xs text-zinc-500">New Members</div>
               </div>

@@ -2,7 +2,8 @@ import db from "../db";
 
 export const getUserByName = db.query.users
   .findFirst({
-    where: (user, { sql, eq }) => eq(user.name, sql.placeholder("username")),
+    where: (user, { sql, eq }) =>
+      eq(user.username, sql.placeholder("username")),
     with: {
       usersToComments: {
         where: (userToCommunity, { ne }) =>
@@ -37,7 +38,8 @@ export const getUserById = db.query.users
 
 export const getUserImage = db.query.users
   .findFirst({
-    where: (user, { eq, sql }) => eq(user.name, sql.placeholder("name")),
+    where: (user, { eq, sql }) =>
+      eq(user.username, sql.placeholder("username")),
     columns: { imageUrl: true },
   })
   .prepare("user_image_url");

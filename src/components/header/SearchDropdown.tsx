@@ -79,8 +79,8 @@ export default function SearchDropdown({
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Users</h2>
           {searchedUsers.data.map((user) => (
             <Link
-              href={`/u/${user.name}`}
-              key={user.name}
+              href={`/u/${user.username}`}
+              key={user.username}
               className="flex items-center gap-2 px-4 py-2 hover:bg-zinc-700/30"
             >
               <Image
@@ -92,7 +92,7 @@ export default function SearchDropdown({
               />
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">
-                  u/{user.name}
+                  u/{user.username}
                 </div>
                 <div className="flex items-center gap-1 truncate text-xs text-zinc-500">
                   <span>User</span>

@@ -9,7 +9,7 @@ import { PostType } from "@/types";
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   communitySearch: string;
   postType: PostType;
-  files: Omit<File, "id" | "postId">[];
+  files: Pick<File, "key" | "url" | "name">[];
   isDisabled: boolean;
 };
 

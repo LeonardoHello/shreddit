@@ -203,7 +203,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort).optional(),
-        username: UserSchema.shape.name,
+        username: UserSchema.shape.username,
       }),
     )
     .query(async ({ input, ctx }) => {

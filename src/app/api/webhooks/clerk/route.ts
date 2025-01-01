@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     case "user.created":
       await db.insert(users).values({
         id: data.id,
-        name: data.username ?? data.id,
+        username: data.username ?? data.id,
         imageUrl: data.image_url,
       });
       break;
@@ -68,7 +68,7 @@ export async function POST(req: Request) {
       await db
         .update(users)
         .set({
-          name: data.username ?? data.id,
+          username: data.username ?? data.id,
           imageUrl: data.image_url,
         })
         .where(eq(users.id, data.id));

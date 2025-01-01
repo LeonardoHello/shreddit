@@ -21,7 +21,7 @@ export const getUserBestPosts = db.query.posts
             .where(
               and(
                 eq(users.id, post.authorId),
-                eq(users.name, sql.placeholder("username")),
+                eq(users.username, sql.placeholder("username")),
               ),
             ),
         ),
@@ -45,7 +45,7 @@ export const getUserHotPosts = db.query.posts
             .where(
               and(
                 eq(users.id, post.authorId),
-                eq(users.name, sql.placeholder("username")),
+                eq(users.username, sql.placeholder("username")),
               ),
             ),
         ),
@@ -69,7 +69,7 @@ export const getUserNewPosts = db.query.posts
             .where(
               and(
                 eq(users.id, post.authorId),
-                eq(users.name, sql.placeholder("username")),
+                eq(users.username, sql.placeholder("username")),
               ),
             ),
         ),
@@ -93,7 +93,7 @@ export const getUserControversialPosts = db.query.posts
             .where(
               and(
                 eq(users.id, post.authorId),
-                eq(users.name, sql.placeholder("username")),
+                eq(users.username, sql.placeholder("username")),
               ),
             ),
         ),

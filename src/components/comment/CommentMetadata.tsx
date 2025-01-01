@@ -12,7 +12,7 @@ export default function CommentMetadata() {
 
   return (
     <div className="flex items-center gap-1 text-xs">
-      <Link href={`/u/${state.author.name}`} className="rounded-full">
+      <Link href={`/u/${state.author.username}`} className="rounded-full">
         <Image
           src={state.author.imageUrl}
           alt="user background"
@@ -23,10 +23,10 @@ export default function CommentMetadata() {
         />
       </Link>
       <Link
-        href={`/u/${state.author.name}`}
+        href={`/u/${state.author.username}`}
         className="font-medium hover:underline"
       >
-        {state.author.name}
+        {state.author.username}
       </Link>
 
       {state.authorId === state.post.authorId && (
