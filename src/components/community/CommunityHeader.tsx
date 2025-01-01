@@ -10,7 +10,7 @@ import type { getCommunityByName } from "@/api/getCommunity";
 import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import communityBanner from "@public/communityBanner.jpg";
 import CommunityImage from "./CommunityImage";
 

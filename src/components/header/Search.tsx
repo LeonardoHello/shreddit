@@ -8,7 +8,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 const SearchDropdown = dynamic(() => import("./SearchDropdown"));
 

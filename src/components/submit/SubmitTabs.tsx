@@ -20,7 +20,7 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { PostType } from "@/types";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 const RTEPost = dynamic(() => import("@/components/RTE/RTEPost"));
 const SubmitDropzone = dynamic(

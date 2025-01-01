@@ -24,7 +24,7 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
 import RTELoading from "./RTELoading";

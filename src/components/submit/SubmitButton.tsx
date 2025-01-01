@@ -14,7 +14,7 @@ import {
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import { PostType } from "@/types";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function SubmitButton({
   selectedCommunityPromise,

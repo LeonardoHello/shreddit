@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
 import useHydration from "@/hooks/useHydration";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import dot from "@public/dot.svg";
 import CommunityImage from "../community/CommunityImage";

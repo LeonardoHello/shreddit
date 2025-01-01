@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { PostSort } from "@/types";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function FeedSort() {
   const pathname = usePathname();

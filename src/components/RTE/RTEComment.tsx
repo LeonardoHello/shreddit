@@ -19,7 +19,7 @@ import { toast } from "sonner";
 
 import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";

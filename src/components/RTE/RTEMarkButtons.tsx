@@ -1,7 +1,7 @@
 import { type Editor } from "@tiptap/react";
 import { Bold, Code, Italic, Strikethrough } from "lucide-react";
 
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function RTEMarkButtons({ editor }: { editor: Editor }) {
   const isActive = (name: string, attributes?: object | undefined) =>

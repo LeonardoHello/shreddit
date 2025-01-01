@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { usePostContext } from "@/context/PostContext";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default memo(function PostContentMedia() {
   const { postId } = useParams();

@@ -12,7 +12,7 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function PostVote() {
   const state = usePostContext();

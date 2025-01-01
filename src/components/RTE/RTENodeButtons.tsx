@@ -8,7 +8,7 @@ import {
   SquareCode,
 } from "lucide-react";
 
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function RTENodeButtons({ editor }: { editor: Editor }) {
   const isActive = (name: string, attributes?: object | undefined) =>

@@ -10,7 +10,7 @@ import {
 import Logo from "@/components/header/Logo";
 import Search from "@/components/header/Search";
 import { User } from "@/db/schema";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import Menu from "../menu/Menu";
 import MenuDropdown from "../menu/MenuDropdown";
 import UserProfile from "../user/UserProfile";

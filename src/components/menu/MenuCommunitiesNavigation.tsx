@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { trpc } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
 import type { ArrElement } from "@/types";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
 type CommunityRelation = ArrElement<

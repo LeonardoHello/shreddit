@@ -10,7 +10,7 @@ import {
   useCommentDispatchContext,
 } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function CommentActionsDropdown() {
   const router = useRouter();

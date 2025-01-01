@@ -12,7 +12,7 @@ import Header from "@/components/header/Header";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import PremiumPurchase from "@/components/modal/PremiumPurchase";
 import { TRPCProvider } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 import "./globals.css";
 

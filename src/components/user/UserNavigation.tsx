@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 
 export default function UserNavigation({ username }: { username: string }) {
   const pathname = usePathname();

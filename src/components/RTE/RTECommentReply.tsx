@@ -23,7 +23,7 @@ import {
   useCommentDispatchContext,
 } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import RTEcommentLoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";

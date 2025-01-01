@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import type { getMyCommunities } from "@/api/getCommunities";
 import { useSubmitContext } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import SubmitCommunitySearch from "./SubmitCommunitySearch";
 

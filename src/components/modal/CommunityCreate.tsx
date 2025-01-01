@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import Modal from "./Modal";
 
 const maxCommunityNameLength = 21;

@@ -9,7 +9,7 @@ import { ChartBarIcon, HomeIcon, UserIcon } from "@heroicons/react/24/solid";
 
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
-import cn from "@/utils/cn";
+import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
 export default function Menu({ children }: { children: React.ReactNode }) {
