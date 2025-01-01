@@ -12,7 +12,6 @@ import Header from "@/components/header/Header";
 import CommunityCreate from "@/components/modal/CommunityCreate";
 import PremiumPurchase from "@/components/modal/PremiumPurchase";
 import { TRPCProvider } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 
 import "./globals.css";
 
@@ -34,36 +33,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      dynamic
-      appearance={{
-        baseTheme: dark,
-        layout: {
-          termsPageUrl: "https://clerk.com/terms",
-          privacyPageUrl: "https://clerk.com/privacy",
-          logoPlacement: "none",
-          socialButtonsVariant: "iconButton",
-        },
-        variables: { colorPrimary: "#f43f5e" },
-      }}
-    >
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={cn(
-            nunito_sans.className,
-            "flex h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-300",
-          )}
+    <html lang="en" suppressHydrationWarning>
+      <body className={nunito_sans.className}>
+        <ClerkProvider
+          dynamic
+          appearance={{
+            baseTheme: dark,
+            layout: {
+              termsPageUrl: "https://clerk.com/terms",
+              privacyPageUrl: "https://clerk.com/privacy",
+              logoPlacement: "none",
+              socialButtonsVariant: "iconButton",
+            },
+            variables: { colorPrimary: "#f43f5e" },
+          }}
         >
-          <NextSSRPlugin
-            /**
-             * The `extractRouterConfig` will extract **only** the route configs
-             * from the router to prevent additional information from being
-             * leaked to the client. The data passed to the client is the same
-             * as if you were to fetch `/api/uploadthing` directly.
-             */
-            routerConfig={extractRouterConfig(ourFileRouter)}
-          />
           <TRPCProvider>
+            <NextSSRPlugin
+              /**
+               * The `extractRouterConfig` will extract **only** the route configs
+               * from the router to prevent additional information from being
+               * leaked to the client. The data passed to the client is the same
+               * as if you were to fetch `/api/uploadthing` directly.
+               */
+              routerConfig={extractRouterConfig(ourFileRouter)}
+            />
             {/* Modal components */}
             <Suspense>
               <CommunityCreate />
@@ -73,11 +67,12 @@ export default function RootLayout({
             </Suspense>
 
             <Header />
-            <main className="relative grow overflow-y-scroll">{children}</main>
+
+            <main className="">{children}</main>
           </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />
-        </body>
-      </html>
-    </ClerkProvider>
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }
