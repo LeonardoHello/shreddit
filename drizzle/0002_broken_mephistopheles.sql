@@ -1,1 +1,0 @@
-ALTER TABLE "users_to_communities" ADD COLUMN "favorite" boolean DEFAULT false;

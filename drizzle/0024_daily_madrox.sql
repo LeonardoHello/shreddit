@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX IF NOT EXISTS "community_id_idx" ON "communities" ("id");
