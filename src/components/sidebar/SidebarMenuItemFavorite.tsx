@@ -11,17 +11,12 @@ import type { ArrElement } from "@/types";
 import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 
-type CommunityRelation = ArrElement<
-  RouterOutput["community"][
-    | "getFavoriteCommunities"
-    | "getModeratedCommunities"
-    | "getJoinedCommunities"]
->;
-
-export default function MenuCommunitiesNavigation({
+export default function SidebarMenuItemFavorite({
   communityRelation,
 }: {
-  communityRelation: CommunityRelation;
+  communityRelation: ArrElement<
+    RouterOutput["community"]["getJoinedCommunities"]
+  >;
 }) {
   const utils = trpc.useUtils();
 
@@ -29,24 +24,8 @@ export default function MenuCommunitiesNavigation({
     onMutate: (variables) => {
       const { communityId, favorite } = variables;
 
-      utils.community.getFavoriteCommunities.setData(undefined, (data) => {
-        if (!data) {
-          toast.error("Oops, something went wrong.");
-          return [];
-        }
-
-        if (favorite) {
-          return [...data, { ...communityRelation, favorite }];
-        } else {
-          return data.filter(
-            (userToCommunity) => userToCommunity.communityId !== communityId,
-          );
-        }
-      });
-
       utils.community.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
-          toast.error("Oops, something went wrong.");
           return [];
         }
 
@@ -60,7 +39,6 @@ export default function MenuCommunitiesNavigation({
 
       utils.community.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
-          toast.error("Oops, something went wrong.");
           return [];
         }
 
@@ -72,16 +50,8 @@ export default function MenuCommunitiesNavigation({
         });
       });
     },
-    onError: async ({ message }) => {
-      await Promise.all([
-        utils.community.getFavoriteCommunities.refetch(),
-        utils.community.getModeratedCommunities.refetch(),
-        utils.community.getJoinedCommunities.refetch(),
-      ]).catch(() => {
-        throw new Error("Could not load menu information.");
-      });
-
-      toast.error(message);
+    onError: async (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -89,11 +59,12 @@ export default function MenuCommunitiesNavigation({
     <li key={communityRelation.communityId}>
       <Link
         href={`/r/${communityRelation.community.name}`}
-        className="flex h-9 items-center gap-2 px-6 text-sm hover:bg-zinc-700/30"
+        className="flex h-10 items-center gap-2 rounded-md px-4 text-sm hover:bg-zinc-700/30"
       >
         <CommunityImage
           imageUrl={communityRelation.community.imageUrl}
-          size={20}
+          size={32}
+          className="border-2"
         />
         <h2 className="truncate">r/{communityRelation.community.name}</h2>
         <StarIcon

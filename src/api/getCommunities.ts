@@ -1,37 +1,23 @@
+import { communities } from "@/db/schema";
 import db from "../db";
-import { communities } from "../db/schema";
 
 export const getModeratedCommunities = db.query.usersToCommunities
   .findMany({
-    where: (userToCommunity, { sql, exists, and, eq }) =>
-      exists(
-        db
-          .select()
-          .from(communities)
-          .where(
-            and(
-              eq(communities.moderatorId, sql.placeholder("currentUserId")),
-              eq(communities.moderatorId, userToCommunity.userId),
-              eq(communities.id, userToCommunity.communityId),
-            ),
-          ),
+    where: (userToCommunity, { sql, and, eq, exists }) =>
+      and(
+        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
+        exists(
+          db
+            .select()
+            .from(communities)
+            .where(and(eq(communities.moderatorId, userToCommunity.userId))),
+        ),
       ),
+
     columns: { userId: true, communityId: true, favorite: true },
     with: { community: { columns: { id: true, name: true, imageUrl: true } } },
   })
   .prepare("moderated_communities");
-
-export const getFavoriteCommunities = db.query.usersToCommunities
-  .findMany({
-    where: (userToCommunity, { sql, and, eq }) =>
-      and(
-        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
-        eq(userToCommunity.favorite, true),
-      ),
-    columns: { userId: true, communityId: true, favorite: true },
-    with: { community: { columns: { id: true, name: true, imageUrl: true } } },
-  })
-  .prepare("favorite_communities");
 
 export const getJoinedCommunities = db.query.usersToCommunities
   .findMany({

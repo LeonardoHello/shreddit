@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 
 import { BellSlashIcon } from "@heroicons/react/24/outline";
@@ -7,6 +8,10 @@ import { BellIcon } from "@heroicons/react/24/solid";
 import { toast } from "sonner";
 
 import type { getCommunityByName } from "@/api/getCommunity";
+import {
+  ReducerAction,
+  useRecentCommunityDispatchContext,
+} from "@/context/RecentCommunityContext";
 import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
@@ -25,6 +30,12 @@ export default function CommunityHeader({
   >;
   initialData: RouterOutput["community"]["getUserToCommunity"];
 }) {
+  const dispatch = useRecentCommunityDispatchContext();
+
+  useEffect(() => {
+    dispatch({ type: ReducerAction.ADD_COMMUNITY, community });
+  }, [community, dispatch]);
+
   const { data: userToCommunity } = trpc.community.getUserToCommunity.useQuery(
     community.id,
     {

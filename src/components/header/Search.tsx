@@ -56,7 +56,7 @@ export default function Search() {
 
   return (
     <div
-      className="static order-1 flex max-w-2xl grow flex-col bg-inherit sm:relative"
+      className="static order-1 flex max-w-xl grow flex-col bg-inherit sm:relative"
       ref={dropdownRef}
     >
       <div className="relative flex basis-full sm:static">

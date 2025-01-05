@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import {
-  getFavoriteCommunities,
   getJoinedCommunities,
   getModeratedCommunities,
 } from "@/api/getCommunities";
@@ -25,9 +24,22 @@ export const communityRouter = createTRPCRouter({
     .query(({ input }) => {
       return getCommunityImage.execute({ communityName: input });
     }),
-  getFavoriteCommunities: protectedProcedure.query(({ ctx }) => {
-    return getFavoriteCommunities.execute({ currentUserId: ctx.userId });
-  }),
+  getRecentCommunities: baseProcedure
+    .input(
+      CommunitySchema.pick({
+        id: true,
+        name: true,
+        imageUrl: true,
+      })
+        .array()
+        .nullable(),
+    )
+    .query(({ input }) => {
+      if (!input) {
+        return [];
+      }
+      return input;
+    }),
   getModeratedCommunities: protectedProcedure.query(({ ctx }) => {
     return getModeratedCommunities.execute({ currentUserId: ctx.userId });
   }),
@@ -69,8 +81,7 @@ export const communityRouter = createTRPCRouter({
       return ctx.db
         .insert(usersToCommunities)
         .values({
-          favorite: input.favorite,
-          communityId: input.communityId,
+          ...input,
           userId: ctx.userId,
         })
         .onConflictDoUpdate({

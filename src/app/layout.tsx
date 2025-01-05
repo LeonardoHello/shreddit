@@ -9,13 +9,12 @@ import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
-import CommunityCreate from "@/components/modal/CommunityCreate";
-import PremiumPurchase from "@/components/modal/PremiumPurchase";
 import { TRPCProvider } from "@/trpc/client";
 
 import "./globals.css";
 
-import { Suspense } from "react";
+import Sidebar from "@/components/sidebar/Sidebar";
+import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 
 const nunito_sans = Roboto_Flex({
   subsets: ["latin"],
@@ -58,17 +57,14 @@ export default function RootLayout({
                */
               routerConfig={extractRouterConfig(ourFileRouter)}
             />
-            {/* Modal components */}
-            <Suspense>
-              <CommunityCreate />
-            </Suspense>
-            <Suspense>
-              <PremiumPurchase />
-            </Suspense>
 
-            <Header />
-
-            <main className="">{children}</main>
+            <div className="grid grid-cols-[auto,minmax(0,1fr)] grid-rows-[auto,minmax(0,1fr)]">
+              <Header />
+              <RecentCommunityContextProvider>
+                <Sidebar />
+              </RecentCommunityContextProvider>
+              <main>{children}</main>
+            </div>
           </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />
         </ClerkProvider>
