@@ -34,7 +34,7 @@ export default async function Header() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full md:hidden"
+              className="rounded-full xl:hidden"
             >
               <Menu />
             </Button>

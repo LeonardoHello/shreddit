@@ -63,7 +63,7 @@ export default function RootLayout({
               <div className="flex">
                 <div
                   style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-                  className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4 md:block"
+                  className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4 xl:block"
                 >
                   <Sidebar />
                 </div>
