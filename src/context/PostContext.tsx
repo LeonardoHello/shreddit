@@ -2,18 +2,12 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import { User } from "@clerk/nextjs/server";
-
-import { UserToPost } from "@/db/schema";
 import { RouterOutput } from "@/trpc/routers/_app";
 import { calculateVotes } from "@/utils/calculateVotes";
 
 type Post = NonNullable<RouterOutput["post"]["getPost"]>;
 
 type ReducerState = Post & {
-  voteStatus: UserToPost["voteStatus"];
-  isSaved: UserToPost["saved"];
-  isHidden: UserToPost["hidden"];
   isEditing: boolean;
   isDisabled: boolean;
   isDeleted: boolean;
@@ -83,8 +77,8 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
         voteStatus: action.vote,
         voteCount: calculateVotes({
           voteCount: state.voteCount,
-          voteStatus: state.voteStatus,
-          newVoteStatus: action.vote,
+          voteStatus: state.voteStatus ?? "none",
+          newVoteStatus: action.vote ?? "none",
         }),
       };
 
@@ -128,21 +122,12 @@ const PostDispatchContext =
 export default function PostContextProvider({
   children,
   post,
-  currentUserId,
 }: {
   children: React.ReactNode;
-  currentUserId: User["id"] | null;
   post: Post;
 }) {
-  const userToPost =
-    currentUserId &&
-    post.usersToPosts.find((userToPost) => userToPost.userId === currentUserId);
-
   const [state, dispatch] = useReducer(reducer, {
     ...post,
-    voteStatus: userToPost ? userToPost.voteStatus : "none",
-    isSaved: userToPost ? userToPost.saved : false,
-    isHidden: userToPost ? userToPost.hidden : false,
     isEditing: false,
     isDisabled: false,
     isDeleted: false,
