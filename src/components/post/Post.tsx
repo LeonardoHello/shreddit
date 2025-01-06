@@ -27,7 +27,7 @@ export default function Post({
   if (!post) notFound();
 
   return (
-    <PostContextProvider post={post} currentUserId={currentUserId}>
+    <PostContextProvider post={post}>
       <div className="flex gap-3 rounded bg-zinc-900 p-2">
         {currentUserId && <PostVote />}
         {!currentUserId && <PostVotePlaceholder />}

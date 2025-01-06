@@ -25,7 +25,6 @@ export const postsQueryConfig = ({
     limit: 10,
     offset: sql.placeholder("offset"),
     with: {
-      usersToPosts: { columns: { postId: false } },
       community: {
         columns: { name: true, imageUrl: true },
         with: {
@@ -94,6 +93,30 @@ export const postsQueryConfig = ({
           WHERE comments.post_id = ${post.id}
         )
       `.as("comment_count"),
+      isSaved: sql<schema.UserToPost["saved"] | null>`
+        (
+          SELECT saved
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+        )
+      `.as("is_saved"),
+      isHidden: sql<schema.UserToPost["hidden"] | null>`
+        (
+          SELECT hidden
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+        )
+      `.as("is_hidden"),
+      voteStatus: sql<schema.UserToPost["voteStatus"] | null>`
+        (
+          SELECT vote_status
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+        )
+      `.as("vote_status"),
     }),
     orderBy: (post, { desc, asc }) => {
       switch (sort) {

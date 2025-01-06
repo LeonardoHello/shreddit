@@ -14,10 +14,15 @@ import {
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const postRouter = createTRPCRouter({
-  getPost: baseProcedure.input(PostSchema.shape.id).query(async ({ input }) => {
-    const post = await getPostById.execute({ postId: input });
-    return post ?? null;
-  }),
+  getPost: baseProcedure
+    .input(PostSchema.shape.id)
+    .query(async ({ input, ctx }) => {
+      const post = await getPostById.execute({
+        currentUserId: ctx.userId,
+        postId: input,
+      });
+      return post ?? null;
+    }),
   createTextPost: protectedProcedure
     .input(
       PostSchema.omit({
