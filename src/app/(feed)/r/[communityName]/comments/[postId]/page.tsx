@@ -17,7 +17,10 @@ export default async function PostPage(props: {
 
   const [params, user] = await Promise.all([paramsPromise, userPromise]);
 
-  const postPromise = getPostById.execute({ postId: params.postId });
+  const postPromise = getPostById.execute({
+    postId: params.postId,
+    currentUserId: user && user.id,
+  });
   const commentsPromise = getComments.execute({ postId: params.postId });
 
   return (

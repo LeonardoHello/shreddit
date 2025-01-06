@@ -56,11 +56,7 @@ export default function FeedDownvotedPosts({
     <div className="relative flex flex-col gap-2.5">
       {data.pages.map((page) =>
         page.posts.map((post) => (
-          <PostContextProvider
-            key={post.id}
-            post={post}
-            currentUserId={currentUserId}
-          >
+          <PostContextProvider key={post.id} post={post}>
             <FeedPost currentUserId={currentUserId} />
           </PostContextProvider>
         )),
