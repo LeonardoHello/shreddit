@@ -3,7 +3,7 @@
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ],
-  "tailwindFunctions": ["cn"],
+  "tailwindFunctions": ["cn", "cva"],
   "importOrder": [
     "<BUILTIN_MODULES>",
     "",
