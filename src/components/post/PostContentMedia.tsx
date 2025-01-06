@@ -30,6 +30,7 @@ export default memo(function PostContentMedia() {
           fill
           sizes="(max-width: 768px) 90vw, (max-width: 1024px) 700px, (max-width: 1280px) 610px, 740px"
           className="object-contain"
+          priority
         />
       </div>
     );
@@ -52,6 +53,7 @@ export default memo(function PostContentMedia() {
               fill
               sizes="(max-width: 768px) 90vw, (max-width: 1024px) 700px, (max-width: 1280px) 610px, 740px"
               className="object-contain"
+              priority
             />
           </div>
         ))}
