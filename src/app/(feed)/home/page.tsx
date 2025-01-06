@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
 import FeedEmpty from "@/components/feed/FeedEmpty";
 import FeedHomePosts from "@/components/feed/FeedHomePosts";
-import FeedInput from "@/components/feed/FeedInput";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/sidebar/PremiumButton";
 import ScrollToTop from "@/components/sidebar/ScrollToTop";
@@ -20,14 +19,14 @@ export default async function HomePage(props: {
   searchParams: Promise<{ sort?: PostSort }>;
 }) {
   const searchParamsPromise = props.searchParams;
-  const userPromise = currentUser();
+  const authPromise = auth();
 
-  const [searchParams, user] = await Promise.all([
+  const [searchParams, { userId }] = await Promise.all([
     searchParamsPromise,
-    userPromise,
+    authPromise,
   ]);
 
-  if (user === null) throw new Error("Could not load home page information.");
+  if (userId === null) throw new Error("Could not load home page information.");
 
   const infiniteQueryPosts = await trpc.postFeed.getHomePosts({
     sort: searchParams.sort,
@@ -41,9 +40,6 @@ export default async function HomePage(props: {
   return (
     <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
       <div className="flex flex-col gap-2.5">
-        {user && (
-          <FeedInput username={user.username} imageUrl={user.imageUrl} />
-        )}
         <FeedSort />
       </div>
 
@@ -90,7 +86,7 @@ export default async function HomePage(props: {
       ) : (
         <FeedHomePosts
           key={searchParams.sort}
-          currentUserId={user.id}
+          currentUserId={userId}
           initialPosts={infiniteQueryPosts}
           queryInfo={queryInfo}
         />

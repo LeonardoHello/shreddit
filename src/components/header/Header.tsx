@@ -7,10 +7,19 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { Plus } from "lucide-react";
+import { Menu, Plus } from "lucide-react";
 
 import Logo from "@/components/header/Logo";
 import Search from "@/components/header/Search";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import Sidebar from "../sidebar/Sidebar";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
@@ -19,7 +28,30 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-20 col-span-2 flex h-14 justify-between gap-5 border-b bg-card px-4 py-2">
-      <Logo />
+      <div className="flex select-none items-center gap-1.5">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full md:hidden"
+            >
+              <Menu />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side={"left"} className="overflow-y-auto bg-card">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription>
+                Navigate through communities and access your personalized menus
+              </SheetDescription>
+            </SheetHeader>
+            <Sidebar />
+          </SheetContent>
+        </Sheet>
+
+        <Logo />
+      </div>
       <Search />
 
       <div className="flex items-center gap-2 self-center">

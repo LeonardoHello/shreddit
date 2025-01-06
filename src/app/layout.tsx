@@ -58,13 +58,18 @@ export default function RootLayout({
               routerConfig={extractRouterConfig(ourFileRouter)}
             />
 
-            <div className="grid grid-cols-[auto,minmax(0,1fr)] grid-rows-[auto,minmax(0,1fr)]">
+            <RecentCommunityContextProvider>
               <Header />
-              <RecentCommunityContextProvider>
-                <Sidebar />
-                <main>{children}</main>
-              </RecentCommunityContextProvider>
-            </div>
+              <div className="flex">
+                <div
+                  style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
+                  className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4 md:block"
+                >
+                  <Sidebar />
+                </div>
+                <main className="grow overflow-hidden">{children}</main>
+              </div>
+            </RecentCommunityContextProvider>
           </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />
         </ClerkProvider>

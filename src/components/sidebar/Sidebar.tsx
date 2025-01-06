@@ -15,10 +15,7 @@ export default async function Sidebar() {
   const { userId } = await auth();
 
   return (
-    <div
-      style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-      className="sticky top-14 h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4"
-    >
+    <>
       <SidebarMenuMain userId={userId} />
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
@@ -51,6 +48,6 @@ export default async function Sidebar() {
           </>
         )}
       </Accordion>
-    </div>
+    </>
   );
 }
