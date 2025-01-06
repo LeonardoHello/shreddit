@@ -62,8 +62,8 @@ export default function RootLayout({
               <Header />
               <RecentCommunityContextProvider>
                 <Sidebar />
+                <main>{children}</main>
               </RecentCommunityContextProvider>
-              <main>{children}</main>
             </div>
           </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />

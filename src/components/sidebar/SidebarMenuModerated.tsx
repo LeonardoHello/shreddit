@@ -2,28 +2,35 @@
 
 import { trpc } from "@/trpc/client";
 import SidebarMenuItemFavorite from "./SidebarMenuItemFavorite";
+import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 
 export default function SidebarMenuModerated() {
-  const { data: moderatedCommunities } =
+  const { data: moderatedCommunities, isLoading } =
     trpc.community.getModeratedCommunities.useQuery();
+
+  if (isLoading) {
+    return <SidebarMenuSkeleton length={2} />;
+  }
 
   if (!moderatedCommunities || moderatedCommunities.length === 0) {
     return null;
   }
 
   return (
-    <div className="flex flex-col gap-2.5">
-      <h2 className="px-6 text-xs uppercase tracking-widest text-muted-foreground">
-        moderation
-      </h2>
-      <menu className="w-full self-center">
-        {moderatedCommunities.map((communityRelation) => (
+    <menu>
+      {moderatedCommunities
+        .sort((a, b) => {
+          if (a.favorite !== b.favorite) {
+            return b.favorite ? 1 : -1;
+          }
+          return a.community.name.localeCompare(b.community.name);
+        })
+        .map((communityRelation) => (
           <SidebarMenuItemFavorite
             key={communityRelation.communityId}
             communityRelation={communityRelation}
           />
         ))}
-      </menu>
-    </div>
+    </menu>
   );
 }

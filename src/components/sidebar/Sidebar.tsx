@@ -1,9 +1,13 @@
-import Link from "next/link";
-
 import { auth } from "@clerk/nextjs/server";
-import { ChartBarIcon, HomeIcon } from "@heroicons/react/24/solid";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import SidebarMenuJoined from "./SidebarMenuJoined";
+import SidebarMenuMain from "./SidebarMenuMain";
 import SidebarMenuModerated from "./SidebarMenuModerated";
 import SidebarMenuRecent from "./SidebarMenuRecent";
 
@@ -13,43 +17,40 @@ export default async function Sidebar() {
   return (
     <div
       style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-      className="sticky top-14 h-[calc(100vh-3.5rem)] w-[272px] gap-3 overflow-y-auto border-r bg-card p-4"
+      className="sticky top-14 h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4"
     >
-      <div className="flex flex-col gap-2.5">
-        <menu className="w-full self-center">
-          <li>
-            <Link
-              href="/home"
-              className="flex h-9 items-center gap-2 rounded-md px-6 text-sm hover:bg-zinc-700/30"
-            >
-              <HomeIcon className="h-5 w-5" />
-              <h2 className="capitalize">home</h2>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/"
-              className="flex h-9 items-center gap-2 rounded-md px-6 text-sm hover:bg-zinc-700/30"
-            >
-              <ChartBarIcon
-                className="h-5 w-5 rounded-full bg-zinc-300 stroke-[3] p-0.5 text-zinc-900"
-                width={20}
-                height={20}
-              />
-              <h2>All</h2>
-            </Link>
-          </li>
-        </menu>
-      </div>
+      <SidebarMenuMain userId={userId} />
 
-      <SidebarMenuRecent />
-
-      {userId && (
-        <>
-          <SidebarMenuModerated />
-          <SidebarMenuJoined />
-        </>
-      )}
+      <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
+        <AccordionItem value="item-1">
+          <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
+            recent
+          </AccordionTrigger>
+          <AccordionContent>
+            <SidebarMenuRecent />
+          </AccordionContent>
+        </AccordionItem>
+        {userId && (
+          <>
+            <AccordionItem value="item-2">
+              <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
+                moderated
+              </AccordionTrigger>
+              <AccordionContent>
+                <SidebarMenuModerated />
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
+                communities
+              </AccordionTrigger>
+              <AccordionContent>
+                <SidebarMenuJoined />
+              </AccordionContent>
+            </AccordionItem>
+          </>
+        )}
+      </Accordion>
     </div>
   );
 }
