@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 
-import { PlusIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { trpc } from "@/trpc/client";
+import { Button } from "../ui/button";
 import SidebarMenuItemFavorite from "./SidebarMenuItemFavorite";
 import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 
@@ -23,14 +24,17 @@ export default function SidebarMenuJoined() {
   return (
     <menu>
       <li>
-        <Link
-          href={{ query: { submit: "community" } }}
-          scroll={false}
-          className="flex h-9 items-center gap-2 rounded-md px-6 text-sm hover:bg-zinc-700/30"
+        <Button
+          variant="ghost"
+          size="lg"
+          className="w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40"
+          asChild
         >
-          <PlusIcon className="h-5 w-5 stroke-2 text-zinc-300" />
-          <h2>Create Community</h2>
-        </Link>
+          <Link href={{ query: { submit: "community" } }} scroll={false}>
+            <Plus className="size-8 stroke-1" />
+            <h2>Create Community</h2>
+          </Link>
+        </Button>
       </li>
       {joinedCommunities
         .sort((a, b) => {
