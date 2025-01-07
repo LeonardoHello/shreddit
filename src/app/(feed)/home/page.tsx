@@ -1,16 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth as authPromise } from "@clerk/nextjs/server";
 import { HomeIcon } from "@heroicons/react/24/solid";
 
-import FeedEmpty from "@/components/feed/FeedEmpty";
-import FeedHomePosts from "@/components/feed/FeedHomePosts";
+import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import FeedSort from "@/components/feed/FeedSort";
 import PremiumButton from "@/components/sidebar/PremiumButton";
 import ScrollToTop from "@/components/sidebar/ScrollToTop";
-import { trpc } from "@/trpc/server";
-import { PostSort, type QueryInfo } from "@/types";
+import { PostSort } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
@@ -18,24 +16,13 @@ export const preferredRegion = ["fra1"];
 export default async function HomePage(props: {
   searchParams: Promise<{ sort?: PostSort }>;
 }) {
-  const searchParamsPromise = props.searchParams;
-  const authPromise = auth();
-
-  const [searchParams, { userId }] = await Promise.all([
-    searchParamsPromise,
-    authPromise,
+  const [searchParams, auth] = await Promise.all([
+    props.searchParams,
+    authPromise(),
   ]);
 
-  if (userId === null) throw new Error("Could not load home page information.");
-
-  const infiniteQueryPosts = await trpc.postFeed.getHomePosts({
-    sort: searchParams.sort,
-  });
-
-  const queryInfo: QueryInfo<"getHomePosts"> = {
-    procedure: "getHomePosts",
-    input: { cursor: infiniteQueryPosts.nextCursor, sort: searchParams.sort },
-  };
+  if (auth.userId === null)
+    throw new Error("Could not load home page information.");
 
   return (
     <div className="container mx-auto grid grid-cols-1 grid-rows-[auto,minmax(0,1fr)] gap-6 px-2 py-4 lg:grid-cols-[minmax(0,1fr),20rem] lg:pb-12 xl:max-w-6xl">
@@ -81,16 +68,16 @@ export default async function HomePage(props: {
         <ScrollToTop />
       </div>
 
-      {infiniteQueryPosts.posts.length === 0 ? (
-        <FeedEmpty params={{}} />
-      ) : (
-        <FeedHomePosts
-          key={searchParams.sort}
-          currentUserId={userId}
-          initialPosts={infiniteQueryPosts}
-          queryInfo={queryInfo}
-        />
-      )}
+      <FeedPostInfiniteQuery
+        key={searchParams.sort}
+        currentUserId={auth.userId}
+        queryInfo={{
+          procedure: "getHomePosts",
+          input: {
+            sort: searchParams.sort,
+          },
+        }}
+      />
     </div>
   );
 }

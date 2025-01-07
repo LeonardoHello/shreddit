@@ -1,11 +1,9 @@
-import { permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 
-import FeedDownvotedPosts from "@/components/feed/FeedDownvotedPosts";
-import FeedEmpty from "@/components/feed/FeedEmpty";
-import { trpc } from "@/trpc/server";
-import { PostSort, QueryInfo } from "@/types";
+import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
+import { PostSort } from "@/types";
 
 export default async function DownvotedPage(props: {
   params: Promise<{ username: string }>;
@@ -17,33 +15,18 @@ export default async function DownvotedPage(props: {
     currentUserPromise(),
   ]);
 
-  if (!currentUser) permanentRedirect(`/u/${params.username}`);
-
-  if (currentUser.username !== params.username)
-    permanentRedirect(`/u/${params.username}`);
-
-  const infiniteQueryPosts = await trpc.postFeed.getDownvotedPosts({
-    sort: searchParams.sort,
-  });
-
-  const queryInfo: QueryInfo<"getDownvotedPosts"> = {
-    procedure: "getDownvotedPosts",
-    input: {
-      cursor: infiniteQueryPosts.nextCursor,
-      sort: searchParams.sort,
-    },
-  };
-
-  if (infiniteQueryPosts.posts.length === 0) {
-    return <FeedEmpty params={params} />;
-  }
+  if (currentUser && currentUser.username !== params.username) notFound();
 
   return (
-    <FeedDownvotedPosts
+    <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      initialPosts={infiniteQueryPosts}
-      queryInfo={queryInfo}
+      queryInfo={{
+        procedure: "getDownvotedPosts",
+        input: {
+          sort: searchParams.sort,
+        },
+      }}
     />
   );
 }

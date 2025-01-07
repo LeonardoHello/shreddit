@@ -1,17 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import type { Community, User } from "@/db/schema";
+export default function FeedEmpty() {
+  const params = useParams();
 
-export default function FeedEmpty({
-  params,
-}: {
-  params: { username?: User["username"]; communityName?: Community["name"] };
-}) {
   return (
     <div className="relative flex flex-col rounded border border-zinc-700/25">
       {Array.from({ length: 6 }).map((_, i) => (

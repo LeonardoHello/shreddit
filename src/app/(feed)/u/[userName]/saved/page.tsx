@@ -1,11 +1,9 @@
-import { permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 
-import FeedEmpty from "@/components/feed/FeedEmpty";
-import FeedSavedPosts from "@/components/feed/FeedSavedPosts";
-import { trpc } from "@/trpc/server";
-import { PostSort, QueryInfo } from "@/types";
+import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
+import { PostSort } from "@/types";
 
 export default async function SavedPage(props: {
   params: Promise<{ username: string }>;
@@ -17,33 +15,18 @@ export default async function SavedPage(props: {
     currentUserPromise(),
   ]);
 
-  if (!currentUser) permanentRedirect(`/u/${params.username}`);
-
-  if (currentUser.username !== params.username)
-    permanentRedirect(`/u/${params.username}`);
-
-  const infiniteQueryPosts = await trpc.postFeed.getSavedPosts({
-    sort: searchParams.sort,
-  });
-
-  const queryInfo: QueryInfo<"getSavedPosts"> = {
-    procedure: "getSavedPosts",
-    input: {
-      cursor: infiniteQueryPosts.nextCursor,
-      sort: searchParams.sort,
-    },
-  };
-
-  if (infiniteQueryPosts.posts.length === 0) {
-    return <FeedEmpty params={params} />;
-  }
+  if (currentUser && currentUser.username !== params.username) notFound();
 
   return (
-    <FeedSavedPosts
+    <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      initialPosts={infiniteQueryPosts}
-      queryInfo={queryInfo}
+      queryInfo={{
+        procedure: "getSavedPosts",
+        input: {
+          sort: searchParams.sort,
+        },
+      }}
     />
   );
 }

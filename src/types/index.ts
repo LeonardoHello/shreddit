@@ -1,13 +1,4 @@
-import type { RouterInput, RouterOutput } from "@/trpc/routers/_app";
-
 export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
-
-export type PostFeedProcedures = keyof RouterOutput["postFeed"];
-
-export type QueryInfo<T extends PostFeedProcedures> = {
-  procedure: T;
-  input: RouterInput["postFeed"][T];
-};
 
 export enum PostSort {
   BEST = "best",

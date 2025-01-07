@@ -5,26 +5,65 @@ import { useEffect, useRef } from "react";
 import PostContextProvider from "@/context/PostContext";
 import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
-import type { PostFeedProcedures, QueryInfo } from "@/types";
+import { AppRouter, RouterInput } from "@/trpc/routers/_app";
+import FeedEmpty from "./FeedEmpty";
 import FeedLoading from "./FeedLoading";
 import FeedPost from "./FeedPost";
 
-type Props<T extends PostFeedProcedures> = {
-  currentUserId: User["id"] | null;
-  queryInfo: QueryInfo<T>;
-};
+type PostFeedProcedures = keyof AppRouter["postFeed"];
 
-export default function FeedAllPosts({
+type QueryInfo = {
+  [P in PostFeedProcedures]: {
+    procedure: P;
+    input: RouterInput["postFeed"][P];
+  };
+}[PostFeedProcedures];
+
+export default function FeedPostInfiniteQuery({
   currentUserId,
   queryInfo,
-}: Props<"getAllPosts">) {
+}: {
+  currentUserId: User["id"] | null;
+  queryInfo: QueryInfo;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
+  let infiniteQuery;
+
+  switch (queryInfo.procedure) {
+    case "getCommunityPosts":
+      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
+        queryInfo.input,
+        {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          refetchOnWindowFocus: false,
+        },
+      );
+      break;
+
+    case "getUserPosts":
+      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
+        queryInfo.input,
+        {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          refetchOnWindowFocus: false,
+        },
+      );
+      break;
+
+    default:
+      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
+        queryInfo.input,
+        {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+          refetchOnWindowFocus: false,
+        },
+      );
+      break;
+  }
+
   const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
-    trpc.postFeed[queryInfo.procedure].useInfiniteQuery(queryInfo.input, {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      refetchOnWindowFocus: false,
-    });
+    infiniteQuery;
 
   useEffect(() => {
     if (!ref.current || !hasNextPage || isFetchingNextPage) return;
@@ -50,6 +89,10 @@ export default function FeedAllPosts({
 
   if (data === undefined) {
     throw new Error("Couldn't fetch posts");
+  }
+
+  if (data.pages.length === 0) {
+    return <FeedEmpty />;
   }
 
   return (
