@@ -40,7 +40,13 @@ export default function SearchDropdown({
   });
 
   return (
-    <div className="absolute left-0 top-12 max-h-[min(calc(100vh-3rem),24rem)] w-full divide-y divide-zinc-700/70 overflow-y-scroll rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20 sm:top-full">
+    <div
+      style={{
+        scrollbarWidth: "thin",
+        colorScheme: "dark",
+      }}
+      className="absolute left-0 top-12 max-h-[min(calc(100vh-3rem),24rem)] w-full divide-y divide-zinc-700/70 overflow-y-scroll rounded-sm border border-zinc-700/70 border-t-transparent bg-inherit shadow-md shadow-zinc-300/20 sm:top-full"
+    >
       {searchedCommunities.data.length > 0 && (
         <div className="py-3">
           <h2 className="mx-4 mb-2.5 text-sm font-medium">Communities</h2>
