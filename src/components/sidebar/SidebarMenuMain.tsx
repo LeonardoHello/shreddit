@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useUser } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
 
 import { cn } from "@/utils/cn";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarMenuMain({
   userId,
@@ -14,9 +17,11 @@ export default function SidebarMenuMain({
   userId: User["id"] | null;
 }) {
   const pathname = usePathname();
+  const { user, isSignedIn, isLoaded } = useUser();
 
   const isHome = pathname === "/home";
   const isAll = pathname === "/";
+  const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
 
   return (
     <menu className="w-full self-center border-b pb-3">
@@ -40,6 +45,7 @@ export default function SidebarMenuMain({
           </Button>
         </li>
       )}
+
       <li>
         <Button
           variant="ghost"
@@ -54,10 +60,41 @@ export default function SidebarMenuMain({
         >
           <Link href="/">
             {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
-            <h2>All</h2>
+            <h2 className="capitalize">all</h2>
           </Link>
         </Button>
       </li>
+
+      {userId && !isLoaded && (
+        <div className="flex h-10 items-center gap-2 px-4">
+          <Skeleton className="size-6 rounded-full" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+      )}
+
+      {userId && isLoaded && isSignedIn && (
+        <li>
+          <Button
+            variant="ghost"
+            size="lg"
+            className={cn(
+              "w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40",
+              {
+                "bg-accent text-accent-foreground hover:bg-accent": isProfile,
+              },
+            )}
+            asChild
+          >
+            <Link href={`/u/${user.username}`}>
+              <Avatar className="size-6">
+                <AvatarImage src={user.imageUrl} />
+                <AvatarFallback>{user.username?.slice(0, 2)}</AvatarFallback>
+              </Avatar>
+              <h2 className="capitalize">view profile</h2>
+            </Link>
+          </Button>
+        </li>
+      )}
     </menu>
   );
 }
@@ -67,9 +104,9 @@ function ActiveHomeIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg
       {...props}
       fill="currentColor"
-      height="20"
       icon-name="home-fill"
       viewBox="0 0 20 20"
+      height="20"
       width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -83,9 +120,9 @@ function InactiveHomeIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg
       {...props}
       fill="currentColor"
-      height="20"
       icon-name="home-outline"
       viewBox="0 0 20 20"
+      height="20"
       width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -99,9 +136,9 @@ function InactiveAllIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg
       {...props}
       fill="currentColor"
-      height="20"
       icon-name="all-fill"
       viewBox="0 0 20 20"
+      height="20"
       width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -115,9 +152,9 @@ function ActiveAllIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg
       {...props}
       fill="currentColor"
-      height="20"
       icon-name="all-fill"
       viewBox="0 0 20 20"
+      height="20"
       width="20"
       xmlns="http://www.w3.org/2000/svg"
     >
