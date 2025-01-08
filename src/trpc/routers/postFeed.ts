@@ -63,36 +63,20 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getAllHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getAllHotPosts,
+        [PostSort.NEW]: getAllNewPosts,
+        [PostSort.CONTROVERSIAL]: getAllControversialPosts,
+        [PostSort.BEST]: getAllBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getAllNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      // Get the appropriate query function or default to BEST
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getAllControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getAllBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -109,36 +93,19 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getHomeHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getHomeHotPosts,
+        [PostSort.NEW]: getHomeNewPosts,
+        [PostSort.CONTROVERSIAL]: getHomeControversialPosts,
+        [PostSort.BEST]: getHomeBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getHomeNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getHomeControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getHomeBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -156,40 +123,20 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getCommunityHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            communityName: input.communityName,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getCommunityHotPosts,
+        [PostSort.NEW]: getCommunityNewPosts,
+        [PostSort.CONTROVERSIAL]: getCommunityControversialPosts,
+        [PostSort.BEST]: getCommunityBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getCommunityNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            communityName: input.communityName,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getCommunityControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            communityName: input.communityName,
-          });
-          break;
-
-        default:
-          posts = await getCommunityBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            communityName: input.communityName,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+        communityName: input.communityName,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -207,40 +154,20 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getUserHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            username: input.username,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getUserHotPosts,
+        [PostSort.NEW]: getUserNewPosts,
+        [PostSort.CONTROVERSIAL]: getUserControversialPosts,
+        [PostSort.BEST]: getUserBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getUserNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            username: input.username,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getUserControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            username: input.username,
-          });
-          break;
-
-        default:
-          posts = await getUserBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-            username: input.username,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+        username: input.username,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -257,36 +184,19 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getUpvotedHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getUpvotedHotPosts,
+        [PostSort.NEW]: getUpvotedNewPosts,
+        [PostSort.CONTROVERSIAL]: getUpvotedControversialPosts,
+        [PostSort.BEST]: getUpvotedBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getUpvotedNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getUpvotedControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getUpvotedBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -303,36 +213,19 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getDownvotedHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getDownvotedHotPosts,
+        [PostSort.NEW]: getDownvotedNewPosts,
+        [PostSort.CONTROVERSIAL]: getDownvotedControversialPosts,
+        [PostSort.BEST]: getDownvotedBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getDownvotedNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getDownvotedControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getDownvotedBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -349,36 +242,19 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getSavedHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getSavedHotPosts,
+        [PostSort.NEW]: getSavedNewPosts,
+        [PostSort.CONTROVERSIAL]: getSavedControversialPosts,
+        [PostSort.BEST]: getSavedBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getSavedNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getSavedControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getSavedBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
@@ -395,36 +271,19 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      let posts;
-      switch (input.sort) {
-        case PostSort.HOT:
-          posts = await getHiddenHotPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const sortQueries = {
+        [PostSort.HOT]: getHiddenHotPosts,
+        [PostSort.NEW]: getHiddenNewPosts,
+        [PostSort.CONTROVERSIAL]: getHiddenControversialPosts,
+        [PostSort.BEST]: getHiddenBestPosts,
+      };
 
-        case PostSort.NEW:
-          posts = await getHiddenNewPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
+      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
 
-        case PostSort.CONTROVERSIAL:
-          posts = await getHiddenControversialPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-
-        default:
-          posts = await getHiddenBestPosts.execute({
-            currentUserId: ctx.userId,
-            offset: input.cursor,
-          });
-          break;
-      }
+      const posts = await queryFn.execute({
+        currentUserId: ctx.userId,
+        offset: input.cursor,
+      });
 
       let nextCursor: typeof input.cursor = undefined;
       if (posts.length === 10) {
