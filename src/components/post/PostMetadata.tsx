@@ -1,14 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+
+import { Dot } from "lucide-react";
 
 import { usePostContext } from "@/context/PostContext";
 import useHydration from "@/hooks/useHydration";
 import { cn } from "@/utils/cn";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import dot from "@public/dot.svg";
 import CommunityImage from "../community/CommunityImage";
 
 export default function PostMetadata() {
@@ -34,7 +34,7 @@ export default function PostMetadata() {
               </div>
             </Link>
 
-            <Image src={dot} alt="dot" height={2} width={2} />
+            <Dot className="size-1" />
           </>
         )}
 
@@ -52,7 +52,7 @@ export default function PostMetadata() {
               </Link>
             </div>
 
-            <Image src={dot} alt="dot" height={2} width={2} />
+            <Dot className="size-1" />
           </>
         )}
 
@@ -67,7 +67,7 @@ export default function PostMetadata() {
             </time>
             {state.updatedAt > state.createdAt && (
               <>
-                <Image src={dot} alt="dot" height={2} width={2} />
+                <Dot className="size-1" />
                 <time
                   dateTime={state.updatedAt.toISOString()}
                   title={state.updatedAt.toLocaleDateString("hr-HR")}

@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { onion } from "@lucide/lab";
+import { Cake, Dot, Icon } from "lucide-react";
+
 import type { getUserByName } from "@/api/getUser";
 import getOnions from "@/utils/calculateOnions";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import cake from "@public/cake.svg";
-import dot from "@public/dot.svg";
-import onion from "@public/onion.svg";
 import userBackground from "@public/userBackground.jpg";
 import CommunityImage from "../community/CommunityImage";
 
@@ -39,7 +39,7 @@ export default function UserInfo({ user }: { user: user }) {
             u/{user.username}
           </span>
 
-          <Image src={dot} alt="dot" height={4} width={4} />
+          <Dot className="size-1" />
           <time
             dateTime={user.createdAt.toISOString()}
             title={user.createdAt.toLocaleDateString("hr-HR")}
@@ -55,7 +55,7 @@ export default function UserInfo({ user }: { user: user }) {
         <div className="space-y-1">
           <div className="font-medium">Onions</div>
           <div className="flex items-center gap-1">
-            <Image src={onion} alt="onion" />
+            <Icon iconNode={onion} className="size-4" />
             <div className="text-xs text-zinc-500">
               {new Intl.NumberFormat("en-US", {
                 notation: "compact",
@@ -67,7 +67,7 @@ export default function UserInfo({ user }: { user: user }) {
         <div className="space-y-1">
           <div className="font-medium">Onion day</div>
           <div className="flex items-center gap-1">
-            <Image src={cake} alt="cake" />
+            <Cake className="size-4" />
             <div className="text-xs text-zinc-500">
               {user.createdAt.toLocaleDateString("en-US", {
                 year: "numeric",

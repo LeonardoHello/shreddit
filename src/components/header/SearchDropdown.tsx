@@ -2,11 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Dot } from "lucide-react";
 import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
 import calculateOnions from "@/utils/calculateOnions";
-import dot from "@public/dot.svg";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SearchDropdown({
@@ -63,7 +63,7 @@ export default function SearchDropdown({
                 </div>
                 <div className="flex items-center gap-1 text-xs text-zinc-500">
                   <span>Community</span>
-                  <Image src={dot} alt="dot" height={4} width={4} />
+                  <Dot className="size-1" />
                   <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
@@ -102,7 +102,7 @@ export default function SearchDropdown({
                 </div>
                 <div className="flex items-center gap-1 truncate text-xs text-zinc-500">
                   <span>User</span>
-                  <Image src={dot} alt="dot" height={4} width={4} />
+                  <Dot className="size-0.5" />
                   <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",

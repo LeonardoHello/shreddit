@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Dot } from "lucide-react";
+
 import { useCommentContext } from "@/context/CommentContext";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import dot from "@public/dot.svg";
 
 export default function CommentMetadata() {
   const hydrated = useHydration();
@@ -32,7 +33,7 @@ export default function CommentMetadata() {
       {state.authorId === state.post.authorId && (
         <div className="font-bold uppercase text-blue-500">op</div>
       )}
-      <Image src={dot} alt="dot" height={2} width={2} />
+      <Dot className="size-0.5" />
 
       {hydrated ? (
         <>
@@ -45,7 +46,7 @@ export default function CommentMetadata() {
           </time>
           {state.updatedAt > state.createdAt && (
             <>
-              <Image src={dot} alt="dot" height={2} width={2} />
+              <Dot className="size-0.5" />
               <time
                 dateTime={state.updatedAt.toISOString()}
                 title={state.updatedAt.toLocaleDateString("hr-HR")}
