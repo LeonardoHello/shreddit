@@ -61,9 +61,9 @@ export default function SearchDropdown({
                 <div className="truncate text-sm font-medium">
                   r/{community.name}
                 </div>
-                <div className="flex items-center gap-1 text-xs text-zinc-500">
+                <div className="flex items-center text-xs text-zinc-500">
                   <span>Community</span>
-                  <Dot className="size-1" />
+                  <Dot className="size-3" />
                   <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
@@ -100,9 +100,9 @@ export default function SearchDropdown({
                 <div className="truncate text-sm font-medium">
                   u/{user.username}
                 </div>
-                <div className="flex items-center gap-1 truncate text-xs text-zinc-500">
+                <div className="flex items-center truncate text-xs text-zinc-500">
                   <span>User</span>
-                  <Dot className="size-0.5" />
+                  <Dot className="size-3" />
                   <span className="truncate lowercase">
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",

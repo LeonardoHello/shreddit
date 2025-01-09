@@ -34,12 +34,11 @@ export default function UserInfo({ user }: { user: user }) {
         <h1 className="max-w-[302px] text-nowrap break-words text-center text-2xl">
           {user.username}
         </h1>
-        <h2 className="flex items-center gap-1 text-xs text-zinc-500">
+        <h2 className="flex items-center text-xs text-zinc-500">
           <span className="max-w-[10rem] break-words text-center">
             u/{user.username}
           </span>
-
-          <Dot className="size-1" />
+          <Dot className="size-3" />
           <time
             dateTime={user.createdAt.toISOString()}
             title={user.createdAt.toLocaleDateString("hr-HR")}

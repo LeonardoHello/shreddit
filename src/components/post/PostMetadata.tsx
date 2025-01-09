@@ -19,7 +19,7 @@ export default function PostMetadata() {
 
   return (
     <>
-      <div className="flex items-center gap-1 text-xs">
+      <div className="flex items-center text-xs">
         {/* checks if the post component is rendered by the community page */}
         {!communityName && (
           <>
@@ -34,7 +34,7 @@ export default function PostMetadata() {
               </div>
             </Link>
 
-            <Dot className="size-1" />
+            <Dot className="size-3 text-zinc-500" />
           </>
         )}
 
@@ -52,32 +52,18 @@ export default function PostMetadata() {
               </Link>
             </div>
 
-            <Dot className="size-1" />
+            <Dot className="size-3 text-zinc-500" />
           </>
         )}
 
         {hydrated ? (
-          <>
-            <time
-              dateTime={state.createdAt.toISOString()}
-              title={state.createdAt.toLocaleDateString("hr-HR")}
-              className="text-zinc-500"
-            >
-              {getRelativeTimeString(state.createdAt)}
-            </time>
-            {state.updatedAt > state.createdAt && (
-              <>
-                <Dot className="size-1" />
-                <time
-                  dateTime={state.updatedAt.toISOString()}
-                  title={state.updatedAt.toLocaleDateString("hr-HR")}
-                  className="italic text-zinc-500"
-                >
-                  edited {getRelativeTimeString(state.updatedAt)}
-                </time>
-              </>
-            )}
-          </>
+          <time
+            dateTime={state.createdAt.toISOString()}
+            title={state.createdAt.toLocaleDateString("hr-HR")}
+            className="text-zinc-500"
+          >
+            {getRelativeTimeString(state.createdAt)}
+          </time>
         ) : (
           <span className="text-zinc-500">Calculating...</span>
         )}
