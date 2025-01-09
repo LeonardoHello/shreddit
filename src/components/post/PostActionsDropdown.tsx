@@ -125,14 +125,16 @@ export default function PostActionsDropdown() {
         Mark As NSFW
       </div>
 
-      <div
-        className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
-        onClick={() => {
-          dispatch({ type: ReducerAction.TOGGLE_EDIT });
-        }}
-      >
-        <PencilSquareIcon className="h-5 w-5" /> Edit
-      </div>
+      {post.files.length === 0 && (
+        <div
+          className="flex items-center gap-2 border-b border-zinc-700/70 px-1.5 py-2 hover:bg-zinc-700/50"
+          onClick={() => {
+            dispatch({ type: ReducerAction.TOGGLE_EDIT });
+          }}
+        >
+          <PencilSquareIcon className="h-5 w-5" /> Edit
+        </div>
+      )}
 
       <div
         className="flex items-center gap-2 px-1.5 py-2 hover:bg-zinc-700/50"
