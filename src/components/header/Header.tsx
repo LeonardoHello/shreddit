@@ -39,7 +39,11 @@ export default async function Header() {
               <Menu />
             </Button>
           </SheetTrigger>
-          <SheetContent side={"left"} className="overflow-y-auto bg-card">
+          <SheetContent
+            side={"left"}
+            style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
+            className="overflow-y-auto bg-card"
+          >
             <SheetHeader className="sr-only">
               <SheetTitle>Menu</SheetTitle>
               <SheetDescription>
