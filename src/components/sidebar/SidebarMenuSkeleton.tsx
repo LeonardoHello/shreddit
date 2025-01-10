@@ -1,7 +1,7 @@
 import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarMenuSkeleton({
-  length = 5,
+  length = 3,
 }: {
   length?: number;
 }) {

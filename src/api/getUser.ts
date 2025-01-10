@@ -16,7 +16,7 @@ export const getUserByName = db.query.users
         columns: { voteStatus: true },
       },
       communities: {
-        columns: { id: true, imageUrl: true, name: true },
+        columns: { id: true, icon: true, name: true },
         with: {
           usersToCommunities: {
             columns: { communityId: true },

@@ -115,12 +115,12 @@ export default function CommunityHeader({
       <div className="flex justify-center bg-zinc-900 px-4 py-2">
         <div className="flex w-[72rem] items-center gap-4">
           <CommunityImage
-            imageUrl={community.imageUrl}
+            icon={community.icon}
             size={56}
             className={cn(
               "-mt-5 min-w-[56px] self-start md:h-20 md:w-20 md:min-w-[80px]",
               {
-                "border-2 md:border-4": !community.imageUrl,
+                "border-2 md:border-4": !community.icon,
               },
             )}
           />

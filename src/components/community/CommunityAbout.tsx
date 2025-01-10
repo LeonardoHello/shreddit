@@ -68,23 +68,23 @@ export default function CommunityAbout({
       </div>
       <div className="flex items-center gap-1.5">
         <CommunityImage
-          imageUrl={community.imageUrl}
+          icon={community.icon}
           size={48}
-          className={cn({ "border-2": !community.imageUrl })}
+          className={cn({ "border-2": !community.icon })}
         />
 
         <h2 className="truncate text-base font-medium tracking-wide">
           r/{community.name}
         </h2>
       </div>
-      {!edit && community.about && (
-        <p className="max-w-[302px] break-words">{community.about}</p>
+      {!edit && community.description && (
+        <p className="max-w-[302px] break-words">{community.description}</p>
       )}
       {edit && (
         <>
           <textarea
             ref={aboutRef}
-            defaultValue={community.about}
+            defaultValue={community.description}
             rows={6}
             className="min-w-0 rounded bg-zinc-400/10 px-2 py-1 outline-none ring-1 ring-inset ring-zinc-700 hover:bg-inherit hover:ring-zinc-300 focus:bg-inherit focus:ring-zinc-300"
             spellCheck={false}
@@ -103,9 +103,9 @@ export default function CommunityAbout({
               onClick={() => {
                 if (isMutating) return;
 
-                setAboutCommunity.mutate({
+                editCommunity.mutate({
                   id: community.id,
-                  about: aboutRef.current?.value ?? "",
+                  description: aboutRef.current?.value ?? "",
                 });
               }}
             >

@@ -26,7 +26,7 @@ export const postsQueryConfig = ({
     offset: sql.placeholder("offset"),
     with: {
       community: {
-        columns: { name: true, imageUrl: true },
+        columns: { name: true, icon: true },
         with: {
           usersToCommunities: { columns: { muted: true, userId: true } },
         },

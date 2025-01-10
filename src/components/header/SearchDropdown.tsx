@@ -56,7 +56,7 @@ export default function SearchDropdown({
               key={community.name}
               className="flex items-center gap-2 px-4 py-2 hover:bg-zinc-700/30"
             >
-              <CommunityImage imageUrl={community.imageUrl} size={24} />
+              <CommunityImage icon={community.icon} size={24} />
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">
                   r/{community.name}

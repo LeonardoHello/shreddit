@@ -29,7 +29,7 @@ export const communityRouter = createTRPCRouter({
       CommunitySchema.pick({
         id: true,
         name: true,
-        imageUrl: true,
+        icon: true,
       })
         .array()
         .nullable(),
@@ -46,12 +46,12 @@ export const communityRouter = createTRPCRouter({
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
     return getJoinedCommunities.execute({ currentUserId: ctx.userId });
   }),
-  setAboutCommunity: protectedProcedure
-    .input(CommunitySchema.pick({ id: true, about: true }))
+  editCommunity: protectedProcedure
+    .input(CommunitySchema.pick({ id: true, description: true }))
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(communities)
-        .set({ about: input.about })
+        .set({ description: input.description })
         .where(eq(communities.id, input.id));
     }),
   deleteCommunity: protectedProcedure

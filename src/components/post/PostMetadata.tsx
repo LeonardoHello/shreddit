@@ -28,7 +28,7 @@ export default function PostMetadata() {
               className="flex items-center gap-1"
               onClick={(e) => e.stopPropagation()}
             >
-              <CommunityImage imageUrl={state.community.imageUrl} size={20} />
+              <CommunityImage icon={state.community.icon} size={20} />
               <div className="font-bold hover:underline">
                 r/{state.community.name}
               </div>

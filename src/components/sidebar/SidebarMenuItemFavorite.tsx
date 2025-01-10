@@ -66,7 +66,7 @@ export default function SidebarMenuItemFavorite({
       >
         <Link href={`/r/${communityRelation.community.name}`}>
           <CommunityImage
-            imageUrl={communityRelation.community.imageUrl}
+            icon={communityRelation.community.icon}
             size={32}
             className="border-2"
           />

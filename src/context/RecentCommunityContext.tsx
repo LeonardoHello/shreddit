@@ -12,11 +12,11 @@ const CommunitySchema = z
   .object({
     id: z.string(),
     name: z.string(),
-    imageUrl: z.string().nullable(),
+    icon: z.string().nullable(),
   })
   .array();
 
-type RecentCommunity = Pick<Community, "id" | "name" | "imageUrl">;
+type RecentCommunity = Pick<Community, "id" | "name" | "icon">;
 type ReducerState = {
   communities: RecentCommunity[];
   isLoading: boolean;

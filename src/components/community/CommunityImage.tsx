@@ -4,18 +4,18 @@ import { Community } from "@/db/schema";
 import { cn } from "@/utils/cn";
 
 export default function CommunityImage({
-  imageUrl,
+  icon,
   size,
   className = "",
 }: {
-  imageUrl?: Community["imageUrl"];
+  icon?: Community["icon"];
   size: number;
   className?: string;
 }) {
-  if (imageUrl) {
+  if (icon) {
     return (
       <Image
-        src={imageUrl}
+        src={icon}
         alt="community image"
         width={size}
         height={size}

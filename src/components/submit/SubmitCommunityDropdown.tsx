@@ -84,10 +84,10 @@ export default function SubmitCommunityDropdown({
                 }}
               >
                 <CommunityImage
-                  imageUrl={myCommunity.community.imageUrl}
+                  icon={myCommunity.community.icon}
                   size={32}
                   className={cn({
-                    "border-2": !myCommunity.community.imageUrl,
+                    "border-2": !myCommunity.community.icon,
                   })}
                 />
 
@@ -161,10 +161,10 @@ function SearchedCommunities({ search }: { search: string }) {
             }}
           >
             <CommunityImage
-              imageUrl={searchedCommunity.imageUrl}
+              icon={searchedCommunity.icon}
               size={32}
               className={cn({
-                "border-2": !searchedCommunity.imageUrl,
+                "border-2": !searchedCommunity.icon,
               })}
             />
 

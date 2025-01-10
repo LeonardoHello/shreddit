@@ -14,7 +14,7 @@ export const getSelectedCommunity = db.query.communities
   .findFirst({
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
-    columns: { id: true, name: true, imageUrl: true },
+    columns: { id: true, name: true, icon: true },
     with: {
       usersToCommunities: {
         columns: { userId: true },
@@ -39,6 +39,6 @@ export const getCommunityImage = db.query.communities
   .findFirst({
     where: (community, { eq, sql }) =>
       eq(community.name, sql.placeholder("communityName")),
-    columns: { imageUrl: true },
+    columns: { icon: true },
   })
   .prepare("community_imageUrl");

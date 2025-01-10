@@ -31,7 +31,7 @@ export default function SubmitCommunitySelected({
         className="flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2"
         onClick={() => setIsOpen(true)}
       >
-        <CommunityImage imageUrl={selectedCommunity.imageUrl} size={24} />
+        <CommunityImage icon={selectedCommunity.icon} size={24} />
 
         <h1 className="grow truncate text-start text-sm font-medium">
           r/{selectedCommunity.name}

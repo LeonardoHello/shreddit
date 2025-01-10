@@ -11,7 +11,7 @@ export default function SidebarMenuRecent() {
   const state = useRecentCommunityContext();
 
   if (state.isLoading) {
-    return <SidebarMenuSkeleton />;
+    return <SidebarMenuSkeleton length={3} />;
   }
 
   if (state.communities.length === 0) {
@@ -30,7 +30,7 @@ export default function SidebarMenuRecent() {
           >
             <Link href={`/r/${community.name}`}>
               <CommunityImage
-                imageUrl={community.imageUrl}
+                icon={community.icon}
                 size={32}
                 className="border-2"
               />

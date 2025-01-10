@@ -89,7 +89,7 @@ export default function UserInfo({ user }: { user: user }) {
             <div className="flex h-56 flex-col gap-3.5 overflow-y-scroll">
               {user.communities.map((community) => (
                 <div key={community.id} className="flex items-center gap-1.5">
-                  <CommunityImage imageUrl={community.imageUrl} size={32} />
+                  <CommunityImage icon={community.icon} size={32} />
 
                   <div className="truncate text-xs tracking-wide">
                     <Link
