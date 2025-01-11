@@ -14,7 +14,7 @@ export const getModeratedCommunities = db.query.usersToCommunities
         ),
       ),
 
-    columns: { userId: true, communityId: true, favorite: true },
+    columns: { userId: true, communityId: true, favorited: true },
     with: { community: { columns: { id: true, name: true, icon: true } } },
   })
   .prepare("moderated_communities");
@@ -24,9 +24,9 @@ export const getJoinedCommunities = db.query.usersToCommunities
     where: (userToCommunity, { sql, and, eq }) =>
       and(
         eq(userToCommunity.userId, sql.placeholder("currentUserId")),
-        eq(userToCommunity.member, true),
+        eq(userToCommunity.joined, true),
       ),
-    columns: { userId: true, communityId: true, favorite: true },
+    columns: { userId: true, communityId: true, favorited: true },
     with: { community: { columns: { id: true, name: true, icon: true } } },
   })
   .prepare("joined_communities");
@@ -36,7 +36,7 @@ export const getMyCommunities = db.query.usersToCommunities
     where: (userToCommunity, { sql, and, eq }) =>
       and(
         eq(userToCommunity.userId, sql.placeholder("currentUserId")),
-        eq(userToCommunity.member, true),
+        eq(userToCommunity.joined, true),
       ),
     columns: {},
     with: {
@@ -46,7 +46,7 @@ export const getMyCommunities = db.query.usersToCommunities
           usersToCommunities: {
             columns: { userId: true },
             where: (userToCommunity, { eq }) =>
-              eq(userToCommunity.member, true),
+              eq(userToCommunity.joined, true),
           },
         },
       },

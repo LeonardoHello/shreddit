@@ -5,7 +5,11 @@ import {
   getJoinedCommunities,
   getModeratedCommunities,
 } from "@/api/getCommunities";
-import { getCommunityImage, getUserToCommunity } from "@/api/getCommunity";
+import {
+  getCommunityByName,
+  getCommunityImage,
+  getUserToCommunity,
+} from "@/api/getCommunity";
 import { searchCommunities } from "@/api/search";
 import {
   communities,
@@ -15,10 +19,24 @@ import {
 } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
+// TODO: rename prcedures for consistency
 export const communityRouter = createTRPCRouter({
+  getCommunityByName: baseProcedure
+    .input(CommunitySchema.shape.name)
+    .query(({ input }) => {
+      return getCommunityByName.execute({ communityName: input });
+    }),
   searchCommunities: baseProcedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
+  getUserToCommunity: baseProcedure
+    .input(UserToCommunitySchema.shape.communityId)
+    .query(({ input, ctx }) => {
+      return getUserToCommunity.execute({
+        currentUserId: ctx.userId,
+        communityId: input,
+      });
+    }),
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(({ input }) => {
@@ -47,12 +65,21 @@ export const communityRouter = createTRPCRouter({
     return getJoinedCommunities.execute({ currentUserId: ctx.userId });
   }),
   editCommunity: protectedProcedure
-    .input(CommunitySchema.pick({ id: true, description: true }))
+    .input(
+      CommunitySchema.pick({
+        id: true,
+        displayName: true,
+        description: true,
+        memberNickname: true,
+      }),
+    )
     .mutation(({ input, ctx }) => {
+      const { id, ...rest } = input;
+
       return ctx.db
         .update(communities)
-        .set({ description: input.description })
-        .where(eq(communities.id, input.id));
+        .set({ ...rest })
+        .where(eq(communities.id, id));
     }),
   deleteCommunity: protectedProcedure
     .input(CommunitySchema.shape.id)
@@ -62,19 +89,11 @@ export const communityRouter = createTRPCRouter({
         .where(eq(communities.id, input))
         .returning({ name: communities.name });
     }),
-  getUserToCommunity: baseProcedure
-    .input(UserToCommunitySchema.shape.communityId)
-    .query(({ input, ctx }) => {
-      return getUserToCommunity.execute({
-        userId: ctx.userId,
-        communityId: input,
-      });
-    }),
-  setFavoriteCommunity: protectedProcedure
+  toggleFavoriteCommunity: protectedProcedure
     .input(
       UserToCommunitySchema.pick({
         communityId: true,
-        favorite: true,
+        favorited: true,
       }),
     )
     .mutation(({ input, ctx }) => {
@@ -86,31 +105,31 @@ export const communityRouter = createTRPCRouter({
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { favorite: input.favorite },
+          set: { favorited: input.favorited },
         });
     }),
-  joinCommunity: protectedProcedure
+  toggleJoinCommunity: protectedProcedure
     .input(
       UserToCommunitySchema.pick({
         communityId: true,
-        member: true,
+        joined: true,
       }),
     )
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(usersToCommunities)
         .values({
-          member: input.member,
-          communityId: input.communityId,
           userId: ctx.userId,
+          joinedAt: new Date(),
+          ...input,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { member: input.member },
+          set: { joined: input.joined, joinedAt: new Date() },
         })
-        .returning({ member: usersToCommunities.member });
+        .returning({ joined: usersToCommunities.joined });
     }),
-  muteCommunity: protectedProcedure
+  toggleMuteCommunity: protectedProcedure
     .input(
       UserToCommunitySchema.pick({
         communityId: true,
@@ -121,9 +140,8 @@ export const communityRouter = createTRPCRouter({
       return ctx.db
         .insert(usersToCommunities)
         .values({
-          muted: input.muted,
-          communityId: input.communityId,
           userId: ctx.userId,
+          ...input,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],

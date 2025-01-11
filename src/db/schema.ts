@@ -52,9 +52,11 @@ export const communities = pgTable(
   {
     id: uuid().primaryKey().defaultRandom(),
     name: text().unique().notNull(),
+    displayName: text(),
+    description: text(),
+    memberNickname: text(),
     icon: text(),
     banner: text(),
-    description: text().notNull().default(""),
     moderatorId: text()
       .references(() => users.id, {
         onDelete: "cascade",
@@ -84,8 +86,9 @@ export const usersToCommunities = pgTable(
       .references(() => communities.id, { onDelete: "cascade" })
       .notNull(),
     muted: boolean().notNull().default(false),
-    favorite: boolean().notNull().default(false),
-    member: boolean().notNull().default(true),
+    favorited: boolean().notNull().default(false),
+    joined: boolean().notNull().default(true),
+    joinedAt: timestamp().notNull().defaultNow(),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.communityId] }),

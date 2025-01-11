@@ -1,12 +1,29 @@
+import { monthAgo } from "@/utils/getLastMonthDate";
 import db from "../db";
 
 export const getCommunityByName = db.query.communities
   .findFirst({
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
-    with: {
-      usersToCommunities: true,
-    },
+    extras: (community, { sql }) => ({
+      memberCount: sql<number>`
+        (
+          SELECT COUNT(*) 
+          FROM users_to_communities 
+          WHERE users_to_communities.community_id = ${community.id} 
+            AND users_to_communities.joined = true
+        )
+      `.as("member_count"),
+      newMemberCount: sql<number>`
+        (
+          SELECT COUNT(*) 
+          FROM users_to_communities 
+          WHERE users_to_communities.community_id = ${community.id} 
+            AND users_to_communities.joined = true 
+            AND users_to_communities.joined_at > ${monthAgo}
+        )
+      `.as("new_member_count"),
+    }),
   })
   .prepare("community_by_name");
 
@@ -18,7 +35,7 @@ export const getSelectedCommunity = db.query.communities
     with: {
       usersToCommunities: {
         columns: { userId: true },
-        where: (userToCommunity, { eq }) => eq(userToCommunity.member, true),
+        where: (userToCommunity, { eq }) => eq(userToCommunity.joined, true),
       },
     },
   })
@@ -29,9 +46,9 @@ export const getUserToCommunity = db.query.usersToCommunities
     where: (community, { sql, and, eq }) =>
       and(
         eq(community.communityId, sql.placeholder("communityId")),
-        eq(community.userId, sql.placeholder("userId")),
+        eq(community.userId, sql.placeholder("currentUserId")),
       ),
-    columns: { favorite: true, muted: true, member: true },
+    columns: { favorited: true, muted: true, joined: true },
   })
   .prepare("user_to_community");
 

@@ -23,7 +23,7 @@ export const searchUsers = db.query.users
           usersToCommunities: {
             columns: { communityId: true },
             where: (userToCommunity, { eq }) =>
-              eq(userToCommunity.member, true),
+              eq(userToCommunity.joined, true),
           },
         },
       },
@@ -39,7 +39,7 @@ export const searchCommunities = db.query.communities
     limit: 4,
     with: {
       usersToCommunities: {
-        where: (userToCommunity, { eq }) => eq(userToCommunity.member, true),
+        where: (userToCommunity, { eq }) => eq(userToCommunity.joined, true),
         columns: { userId: true },
       },
     },

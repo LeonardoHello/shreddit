@@ -7,15 +7,10 @@ import { Plus } from "lucide-react";
 import { trpc } from "@/trpc/client";
 import { Button } from "../ui/button";
 import SidebarMenuItemFavorite from "./SidebarMenuItemFavorite";
-import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 
 export default function SidebarMenuJoined() {
-  const { data: joinedCommunities, isLoading } =
-    trpc.community.getJoinedCommunities.useQuery();
-
-  if (isLoading) {
-    return <SidebarMenuSkeleton length={6} />;
-  }
+  const [joinedCommunities] =
+    trpc.community.getJoinedCommunities.useSuspenseQuery();
 
   if (!joinedCommunities || joinedCommunities.length === 0) {
     return null;
@@ -38,8 +33,8 @@ export default function SidebarMenuJoined() {
       </li>
       {joinedCommunities
         .sort((a, b) => {
-          if (a.favorite !== b.favorite) {
-            return b.favorite ? 1 : -1;
+          if (a.favorited !== b.favorited) {
+            return b.favorited ? 1 : -1;
           }
           return a.community.name.localeCompare(b.community.name);
         })

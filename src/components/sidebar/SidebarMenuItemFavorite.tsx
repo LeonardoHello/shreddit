@@ -21,9 +21,9 @@ export default function SidebarMenuItemFavorite({
 }) {
   const utils = trpc.useUtils();
 
-  const setFavorite = trpc.community.setFavoriteCommunity.useMutation({
+  const setFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
     onMutate: (variables) => {
-      const { communityId, favorite } = variables;
+      const { communityId, favorited } = variables;
 
       utils.community.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
@@ -34,7 +34,7 @@ export default function SidebarMenuItemFavorite({
           if (userToCommunity.communityId !== communityId)
             return userToCommunity;
 
-          return { ...userToCommunity, favorite };
+          return { ...userToCommunity, favorited };
         });
       });
 
@@ -47,7 +47,7 @@ export default function SidebarMenuItemFavorite({
           if (userToCommunity.communityId !== communityId)
             return userToCommunity;
 
-          return { ...userToCommunity, favorite };
+          return { ...userToCommunity, favorited };
         });
       });
     },
@@ -73,14 +73,14 @@ export default function SidebarMenuItemFavorite({
           <h2 className="truncate">r/{communityRelation.community.name}</h2>
           <StarIcon
             className={cn("ml-auto size-6 text-muted-foreground", {
-              "fill-[#0079d3] text-[#0079d3]": communityRelation.favorite,
+              "fill-[#0079d3] text-[#0079d3]": communityRelation.favorited,
             })}
             onClick={(e) => {
               e.preventDefault();
 
               setFavorite.mutate({
                 communityId: communityRelation.communityId,
-                favorite: !communityRelation.favorite,
+                favorited: !communityRelation.favorited,
               });
             }}
           />
