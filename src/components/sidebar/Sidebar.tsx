@@ -15,14 +15,21 @@ import SidebarMenuModerated from "./SidebarMenuModerated";
 import SidebarMenuRecent from "./SidebarMenuRecent";
 import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 
-export default async function Sidebar() {
+export default async function Sidebar({ sheet = false }: { sheet?: boolean }) {
   const { userId } = await auth();
 
   void trpc.community.getModeratedCommunities.prefetch();
   void trpc.community.getJoinedCommunities.prefetch();
 
   return (
-    <>
+    <div
+      style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
+      className={
+        !sheet
+          ? "sticky top-14 hidden h-[calc(100vh-3.5rem)] w-[274px] gap-3 overflow-y-auto border-r bg-card p-4 xl:block"
+          : undefined
+      }
+    >
       <SidebarMenuMain userId={userId} />
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
@@ -65,6 +72,6 @@ export default async function Sidebar() {
           </>
         )}
       </Accordion>
-    </>
+    </div>
   );
 }
