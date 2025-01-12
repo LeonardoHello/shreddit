@@ -29,12 +29,12 @@ export const communityRouter = createTRPCRouter({
   searchCommunities: baseProcedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
   }),
-  getUserToCommunity: baseProcedure
-    .input(UserToCommunitySchema.shape.communityId)
+  getUserToCommunity: protectedProcedure
+    .input(CommunitySchema.shape.name)
     .query(({ input, ctx }) => {
       return getUserToCommunity.execute({
         currentUserId: ctx.userId,
-        communityId: input,
+        communityName: input,
       });
     }),
   getCommunityImage: protectedProcedure
@@ -106,7 +106,8 @@ export const communityRouter = createTRPCRouter({
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
           set: { favorited: input.favorited },
-        });
+        })
+        .returning({ favorited: usersToCommunities.favorited });
     }),
   toggleJoinCommunity: protectedProcedure
     .input(

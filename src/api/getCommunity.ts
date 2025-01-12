@@ -1,3 +1,4 @@
+import { communities } from "@/db/schema";
 import { monthAgo } from "@/utils/getLastMonthDate";
 import db from "../db";
 
@@ -43,10 +44,20 @@ export const getSelectedCommunity = db.query.communities
 
 export const getUserToCommunity = db.query.usersToCommunities
   .findFirst({
-    where: (community, { sql, and, eq }) =>
+    where: (userToCommunity, { sql, and, eq, exists }) =>
       and(
-        eq(community.communityId, sql.placeholder("communityId")),
-        eq(community.userId, sql.placeholder("currentUserId")),
+        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
+        exists(
+          db
+            .select()
+            .from(communities)
+            .where(
+              and(
+                eq(communities.id, userToCommunity.communityId),
+                eq(communities.name, sql.placeholder("communityName")),
+              ),
+            ),
+        ),
       ),
     columns: { favorited: true, muted: true, joined: true },
   })
