@@ -33,8 +33,8 @@ export const getHomeBestPosts = db.query.posts
             .where(
               and(
                 eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-                eq(usersToCommunities.member, true),
-                eq(usersToCommunities.userId, post.authorId),
+                eq(usersToCommunities.communityId, post.communityId),
+                eq(usersToCommunities.joined, true),
               ),
             ),
         ),
@@ -58,8 +58,8 @@ export const getHomeHotPosts = db.query.posts
             .where(
               and(
                 eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-                eq(usersToCommunities.member, true),
-                eq(usersToCommunities.userId, post.authorId),
+                eq(usersToCommunities.communityId, post.communityId),
+                eq(usersToCommunities.joined, true),
               ),
             ),
         ),
@@ -83,8 +83,8 @@ export const getHomeNewPosts = db.query.posts
             .where(
               and(
                 eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-                eq(usersToCommunities.member, true),
-                eq(usersToCommunities.userId, post.authorId),
+                eq(usersToCommunities.communityId, post.communityId),
+                eq(usersToCommunities.joined, true),
               ),
             ),
         ),
@@ -108,8 +108,8 @@ export const getHomeControversialPosts = db.query.posts
             .where(
               and(
                 eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
-                eq(usersToCommunities.member, true),
-                eq(usersToCommunities.userId, post.authorId),
+                eq(usersToCommunities.communityId, post.communityId),
+                eq(usersToCommunities.joined, true),
               ),
             ),
         ),
