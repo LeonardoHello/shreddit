@@ -21,13 +21,13 @@ export default function SidebarMenuItemFavorite({
 }) {
   const utils = trpc.useUtils();
 
-  const setFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
+  const toggleFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
     onMutate: (variables) => {
       const { communityId, favorited } = variables;
 
       utils.community.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
-          return [];
+          return [communityRelation];
         }
 
         return data.map((userToCommunity) => {
@@ -40,7 +40,7 @@ export default function SidebarMenuItemFavorite({
 
       utils.community.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
-          return [];
+          return [communityRelation];
         }
 
         return data.map((userToCommunity) => {
@@ -50,6 +50,11 @@ export default function SidebarMenuItemFavorite({
           return { ...userToCommunity, favorited };
         });
       });
+    },
+    onSuccess: () => {
+      utils.community.getUserToCommunity.invalidate(
+        communityRelation.community.name,
+      );
     },
     onError: async (error) => {
       toast.error(error.message);
@@ -78,7 +83,7 @@ export default function SidebarMenuItemFavorite({
             onClick={(e) => {
               e.preventDefault();
 
-              setFavorite.mutate({
+              toggleFavorite.mutate({
                 communityId: communityRelation.communityId,
                 favorited: !communityRelation.favorited,
               });
