@@ -21,7 +21,7 @@ export default async function UpvotedPage(props: {
     <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      queryInfo={{
+      infiniteQueryOptions={{
         procedure: "getUpvotedPosts",
         input: {
           sort: searchParams.sort,

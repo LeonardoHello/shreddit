@@ -7,12 +7,12 @@ import type { User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { AppRouter, RouterInput } from "@/trpc/routers/_app";
 import FeedEmpty from "./FeedEmpty";
-import FeedLoading from "./FeedLoading";
 import FeedPost from "./FeedPost";
+import FeedPostInfiniteQuerySkeleton from "./FeedPostInfiniteQuerySkeleton";
 
 type PostFeedProcedures = keyof AppRouter["postFeed"];
 
-type QueryInfo = {
+type InfiniteQueryOptions = {
   [P in PostFeedProcedures]: {
     procedure: P;
     input: RouterInput["postFeed"][P];
@@ -21,49 +21,21 @@ type QueryInfo = {
 
 export default function FeedPostInfiniteQuery({
   currentUserId,
-  queryInfo,
+  infiniteQueryOptions,
 }: {
   currentUserId: User["id"] | null;
-  queryInfo: QueryInfo;
+  infiniteQueryOptions: InfiniteQueryOptions;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  let infiniteQuery;
+  const { procedure, input } = infiniteQueryOptions;
 
-  switch (queryInfo.procedure) {
-    case "getCommunityPosts":
-      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
-        queryInfo.input,
-        {
-          getNextPageParam: (lastPage) => lastPage.nextCursor,
-          refetchOnWindowFocus: false,
-        },
-      );
-      break;
-
-    case "getUserPosts":
-      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
-        queryInfo.input,
-        {
-          getNextPageParam: (lastPage) => lastPage.nextCursor,
-          refetchOnWindowFocus: false,
-        },
-      );
-      break;
-
-    default:
-      infiniteQuery = trpc.postFeed[queryInfo.procedure].useInfiniteQuery(
-        queryInfo.input,
-        {
-          getNextPageParam: (lastPage) => lastPage.nextCursor,
-          refetchOnWindowFocus: false,
-        },
-      );
-      break;
-  }
-
-  const { data, isFetchingNextPage, fetchNextPage, hasNextPage, isLoading } =
-    infiniteQuery;
+  const [{ pages }, { isFetchingNextPage, fetchNextPage, hasNextPage }] =
+    // @ts-expect-error input is correctly inferred based on procedure
+    trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+      refetchOnWindowFocus: false,
+    });
 
   useEffect(() => {
     if (!ref.current || !hasNextPage || isFetchingNextPage) return;
@@ -83,28 +55,20 @@ export default function FeedPostInfiniteQuery({
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (isLoading) {
-    return <FeedLoading />;
-  }
-
-  if (data === undefined) {
-    throw new Error("Couldn't fetch posts");
-  }
-
-  if (data.pages.length === 0) {
+  if (pages.length === 0) {
     return <FeedEmpty />;
   }
 
   return (
     <div className="relative flex flex-col gap-2.5">
-      {data.pages.map((page) =>
+      {pages.map((page) =>
         page.posts.map((post) => (
           <PostContextProvider key={post.id} post={post}>
             <FeedPost currentUserId={currentUserId} />
           </PostContextProvider>
         )),
       )}
-      {isFetchingNextPage && <FeedLoading />}
+      {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton />}
       <div ref={ref} className="sr-only bottom-0 h-[550px]" />
     </div>
   );

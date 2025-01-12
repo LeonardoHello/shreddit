@@ -1,7 +1,10 @@
+import { Suspense } from "react";
+
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import FeedSort from "@/components/feed/FeedSort";
+import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
+import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
 export default async function UserPage(props: {
@@ -15,23 +18,26 @@ export default async function UserPage(props: {
     currentUserPromise(),
   ]);
 
-  return (
-    <>
-      <div className="flex flex-col gap-2.5">
-        <FeedSort />
-      </div>
+  void trpc.postFeed.getUserPosts.prefetchInfinite({
+    sort: searchParams.sort,
+    username: params.username,
+  });
 
-      <FeedPostInfiniteQuery
-        key={searchParams.sort}
-        currentUserId={currentUser && currentUser.id}
-        queryInfo={{
-          procedure: "getUserPosts",
-          input: {
-            sort: searchParams.sort,
-            username: params.username,
-          },
-        }}
-      />
-    </>
+  return (
+    <HydrateClient>
+      <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
+        <FeedPostInfiniteQuery
+          key={searchParams.sort}
+          currentUserId={currentUser && currentUser.id}
+          infiniteQueryOptions={{
+            procedure: "getUserPosts",
+            input: {
+              sort: searchParams.sort,
+              username: params.username,
+            },
+          }}
+        />
+      </Suspense>
+    </HydrateClient>
   );
 }

@@ -21,7 +21,7 @@ export default async function DownvotedPage(props: {
     <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      queryInfo={{
+      infiniteQueryOptions={{
         procedure: "getDownvotedPosts",
         input: {
           sort: searchParams.sort,

@@ -61,12 +61,7 @@ export default function RootLayout({
             <RecentCommunityContextProvider>
               <Header />
               <div className="flex">
-                <div
-                  style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-                  className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4 xl:block"
-                >
-                  <Sidebar />
-                </div>
+                <Sidebar />
                 <main className="grow overflow-hidden">{children}</main>
               </div>
             </RecentCommunityContextProvider>

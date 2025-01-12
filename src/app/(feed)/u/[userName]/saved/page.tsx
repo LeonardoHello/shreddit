@@ -21,7 +21,7 @@ export default async function SavedPage(props: {
     <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      queryInfo={{
+      infiniteQueryOptions={{
         procedure: "getSavedPosts",
         input: {
           sort: searchParams.sort,

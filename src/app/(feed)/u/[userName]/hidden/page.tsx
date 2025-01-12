@@ -21,7 +21,7 @@ export default async function HiddenPage(props: {
     <FeedPostInfiniteQuery
       key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
-      queryInfo={{
+      infiniteQueryOptions={{
         procedure: "getHiddenPosts",
         input: {
           sort: searchParams.sort,

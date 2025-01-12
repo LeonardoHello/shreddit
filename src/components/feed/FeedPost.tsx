@@ -32,7 +32,7 @@ export default function FeedPost({
   }
 
   // show hidden files only on user filter feed
-  if (state.isHidden && !(username && !pathname.endsWith(`u/${username}`))) {
+  if (state.isHidden && !(username && pathname !== `/u/${username}`)) {
     return <FeedPostHidden />;
   }
 
