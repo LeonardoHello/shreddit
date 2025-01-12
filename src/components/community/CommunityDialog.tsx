@@ -1,7 +1,8 @@
 "use client";
 
 import { Pencil } from "lucide-react";
-import { toast } from "sonner";
+
+// import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,19 +14,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Community } from "@/db/schema";
-import { trpc } from "@/trpc/client";
 
-export default function CommunityDialog({
-  communityId,
-}: {
-  communityId: Community["id"];
-}) {
-  const editCommunity = trpc.community.editCommunity.useMutation({
-    onSuccess: () => {},
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+// import { trpc } from "@/trpc/client";
+
+export default function CommunityDialog({}: { communityId: Community["id"] }) {
+  // const editCommunity = trpc.community.editCommunity.useMutation({
+  //   onSuccess: () => {},
+  //   onError: (error) => {
+  //     toast.error(error.message);
+  //   },
+  // });
 
   return (
     <Dialog>
