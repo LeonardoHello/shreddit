@@ -7,21 +7,14 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { Menu, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import Logo from "@/components/header/Logo";
 import Search from "@/components/header/Search";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import Sidebar from "../sidebar/Sidebar";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import HeaderSheet from "./HeaderSheet";
 
 export default async function Header() {
   const { userId } = await auth();
@@ -29,30 +22,9 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-20 col-span-2 flex h-14 justify-between gap-5 border-b bg-card px-4 py-2">
       <div className="flex select-none items-center gap-1.5">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full xl:hidden"
-            >
-              <Menu />
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side={"left"}
-            style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-            className="overflow-y-auto bg-card"
-          >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Menu</SheetTitle>
-              <SheetDescription>
-                Navigate through communities and access your personalized menus
-              </SheetDescription>
-            </SheetHeader>
-            <Sidebar />
-          </SheetContent>
-        </Sheet>
+        <HeaderSheet>
+          <Sidebar sheet />
+        </HeaderSheet>
 
         <Logo />
       </div>
