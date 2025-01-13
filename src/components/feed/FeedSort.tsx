@@ -3,115 +3,98 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import {
-  ChatBubbleBottomCenterTextIcon,
-  FireIcon,
-  RocketLaunchIcon,
-  TagIcon,
-} from "@heroicons/react/24/outline";
-import {
-  ChatBubbleBottomCenterTextIcon as ChatBubbleBottomCenterTextIconSolid,
-  FireIcon as FireIconSolid,
-  RocketLaunchIcon as RocketLaunchIconSolid,
-  TagIcon as TagIconSolid,
-} from "@heroicons/react/24/solid";
+import { Flame, MessageSquareText, Rocket, Tag } from "lucide-react";
 
 import { PostSort } from "@/types";
-import { cn } from "@/utils/cn";
+import { Button } from "../ui/button";
 
 export default function FeedSort() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const sort = searchParams.get("sort") as PostSort | undefined;
 
-  const defaultSort = !(
-    sort && [PostSort.HOT, PostSort.NEW, PostSort.CONTROVERSIAL].includes(sort)
-  );
+  const sort = searchParams.get("sort") as PostSort | null;
+
+  const isBest = !sort || sort === PostSort.BEST;
+  const isHot = sort === PostSort.HOT;
+  const isNew = sort === PostSort.NEW;
+  const isControversial = sort === PostSort.CONTROVERSIAL;
 
   return (
-    <nav className="rounded border border-zinc-700/70 bg-zinc-900 px-3 py-2 text-base">
-      <ul className="flex justify-around gap-3 font-bold text-zinc-500">
+    <nav className="rounded border bg-card p-2">
+      <ul className="flex justify-around gap-2 font-bold text-muted-foreground">
         <li>
-          <Link
-            href={{
-              pathname,
-              query: { sort: PostSort.BEST },
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
-              {
-                "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  defaultSort,
-              },
-            )}
+          <Button
+            variant={isBest ? "default" : "ghost"}
+            className="rounded-full"
+            disabled={isBest}
+            asChild
           >
-            {defaultSort && <RocketLaunchIconSolid className="h-6 w-6" />}
-            {!defaultSort && <RocketLaunchIcon className="h-6 w-6" />}
-            <span className="hidden sm:inline-block">Best</span>
-          </Link>
+            <Link
+              href={{
+                pathname,
+                query: { sort: PostSort.BEST },
+              }}
+            >
+              <Rocket className="h-6 w-6" />
+              <span className="hidden sm:inline-block">Best</span>
+            </Link>
+          </Button>
         </li>
         <li>
-          <Link
-            href={{
-              pathname,
-              query: { sort: PostSort.HOT },
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
-              {
-                "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === PostSort.HOT,
-              },
-            )}
+          <Button
+            variant={isHot ? "default" : "ghost"}
+            className="rounded-full"
+            disabled={isHot}
+            asChild
           >
-            {sort === PostSort.HOT && <FireIconSolid className="h-6 w-6" />}
-            {sort !== PostSort.HOT && <FireIcon className="h-6 w-6" />}
-            <span className="hidden sm:inline-block">Hot</span>
-          </Link>
+            <Link
+              href={{
+                pathname,
+                query: { sort: PostSort.HOT },
+              }}
+            >
+              <Flame className="h-6 w-6" />
+              <span className="hidden sm:inline-block">Hot</span>
+            </Link>
+          </Button>
         </li>
         <li>
-          <Link
-            href={{
-              pathname,
-              query: { sort: PostSort.NEW },
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
-              {
-                "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === PostSort.NEW,
-              },
-            )}
+          <Button
+            variant={isNew ? "default" : "ghost"}
+            className="rounded-full"
+            disabled={isNew}
+            asChild
           >
-            {sort === PostSort.NEW && <TagIconSolid className="h-6 w-6" />}
-            {sort !== PostSort.NEW && <TagIcon className="h-6 w-6" />}
-            <span className="hidden sm:inline-block">New</span>
-          </Link>
+            <Link
+              href={{
+                pathname,
+                query: { sort: PostSort.NEW },
+              }}
+            >
+              <Tag className="h-6 w-6" />
+              <span className="hidden sm:inline-block">New</span>
+            </Link>
+          </Button>
         </li>
         <li>
-          <Link
-            href={{
-              pathname,
-              query: {
-                sort: PostSort.CONTROVERSIAL,
-              },
-            }}
-            className={cn(
-              "flex items-center gap-1.5 rounded-full px-2 py-1.5 hover:bg-zinc-700/30",
-              {
-                "bg-zinc-700/30 text-zinc-300 hover:bg-zinc-700/50":
-                  sort === PostSort.CONTROVERSIAL,
-              },
-            )}
+          <Button
+            variant={isControversial ? "default" : "ghost"}
+            className="rounded-full"
+            disabled={isControversial}
+            asChild
           >
-            {sort === PostSort.CONTROVERSIAL && (
-              <ChatBubbleBottomCenterTextIconSolid className="h-6 w-6" />
-            )}
-            {sort !== PostSort.CONTROVERSIAL && (
-              <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
-            )}
-            <span className="hidden sm:inline-block">Controversial</span>
-          </Link>
+            <Link
+              href={{
+                pathname,
+                query: {
+                  sort: PostSort.CONTROVERSIAL,
+                },
+              }}
+            >
+              <MessageSquareText className="h-6 w-6" />
+              <span className="hidden sm:inline-block">Controversial</span>
+            </Link>
+          </Button>
         </li>
       </ul>
     </nav>
