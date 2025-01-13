@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import {
-  ArrowDownCircleIcon,
-  ArrowUpCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 export default function FeedEmpty() {
   const params = useParams();
@@ -16,8 +13,8 @@ export default function FeedEmpty() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
           <div className="flex select-none flex-col items-center gap-4 text-zinc-500">
-            <ArrowUpCircleIcon className="h-8 w-8 rounded" />
-            <ArrowDownCircleIcon className="h-8 w-8 rounded" />
+            <ArrowUp className="h-8 w-8 rounded" />
+            <ArrowDown className="h-8 w-8 rounded" />
           </div>
           <div className="min-h-full w-32 rounded bg-zinc-700" />
           <div className="flex grow flex-col gap-2">

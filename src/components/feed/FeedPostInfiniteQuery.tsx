@@ -55,7 +55,7 @@ export default function FeedPostInfiniteQuery({
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (pages.length === 0) {
+  if (pages[0].posts.length === 0) {
     return <FeedEmpty />;
   }
 
