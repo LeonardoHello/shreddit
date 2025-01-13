@@ -22,7 +22,7 @@ export default async function Header() {
     <header className="sticky top-0 z-20 col-span-2 flex h-14 justify-between gap-5 border-b bg-card px-4 py-2">
       <div className="flex select-none items-center gap-1.5">
         <HeaderSheet>
-          <Sidebar />
+          <Sidebar sheet />
         </HeaderSheet>
 
         <Logo />

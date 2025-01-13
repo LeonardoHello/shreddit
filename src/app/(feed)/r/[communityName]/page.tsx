@@ -9,7 +9,6 @@ import CommunitySidebar from "@/components/community/CommunitySidebar";
 import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSkeleton";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
-import FeedSort from "@/components/feed/FeedSort";
 import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
@@ -27,6 +26,7 @@ export default async function CommunityPage(props: {
     void trpc.community.getUserToCommunity.prefetch(params.communityName);
   }
 
+  void trpc.community.getCommunityByName.prefetch(params.communityName);
   void trpc.postFeed.getCommunityPosts.prefetchInfinite({
     sort: searchParams.sort,
     communityName: params.communityName,
@@ -36,42 +36,42 @@ export default async function CommunityPage(props: {
     <div className="container flex flex-col gap-4 p-2 pb-6 2xl:max-w-[1080px]">
       <HydrateClient>
         <Suspense fallback={<CommunityHeaderSkeleton />}>
-          {auth.userId && (
+          {auth.userId ? (
             <CommunityHeaderAuthenticated
               communityName={params.communityName}
             />
-          )}
-          {!auth.userId && (
+          ) : (
             <CommunityHeader communityName={params.communityName} />
           )}
         </Suspense>
+      </HydrateClient>
 
-        <div className="flex justify-center gap-4">
-          <div className="flex grow flex-col gap-4">
-            <FeedSort />
-            <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
-              <FeedPostInfiniteQuery
-                key={searchParams.sort}
-                currentUserId={auth.userId}
-                infiniteQueryOptions={{
-                  procedure: "getCommunityPosts",
-                  input: {
-                    sort: searchParams.sort,
-                    communityName: params.communityName,
-                  },
-                }}
-              />
-            </Suspense>
-          </div>
+      <div className="flex justify-center gap-4">
+        <HydrateClient>
+          <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
+            <FeedPostInfiniteQuery
+              key={searchParams.sort}
+              currentUserId={auth.userId}
+              infiniteQueryOptions={{
+                procedure: "getCommunityPosts",
+                input: {
+                  sort: searchParams.sort,
+                  communityName: params.communityName,
+                },
+              }}
+            />
+          </Suspense>
+        </HydrateClient>
 
+        <HydrateClient>
           <Suspense fallback={<CommunitySidebarSkeleton />}>
             <CommunitySidebar
               currentUserId={auth.userId}
               communityName={params.communityName}
             />
           </Suspense>
-        </div>
-      </HydrateClient>
+        </HydrateClient>
+      </div>
     </div>
   );
 }

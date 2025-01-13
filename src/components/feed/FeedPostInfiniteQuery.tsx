@@ -9,6 +9,7 @@ import { AppRouter, RouterInput } from "@/trpc/routers/_app";
 import FeedEmpty from "./FeedEmpty";
 import FeedPost from "./FeedPost";
 import FeedPostInfiniteQuerySkeleton from "./FeedPostInfiniteQuerySkeleton";
+import FeedSort from "./FeedSort";
 
 type PostFeedProcedures = keyof AppRouter["postFeed"];
 
@@ -56,11 +57,18 @@ export default function FeedPostInfiniteQuery({
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (pages[0].posts.length === 0) {
-    return <FeedEmpty />;
+    return (
+      <div className="flex grow flex-col gap-2.5">
+        <FeedSort />
+        <FeedEmpty />;
+      </div>
+    );
   }
 
   return (
-    <div className="relative flex flex-col gap-2.5">
+    <div className="relative flex grow flex-col gap-2.5">
+      <FeedSort />
+
       {pages.map((page) =>
         page.posts.map((post) => (
           <PostContextProvider key={post.id} post={post}>
@@ -69,6 +77,7 @@ export default function FeedPostInfiniteQuery({
         )),
       )}
       {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton />}
+
       <div ref={ref} className="sr-only bottom-0 h-[550px]" />
     </div>
   );

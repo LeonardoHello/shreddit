@@ -35,7 +35,7 @@ export default function FeedSort() {
                 query: { sort: PostSort.BEST },
               }}
             >
-              <Rocket className="h-6 w-6" />
+              <Rocket className="size-6" />
               <span className="hidden sm:inline-block">Best</span>
             </Link>
           </Button>
@@ -53,7 +53,7 @@ export default function FeedSort() {
                 query: { sort: PostSort.HOT },
               }}
             >
-              <Flame className="h-6 w-6" />
+              <Flame className="size-6" />
               <span className="hidden sm:inline-block">Hot</span>
             </Link>
           </Button>
@@ -71,7 +71,7 @@ export default function FeedSort() {
                 query: { sort: PostSort.NEW },
               }}
             >
-              <Tag className="h-6 w-6" />
+              <Tag className="size-6" />
               <span className="hidden sm:inline-block">New</span>
             </Link>
           </Button>
@@ -91,7 +91,7 @@ export default function FeedSort() {
                 },
               }}
             >
-              <MessageSquareText className="h-6 w-6" />
+              <MessageSquareText className="size-6" />
               <span className="hidden sm:inline-block">Controversial</span>
             </Link>
           </Button>
