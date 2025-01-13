@@ -13,7 +13,10 @@ import { TRPCProvider } from "@/trpc/client";
 
 import "./globals.css";
 
+import { Suspense } from "react";
+
 import Sidebar from "@/components/sidebar/Sidebar";
+import SidebarSkeleton from "@/components/sidebar/SidebarSkeleton";
 import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 
 const nunito_sans = Roboto_Flex({
@@ -61,7 +64,10 @@ export default function RootLayout({
             <RecentCommunityContextProvider>
               <Header />
               <div className="flex">
-                <Sidebar />
+                <Suspense fallback={<SidebarSkeleton />}>
+                  <Sidebar />
+                </Suspense>
+
                 <main className="grow overflow-hidden">{children}</main>
               </div>
             </RecentCommunityContextProvider>
