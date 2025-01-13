@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ArrowDownCircleIcon,
-  ArrowUpCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -31,11 +28,10 @@ export default function PostVote() {
   });
 
   return (
-    <div className="flex select-none flex-col gap-0.5 text-center text-zinc-500">
-      <ArrowUpCircleIcon
-        viewBox="2.25 2.25 19.5 19.5"
+    <div className="flex select-none flex-col gap-0.5 text-center text-muted-foreground">
+      <ArrowUpCircle
         className={cn(
-          "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
+          "size-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-rose-500": state.voteStatus === "upvoted",
           },
@@ -60,10 +56,9 @@ export default function PostVote() {
           maximumFractionDigits: 1,
         }).format(state.voteCount)}
       </div>
-      <ArrowDownCircleIcon
-        viewBox="2.25 2.25 19.5 19.5"
+      <ArrowDownCircle
         className={cn(
-          "h-6 w-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
+          "size-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
           {
             "text-blue-500": state.voteStatus === "downvoted",
           },
