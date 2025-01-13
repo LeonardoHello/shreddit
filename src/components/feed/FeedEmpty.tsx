@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 export default function FeedEmpty() {
   const params = useParams();
 
   return (
-    <div className="relative flex flex-col rounded border border-zinc-700/25">
+    <div className="relative flex grow flex-col rounded border border-zinc-700/25">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex gap-2 bg-zinc-900 p-2 opacity-20">
           <div className="flex select-none flex-col items-center gap-4 text-zinc-500">
-            <ArrowUp className="h-8 w-8 rounded" />
-            <ArrowDown className="h-8 w-8 rounded" />
+            <ArrowUpCircle className="h-8 w-8 rounded" />
+            <ArrowDownCircle className="h-8 w-8 rounded" />
           </div>
           <div className="min-h-full w-32 rounded bg-zinc-700" />
           <div className="flex grow flex-col gap-2">
