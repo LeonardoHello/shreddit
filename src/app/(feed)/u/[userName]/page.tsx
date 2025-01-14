@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
+import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
@@ -9,7 +10,7 @@ import { PostSort } from "@/types";
 
 export default async function UserPage(props: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<{ sort?: PostSort }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const [params, searchParams, currentUser] = await Promise.all([
     props.params,
@@ -18,8 +19,12 @@ export default async function UserPage(props: {
     currentUserPromise(),
   ]);
 
+  const { data: sort = PostSort.BEST } = z
+    .nativeEnum(PostSort)
+    .safeParse(searchParams.sort);
+
   void trpc.postFeed.getUserPosts.prefetchInfinite({
-    sort: searchParams.sort,
+    sort,
     username: params.username,
   });
 
@@ -27,12 +32,11 @@ export default async function UserPage(props: {
     <HydrateClient>
       <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
         <FeedPostInfiniteQuery
-          key={searchParams.sort}
           currentUserId={currentUser && currentUser.id}
           infiniteQueryOptions={{
             procedure: "getUserPosts",
             input: {
-              sort: searchParams.sort,
+              sort,
               username: params.username,
             },
           }}

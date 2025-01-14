@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
 
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
+import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types";
 
 export default async function DownvotedPage(props: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<{ sort?: PostSort }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const [params, searchParams, currentUser] = await Promise.all([
     props.params,
@@ -17,15 +18,16 @@ export default async function DownvotedPage(props: {
 
   if (currentUser && currentUser.username !== params.username) notFound();
 
+  const { data: sort = PostSort.BEST } = z
+    .nativeEnum(PostSort)
+    .safeParse(searchParams.sort);
+
   return (
     <FeedPostInfiniteQuery
-      key={searchParams.sort}
       currentUserId={currentUser && currentUser.id}
       infiniteQueryOptions={{
         procedure: "getDownvotedPosts",
-        input: {
-          sort: searchParams.sort,
-        },
+        input: { sort },
       }}
     />
   );

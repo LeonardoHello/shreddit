@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { auth as authPromise } from "@clerk/nextjs/server";
+import { z } from "zod";
 
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunityHeaderAuthenticated from "@/components/community/CommunityHeaderAuthenticated";
@@ -14,7 +15,7 @@ import { PostSort } from "@/types";
 
 export default async function CommunityPage(props: {
   params: Promise<{ communityName: string }>;
-  searchParams: Promise<{ sort?: PostSort }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const [params, searchParams, auth] = await Promise.all([
     props.params,
@@ -22,13 +23,16 @@ export default async function CommunityPage(props: {
     authPromise(),
   ]);
 
+  const { data: sort = PostSort.BEST } = z
+    .nativeEnum(PostSort)
+    .safeParse(searchParams.sort);
+
   if (auth.userId) {
     void trpc.community.getUserToCommunity.prefetch(params.communityName);
   }
-
   void trpc.community.getCommunityByName.prefetch(params.communityName);
   void trpc.postFeed.getCommunityPosts.prefetchInfinite({
-    sort: searchParams.sort,
+    sort,
     communityName: params.communityName,
   });
 
@@ -50,12 +54,11 @@ export default async function CommunityPage(props: {
         <HydrateClient>
           <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
             <FeedPostInfiniteQuery
-              key={searchParams.sort}
               currentUserId={auth.userId}
               infiniteQueryOptions={{
                 procedure: "getCommunityPosts",
                 input: {
-                  sort: searchParams.sort,
+                  sort,
                   communityName: params.communityName,
                 },
               }}

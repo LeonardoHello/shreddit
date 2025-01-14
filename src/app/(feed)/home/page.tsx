@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { auth as authPromise } from "@clerk/nextjs/server";
+import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
@@ -9,16 +10,19 @@ import { PostSort } from "@/types";
 
 export const runtime = "edge";
 export const preferredRegion = ["fra1"];
-
 export default async function HomePage(props: {
-  searchParams: Promise<{ sort?: PostSort }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const [searchParams, auth] = await Promise.all([
     props.searchParams,
     authPromise(),
   ]);
 
-  void trpc.postFeed.getHomePosts.prefetchInfinite({ sort: searchParams.sort });
+  const { data: sort = PostSort.BEST } = z
+    .nativeEnum(PostSort)
+    .safeParse(searchParams.sort);
+
+  void trpc.postFeed.getHomePosts.prefetchInfinite({ sort });
 
   if (auth.userId === null)
     throw new Error("Could not load home page information.");
@@ -31,9 +35,7 @@ export default async function HomePage(props: {
             currentUserId={auth.userId}
             infiniteQueryOptions={{
               procedure: "getHomePosts",
-              input: {
-                sort: searchParams.sort,
-              },
+              input: { sort },
             }}
           />
         </Suspense>
