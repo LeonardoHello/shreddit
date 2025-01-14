@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 
-export default function HeaderSheet({
+export default function SidebarSheet({
   children,
 }: {
   children: React.ReactNode;
@@ -45,6 +45,7 @@ export default function HeaderSheet({
             Navigate through communities and access your personalized menus
           </SheetDescription>
         </SheetHeader>
+
         {children}
       </SheetContent>
     </Sheet>
