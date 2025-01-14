@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Roboto_Flex } from "next/font/google";
 
@@ -11,13 +10,11 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
 import Sidebar from "@/components/sidebar/Sidebar";
-import SidebarSkeleton from "@/components/sidebar/SidebarSkeleton";
+import SidebarSheet from "@/components/sidebar/SidebarSheet";
 import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 import { TRPCProvider } from "@/trpc/client";
 
 import "./globals.css";
-
-import SidebarSheet from "@/components/sidebar/SidebarSheet";
 
 const nunito_sans = Roboto_Flex({
   subsets: ["latin"],
@@ -65,16 +62,12 @@ export default function RootLayout({
             <RecentCommunityContextProvider>
               <Header>
                 <SidebarSheet>
-                  <Suspense fallback={<SidebarSkeleton />}>
-                    <Sidebar sheet />
-                  </Suspense>
+                  <Sidebar sheet />
                 </SidebarSheet>
               </Header>
 
               <div className="flex">
-                <Suspense fallback={<SidebarSkeleton />}>
-                  <Sidebar />
-                </Suspense>
+                <Sidebar />
 
                 <main className="grow overflow-hidden">{children}</main>
               </div>
