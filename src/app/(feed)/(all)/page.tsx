@@ -8,8 +8,6 @@ import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQue
 import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
-export const runtime = "edge";
-export const preferredRegion = ["fra1"];
 export default async function AllPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {

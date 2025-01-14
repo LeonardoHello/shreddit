@@ -13,9 +13,6 @@ import SubmitTabs from "@/components/submit/SubmitTabs";
 import DropdownContextProvider from "@/context/DropdownContext";
 import ogre from "@public/logo-green.svg";
 
-export const runtime = "edge";
-export const preferredRegion = ["fra1"];
-
 export default async function CommunitySubmitPage(props: {
   params: Promise<{ communityName: string }>;
 }) {

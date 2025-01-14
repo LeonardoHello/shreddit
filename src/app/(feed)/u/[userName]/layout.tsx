@@ -7,9 +7,6 @@ import ScrollToTop from "@/components/sidebar/ScrollToTop";
 import UserInfo from "@/components/user/UserInfo";
 import UserNavigation from "@/components/user/UserNavigation";
 
-export const runtime = "edge";
-export const preferredRegion = ["fra1"];
-
 export default async function UserLayout(props: {
   children: React.ReactNode;
   params: Promise<{ username: string }>;
