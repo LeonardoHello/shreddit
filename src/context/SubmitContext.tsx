@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useReducer } from "react";
-import { useSearchParams } from "next/navigation";
 
 import type { File, Post } from "@/db/schema";
 import { PostType } from "@/types";
@@ -87,20 +86,15 @@ const SubmitContext = createContext<ReducerState | null>(null);
 const SubmitDispatchContext =
   createContext<React.Dispatch<ReducerActionType> | null>(null);
 
-const defaultType = PostType.TEXT;
-
 export default function SubmitContextProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const searchParams = useSearchParams();
-
   const [state, dispatch] = useReducer(reducer, {
     communitySearch: "",
-    postType:
-      PostType[(searchParams.get("type") ?? defaultType) as PostType] ??
-      defaultType,
+    postType: PostType.TEXT,
+
     title: "",
     text: null,
     files: [],
