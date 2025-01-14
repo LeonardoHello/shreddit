@@ -1,4 +1,4 @@
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { User } from "@clerk/nextjs/server";
 
@@ -17,6 +17,7 @@ export default function FeedPost({
 }: {
   currentUserId: User["id"] | null;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
 
   const state = usePostContext();
@@ -43,7 +44,12 @@ export default function FeedPost({
   }
 
   return (
-    <div className="flex gap-3 rounded bg-zinc-900 p-2">
+    <div
+      className="flex cursor-pointer gap-3 rounded bg-card p-2 hover:border-ring"
+      onClick={() => {
+        router.push(`/r/${state.community.name}/comments/${state.id}`);
+      }}
+    >
       {currentUserId && <PostVote />}
       {!currentUserId && <PostVotePlaceholder />}
       <div className="flex w-0 grow flex-col gap-1">

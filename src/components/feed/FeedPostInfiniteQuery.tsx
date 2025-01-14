@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 import PostContextProvider from "@/context/PostContext";
 import type { User } from "@/db/schema";
@@ -29,7 +28,6 @@ export default function FeedPostInfiniteQuery({
   infiniteQueryOptions: InfiniteQueryOptions;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   const { procedure, input } = infiniteQueryOptions;
 
@@ -62,7 +60,7 @@ export default function FeedPostInfiniteQuery({
     return (
       <div className="flex grow flex-col gap-2.5">
         <FeedSort sort={input.sort} />
-        <FeedEmpty />;
+        <FeedEmpty />
       </div>
     );
   }
@@ -73,17 +71,9 @@ export default function FeedPostInfiniteQuery({
 
       {pages.map((page) =>
         page.posts.map((post, index) => (
-          <div
-            key={`${post.id}-${index}`}
-            className="cursor-pointer rounded border hover:border-ring"
-            onClick={() => {
-              router.push(`/r/${post.community.name}/comments/${post.id}`);
-            }}
-          >
-            <PostContextProvider post={post}>
-              <FeedPost currentUserId={currentUserId} />
-            </PostContextProvider>
-          </div>
+          <PostContextProvider key={`${post.id}-${index}`} post={post}>
+            <FeedPost currentUserId={currentUserId} />
+          </PostContextProvider>
         )),
       )}
       {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton />}
