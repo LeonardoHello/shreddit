@@ -45,7 +45,7 @@ export default function FeedPost({
 
   return (
     <div
-      className="flex cursor-pointer gap-3 rounded bg-card p-2 hover:border-ring"
+      className="flex cursor-pointer gap-3 rounded border bg-card p-2 hover:border-ring"
       onClick={() => {
         router.push(`/r/${state.community.name}/comments/${state.id}`);
       }}

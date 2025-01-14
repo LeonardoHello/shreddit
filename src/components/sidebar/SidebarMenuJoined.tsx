@@ -22,7 +22,7 @@ export default function SidebarMenuJoined() {
         <Button
           variant="ghost"
           size="lg"
-          className="w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40"
+          className="w-full justify-start px-4 text-sm font-normal hover:bg-accent/40"
           asChild
         >
           <Link href={{ query: { submit: "community" } }} scroll={false}>

@@ -42,7 +42,7 @@ const extensions = [
   }),
 ];
 
-export default function RTEPostSubmit() {
+export default function RTEPost() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 

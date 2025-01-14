@@ -31,7 +31,7 @@ export default function SidebarMenuMain({
             variant="ghost"
             size="lg"
             className={cn(
-              "w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40",
+              "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
               {
                 "bg-accent text-accent-foreground hover:bg-accent": isHome,
               },
@@ -51,7 +51,7 @@ export default function SidebarMenuMain({
           variant="ghost"
           size="lg"
           className={cn(
-            "w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40",
+            "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
             {
               "bg-accent text-accent-foreground hover:bg-accent": isAll,
             },
@@ -78,7 +78,7 @@ export default function SidebarMenuMain({
             variant="ghost"
             size="lg"
             className={cn(
-              "w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40",
+              "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
               {
                 "bg-accent text-accent-foreground hover:bg-accent": isProfile,
               },

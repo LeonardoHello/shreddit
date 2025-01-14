@@ -66,7 +66,7 @@ export default function SidebarMenuItemFavorite({
       <Button
         variant="ghost"
         size="lg"
-        className="w-full px-4 text-sm font-normal tracking-wide hover:bg-accent/40"
+        className="w-full px-4 text-sm font-normal hover:bg-accent/40"
         asChild
       >
         <Link href={`/r/${communityRelation.community.name}`}>

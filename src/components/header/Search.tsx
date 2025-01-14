@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ChangeEvent, type FocusEvent } from "react";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -27,7 +27,7 @@ export default function Search() {
 
   const utils = trpc.useUtils();
 
-  const onInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
     const searchedValue = e.currentTarget.value.replaceAll(
       /[^a-zA-Z0-9_-]/g,
@@ -48,7 +48,7 @@ export default function Search() {
     }
   };
 
-  const onInputFocus = (e: FocusEvent<HTMLInputElement>) => {
+  const onInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     if (e.currentTarget.value.length > 0) {
       setIsOpen(true);
     }

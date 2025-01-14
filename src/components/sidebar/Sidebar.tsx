@@ -36,7 +36,7 @@ export default async function Sidebar({ sheet = false }: { sheet?: boolean }) {
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
         <AccordionItem value="item-1">
-          <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
+          <AccordionTrigger className="px-4 text-xs font-light uppercase text-muted-foreground hover:no-underline">
             recent
           </AccordionTrigger>
           <AccordionContent>
