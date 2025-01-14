@@ -18,8 +18,10 @@ import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 export default async function Sidebar({ sheet = false }: { sheet?: boolean }) {
   const { userId } = await auth();
 
-  void trpc.community.getModeratedCommunities.prefetch();
-  void trpc.community.getJoinedCommunities.prefetch();
+  if (userId) {
+    void trpc.community.getModeratedCommunities.prefetch();
+    void trpc.community.getJoinedCommunities.prefetch();
+  }
 
   return (
     <div
