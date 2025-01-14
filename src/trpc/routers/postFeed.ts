@@ -59,7 +59,7 @@ export const postFeedRouter = createTRPCRouter({
         // cursor input needed to expose useInfiniteQuery hook
         // value of the cursor is what's returned from getNextPageParam
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -71,7 +71,7 @@ export const postFeedRouter = createTRPCRouter({
       };
 
       // Get the appropriate query function or default to BEST
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -89,7 +89,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -100,7 +100,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getHomeBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -118,7 +118,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
         communityName: CommunitySchema.shape.name,
       }),
     )
@@ -130,7 +130,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getCommunityBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -149,7 +149,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
         username: UserSchema.shape.username,
       }),
     )
@@ -161,7 +161,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getUserBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -180,7 +180,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -191,7 +191,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getUpvotedBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -209,7 +209,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -220,7 +220,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getDownvotedBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -238,7 +238,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -249,7 +249,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getSavedBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -267,7 +267,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort).optional(),
+        sort: z.nativeEnum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -278,7 +278,7 @@ export const postFeedRouter = createTRPCRouter({
         [PostSort.BEST]: getHiddenBestPosts,
       };
 
-      const queryFn = sortQueries[input.sort ?? PostSort.BEST];
+      const queryFn = sortQueries[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,

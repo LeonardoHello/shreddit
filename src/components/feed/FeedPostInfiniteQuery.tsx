@@ -61,7 +61,7 @@ export default function FeedPostInfiniteQuery({
   if (pages[0].posts.length === 0) {
     return (
       <div className="flex grow flex-col gap-2.5">
-        <FeedSort />
+        <FeedSort sort={input.sort} />
         <FeedEmpty />;
       </div>
     );
@@ -69,7 +69,7 @@ export default function FeedPostInfiniteQuery({
 
   return (
     <div className="relative flex grow flex-col gap-2.5">
-      <FeedSort />
+      <FeedSort sort={input.sort} />
 
       {pages.map((page) =>
         page.posts.map((post, index) => (

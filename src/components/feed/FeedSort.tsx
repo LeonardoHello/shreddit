@@ -1,20 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { Flame, MessageSquareText, Rocket, Tag } from "lucide-react";
 
 import { PostSort } from "@/types";
 import { Button } from "../ui/button";
 
-export default function FeedSort() {
+export default function FeedSort({ sort }: { sort: PostSort }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  const sort = searchParams.get("sort") as PostSort | null;
-
-  const isBest = !sort || sort === PostSort.BEST;
+  const isBest = sort === PostSort.BEST;
   const isHot = sort === PostSort.HOT;
   const isNew = sort === PostSort.NEW;
   const isControversial = sort === PostSort.CONTROVERSIAL;
@@ -29,17 +26,13 @@ export default function FeedSort() {
             disabled={isBest}
             asChild
           >
-            <Link
-              href={{
-                pathname,
-                query: { sort: PostSort.BEST },
-              }}
-            >
+            <Link href={{ pathname, query: { sort: PostSort.BEST } }}>
               <Rocket className="size-6" />
               <span className="hidden sm:inline-block">Best</span>
             </Link>
           </Button>
         </li>
+
         <li>
           <Button
             variant={isHot ? "default" : "ghost"}
@@ -47,17 +40,13 @@ export default function FeedSort() {
             disabled={isHot}
             asChild
           >
-            <Link
-              href={{
-                pathname,
-                query: { sort: PostSort.HOT },
-              }}
-            >
+            <Link href={{ pathname, query: { sort: PostSort.HOT } }}>
               <Flame className="size-6" />
               <span className="hidden sm:inline-block">Hot</span>
             </Link>
           </Button>
         </li>
+
         <li>
           <Button
             variant={isNew ? "default" : "ghost"}
@@ -65,17 +54,13 @@ export default function FeedSort() {
             disabled={isNew}
             asChild
           >
-            <Link
-              href={{
-                pathname,
-                query: { sort: PostSort.NEW },
-              }}
-            >
+            <Link href={{ pathname, query: { sort: PostSort.NEW } }}>
               <Tag className="size-6" />
               <span className="hidden sm:inline-block">New</span>
             </Link>
           </Button>
         </li>
+
         <li>
           <Button
             variant={isControversial ? "default" : "ghost"}
@@ -83,14 +68,7 @@ export default function FeedSort() {
             disabled={isControversial}
             asChild
           >
-            <Link
-              href={{
-                pathname,
-                query: {
-                  sort: PostSort.CONTROVERSIAL,
-                },
-              }}
-            >
+            <Link href={{ pathname, query: { sort: PostSort.CONTROVERSIAL } }}>
               <MessageSquareText className="size-6" />
               <span className="hidden sm:inline-block">Controversial</span>
             </Link>
