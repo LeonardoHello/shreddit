@@ -29,24 +29,8 @@ export default async function Header({
 
         <Logo />
       </div>
-      <Search />
 
-      {userId && (
-        <div className="flex items-center gap-2 self-center">
-          <ClerkLoading>
-            <Button variant={"secondary"} className="rounded-full">
-              Sign in
-            </Button>
-          </ClerkLoading>
-          <ClerkLoaded>
-            <SignInButton mode="modal">
-              <Button variant={"secondary"} className="rounded-full">
-                Sign in
-              </Button>
-            </SignInButton>
-          </ClerkLoaded>
-        </div>
-      )}
+      <Search />
 
       {userId && (
         <div className="flex items-center gap-2 self-center">
@@ -80,6 +64,23 @@ export default async function Header({
             <UserButton
               appearance={{ elements: { userButtonAvatarBox: "size-8" } }}
             />
+          </ClerkLoaded>
+        </div>
+      )}
+
+      {!userId && (
+        <div className="flex items-center gap-2 self-center">
+          <ClerkLoading>
+            <Button variant={"secondary"} className="rounded-full">
+              Sign in
+            </Button>
+          </ClerkLoading>
+          <ClerkLoaded>
+            <SignInButton mode="modal">
+              <Button variant={"secondary"} className="rounded-full">
+                Sign in
+              </Button>
+            </SignInButton>
           </ClerkLoaded>
         </div>
       )}
