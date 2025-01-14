@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Roboto_Flex } from "next/font/google";
+import { Reddit_Sans } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
@@ -16,8 +16,9 @@ import { TRPCProvider } from "@/trpc/client";
 
 import "./globals.css";
 
-const nunito_sans = Roboto_Flex({
+const reddit_sans = Reddit_Sans({
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,27 +28,28 @@ export const metadata: Metadata = {
 };
 
 export const preferredRegion = ["fra1"];
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={nunito_sans.className}>
-        <ClerkProvider
-          dynamic
-          appearance={{
-            baseTheme: dark,
-            layout: {
-              termsPageUrl: "https://clerk.com/terms",
-              privacyPageUrl: "https://clerk.com/privacy",
-              logoPlacement: "none",
-              socialButtonsVariant: "iconButton",
-            },
-            variables: { colorPrimary: "#f43f5e" },
-          }}
-        >
+    <ClerkProvider
+      dynamic
+      appearance={{
+        baseTheme: dark,
+        layout: {
+          termsPageUrl: "https://clerk.com/terms",
+          privacyPageUrl: "https://clerk.com/privacy",
+          logoPlacement: "none",
+          socialButtonsVariant: "iconButton",
+        },
+        variables: { colorPrimary: "#f43f5e" },
+      }}
+    >
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${reddit_sans.className} antialiased`}>
           <TRPCProvider>
             <NextSSRPlugin
               /**
@@ -74,8 +76,8 @@ export default function RootLayout({
             </RecentCommunityContextProvider>
           </TRPCProvider>
           <Toaster theme="dark" richColors closeButton />
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
