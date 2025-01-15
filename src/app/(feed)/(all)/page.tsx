@@ -23,7 +23,7 @@ export default async function AllPage(props: {
   void trpc.postFeed.getAllPosts.prefetchInfinite({ sort });
 
   return (
-    <main className="container flex grow gap-6 p-2 pb-6 2xl:max-w-[1080px]">
+    <main className="container flex grow gap-6 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
         <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
           <FeedPostInfiniteQuery

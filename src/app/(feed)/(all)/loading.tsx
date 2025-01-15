@@ -2,7 +2,7 @@ import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQue
 
 export default async function Loading() {
   return (
-    <div className="container flex gap-6 p-2 2xl:max-w-[1080px]">
+    <div className="container flex gap-6 p-2 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <FeedPostInfiniteQuerySkeleton />
 
       <div className="hidden w-80 xl:block" />

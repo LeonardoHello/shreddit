@@ -37,7 +37,7 @@ export default async function CommunityPage(props: {
   });
 
   return (
-    <main className="container flex grow flex-col gap-4 p-2 pb-6 2xl:max-w-[1080px]">
+    <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
         <Suspense fallback={<CommunityHeaderSkeleton />}>
           {auth.userId ? (

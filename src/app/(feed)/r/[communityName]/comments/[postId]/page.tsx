@@ -20,7 +20,7 @@ export default async function PostPage(props: {
   void trpc.community.getCommunityByName.prefetch(params.communityName);
 
   return (
-    <main className="container flex grow gap-4 p-2 pb-6 2xl:max-w-[1080px]">
+    <main className="container flex grow gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <div className="flex grow flex-col gap-2">
         <Suspense fallback={<PostSkeleton />}>
           <Post currentUserId={userId} postId={params.postId} />
