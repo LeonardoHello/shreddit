@@ -88,7 +88,9 @@ export default function SidebarMenuMain({
             <Link href={`/u/${user.username}`}>
               <Avatar className="size-6">
                 <AvatarImage src={user.imageUrl} />
-                <AvatarFallback>{user.username?.slice(0, 2)}</AvatarFallback>
+                <AvatarFallback className="uppercase">
+                  {user.username?.slice(0, 2)}
+                </AvatarFallback>
               </Avatar>
               <h2 className="capitalize">view profile</h2>
             </Link>

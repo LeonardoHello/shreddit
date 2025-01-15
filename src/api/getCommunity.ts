@@ -6,6 +6,7 @@ export const getCommunityByName = db.query.communities
   .findFirst({
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
+    with: { moderator: true },
     extras: (community, { sql }) => ({
       memberCount: sql<number>`
         (

@@ -6,6 +6,7 @@ import { CakeSlice, Globe } from "lucide-react";
 
 import { Community, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import CommunityDialog from "./CommunityDialog";
@@ -92,6 +93,24 @@ export default function CommunitySidebar({
           </div>
         </div>
         <div />
+      </div>
+
+      <Separator />
+
+      <div className="flex flex-col items-start gap-1">
+        <div className="text-sm uppercase text-muted-foreground">Moderator</div>
+        <Link
+          href={`/u/${community.moderator.username}`}
+          className="flex items-center gap-2"
+        >
+          <Avatar className="size-8">
+            <AvatarImage src={community.moderator.imageUrl} />
+            <AvatarFallback className="uppercase">
+              {community.moderator.username?.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm">u/{community.moderator.username}</span>
+        </Link>
       </div>
 
       <Separator />
