@@ -71,7 +71,7 @@ export default function RootLayout({
               <div className="flex">
                 <Sidebar />
 
-                <main className="grow overflow-hidden">{children}</main>
+                {children}
               </div>
             </RecentCommunityContextProvider>
           </TRPCProvider>

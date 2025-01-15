@@ -26,7 +26,7 @@ export default async function HomePage(props: {
     throw new Error("Could not load home page information.");
 
   return (
-    <div className="container flex gap-6 p-2 pb-6 2xl:max-w-[1080px]">
+    <main className="container flex grow gap-6 p-2 pb-6 2xl:max-w-[1080px]">
       <HydrateClient>
         <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
           <FeedPostInfiniteQuery
@@ -40,6 +40,6 @@ export default async function HomePage(props: {
       </HydrateClient>
 
       <div className="hidden w-80 xl:block" />
-    </div>
+    </main>
   );
 }
