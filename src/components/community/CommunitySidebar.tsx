@@ -101,7 +101,7 @@ export default function CommunitySidebar({
         <div className="text-sm uppercase text-muted-foreground">Moderator</div>
         <Link
           href={`/u/${community.moderator.username}`}
-          className="flex items-center gap-2"
+          className="inline-flex w-full items-center gap-2"
         >
           <Avatar className="size-8">
             <AvatarImage src={community.moderator.imageUrl} />
@@ -109,7 +109,9 @@ export default function CommunitySidebar({
               {community.moderator.username?.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm">u/{community.moderator.username}</span>
+          <span className="truncate text-sm">
+            u/{community.moderator.username}
+          </span>
         </Link>
       </div>
 
