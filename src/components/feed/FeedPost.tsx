@@ -46,6 +46,9 @@ export default function FeedPost({
   return (
     <div
       className="flex cursor-pointer gap-3 rounded border bg-card p-2 hover:border-ring"
+      onMouseEnter={() => {
+        router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
+      }}
       onClick={() => {
         router.push(`/r/${state.community.name}/comments/${state.id}`);
       }}
