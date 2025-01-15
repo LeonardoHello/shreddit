@@ -15,7 +15,7 @@ import SidebarMenuModerated from "./SidebarMenuModerated";
 import SidebarMenuRecent from "./SidebarMenuRecent";
 import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
 
-export default async function Sidebar({ sheet = false }: { sheet?: boolean }) {
+export default async function Sidebar({ className }: { className?: string }) {
   const { userId } = await auth();
 
   if (userId) {
@@ -25,12 +25,11 @@ export default async function Sidebar({ sheet = false }: { sheet?: boolean }) {
 
   return (
     <div
-      style={{ scrollbarWidth: "thin", colorScheme: "dark" }}
-      className={
-        !sheet
-          ? "sticky top-14 hidden h-[calc(100vh-3.5rem)] w-[274px] gap-3 overflow-y-auto border-r bg-card p-4 xl:block"
-          : undefined
-      }
+      style={{
+        scrollbarWidth: "thin",
+        scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
+      }}
+      className={className}
     >
       <SidebarMenuMain userId={userId} />
 
