@@ -7,7 +7,9 @@ export default function CommentSectionSkeleton() {
     <div className="flex grow flex-col gap-6">
       <div className="flex flex-col gap-6">
         <CommentSkeleton>
-          <CommentSkeleton />
+          <CommentSkeleton>
+            <CommentSkeleton />
+          </CommentSkeleton>
           <CommentSkeleton />
         </CommentSkeleton>
         <CommentSkeleton />

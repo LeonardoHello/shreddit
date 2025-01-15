@@ -55,7 +55,7 @@ export default function RTECommentReply() {
 
   return (
     <div
-      className={cn("ml-3 rounded border border-zinc-700/70", {
+      className={cn("rounded border border-zinc-700/70", {
         "border-zinc-300": editor.isFocused,
       })}
     >

@@ -27,7 +27,7 @@ export default function CommentThread({
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-2">
       {currentReplies.map((reply) => (
         <CommentContextProvider key={reply.id} comment={reply}>
           <Comment currentUserId={currentUserId}>
