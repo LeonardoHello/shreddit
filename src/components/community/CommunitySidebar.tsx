@@ -25,7 +25,7 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div className="sticky top-4 hidden w-80 flex-col gap-2 self-start rounded border bg-card px-3 py-2 lg:flex">
+    <div className="sticky top-16 z-10 hidden h-64 w-80 flex-col gap-2 rounded border bg-card px-3 py-2 lg:flex">
       <div className="flex items-center justify-between gap-2">
         <h2 className="truncate font-medium tracking-wide">
           {community.displayName ?? community.name}
