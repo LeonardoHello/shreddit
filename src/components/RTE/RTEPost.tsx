@@ -29,9 +29,9 @@ import {
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEpostLoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
+import RTEpostLoading from "./RTESkeleton";
 
 const extensions = [
   StarterKit,

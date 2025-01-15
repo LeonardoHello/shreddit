@@ -19,9 +19,9 @@ import {
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
+import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
   StarterKit,
@@ -47,7 +47,7 @@ export default function RTECommentEdit() {
   });
 
   if (!editor) {
-    return <RTELoading content={state.text} />;
+    return <RTESkeleton content={state.text} />;
   }
 
   return (

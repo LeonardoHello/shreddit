@@ -1,6 +1,6 @@
 import { cn } from "@/utils/cn";
 
-export default function RTEPostLoading({
+export default function RTESkeleton({
   content,
 }: {
   content?: string | TrustedHTML;

@@ -25,9 +25,9 @@ import {
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import RTEcommentLoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
+import RTEcommentLoading from "./RTESkeleton";
 
 const extensions = [
   StarterKit,

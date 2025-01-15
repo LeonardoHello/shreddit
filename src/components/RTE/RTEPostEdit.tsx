@@ -27,9 +27,9 @@ import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
+import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
   StarterKit,
@@ -57,7 +57,7 @@ export default function PostEditRTE() {
   });
 
   if (!editor) {
-    return <RTELoading content={post.text ?? undefined} />;
+    return <RTESkeleton content={post.text ?? undefined} />;
   }
 
   return (

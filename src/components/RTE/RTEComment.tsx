@@ -21,9 +21,9 @@ import type { Post } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import RTELoading from "./RTELoading";
 import RTEMarkButtons from "./RTEMarkButtons";
 import RTENodeButtons from "./RTENodeButtons";
+import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
   StarterKit,
@@ -46,7 +46,7 @@ export default function RTEComment({ postId }: { postId: Post["id"] }) {
   });
 
   if (!editor) {
-    return <RTELoading />;
+    return <RTESkeleton />;
   }
 
   return (
