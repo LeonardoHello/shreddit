@@ -3,14 +3,12 @@
 import { createContext, useContext, useReducer } from "react";
 
 import { getComments } from "@/api/getComment";
-import { User, UserToComments } from "@/db/schema";
 import { ArrElement } from "@/types";
 import { calculateVotes } from "@/utils/calculateVotes";
 
 type Comment = ArrElement<Awaited<ReturnType<typeof getComments.execute>>>;
 
 type ReducerState = Comment & {
-  voteStatus: UserToComments["voteStatus"];
   isEditing: boolean;
   isReplying: boolean;
 };
@@ -49,8 +47,8 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
         voteStatus: action.vote,
         voteCount: calculateVotes({
           voteCount: state.voteCount,
-          voteStatus: state.voteStatus,
-          newVoteStatus: action.vote,
+          voteStatus: state.voteStatus ?? "none",
+          newVoteStatus: action.vote ?? "none",
         }),
       };
 
@@ -78,22 +76,13 @@ const CommentDispatchContext =
 
 export default function CommentContextProvider({
   children,
-  currentUserId,
   comment,
 }: {
   children: React.ReactNode;
-  currentUserId: User["id"] | null;
   comment: Comment;
 }) {
-  const userToComment =
-    currentUserId &&
-    comment.usersToComments.find(
-      (userToPost) => userToPost.userId === currentUserId,
-    );
-
   const [state, dispatch] = useReducer(reducer, {
     ...comment,
-    voteStatus: userToComment ? userToComment.voteStatus : "none",
     isEditing: false,
     isReplying: false,
   });

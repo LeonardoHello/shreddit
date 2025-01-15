@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { notFound } from "next/navigation";
 
 import { User } from "@clerk/nextjs/server";
@@ -15,20 +12,23 @@ import PostMetadata from "./PostMetadata";
 import PostVote from "./PostVote";
 import PostVotePlaceholder from "./PostVotePlaceholder";
 
-export default function Post({
+export default async function Post({
   currentUserId,
-  postPromise,
+  postId,
 }: {
   currentUserId: User["id"] | null;
-  postPromise: ReturnType<typeof getPostById.execute>;
+  postId: string;
 }) {
-  const post = use(postPromise);
+  const post = await getPostById.execute({
+    currentUserId,
+    postId,
+  });
 
   if (!post) notFound();
 
   return (
     <PostContextProvider post={post}>
-      <div className="flex gap-3 rounded bg-zinc-900 p-2">
+      <div className="flex gap-3 rounded border bg-card p-2">
         {currentUserId && <PostVote />}
         {!currentUserId && <PostVotePlaceholder />}
         <div className="flex w-0 grow flex-col gap-1">

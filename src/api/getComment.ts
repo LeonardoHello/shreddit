@@ -1,3 +1,4 @@
+import { UserToComments } from "@/db/schema";
 import db from "../db";
 
 export const getComments = db.query.comments
@@ -23,6 +24,14 @@ export const getComments = db.query.comments
             AND users_to_comments.vote_status = 'downvoted'
         )
       `.as("vote_count"),
+      voteStatus: sql<UserToComments["voteStatus"] | null>`
+      (
+        SELECT vote_status
+        FROM users_to_comments
+        WHERE users_to_comments.comment_id = ${comment.id}
+          AND users_to_comments.user_id = ${sql.placeholder("currentUserId")}
+      )
+    `.as("vote_status"),
     }),
     orderBy: (post, { desc }) => desc(post.createdAt),
   })

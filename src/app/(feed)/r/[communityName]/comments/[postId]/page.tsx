@@ -1,59 +1,50 @@
 import { Suspense } from "react";
-import Link from "next/link";
 
-import { currentUser } from "@clerk/nextjs/server";
+import { auth as authPromise } from "@clerk/nextjs/server";
 
-import { getComments } from "@/api/getComment";
-import { getPostById } from "@/api/getPost";
 import CommentSection from "@/components/comment/CommentSection";
+import CommentSectionSkeleton from "@/components/comment/CommentSectionSkeleton";
+import CommunitySidebar from "@/components/community/CommunitySidebar";
+import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSkeleton";
 import Post from "@/components/post/Post";
+import PostSkeleton from "@/components/post/PostSkeleton";
 import RTEComment from "@/components/RTE/RTEComment";
+import { Separator } from "@/components/ui/separator";
+import { HydrateClient, trpc } from "@/trpc/server";
 
 export default async function PostPage(props: {
-  params: Promise<{ postId: string }>;
+  params: Promise<{ communityName: string; postId: string }>;
 }) {
-  const paramsPromise = props.params;
-  const userPromise = currentUser();
+  const [params, { userId }] = await Promise.all([props.params, authPromise()]);
 
-  const [params, user] = await Promise.all([paramsPromise, userPromise]);
-
-  const postPromise = getPostById.execute({
-    postId: params.postId,
-    currentUserId: user && user.id,
-  });
-  const commentsPromise = getComments.execute({ postId: params.postId });
+  void trpc.community.getCommunityByName.prefetch(params.communityName);
 
   return (
-    <div className="-order-1 row-span-2 bg-zinc-900">
-      <Suspense fallback={<p>Loading...</p>}>
-        <Post currentUserId={user && user.id} postPromise={postPromise} />
-      </Suspense>
+    <main className="container flex grow gap-4 p-2 pb-6 2xl:max-w-[1080px]">
+      <div className="flex grow flex-col gap-2">
+        <Suspense fallback={<PostSkeleton />}>
+          <Post currentUserId={userId} postId={params.postId} />
+        </Suspense>
 
-      <div className="flex flex-col gap-4 p-4 pb-8">
-        <div className="flex flex-col gap-2 lg:ml-8">
-          {user && (
-            <div className="text-xs">
-              Comment as{" "}
-              <Link
-                href={`/u/${user.username}`}
-                className="text-sky-500 hover:underline"
-              >
-                {user.username}
-              </Link>
-            </div>
-          )}
+        <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
           <RTEComment postId={params.postId} />
+
+          <Separator />
+
+          <Suspense fallback={<CommentSectionSkeleton />}>
+            <CommentSection currentUserId={userId} postId={params.postId} />
+          </Suspense>
         </div>
+      </div>
 
-        <hr className="border-zinc-700/70 lg:ml-8" />
-
-        <Suspense fallback={<p>Loading...</p>}>
-          <CommentSection
-            currentUserId={user && user.id}
-            commentsPromise={commentsPromise}
+      <HydrateClient>
+        <Suspense fallback={<CommunitySidebarSkeleton />}>
+          <CommunitySidebar
+            currentUserId={userId}
+            communityName={params.communityName}
           />
         </Suspense>
-      </div>
-    </div>
+      </HydrateClient>
+    </main>
   );
 }
