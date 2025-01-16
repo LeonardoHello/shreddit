@@ -35,7 +35,7 @@ export default async function Post({
           <PostMetadata />
           <PostContent />
           {currentUserId && (
-            <PostActions>
+            <PostActions currentUserId={currentUserId}>
               <PostActionsDropdown />
             </PostActions>
           )}

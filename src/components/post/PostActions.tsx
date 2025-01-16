@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "@clerk/nextjs/server";
 import {
   BookmarkIcon,
   BookmarkSlashIcon,
@@ -21,8 +22,10 @@ import { trpc } from "@/trpc/client";
 
 export default function PostActions({
   children,
+  currentUserId,
 }: {
   children: React.ReactNode;
+  currentUserId: User["id"];
 }) {
   const { dropdownRef, isOpen, setIsOpen } = useDropdown();
 
@@ -144,17 +147,19 @@ export default function PostActions({
           </>
         )}
       </div>
-      <div
-        ref={dropdownRef}
-        className="cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen((prev) => !prev);
-        }}
-      >
-        <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
-        {isOpen && children}
-      </div>
+      {currentUserId === state.authorId && (
+        <div
+          ref={dropdownRef}
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen((prev) => !prev);
+          }}
+        >
+          <EllipsisHorizontalIcon className="h-6 w-6 rounded hover:bg-zinc-700/50" />
+          {isOpen && children}
+        </div>
+      )}
     </div>
   );
 }

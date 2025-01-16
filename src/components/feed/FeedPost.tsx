@@ -59,7 +59,7 @@ export default function FeedPost({
         <PostMetadata />
         <PostContent />
         {currentUserId && (
-          <PostActions>
+          <PostActions currentUserId={currentUserId}>
             <PostActionsDropdown />
           </PostActions>
         )}
