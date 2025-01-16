@@ -7,11 +7,22 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
+import { trpc } from "@/trpc/client";
 import { UploadDropzone } from "@/utils/uploadthing";
 
 export default function SubmitDropzone() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
+
+  const createThumbHash = trpc.file.createThumbHash.useMutation({
+    onSuccess: (data) => {
+      dispatch({
+        type: ReducerAction.SET_FILES,
+        nextFiles: data,
+      });
+      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+    },
+  });
 
   return (
     <UploadDropzone
@@ -37,17 +48,13 @@ export default function SubmitDropzone() {
       }}
       className="mt-0 min-h-[18rem] rounded border border-zinc-700/70"
       onClientUploadComplete={(res) => {
-        const files = res.map((file) => ({
-          name: file.name,
-          key: file.key,
-          url: file.url,
-        }));
-
-        dispatch({
-          type: ReducerAction.SET_FILES,
-          nextFiles: files,
-        });
-        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+        createThumbHash.mutate(
+          res.map((file) => ({
+            name: file.name,
+            key: file.key,
+            url: file.url,
+          })),
+        );
       }}
       onUploadError={(e) => {
         toast.error(e.message);

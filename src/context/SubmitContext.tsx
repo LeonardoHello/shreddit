@@ -2,13 +2,13 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import type { File, Post } from "@/db/schema";
+import type { Post, PostFile } from "@/db/schema";
 import { PostType } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   communitySearch: string;
   postType: PostType;
-  files: Pick<File, "key" | "url" | "name">[];
+  files: Pick<PostFile, "key" | "url" | "name" | "thumbHash">[];
   isDisabled: boolean;
 };
 
@@ -94,7 +94,6 @@ export default function SubmitContextProvider({
   const [state, dispatch] = useReducer(reducer, {
     communitySearch: "",
     postType: PostType.TEXT,
-
     title: "",
     text: null,
     files: [],

@@ -141,7 +141,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
     fields: [posts.communityId],
     references: [communities.id],
   }),
-  files: many(files),
+  files: many(postFiles),
   comments: many(comments),
   usersToPosts: many(usersToPosts),
 }));
@@ -177,20 +177,21 @@ export const usersToPostsRelations = relations(usersToPosts, ({ one }) => ({
   }),
 }));
 
-export const files = pgTable("files", {
+export const postFiles = pgTable("post_files", {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
   key: text().unique().notNull(),
   url: text().unique().notNull(),
+  thumbHash: text().notNull(),
   postId: uuid()
     .references(() => posts.id, { onDelete: "cascade" })
     .notNull(),
   ...timestamps,
 });
 
-export const filesRelations = relations(files, ({ one }) => ({
+export const filesRelations = relations(postFiles, ({ one }) => ({
   post: one(posts, {
-    fields: [files.postId],
+    fields: [postFiles.postId],
     references: [posts.id],
   }),
 }));
@@ -269,7 +270,7 @@ export type Community = InferSelectModel<typeof communities>;
 export type UserToCommunity = InferSelectModel<typeof usersToCommunities>;
 export type Post = InferSelectModel<typeof posts>;
 export type UserToPost = InferSelectModel<typeof usersToPosts>;
-export type File = InferSelectModel<typeof files>;
+export type PostFile = InferSelectModel<typeof postFiles>;
 export type Comment = InferSelectModel<typeof comments>;
 export type UserToComments = InferSelectModel<typeof usersToComments>;
 
@@ -278,6 +279,6 @@ export const CommunitySchema = createSelectSchema(communities);
 export const UserToCommunitySchema = createSelectSchema(usersToCommunities);
 export const PostSchema = createSelectSchema(posts);
 export const UserToPostSchema = createSelectSchema(usersToPosts);
-export const FileSchema = createSelectSchema(files);
+export const PostFileSchema = createSelectSchema(postFiles);
 export const CommentSchema = createSelectSchema(comments);
 export const UserToCommentSchema = createSelectSchema(usersToComments);

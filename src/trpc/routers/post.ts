@@ -4,8 +4,8 @@ import { z } from "zod";
 
 import { getPostById } from "@/api/getPost";
 import {
-  files,
-  FileSchema,
+  postFiles,
+  PostFileSchema,
   posts,
   PostSchema,
   usersToPosts,
@@ -47,12 +47,17 @@ export const postRouter = createTRPCRouter({
         authorId: true,
       }).and(
         z.object({
-          files: FileSchema.pick({ key: true, url: true, name: true }).array(),
+          files: PostFileSchema.pick({
+            key: true,
+            url: true,
+            name: true,
+            thumbHash: true,
+          }).array(),
         }),
       ),
     )
     .mutation(({ input, ctx }) => {
-      const { files: postFiles, ...post } = input;
+      const { files, ...post } = input;
 
       const postId = uuidv4();
 
@@ -62,8 +67,8 @@ export const postRouter = createTRPCRouter({
           .values({ ...post, text: null, id: postId, authorId: ctx.userId })
           .returning({ id: posts.id }),
         ctx.db
-          .insert(files)
-          .values(postFiles.map((file) => ({ ...file, postId }))),
+          .insert(postFiles)
+          .values(files.map((file) => ({ ...file, postId }))),
       ]);
     }),
   editPost: protectedProcedure
