@@ -4,8 +4,9 @@
  * "a minute ago", "in 2 hours", "yesterday", "3 months ago", etc.
  * using Intl.RelativeTimeFormat
  */
+
 export default function getRelativeTimeString(
-  date: Date | number,
+  date: Date,
   lang = "en-US",
 ): string {
   // Allow dates or times to be passed
@@ -15,25 +16,16 @@ export default function getRelativeTimeString(
   const deltaSeconds = Math.round((timeMs - Date.now()) / 1000);
 
   // Array reprsenting one minute, hour, day, week, month, etc in seconds
-  const cutoffs = [
-    60,
-    3600,
-    86400,
-    86400 * 7,
-    86400 * 30,
-    86400 * 365,
-    Infinity,
-  ];
+  const cutoffs = [60, 3600, 86400, 86400 * 30, 86400 * 365, Infinity];
 
   // Array equivalent to the above but in the string representation of the units
   const units: Intl.RelativeTimeFormatUnit[] = [
-    "second",
-    "minute",
-    "hour",
-    "day",
-    "week",
-    "month",
-    "year",
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "months",
+    "years",
   ];
 
   // Grab the ideal cutoff unit
@@ -46,6 +38,10 @@ export default function getRelativeTimeString(
   const divisor = unitIndex ? cutoffs[unitIndex - 1] : 1;
 
   // Intl.RelativeTimeFormat do its magic
-  const rtf = new Intl.RelativeTimeFormat(lang, { numeric: "auto" });
+  const rtf = new Intl.RelativeTimeFormat(lang, {
+    numeric: "auto",
+    style: "short",
+  });
+
   return rtf.format(Math.floor(deltaSeconds / divisor), units[unitIndex]);
 }
