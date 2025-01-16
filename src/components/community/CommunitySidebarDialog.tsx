@@ -17,7 +17,9 @@ import { Community } from "@/db/schema";
 
 // import { trpc } from "@/trpc/client";
 
-export default function CommunityDialog({}: { communityId: Community["id"] }) {
+export default function CommunitySidebarDialog({}: {
+  communityId: Community["id"];
+}) {
   // const editCommunity = trpc.community.editCommunity.useMutation({
   //   onSuccess: () => {},
   //   onError: (error) => {

@@ -101,6 +101,7 @@ export default function SubmitButton({
               communityId: selectedCommunity.id,
             });
           } else if (state.postType === PostType.IMAGE) {
+            // text is set to null
             createPostImage.mutate({
               ...post,
               communityId: selectedCommunity.id,

@@ -9,7 +9,7 @@ import { trpc } from "@/trpc/client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import CommunityDialog from "./CommunityDialog";
+import CommunitySidebarDialog from "./CommunitySidebarDialog";
 
 export default function CommunitySidebar({
   currentUserId,
@@ -32,7 +32,7 @@ export default function CommunitySidebar({
           {community.displayName ?? community.name}
         </h2>
         {currentUserId === community.moderatorId && (
-          <CommunityDialog communityId={community.id} />
+          <CommunitySidebarDialog communityId={community.id} />
         )}
       </div>
 
