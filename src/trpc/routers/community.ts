@@ -31,11 +31,12 @@ export const communityRouter = createTRPCRouter({
   }),
   getUserToCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
-    .query(({ input, ctx }) => {
-      return getUserToCommunity.execute({
+    .query(async ({ input, ctx }) => {
+      const data = await getUserToCommunity.execute({
         currentUserId: ctx.userId,
         communityName: input,
       });
+      return data ?? null;
     }),
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)

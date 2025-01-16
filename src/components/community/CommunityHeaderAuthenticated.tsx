@@ -31,8 +31,14 @@ export default function CommunityHeaderAuthenticated({
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
 
-  const [userToCommunity = { joined: false, favorited: false, muted: false }] =
+  const [userToCommunity] =
     trpc.community.getUserToCommunity.useSuspenseQuery(communityName);
+
+  const defaultUserToCommunity = userToCommunity ?? {
+    joined: false,
+    favorited: false,
+    muted: false,
+  };
 
   if (!community) {
     throw new Error("Community not found");
@@ -146,16 +152,16 @@ export default function CommunityHeaderAuthenticated({
 
         <div className="flex items-center gap-3">
           <Button
-            variant={userToCommunity.joined ? "outline" : "default"}
+            variant={defaultUserToCommunity.joined ? "outline" : "default"}
             className="h-10 rounded-full font-bold"
             onClick={() => {
               joinCommunity.mutate({
                 communityId: community.id,
-                joined: !userToCommunity.joined,
+                joined: !defaultUserToCommunity.joined,
               });
             }}
           >
-            {userToCommunity.joined ? "Joined" : "Join"}
+            {defaultUserToCommunity.joined ? "Joined" : "Join"}
           </Button>
 
           <DropdownMenu>
@@ -170,11 +176,11 @@ export default function CommunityHeaderAuthenticated({
                 onClick={() => {
                   favoriteCommunity.mutate({
                     communityId: community.id,
-                    favorited: !userToCommunity.favorited,
+                    favorited: !defaultUserToCommunity.favorited,
                   });
                 }}
               >
-                {userToCommunity.favorited
+                {defaultUserToCommunity.favorited
                   ? "Remove from Favorites"
                   : "Add to Favorites"}
               </DropdownMenuItem>
@@ -183,11 +189,12 @@ export default function CommunityHeaderAuthenticated({
                 onClick={() => {
                   muteCommunity.mutate({
                     communityId: community.id,
-                    muted: !userToCommunity.muted,
+                    muted: !defaultUserToCommunity.muted,
                   });
                 }}
               >
-                {userToCommunity.muted ? "Unmute" : "Mute"} r/{community.name}
+                {defaultUserToCommunity.muted ? "Unmute" : "Mute"} r/
+                {community.name}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
