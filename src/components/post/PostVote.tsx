@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -10,6 +10,7 @@ import {
 } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
+import { Button } from "../ui/button";
 
 export default function PostVote() {
   const state = usePostContext();
@@ -22,56 +23,72 @@ export default function PostVote() {
         vote: variables.voteStatus,
       });
     },
-    onError: async ({ message }) => {
-      toast.error(message);
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
-  return (
-    <div className="flex select-none flex-col gap-0.5 text-center text-muted-foreground">
-      <ArrowUpCircle
-        className={cn(
-          "size-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
-          {
-            "text-rose-500": state.voteStatus === "upvoted",
-          },
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
+  const isUpvoted = state.voteStatus === "upvoted";
+  const isDownvoted = state.voteStatus === "downvoted";
 
+  return (
+    <div
+      className={cn("flex items-center gap-0.5 rounded-full bg-secondary", {
+        "bg-rose-600": isUpvoted,
+        "bg-indigo-500": isDownvoted,
+      })}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <Button
+        variant={"secondary"}
+        className={cn("size-8 rounded-full bg-inherit transition", {
+          "hover:bg-rose-700": isUpvoted,
+          "hover:bg-indigo-600": isDownvoted,
+        })}
+        onClick={() => {
           votePost.mutate({
             postId: state.id,
-            voteStatus: state.voteStatus === "upvoted" ? "none" : "upvoted",
+            voteStatus: isUpvoted ? "none" : "upvoted",
           });
         }}
-      />
-      <div
-        className={cn("text-xs font-bold text-zinc-300 transition-colors", {
-          "text-rose-500": state.voteStatus === "upvoted",
-          "text-blue-500": state.voteStatus === "downvoted",
-        })}
       >
+        <ArrowBigUp
+          className={cn("stroke-[1.2]", {
+            "hover:text-rose-600": !isUpvoted && !isDownvoted,
+            "fill-foreground": isUpvoted,
+          })}
+        />
+      </Button>
+
+      <div className="text-xs font-bold">
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
         }).format(state.voteCount)}
       </div>
-      <ArrowDownCircle
-        className={cn(
-          "size-6 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
-          {
-            "text-blue-500": state.voteStatus === "downvoted",
-          },
-        )}
-        onClick={(e) => {
-          e.stopPropagation();
 
+      <Button
+        variant={"secondary"}
+        className={cn("size-8 rounded-full bg-inherit", {
+          "hover:bg-rose-700": isUpvoted,
+          "hover:bg-indigo-600": isDownvoted,
+        })}
+        onClick={() => {
           votePost.mutate({
             postId: state.id,
-            voteStatus: state.voteStatus === "downvoted" ? "none" : "downvoted",
+            voteStatus: isDownvoted ? "none" : "downvoted",
           });
         }}
-      />
+      >
+        <ArrowBigDown
+          className={cn("stroke-[1.2]", {
+            "hover:text-indigo-500": !isUpvoted && !isDownvoted,
+            "fill-foreground": isDownvoted,
+          })}
+        />
+      </Button>
     </div>
   );
 }

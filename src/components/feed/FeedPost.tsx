@@ -4,10 +4,9 @@ import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
 import PostActions from "../post/PostActions";
-import PostActionsDropdown from "../post/PostActionsDropdown";
-import PostActionsPlaceholder from "../post/PostActionsPlaceholder";
 import PostContent from "../post/PostContent";
-import PostMetadata from "../post/PostMetadata";
+import PostDropdown from "../post/PostDropdown";
+import PostHeader from "../post/PostHeader";
 import PostVote from "../post/PostVote";
 import PostVotePlaceholder from "../post/PostVotePlaceholder";
 import FeedPostHidden from "./FeedPostHidden";
@@ -45,7 +44,7 @@ export default function FeedPost({
 
   return (
     <div
-      className="flex cursor-pointer gap-3 rounded border bg-card p-2 hover:border-ring"
+      className="flex cursor-pointer flex-col gap-2 rounded border bg-card px-4 py-2 hover:border-ring/50"
       onMouseEnter={() => {
         router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
       }}
@@ -53,18 +52,13 @@ export default function FeedPost({
         router.push(`/r/${state.community.name}/comments/${state.id}`);
       }}
     >
-      {currentUserId && <PostVote />}
-      {!currentUserId && <PostVotePlaceholder />}
-      <div className="flex w-0 grow flex-col gap-1">
-        <PostMetadata />
-        <PostContent />
-        {currentUserId && (
-          <PostActions currentUserId={currentUserId}>
-            <PostActionsDropdown />
-          </PostActions>
-        )}
-        {!currentUserId && <PostActionsPlaceholder />}
-      </div>
+      <PostHeader>
+        {currentUserId && <PostDropdown currentUserId={currentUserId} />}
+      </PostHeader>
+      <PostContent />
+      <PostActions>
+        {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
+      </PostActions>
     </div>
   );
 }

@@ -5,10 +5,9 @@ import { User } from "@clerk/nextjs/server";
 import { getPostById } from "@/api/getPost";
 import PostContextProvider from "@/context/PostContext";
 import PostActions from "./PostActions";
-import PostActionsDropdown from "./PostActionsDropdown";
-import PostActionsPlaceholder from "./PostActionsPlaceholder";
 import PostContent from "./PostContent";
-import PostMetadata from "./PostMetadata";
+import PostDropdown from "./PostDropdown";
+import PostHeader from "./PostHeader";
 import PostVote from "./PostVote";
 import PostVotePlaceholder from "./PostVotePlaceholder";
 
@@ -28,19 +27,14 @@ export default async function Post({
 
   return (
     <PostContextProvider post={post}>
-      <div className="flex gap-3 rounded border bg-card p-2">
-        {currentUserId && <PostVote />}
-        {!currentUserId && <PostVotePlaceholder />}
-        <div className="flex w-0 grow flex-col gap-1">
-          <PostMetadata />
-          <PostContent />
-          {currentUserId && (
-            <PostActions currentUserId={currentUserId}>
-              <PostActionsDropdown />
-            </PostActions>
-          )}
-          {!currentUserId && <PostActionsPlaceholder />}
-        </div>
+      <div className="flex flex-col gap-2 rounded border bg-card px-4 py-2">
+        <PostHeader>
+          {currentUserId && <PostDropdown currentUserId={currentUserId} />}
+        </PostHeader>
+        <PostContent />
+        <PostActions>
+          {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
+        </PostActions>
       </div>
     </PostContextProvider>
   );

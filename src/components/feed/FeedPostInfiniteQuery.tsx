@@ -66,7 +66,7 @@ export default function FeedPostInfiniteQuery({
   }
 
   return (
-    <div className="relative flex grow flex-col gap-2.5">
+    <div className="relative flex w-0 grow flex-col gap-2.5">
       <FeedSort sort={input.sort} />
 
       {pages.map((page) =>

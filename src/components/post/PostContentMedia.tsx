@@ -36,7 +36,7 @@ export default function PostContentMedia() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
-        className={cn("relative h-96 overflow-hidden", {
+        className={cn("relative h-96 overflow-hidden rounded-md", {
           "brightness-[0.4]": showBlur,
         })}
       >
@@ -48,7 +48,7 @@ export default function PostContentMedia() {
             sizes={imageSizes}
             placeholder="blur"
             blurDataURL={placeholderURL}
-            className="object-contain backdrop-brightness-[0.4]"
+            className="rounded-md border border-white/10 object-contain backdrop-brightness-[0.4]"
           />
         )}
       </div>
@@ -72,7 +72,7 @@ export default function PostContentMedia() {
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
-              className={cn("relative order-2 h-96 min-w-full", {
+              className={cn("relative order-2 h-96 min-w-full rounded-md", {
                 "order-1": currentIndex === i + 1,
                 "brightness-[0.4]": showBlur,
               })}
@@ -85,7 +85,7 @@ export default function PostContentMedia() {
                   sizes={imageSizes}
                   placeholder="blur"
                   blurDataURL={placeholderURL}
-                  className="object object-contain backdrop-brightness-[0.4]"
+                  className="rounded-md border border-white/10 object-contain backdrop-brightness-[0.4]"
                 />
               )}
             </div>
