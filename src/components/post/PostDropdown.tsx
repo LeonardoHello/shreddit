@@ -5,14 +5,16 @@ import { useParams, useRouter } from "next/navigation";
 import { User } from "@clerk/nextjs/server";
 import {
   AlertTriangle,
-  Baby,
   Bookmark,
   BookmarkCheck,
   Ellipsis,
   Eye,
   EyeOff,
   Pencil,
+  Shield,
+  ShieldX,
   Trash,
+  Triangle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -210,18 +212,36 @@ export default function PostDropdown({
                 setSpoiler.mutate({ id: post.id, spoiler: !post.spoiler });
               }}
             >
-              <AlertTriangle />
-              {post.spoiler && <span>Remove spoiler tag</span>}
-              {!post.spoiler && <span>Add spoiler tag</span>}
+              {post.spoiler && (
+                <>
+                  <AlertTriangle />
+                  <span>Remove spoiler tag</span>
+                </>
+              )}
+              {!post.spoiler && (
+                <>
+                  <Triangle />
+                  <span>Add spoiler tag</span>
+                </>
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
                 setNSFW.mutate({ id: post.id, nsfw: !post.nsfw });
               }}
             >
-              <Baby />
-              {post.nsfw && <span>Remove NSFW tag</span>}
-              {!post.nsfw && <span>Add NSFW tag</span>}
+              {post.nsfw && (
+                <>
+                  <ShieldX />
+                  <span>Remove NSFW tag</span>
+                </>
+              )}
+              {!post.nsfw && (
+                <>
+                  <Shield />
+                  <span>Add NSFW tag</span>
+                </>
+              )}
             </DropdownMenuItem>
           </>
         )}
