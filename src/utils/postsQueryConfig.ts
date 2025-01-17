@@ -25,10 +25,10 @@ const postsQueryConfig = (props: {
       author: { columns: { username: true, imageUrl: true } },
       files: { columns: { id: true, name: true, url: true, thumbHash: true } },
     },
-    where: (post, { eq, ne, and, gt, exists }) =>
+    where: (post, { eq, and, gt, notExists }) =>
       and(
         props.hideHidden
-          ? exists(
+          ? notExists(
               db
                 .select()
                 .from(schema.usersToPosts)
@@ -39,13 +39,13 @@ const postsQueryConfig = (props: {
                       schema.usersToPosts.userId,
                       sql.placeholder("currentUserId"),
                     ),
-                    ne(schema.usersToPosts.hidden, true),
+                    eq(schema.usersToPosts.hidden, true),
                   ),
                 ),
             )
           : undefined,
         props.hideCommunityMuted
-          ? exists(
+          ? notExists(
               db
                 .select()
                 .from(schema.usersToCommunities)
@@ -56,7 +56,7 @@ const postsQueryConfig = (props: {
                       schema.usersToCommunities.userId,
                       sql.placeholder("currentUserId"),
                     ),
-                    ne(schema.usersToCommunities.muted, true),
+                    eq(schema.usersToCommunities.muted, true),
                   ),
                 ),
             )
