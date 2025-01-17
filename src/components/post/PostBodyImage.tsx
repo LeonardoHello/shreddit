@@ -10,7 +10,7 @@ import { cn } from "@/utils/cn";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 
-export default function PostContentMedia() {
+export default function PostBodyImage() {
   const { postId } = useParams();
   const [currentIndex, setCurrentIndex] = useState(1);
 

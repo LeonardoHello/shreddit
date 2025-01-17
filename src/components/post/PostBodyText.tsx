@@ -2,7 +2,7 @@ import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
 
-export default function PostContentText() {
+export default function PostBodyText() {
   const { postId } = useParams();
 
   const state = usePostContext();

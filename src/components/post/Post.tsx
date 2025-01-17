@@ -5,7 +5,7 @@ import { User } from "@clerk/nextjs/server";
 import { getPostById } from "@/api/getPost";
 import PostContextProvider from "@/context/PostContext";
 import PostActions from "./PostActions";
-import PostContent from "./PostContent";
+import PostBody from "./PostBody";
 import PostDropdown from "./PostDropdown";
 import PostHeader from "./PostHeader";
 import PostVote from "./PostVote";
@@ -31,7 +31,7 @@ export default async function Post({
         <PostHeader>
           {currentUserId && <PostDropdown currentUserId={currentUserId} />}
         </PostHeader>
-        <PostContent />
+        <PostBody />
         <PostActions>
           {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
         </PostActions>

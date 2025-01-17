@@ -4,7 +4,7 @@ import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
 import PostActions from "../post/PostActions";
-import PostContent from "../post/PostContent";
+import PostBody from "../post/PostBody";
 import PostDropdown from "../post/PostDropdown";
 import PostHeader from "../post/PostHeader";
 import PostVote from "../post/PostVote";
@@ -55,7 +55,7 @@ export default function FeedPost({
       <PostHeader>
         {currentUserId && <PostDropdown currentUserId={currentUserId} />}
       </PostHeader>
-      <PostContent />
+      <PostBody />
       <PostActions>
         {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
       </PostActions>
