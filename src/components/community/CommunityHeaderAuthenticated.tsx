@@ -172,7 +172,6 @@ export default function CommunityHeaderAuthenticated({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="rounded bg-card">
               <DropdownMenuItem
-                className="px-4 py-3"
                 onClick={() => {
                   favoriteCommunity.mutate({
                     communityId: community.id,
@@ -185,7 +184,6 @@ export default function CommunityHeaderAuthenticated({
                   : "Add to Favorites"}
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="px-4 py-3"
                 onClick={() => {
                   muteCommunity.mutate({
                     communityId: community.id,

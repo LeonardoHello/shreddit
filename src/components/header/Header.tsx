@@ -71,15 +71,11 @@ export default async function Header({
       {!userId && (
         <div className="flex items-center gap-2 self-center">
           <ClerkLoading>
-            <Button variant={"secondary"} className="rounded-full">
-              Sign in
-            </Button>
+            <Button className="rounded-full">Sign in</Button>
           </ClerkLoading>
           <ClerkLoaded>
             <SignInButton mode="modal">
-              <Button variant={"secondary"} className="rounded-full">
-                Sign in
-              </Button>
+              <Button className="rounded-full">Sign in</Button>
             </SignInButton>
           </ClerkLoaded>
         </div>
