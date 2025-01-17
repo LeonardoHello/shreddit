@@ -1,104 +1,74 @@
 import db from "@/db";
 import { users } from "@/db/schema";
 import {
-  bestPosts,
-  controversialPosts,
-  hotPosts,
-  newPosts,
+  bestPostsQueryConfig,
+  controversialPostsQueryConfig,
+  hotPostsQueryConfig,
+  newPostsQueryConfig,
+  PostsQueryConfig,
 } from "@/utils/postsQueryConfig";
+
+const userPostsFilter = {
+  hideHidden: false,
+  hideCommunityMuted: false,
+};
+
+const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
+  const { sql, exists, and, eq } = filter;
+
+  return exists(
+    db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.id, post.authorId),
+          eq(users.username, sql.placeholder("username")),
+        ),
+      ),
+  );
+};
 
 export const getUserBestPosts = db.query.posts
   .findMany({
-    ...bestPosts,
-    where: (post, filter) => {
-      const { sql, exists, and, eq } = filter;
-
-      return and(
-        exists(
-          db
-            .select()
-            .from(users)
-            .where(
-              and(
-                eq(users.id, post.authorId),
-                eq(users.username, sql.placeholder("username")),
-              ),
-            ),
-        ),
-        bestPosts.where(post, filter),
-      );
-    },
+    ...bestPostsQueryConfig(userPostsFilter),
+    where: (post, filter) =>
+      filter.and(
+        whereConfig(post, filter),
+        bestPostsQueryConfig(userPostsFilter).where(post, filter),
+      ),
   })
   .prepare("user_best_posts");
 
 export const getUserHotPosts = db.query.posts
   .findMany({
-    ...hotPosts,
-    where: (post, filter) => {
-      const { sql, exists, and, eq } = filter;
-
-      return and(
-        exists(
-          db
-            .select()
-            .from(users)
-            .where(
-              and(
-                eq(users.id, post.authorId),
-                eq(users.username, sql.placeholder("username")),
-              ),
-            ),
-        ),
-        hotPosts.where(post, filter),
-      );
-    },
+    ...hotPostsQueryConfig(userPostsFilter),
+    where: (post, filter) =>
+      filter.and(
+        whereConfig(post, filter),
+        hotPostsQueryConfig(userPostsFilter).where(post, filter),
+      ),
   })
   .prepare("user_hot_posts");
 
 export const getUserNewPosts = db.query.posts
   .findMany({
-    ...newPosts,
-    where: (post, filter) => {
-      const { sql, exists, and, eq } = filter;
-
-      return and(
-        exists(
-          db
-            .select()
-            .from(users)
-            .where(
-              and(
-                eq(users.id, post.authorId),
-                eq(users.username, sql.placeholder("username")),
-              ),
-            ),
-        ),
-        newPosts.where(post, filter),
-      );
-    },
+    ...newPostsQueryConfig(userPostsFilter),
+    where: (post, filter) =>
+      filter.and(
+        whereConfig(post, filter),
+        newPostsQueryConfig(userPostsFilter).where(post, filter),
+      ),
   })
   .prepare("user_new_posts");
 
 export const getUserControversialPosts = db.query.posts
   .findMany({
-    ...controversialPosts,
-    where: (post, filter) => {
-      const { sql, exists, and, eq } = filter;
-
-      return and(
-        exists(
-          db
-            .select()
-            .from(users)
-            .where(
-              and(
-                eq(users.id, post.authorId),
-                eq(users.username, sql.placeholder("username")),
-              ),
-            ),
-        ),
-        controversialPosts.where(post, filter),
-      );
-    },
+    ...controversialPostsQueryConfig(userPostsFilter),
+    where: (post, filter) =>
+      filter.and(
+        whereConfig(post, filter),
+        controversialPostsQueryConfig(userPostsFilter).where(post, filter),
+      ),
   })
   .prepare("user_controversial_posts");

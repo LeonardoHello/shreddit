@@ -12,32 +12,23 @@ export type PostsQueryConfig = DBQueryConfig<
   ExtractTablesWithRelations<typeof schema>["posts"]
 >;
 
-export const postsQueryConfig = ({
-  sort,
-  showHidden,
-  hideMuted,
-}: {
-  sort?: PostSort;
-  showHidden?: boolean;
-  hideMuted?: boolean;
+const postsQueryConfig = (props: {
+  sort: PostSort;
+  hideHidden: boolean;
+  hideCommunityMuted: boolean;
 }) =>
   ({
     limit: 10,
     offset: sql.placeholder("offset"),
     with: {
-      community: {
-        columns: { name: true, icon: true },
-        with: {
-          usersToCommunities: { columns: { muted: true, userId: true } },
-        },
-      },
-      author: { columns: { username: true } },
-      files: true,
+      community: { columns: { name: true, icon: true } },
+      author: { columns: { username: true, imageUrl: true } },
+      files: { columns: { id: true, name: true, url: true, thumbHash: true } },
     },
-    where: (post, { eq, and, notExists, gt }) =>
+    where: (post, { eq, ne, and, gt, exists }) =>
       and(
-        !showHidden
-          ? notExists(
+        props.hideHidden
+          ? exists(
               db
                 .select()
                 .from(schema.usersToPosts)
@@ -48,13 +39,13 @@ export const postsQueryConfig = ({
                       schema.usersToPosts.userId,
                       sql.placeholder("currentUserId"),
                     ),
-                    eq(schema.usersToPosts.hidden, true),
+                    ne(schema.usersToPosts.hidden, true),
                   ),
                 ),
             )
           : undefined,
-        hideMuted
-          ? notExists(
+        props.hideCommunityMuted
+          ? exists(
               db
                 .select()
                 .from(schema.usersToCommunities)
@@ -65,12 +56,12 @@ export const postsQueryConfig = ({
                       schema.usersToCommunities.userId,
                       sql.placeholder("currentUserId"),
                     ),
-                    eq(schema.usersToCommunities.muted, true),
+                    ne(schema.usersToCommunities.muted, true),
                   ),
                 ),
             )
           : undefined,
-        sort === PostSort.HOT ? gt(post.createdAt, monthAgo) : undefined,
+        props.sort === PostSort.HOT ? gt(post.createdAt, monthAgo) : undefined,
       ),
     extras: (post) => ({
       voteCount: sql<number>`
@@ -110,19 +101,16 @@ export const postsQueryConfig = ({
         )
       `.as("is_hidden"),
       voteStatus: sql<schema.UserToPost["voteStatus"] | null>`
-        (
-          SELECT vote_status
-          FROM users_to_posts
-          WHERE users_to_posts.post_id = ${post.id}
-            AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+      (
+        SELECT vote_status
+        FROM users_to_posts
+        WHERE users_to_posts.post_id = ${post.id}
+        AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
         )
-      `.as("vote_status"),
+        `.as("vote_status"),
     }),
     orderBy: (post, { desc, asc }) => {
-      switch (sort) {
-        case PostSort.HOT:
-          return [desc(sql`vote_count`), asc(post.createdAt)];
-
+      switch (props.sort) {
         case PostSort.NEW:
           return [desc(post.createdAt)];
 
@@ -135,9 +123,22 @@ export const postsQueryConfig = ({
     },
   }) satisfies PostsQueryConfig;
 
-export const bestPosts = postsQueryConfig({});
-export const hotPosts = postsQueryConfig({ sort: PostSort.HOT });
-export const newPosts = postsQueryConfig({ sort: PostSort.NEW });
-export const controversialPosts = postsQueryConfig({
-  sort: PostSort.CONTROVERSIAL,
-});
+export const bestPostsQueryConfig = (props: {
+  hideHidden: boolean;
+  hideCommunityMuted: boolean;
+}) => postsQueryConfig({ sort: PostSort.BEST, ...props });
+
+export const hotPostsQueryConfig = (props: {
+  hideHidden: boolean;
+  hideCommunityMuted: boolean;
+}) => postsQueryConfig({ sort: PostSort.HOT, ...props });
+
+export const newPostsQueryConfig = (props: {
+  hideHidden: boolean;
+  hideCommunityMuted: boolean;
+}) => postsQueryConfig({ sort: PostSort.NEW, ...props });
+
+export const controversialPostsQueryConfig = (props: {
+  hideHidden: boolean;
+  hideCommunityMuted: boolean;
+}) => postsQueryConfig({ sort: PostSort.CONTROVERSIAL, ...props });
