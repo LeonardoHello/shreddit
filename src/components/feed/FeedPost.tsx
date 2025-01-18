@@ -3,9 +3,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
-import PostActions from "../post/PostActions";
 import PostBody from "../post/PostBody";
 import PostDropdown from "../post/PostDropdown";
+import PostFooter from "../post/PostFooter";
 import PostHeader from "../post/PostHeader";
 import PostVote from "../post/PostVote";
 import PostVotePlaceholder from "../post/PostVotePlaceholder";
@@ -56,9 +56,9 @@ export default function FeedPost({
         {currentUserId && <PostDropdown currentUserId={currentUserId} />}
       </PostHeader>
       <PostBody />
-      <PostActions>
+      <PostFooter>
         {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
-      </PostActions>
+      </PostFooter>
     </div>
   );
 }

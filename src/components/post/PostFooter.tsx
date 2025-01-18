@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { usePostContext } from "@/context/PostContext";
 import { Button } from "../ui/button";
 
-export default function PostActions({
+export default function PostFooter({
   children,
 }: {
   children: React.ReactNode;
