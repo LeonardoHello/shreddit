@@ -23,7 +23,7 @@ export default function PostHeader({
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         {postId ? (
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-2 text-xs">
             <Link
               href={`/r/${state.community.name}`}
               className="block rounded-full"
@@ -31,32 +31,31 @@ export default function PostHeader({
             >
               <CommunityImage icon={state.community.icon} size={32} />
             </Link>
-            <div className="flex flex-col items-start">
-              <div className="flex items-center gap-1">
+            <div>
+              <div className="flex items-center gap-1 text-muted-foreground">
                 <Link
                   href={`/r/${state.community.name}`}
-                  className="font-extrabold"
+                  className="font-extrabold text-foreground hover:opacity-80"
                   onClick={(e) => e.stopPropagation()}
                 >
                   r/{state.community.name}
                 </Link>
-                <span className="text-muted-foreground">•</span>
+                <span>•</span>
                 {hydrated ? (
                   <time
                     dateTime={state.createdAt.toISOString()}
                     title={state.createdAt.toLocaleDateString("hr-HR")}
-                    className="text-muted-foreground"
                   >
                     {getRelativeTimeString(state.createdAt)}
                   </time>
                 ) : (
-                  <span className="text-muted-foreground">Calculating...</span>
+                  <span>Calculating...</span>
                 )}
               </div>
               <Link
                 href={`/u/${state.author.username}`}
                 onClick={(e) => e.stopPropagation()}
-                className="text-muted-foreground hover:underline"
+                className="hover:opacity-80"
               >
                 {state.author.username}
               </Link>
@@ -67,7 +66,7 @@ export default function PostHeader({
             <Link
               href={`/u/${state.author.username}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 text-xs"
+              className="group flex items-center gap-1.5 text-foreground"
             >
               <Avatar className="size-6">
                 <AvatarImage src={state.author.imageUrl} />
@@ -75,7 +74,9 @@ export default function PostHeader({
                   {state.author.username.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-extrabold">u/{state.author.username}</span>
+              <span className="font-extrabold group-hover:opacity-80">
+                u/{state.author.username}
+              </span>
             </Link>
             <span>•</span>
             {hydrated ? (
@@ -90,26 +91,27 @@ export default function PostHeader({
             )}
           </div>
         ) : (
-          <div className="flex items-center gap-1 text-xs">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Link
               href={`/r/${state.community.name}`}
               onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 text-xs"
+              className="group flex items-center gap-1.5 text-xs text-foreground"
             >
               <CommunityImage icon={state.community.icon} size={24} />
-              <span className="font-extrabold">r/{state.community.name}</span>
+              <span className="font-extrabold group-hover:opacity-80">
+                r/{state.community.name}
+              </span>
             </Link>
-            <span className="text-muted-foreground">•</span>
+            <span>•</span>
             {hydrated ? (
               <time
                 dateTime={state.createdAt.toISOString()}
                 title={state.createdAt.toLocaleDateString("hr-HR")}
-                className="text-muted-foreground"
               >
                 {getRelativeTimeString(state.createdAt)}
               </time>
             ) : (
-              <span className="text-muted-foreground">Calculating...</span>
+              <span>Calculating...</span>
             )}
           </div>
         )}
