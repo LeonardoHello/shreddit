@@ -1,45 +1,75 @@
-import { useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import * as thumbhash from "thumbhash";
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { usePostContext } from "@/context/PostContext";
-import { cn } from "@/utils/cn";
+import { ArrElement } from "@/types";
 import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
 
 export default function PostBodyImage() {
   const { postId } = useParams();
-  const [currentIndex, setCurrentIndex] = useState(1);
 
   const post = usePostContext();
 
   const showBlur = !postId && (post.nsfw || post.spoiler);
 
-  const imageSizes =
-    "(max-width: 640px) 90vw, (max-width: 768px) 570px, (max-width: 1024px) 698px, (max-width: 1280px) 618px, (max-width: 1536px) 586px, 674px";
-
   if (post.files.length === 1) {
     const file = post.files[0];
 
-    const placeholderURL = thumbhash.thumbHashToDataURL(
-      Buffer.from(file.thumbHash, "base64"),
-    );
+    return <PostImage file={file} showBlur={showBlur} />;
+  }
 
-    return (
-      <div
-        style={{
-          backgroundImage: `url(${placeholderURL})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        className={cn("relative h-96 overflow-hidden rounded-md", {
-          "brightness-[0.4]": showBlur,
-        })}
-      >
+  return (
+    <Carousel>
+      <CarouselContent className="gap-4">
+        {post.files.map((image) => (
+          <CarouselItem key={image.id}>
+            <PostImage file={image} showBlur={showBlur} />
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      {!showBlur && (
+        <>
+          <CarouselPrevious />
+          <CarouselNext />
+        </>
+      )}
+    </Carousel>
+  );
+}
+
+function PostImage({
+  file,
+  showBlur,
+}: {
+  file: ArrElement<ReturnType<typeof usePostContext>["files"]>;
+  showBlur: boolean;
+}) {
+  const placeholderURL = thumbhash.thumbHashToDataURL(
+    Buffer.from(file.thumbHash, "base64"),
+  );
+
+  const imageSizes =
+    "(max-width: 640px) 90vw, (max-width: 768px) 570px, (max-width: 1024px) 698px, (max-width: 1280px) 618px, (max-width: 1536px) 586px, 674px";
+
+  return (
+    <div className="relative overflow-hidden rounded-md">
+      <div className="relative flex h-96 flex-col justify-center rounded-md border border-white/15">
+        <Image
+          src={placeholderURL}
+          alt={file.name + " - background image"}
+          fill
+          sizes={imageSizes}
+          className="scale-105 rounded-md object-cover object-center opacity-30"
+        />
         {!showBlur && (
           <Image
             src={file.url}
@@ -48,93 +78,38 @@ export default function PostBodyImage() {
             sizes={imageSizes}
             placeholder="blur"
             blurDataURL={placeholderURL}
-            className="rounded-md border border-white/10 object-contain backdrop-brightness-[0.4]"
+            className="object-contain"
           />
         )}
+
+        {showBlur && <WarningBadge />}
       </div>
+    </div>
+  );
+}
+
+function WarningBadge() {
+  const post = usePostContext();
+
+  if (post.nsfw && post.spoiler) {
+    return (
+      <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
+        View NSFW content & spoilers
+      </Badge>
+    );
+  }
+
+  if (post.nsfw) {
+    return (
+      <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
+        View NSFW content
+      </Badge>
     );
   }
 
   return (
-    <div className="relative flex flex-col justify-center overflow-hidden">
-      <div className="flex items-center">
-        {post.files.map((image, i) => {
-          const placeholderURL = thumbhash.thumbHashToDataURL(
-            Buffer.from(image.thumbHash, "base64"),
-          );
-
-          return (
-            <div
-              key={image.id}
-              style={{
-                backgroundImage: `url(${placeholderURL})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-              }}
-              className={cn("relative order-2 h-96 min-w-full rounded-md", {
-                "order-1": currentIndex === i + 1,
-                "brightness-[0.4]": showBlur,
-              })}
-            >
-              {!showBlur && (
-                <Image
-                  src={image.url}
-                  alt={image.name}
-                  fill
-                  sizes={imageSizes}
-                  placeholder="blur"
-                  blurDataURL={placeholderURL}
-                  className="rounded-md border border-white/10 object-contain backdrop-brightness-[0.4]"
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-      {!showBlur && (
-        <>
-          <Badge className="absolute right-4 top-4 rounded-full">
-            {currentIndex}/{post.files.length}
-          </Badge>
-
-          <Button
-            className="absolute left-8 rounded-full"
-            size={"icon"}
-            onClick={(e) => {
-              e.stopPropagation();
-
-              setCurrentIndex((prev) => {
-                if (prev === 1) {
-                  return post.files.length;
-                }
-
-                return prev - 1;
-              });
-            }}
-          >
-            <ChevronLeftIcon />
-          </Button>
-
-          <Button
-            className="absolute right-8 rounded-full"
-            size={"icon"}
-            onClick={(e) => {
-              e.stopPropagation();
-
-              setCurrentIndex((prev) => {
-                if (prev === post.files.length) {
-                  return 1;
-                }
-
-                return prev + 1;
-              });
-            }}
-          >
-            <ChevronRightIcon />
-          </Button>
-        </>
-      )}
-    </div>
+    <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
+      View spoilers
+    </Badge>
   );
 }

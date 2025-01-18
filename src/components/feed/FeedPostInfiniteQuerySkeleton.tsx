@@ -15,7 +15,7 @@ export default function FeedPostInfiniteQuerySkeleton() {
       {Array.from({ length: 3 }).map((_, index) => (
         <div
           key={index}
-          className="flex w-full gap-3 rounded border bg-card p-2 hover:border-ring"
+          className="flex w-full gap-3 rounded border bg-card p-2"
         >
           <div className="flex select-none flex-col items-center gap-1 text-muted-foreground">
             <ArrowUpCircle className="size-6 rounded" />
