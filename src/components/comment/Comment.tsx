@@ -3,11 +3,12 @@
 import { useCommentContext } from "@/context/CommentContext";
 import type { User } from "@/db/schema";
 import RTECommentReply from "../RTE/RTECommentReply";
-import CommentActions from "./CommentActions";
-import CommentActionsDropdown from "./CommentActionsDropdown";
-import CommentActionsPlaceholder from "./CommentActionsPlaceholder";
-import CommentContent from "./CommentContent";
-import CommentMetadata from "./CommentMetadata";
+import CommentBody from "./CommentBody";
+import CommentDropdown from "./CommentDropdown";
+import CommentFooter from "./CommentFooter";
+import CommentHeader from "./CommentHeader";
+import CommentVote from "./CommentVote";
+import CommentVotePlaceholder from "./CommentVotePlaceholder";
 
 export default function Comment({
   children,
@@ -20,17 +21,17 @@ export default function Comment({
 
   return (
     <div className="flex flex-col gap-2">
-      <CommentMetadata />
+      <CommentHeader />
       <div className="ml-3 flex flex-col gap-4 border-l-2 border-zinc-700/70 pl-4">
         <div className="flex flex-col gap-1">
-          <CommentContent />
+          <CommentBody />
 
-          {currentUserId && (
-            <CommentActions currentUserId={currentUserId}>
-              <CommentActionsDropdown />
-            </CommentActions>
-          )}
-          {!currentUserId && <CommentActionsPlaceholder />}
+          <CommentFooter>
+            {currentUserId && <CommentVote />}
+            {!currentUserId && <CommentVotePlaceholder />}
+
+            {currentUserId === state.author.id && <CommentDropdown />}
+          </CommentFooter>
         </div>
 
         {/* create reply */}

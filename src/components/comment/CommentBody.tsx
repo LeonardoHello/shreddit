@@ -1,7 +1,7 @@
 import { useCommentContext } from "@/context/CommentContext";
 import RTECommentEdit from "../RTE/RTECommentEdit";
 
-export default function CommentContent() {
+export default function CommentBody() {
   const state = useCommentContext();
 
   if (state.isEditing) {

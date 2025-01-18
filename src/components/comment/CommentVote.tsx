@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ArrowDownCircleIcon,
-  ArrowUpCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -13,6 +10,7 @@ import {
 } from "@/context/CommentContext";
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
+import { Button } from "../ui/button";
 
 export default function CommentVote() {
   const state = useCommentContext();
@@ -30,47 +28,56 @@ export default function CommentVote() {
     },
   });
 
+  const isUpvoted = state.voteStatus === "upvoted";
+  const isDownvoted = state.voteStatus === "downvoted";
+
   return (
-    <div className="flex select-none items-center gap-1 text-zinc-500">
-      <ArrowUpCircleIcon
-        className={cn(
-          "h-7 w-7 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
-          {
-            "text-rose-500": state.voteStatus === "upvoted",
-          },
-        )}
+    <div
+      className="flex items-center"
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
+      <Button
+        variant="ghost"
+        className="size-8 rounded-full hover:text-rose-600"
         onClick={() => {
           voteComment.mutate({
             commentId: state.id,
-            voteStatus: state.voteStatus === "upvoted" ? "none" : "upvoted",
+            voteStatus: isUpvoted ? "none" : "upvoted",
           });
         }}
-      />
-      <div
-        className={cn("text-xs font-bold text-zinc-300 transition-colors", {
-          "text-rose-500": state.voteStatus === "upvoted",
-          "text-blue-500": state.voteStatus === "downvoted",
-        })}
       >
+        <ArrowBigUp
+          className={cn("stroke-[1.2]", {
+            "fill-rose-600 text-rose-600": isUpvoted,
+          })}
+        />
+      </Button>
+
+      <div className="text-xs font-bold">
         {new Intl.NumberFormat("en-US", {
           notation: "compact",
           maximumFractionDigits: 1,
         }).format(state.voteCount)}
       </div>
-      <ArrowDownCircleIcon
-        className={cn(
-          "h-7 w-7 cursor-pointer rounded transition-colors hover:bg-zinc-700/50",
-          {
-            "text-blue-500": state.voteStatus === "downvoted",
-          },
-        )}
+
+      <Button
+        variant="ghost"
+        className="size-8 rounded-full hover:text-indigo-500"
         onClick={() => {
           voteComment.mutate({
             commentId: state.id,
-            voteStatus: state.voteStatus === "downvoted" ? "none" : "downvoted",
+            voteStatus: isDownvoted ? "none" : "downvoted",
           });
         }}
-      />
+      >
+        <ArrowBigDown
+          className={cn("stroke-[1.2]", {
+            "fill-indigo-500 text-indigo-500": isDownvoted,
+          })}
+        />
+      </Button>
     </div>
   );
 }
