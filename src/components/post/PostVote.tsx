@@ -33,7 +33,7 @@ export default function PostVote() {
 
   return (
     <div
-      className={cn("flex items-center gap-0.5 rounded-full bg-secondary", {
+      className={cn("flex items-center rounded-full bg-secondary", {
         "bg-rose-600": isUpvoted,
         "bg-indigo-500": isDownvoted,
       })}
@@ -42,8 +42,9 @@ export default function PostVote() {
       }}
     >
       <Button
-        variant={"secondary"}
-        className={cn("size-8 rounded-full bg-inherit transition", {
+        variant="secondary"
+        className={cn("size-8 rounded-full bg-inherit", {
+          "hover:text-rose-600": !isUpvoted && !isDownvoted,
           "hover:bg-rose-700": isUpvoted,
           "hover:bg-indigo-600": isDownvoted,
         })}
@@ -56,7 +57,6 @@ export default function PostVote() {
       >
         <ArrowBigUp
           className={cn("stroke-[1.2]", {
-            "hover:text-rose-600": !isUpvoted && !isDownvoted,
             "fill-foreground": isUpvoted,
           })}
         />
@@ -70,10 +70,11 @@ export default function PostVote() {
       </div>
 
       <Button
-        variant={"secondary"}
+        variant="secondary"
         className={cn("size-8 rounded-full bg-inherit", {
-          "hover:bg-rose-700": isUpvoted,
+          "hover:text-indigo-500": !isUpvoted && !isDownvoted,
           "hover:bg-indigo-600": isDownvoted,
+          "hover:bg-rose-700": isUpvoted,
         })}
         onClick={() => {
           votePost.mutate({
@@ -84,7 +85,6 @@ export default function PostVote() {
       >
         <ArrowBigDown
           className={cn("stroke-[1.2]", {
-            "hover:text-indigo-500": !isUpvoted && !isDownvoted,
             "fill-foreground": isDownvoted,
           })}
         />

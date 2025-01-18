@@ -11,7 +11,7 @@ export default function PostVotePlaceholder() {
 
   return (
     <div
-      className="flex items-center gap-0.5 rounded-full bg-secondary"
+      className="flex items-center rounded-full bg-secondary"
       onClick={(e) => {
         e.stopPropagation();
       }}
@@ -19,18 +19,18 @@ export default function PostVotePlaceholder() {
       <ClerkLoading>
         <Button
           variant="secondary"
-          className="size-8 rounded-full bg-inherit transition"
+          className="size-8 rounded-full bg-inherit hover:text-rose-600"
         >
-          <ArrowBigUp className="stroke-[1.2] hover:text-rose-600" />
+          <ArrowBigUp className="stroke-[1.2]" />
         </Button>
       </ClerkLoading>
       <ClerkLoaded>
         <SignInButton mode="modal">
           <Button
             variant="secondary"
-            className="size-8 rounded-full bg-inherit transition"
+            className="size-8 rounded-full bg-inherit hover:text-rose-600"
           >
-            <ArrowBigUp className="stroke-[1.2] hover:text-rose-600" />
+            <ArrowBigUp className="stroke-[1.2]" />
           </Button>
         </SignInButton>
       </ClerkLoaded>
@@ -43,17 +43,20 @@ export default function PostVotePlaceholder() {
       </div>
 
       <ClerkLoading>
-        <Button variant="secondary" className="size-8 rounded-full bg-inherit">
-          <ArrowBigDown className="stroke-[1.2] hover:text-indigo-500" />
+        <Button
+          variant="secondary"
+          className="size-8 rounded-full bg-inherit hover:text-indigo-500"
+        >
+          <ArrowBigDown className="stroke-[1.2]" />
         </Button>
       </ClerkLoading>
       <ClerkLoaded>
         <SignInButton mode="modal">
           <Button
             variant="secondary"
-            className="size-8 rounded-full bg-inherit"
+            className="size-8 rounded-full bg-inherit hover:text-indigo-500"
           >
-            <ArrowBigDown className="stroke-[1.2] hover:text-indigo-500" />
+            <ArrowBigDown className="stroke-[1.2]" />
           </Button>
         </SignInButton>
       </ClerkLoaded>
