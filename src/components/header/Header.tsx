@@ -71,11 +71,15 @@ export default async function Header({
       {!userId && (
         <div className="flex items-center gap-2 self-center">
           <ClerkLoading>
-            <Button className="rounded-full">Sign in</Button>
+            <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
+              Sign in
+            </Button>
           </ClerkLoading>
           <ClerkLoaded>
             <SignInButton mode="modal">
-              <Button className="rounded-full">Sign in</Button>
+              <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
+                Sign in
+              </Button>
             </SignInButton>
           </ClerkLoaded>
         </div>

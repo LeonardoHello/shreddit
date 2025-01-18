@@ -21,7 +21,7 @@ export default function PostVotePlaceholder() {
           variant="secondary"
           className="size-8 rounded-full bg-inherit transition"
         >
-          <ArrowBigUp className="stroke-[1.2]" />
+          <ArrowBigUp className="stroke-[1.2] hover:text-rose-600" />
         </Button>
       </ClerkLoading>
       <ClerkLoaded>
@@ -30,7 +30,7 @@ export default function PostVotePlaceholder() {
             variant="secondary"
             className="size-8 rounded-full bg-inherit transition"
           >
-            <ArrowBigUp className="stroke-[1.2]" />
+            <ArrowBigUp className="stroke-[1.2] hover:text-rose-600" />
           </Button>
         </SignInButton>
       </ClerkLoaded>
@@ -44,7 +44,7 @@ export default function PostVotePlaceholder() {
 
       <ClerkLoading>
         <Button variant="secondary" className="size-8 rounded-full bg-inherit">
-          <ArrowBigDown className="stroke-[1.2]" />
+          <ArrowBigDown className="stroke-[1.2] hover:text-indigo-500" />
         </Button>
       </ClerkLoading>
       <ClerkLoaded>
@@ -53,7 +53,7 @@ export default function PostVotePlaceholder() {
             variant="secondary"
             className="size-8 rounded-full bg-inherit"
           >
-            <ArrowBigDown className="stroke-[1.2]" />
+            <ArrowBigDown className="stroke-[1.2] hover:text-indigo-500" />
           </Button>
         </SignInButton>
       </ClerkLoaded>
