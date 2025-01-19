@@ -153,7 +153,7 @@ export default function CommunityHeaderAuthenticated({
         <div className="flex items-center gap-3">
           <Button
             variant={defaultUserToCommunity.joined ? "outline" : "default"}
-            className="h-10 rounded-full font-bold"
+            className="rounded-full font-bold"
             onClick={() => {
               joinCommunity.mutate({
                 communityId: community.id,
@@ -166,7 +166,7 @@ export default function CommunityHeaderAuthenticated({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 w-10 rounded-full">
+              <Button variant="ghost" size="icon" className="rounded-full">
                 <Ellipsis className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
