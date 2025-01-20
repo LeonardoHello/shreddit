@@ -45,11 +45,7 @@ export default function CommentDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="order-3 size-8 rounded-full"
-        >
+        <Button variant="ghost" size="icon" className="size-8 rounded-full">
           <Ellipsis className="size-4 stroke-[2.5]" />
         </Button>
       </DropdownMenuTrigger>

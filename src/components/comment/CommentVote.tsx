@@ -1,5 +1,7 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
+import { User } from "@clerk/nextjs/server";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,9 +14,15 @@ import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 
-export default function CommentVote() {
+export default function CommentVote({
+  currentUserId,
+}: {
+  currentUserId: User["id"] | null;
+}) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
+
+  const clerk = useClerk();
 
   const voteComment = trpc.comment.voteComment.useMutation({
     onMutate: (variables) => {
@@ -42,10 +50,14 @@ export default function CommentVote() {
         variant="ghost"
         className="size-8 rounded-full hover:text-rose-600"
         onClick={() => {
-          voteComment.mutate({
-            commentId: state.id,
-            voteStatus: isUpvoted ? "none" : "upvoted",
-          });
+          if (currentUserId) {
+            voteComment.mutate({
+              commentId: state.id,
+              voteStatus: isUpvoted ? "none" : "upvoted",
+            });
+          } else {
+            clerk.openSignIn();
+          }
         }}
       >
         <ArrowBigUp
@@ -66,10 +78,14 @@ export default function CommentVote() {
         variant="ghost"
         className="size-8 rounded-full hover:text-indigo-500"
         onClick={() => {
-          voteComment.mutate({
-            commentId: state.id,
-            voteStatus: isDownvoted ? "none" : "downvoted",
-          });
+          if (currentUserId) {
+            voteComment.mutate({
+              commentId: state.id,
+              voteStatus: isDownvoted ? "none" : "downvoted",
+            });
+          } else {
+            clerk.openSignIn();
+          }
         }}
       >
         <ArrowBigDown
