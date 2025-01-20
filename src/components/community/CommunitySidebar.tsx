@@ -6,6 +6,7 @@ import { CakeSlice, Globe } from "lucide-react";
 
 import { Community, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
+import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import CommunitySidebarDialog from "./CommunitySidebarDialog";
@@ -13,11 +14,11 @@ import CommunitySidebarDialog from "./CommunitySidebarDialog";
 export default function CommunitySidebar({
   currentUserId,
   communityName,
-  className,
+  isDialog,
 }: {
   currentUserId: User["id"] | null;
   communityName: Community["name"];
-  className?: string;
+  isDialog?: boolean;
 }) {
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
@@ -27,7 +28,12 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div className={className}>
+    <div
+      className={cn("flex flex-col gap-2", {
+        "sticky top-16 z-10 hidden h-fit w-80 rounded border bg-card px-3 py-2 lg:flex":
+          !isDialog,
+      })}
+    >
       <div className="flex items-center justify-between gap-2">
         <h2 className="truncate font-medium tracking-wide">
           {community.displayName ?? community.name}

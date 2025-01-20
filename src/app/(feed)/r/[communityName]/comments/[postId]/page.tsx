@@ -15,7 +15,7 @@ import { HydrateClient, trpc } from "@/trpc/server";
 export default async function PostPage(props: {
   params: Promise<{ communityName: string; postId: string }>;
 }) {
-  const [params, { userId }] = await Promise.all([props.params, authPromise()]);
+  const [params, auth] = await Promise.all([props.params, authPromise()]);
 
   void trpc.community.getCommunityByName.prefetch(params.communityName);
 
@@ -23,7 +23,7 @@ export default async function PostPage(props: {
     <main className="container flex grow gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <div className="flex w-0 grow flex-col gap-2">
         <Suspense fallback={<PostSkeleton />}>
-          <Post currentUserId={userId} postId={params.postId} />
+          <Post currentUserId={auth.userId} postId={params.postId} />
         </Suspense>
 
         <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
@@ -32,7 +32,10 @@ export default async function PostPage(props: {
           <Separator />
 
           <Suspense fallback={<CommentSectionSkeleton />}>
-            <CommentSection currentUserId={userId} postId={params.postId} />
+            <CommentSection
+              currentUserId={auth.userId}
+              postId={params.postId}
+            />
           </Suspense>
         </div>
       </div>
@@ -40,7 +43,7 @@ export default async function PostPage(props: {
       <HydrateClient>
         <Suspense fallback={<CommunitySidebarSkeleton />}>
           <CommunitySidebar
-            currentUserId={userId}
+            currentUserId={auth.userId}
             communityName={params.communityName}
           />
         </Suspense>

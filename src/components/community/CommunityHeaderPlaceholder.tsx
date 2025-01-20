@@ -2,11 +2,9 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
-import { User } from "@clerk/nextjs/server";
+import { useClerk } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
 
 import {
   ReducerAction,
@@ -16,23 +14,19 @@ import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
 import CommunityHeaderDialog from "./CommunityHeaderDialog";
-import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
 import CommunityImage from "./CommunityImage";
 
-export default function CommunityHeader({
-  currentUserId,
+export default function CommunityHeaderPlaceholder({
   communityName,
 }: {
-  currentUserId: User["id"];
   communityName: string;
 }) {
   const dispatch = useRecentCommunityDispatchContext();
 
+  const clerk = useClerk();
+
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
-
-  const [userToCommunity] =
-    trpc.community.getUserToCommunity.useSuspenseQuery(communityName);
 
   if (!community) {
     throw new Error("Community not found");
@@ -48,33 +42,6 @@ export default function CommunityHeader({
       },
     });
   }, [dispatch, community.icon, community.id, community.name]);
-
-  const utils = trpc.useUtils();
-
-  const joinCommunity = trpc.community.toggleJoinCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getUserToCommunity.setData(communityName, (updater) => {
-        if (!updater) {
-          return { joined: false, favorited: false, muted: false };
-        }
-
-        return { ...updater, joined: variables.joined };
-      });
-    },
-    onSuccess: (data) => {
-      utils.community.getCommunityByName.invalidate(communityName);
-      utils.community.getJoinedCommunities.invalidate();
-
-      if (data[0].joined) {
-        toast.success(`Joined r/${community.name}`);
-      } else {
-        toast.success(`Left r/${community.name}`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
   return (
     <div className="flex flex-col rounded-lg border bg-card">
@@ -98,7 +65,7 @@ export default function CommunityHeader({
                 r/{community.name}
               </h1>
               <CommunityHeaderDialog
-                currentUserId={currentUserId}
+                currentUserId={null}
                 communityName={communityName}
               />
             </div>
@@ -123,34 +90,25 @@ export default function CommunityHeader({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant={"outline"} className="rounded-full" asChild>
-            <Link href={`/r/${communityName}/submit`}>
-              <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
-              <span className="capitalize">create post</span>
-            </Link>
+          <Button
+            variant={"outline"}
+            className="rounded-full"
+            onClick={() => {
+              clerk.openSignIn();
+            }}
+          >
+            <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+            <span className="capitalize">create post</span>
           </Button>
 
           <Button
-            variant={userToCommunity?.joined ? "outline" : "default"}
-            className="rounded-full font-bold"
+            className="rounded-full font-bold capitalize"
             onClick={() => {
-              joinCommunity.mutate({
-                communityId: community.id,
-                joined: !userToCommunity?.joined,
-              });
+              clerk.openSignIn();
             }}
           >
-            {userToCommunity?.joined ? "Joined" : "Join"}
+            join
           </Button>
-
-          {currentUserId && (
-            <CommunityHeaderDropdown
-              communityId={community.id}
-              communityName={communityName}
-              isFavorite={userToCommunity?.joined ?? false}
-              isMuted={userToCommunity?.joined ?? false}
-            />
-          )}
         </div>
       </div>
     </div>

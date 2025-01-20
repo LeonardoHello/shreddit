@@ -4,7 +4,7 @@ import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import CommunityHeader from "@/components/community/CommunityHeader";
-import CommunityHeaderAuthenticated from "@/components/community/CommunityHeaderAuthenticated";
+import CommunityHeaderPlaceholder from "@/components/community/CommunityHeaderPlaceholder";
 import CommunityHeaderSkeleton from "@/components/community/CommunityHeaderSkeleton";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
 import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSkeleton";
@@ -40,12 +40,14 @@ export default async function CommunityPage(props: {
     <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
         <Suspense fallback={<CommunityHeaderSkeleton />}>
-          {auth.userId ? (
-            <CommunityHeaderAuthenticated
+          {auth.userId && (
+            <CommunityHeader
+              currentUserId={auth.userId}
               communityName={params.communityName}
             />
-          ) : (
-            <CommunityHeader communityName={params.communityName} />
+          )}
+          {!auth.userId && (
+            <CommunityHeaderPlaceholder communityName={params.communityName} />
           )}
         </Suspense>
       </HydrateClient>
