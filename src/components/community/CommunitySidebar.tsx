@@ -7,16 +7,17 @@ import { CakeSlice, Globe } from "lucide-react";
 import { Community, User } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import CommunitySidebarDialog from "./CommunitySidebarDialog";
 
 export default function CommunitySidebar({
   currentUserId,
   communityName,
+  className,
 }: {
   currentUserId: User["id"] | null;
   communityName: Community["name"];
+  className?: string;
 }) {
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
@@ -26,7 +27,7 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div className="sticky top-16 z-10 hidden h-fit w-80 flex-col gap-2 rounded border bg-card px-3 py-2 lg:flex">
+    <div className={className}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="truncate font-medium tracking-wide">
           {community.displayName ?? community.name}
@@ -114,12 +115,6 @@ export default function CommunitySidebar({
           </span>
         </Link>
       </div>
-
-      <Separator />
-
-      <Button className="rounded-full font-bold" asChild>
-        <Link href={`/r/${community.name}/submit`}>Create Post</Link>
-      </Button>
     </div>
   );
 }
