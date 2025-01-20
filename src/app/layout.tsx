@@ -36,14 +36,12 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider
-      dynamic
       appearance={{
         baseTheme: dark,
         layout: {
           termsPageUrl: "https://clerk.com/terms",
           privacyPageUrl: "https://clerk.com/privacy",
           logoPlacement: "none",
-          socialButtonsVariant: "iconButton",
         },
         variables: { colorPrimary: "#f43f5e" },
       }}

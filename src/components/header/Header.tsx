@@ -3,10 +3,11 @@ import Link from "next/link";
 import {
   ClerkLoaded,
   ClerkLoading,
+  SignedIn,
+  SignedOut,
   SignInButton,
   UserButton,
 } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import { Plus } from "lucide-react";
 
 import Logo from "@/components/header/Logo";
@@ -14,13 +15,7 @@ import Search from "@/components/header/Search";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
-export default async function Header({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { userId } = await auth();
-
+export default function Header({ children }: { children: React.ReactNode }) {
   return (
     <header className="sticky top-0 z-20 col-span-2 flex h-14 justify-between gap-5 border-b bg-card px-4 py-2">
       <div className="flex select-none items-center gap-1.5">
@@ -32,28 +27,16 @@ export default async function Header({
 
       <Search />
 
-      {userId && (
+      <SignedIn>
         <div className="flex items-center gap-2 self-center">
-          {/* mobile */}
           <Button
             variant={"ghost"}
-            size={"icon"}
-            className="rounded-full md:hidden"
+            className="w-9 rounded-full sm:w-auto"
             asChild
           >
             <Link href={"/submit"}>
-              <Plus className="size-7 stroke-1" />
-            </Link>
-          </Button>
-          {/* desktop */}
-          <Button
-            variant={"ghost"}
-            className="hidden gap-1 rounded-full pl-2.5 pr-3.5 md:flex"
-            asChild
-          >
-            <Link href={"/submit"}>
-              <Plus className="size-7 stroke-1" />
-              Create
+              <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+              <span className="hidden sm:inline-block">Create</span>
             </Link>
           </Button>
 
@@ -66,9 +49,9 @@ export default async function Header({
             />
           </ClerkLoaded>
         </div>
-      )}
+      </SignedIn>
 
-      {!userId && (
+      <SignedOut>
         <div className="flex items-center gap-2 self-center">
           <ClerkLoading>
             <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
@@ -83,7 +66,7 @@ export default async function Header({
             </SignInButton>
           </ClerkLoaded>
         </div>
-      )}
+      </SignedOut>
     </header>
   );
 }
