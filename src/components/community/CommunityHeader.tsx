@@ -108,7 +108,7 @@ export default function CommunityHeader({
                   notation: "compact",
                   maximumFractionDigits: 1,
                 }).format(community.memberCount)}{" "}
-                {community.memberCount == 1 ? "member" : "members"}
+                {community.memberNickname || "members"}
               </span>
               <span>•</span>
               <div>
@@ -116,7 +116,7 @@ export default function CommunityHeader({
                   notation: "compact",
                   maximumFractionDigits: 1,
                 }).format(community.newMemberCount)}{" "}
-                {community.newMemberCount == 1 ? "new member" : "new members"}
+                new {community.memberNickname || "members"}
               </div>
             </div>
           </div>
@@ -147,8 +147,8 @@ export default function CommunityHeader({
             <CommunityHeaderDropdown
               communityId={community.id}
               communityName={communityName}
-              isFavorite={userToCommunity?.joined ?? false}
-              isMuted={userToCommunity?.joined ?? false}
+              isFavorite={userToCommunity?.favorited ?? false}
+              isMuted={userToCommunity?.muted ?? false}
             />
           )}
         </div>

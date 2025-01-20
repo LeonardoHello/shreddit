@@ -36,17 +36,15 @@ export default function CommunitySidebar({
     >
       <div className="flex items-center justify-between gap-2">
         <h2 className="truncate font-medium tracking-wide">
-          {community.displayName ?? community.name}
+          {community.displayName || community.name}
         </h2>
         {currentUserId === community.moderatorId && (
-          <CommunitySidebarDialog communityId={community.id} />
+          <CommunitySidebarDialog community={community} />
         )}
       </div>
 
       {community.description && (
-        <p className="max-w-[302px] break-words text-sm">
-          {community.description}
-        </p>
+        <p className="break-words text-sm">{community.description}</p>
       )}
 
       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
@@ -81,7 +79,7 @@ export default function CommunitySidebar({
             }).format(community.memberCount)}
           </div>
           <div className="text-xs text-muted-foreground">
-            {community.memberNickname ?? "Memebers"}
+            {community.memberNickname || "Memebers"}
           </div>
         </div>
 
@@ -96,7 +94,7 @@ export default function CommunitySidebar({
             }).format(community.newMemberCount)}
           </div>
           <div className="text-xs text-muted-foreground">
-            New {community.memberNickname ?? "Memebers"}
+            New {community.memberNickname || "memebers"}
           </div>
         </div>
         <div />

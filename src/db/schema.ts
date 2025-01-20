@@ -52,9 +52,9 @@ export const communities = pgTable(
   {
     id: uuid().primaryKey().defaultRandom(),
     name: text().unique().notNull(),
-    displayName: text(),
-    description: text(),
-    memberNickname: text(),
+    displayName: text().notNull().default(""),
+    description: text().notNull().default(""),
+    memberNickname: text().notNull().default(""),
     icon: text(),
     banner: text(),
     moderatorId: text()
