@@ -34,7 +34,7 @@ export default function CommentFooter({
         <span className="hidden sm:inline-block">Reply</span>
       </Button>
 
-      {currentUserId === state.author.id && <CommentDropdown />}
+      {currentUserId === state.authorId && <CommentDropdown />}
     </div>
   );
 }

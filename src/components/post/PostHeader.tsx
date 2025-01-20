@@ -118,9 +118,7 @@ export default function PostHeader({
         </div>
       )}
 
-      {currentUserId === state.authorId && (
-        <PostDropdown currentUserId={currentUserId} />
-      )}
+      {currentUserId && <PostDropdown currentUserId={currentUserId} />}
     </div>
   );
 }
