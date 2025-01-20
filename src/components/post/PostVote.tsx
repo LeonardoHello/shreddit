@@ -1,5 +1,7 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
+import { User } from "@clerk/nextjs/server";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,9 +14,15 @@ import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 
-export default function PostVote() {
+export default function PostVote({
+  currentUserId,
+}: {
+  currentUserId: User["id"] | null;
+}) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
+
+  const clerk = useClerk();
 
   const votePost = trpc.post.votePost.useMutation({
     onMutate: (variables) => {
@@ -49,10 +57,14 @@ export default function PostVote() {
           "hover:bg-indigo-600": isDownvoted,
         })}
         onClick={() => {
-          votePost.mutate({
-            postId: state.id,
-            voteStatus: isUpvoted ? "none" : "upvoted",
-          });
+          if (currentUserId) {
+            votePost.mutate({
+              postId: state.id,
+              voteStatus: isUpvoted ? "none" : "upvoted",
+            });
+          } else {
+            clerk.openSignIn();
+          }
         }}
       >
         <ArrowBigUp

@@ -4,11 +4,8 @@ import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
 import PostBody from "../post/PostBody";
-import PostDropdown from "../post/PostDropdown";
 import PostFooter from "../post/PostFooter";
 import PostHeader from "../post/PostHeader";
-import PostVote from "../post/PostVote";
-import PostVotePlaceholder from "../post/PostVotePlaceholder";
 import FeedPostHidden from "./FeedPostHidden";
 
 export default function FeedPost({
@@ -52,13 +49,11 @@ export default function FeedPost({
         router.push(`/r/${state.community.name}/comments/${state.id}`);
       }}
     >
-      <PostHeader>
-        {currentUserId && <PostDropdown currentUserId={currentUserId} />}
-      </PostHeader>
+      <PostHeader currentUserId={currentUserId} />
+
       <PostBody />
-      <PostFooter>
-        {currentUserId ? <PostVote /> : <PostVotePlaceholder />}
-      </PostFooter>
+
+      <PostFooter currentUserId={currentUserId} />
     </div>
   );
 }

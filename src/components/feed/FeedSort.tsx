@@ -18,7 +18,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
 
   return (
     <nav className="rounded border bg-card p-2">
-      <ul className="flex justify-around gap-2 font-bold text-muted-foreground">
+      <ul className="flex justify-around gap-1 font-bold text-muted-foreground">
         <li>
           <Button
             variant={isBest ? "default" : "ghost"}

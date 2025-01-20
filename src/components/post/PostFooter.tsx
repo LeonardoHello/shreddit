@@ -1,15 +1,17 @@
 "use client";
 
+import { User } from "@clerk/nextjs/server";
 import { Link, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { usePostContext } from "@/context/PostContext";
 import { Button } from "../ui/button";
+import PostVote from "./PostVote";
 
 export default function PostFooter({
-  children,
+  currentUserId,
 }: {
-  children: React.ReactNode;
+  currentUserId: User["id"] | null;
 }) {
   const state = usePostContext();
 
@@ -28,7 +30,7 @@ export default function PostFooter({
 
   return (
     <div className="flex items-center gap-2">
-      {children}
+      <PostVote currentUserId={currentUserId} />
 
       <Button size="sm" variant={"secondary"} className="rounded-full">
         <MessageCircle className="size-4" />

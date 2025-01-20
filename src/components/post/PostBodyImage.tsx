@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { useParams } from "next/navigation";
 
 import * as thumbhash from "thumbhash";
 
@@ -14,17 +13,13 @@ import { usePostContext } from "@/context/PostContext";
 import { ArrElement } from "@/types";
 import { Badge } from "../ui/badge";
 
-export default function PostBodyImage() {
-  const { postId } = useParams();
-
+export default function PostBodyImage({ isUnsafe }: { isUnsafe: boolean }) {
   const post = usePostContext();
-
-  const showBlur = !postId && (post.nsfw || post.spoiler);
 
   if (post.files.length === 1) {
     const file = post.files[0];
 
-    return <PostImage file={file} showBlur={showBlur} />;
+    return <PostImage file={file} isUnsafe={isUnsafe} />;
   }
 
   return (
@@ -32,11 +27,11 @@ export default function PostBodyImage() {
       <CarouselContent className="gap-4">
         {post.files.map((image) => (
           <CarouselItem key={image.id}>
-            <PostImage file={image} showBlur={showBlur} />
+            <PostImage file={image} isUnsafe={isUnsafe} />
           </CarouselItem>
         ))}
       </CarouselContent>
-      {!showBlur && (
+      {!isUnsafe && (
         <>
           <CarouselPrevious />
           <CarouselNext />
@@ -48,11 +43,13 @@ export default function PostBodyImage() {
 
 function PostImage({
   file,
-  showBlur,
+  isUnsafe,
 }: {
   file: ArrElement<ReturnType<typeof usePostContext>["files"]>;
-  showBlur: boolean;
+  isUnsafe: boolean;
 }) {
+  const post = usePostContext();
+
   const placeholderURL = thumbhash.thumbHashToDataURL(
     Buffer.from(file.thumbHash, "base64"),
   );
@@ -70,7 +67,7 @@ function PostImage({
           sizes={imageSizes}
           className="scale-105 rounded-md object-cover object-center opacity-30"
         />
-        {!showBlur && (
+        {!isUnsafe && (
           <Image
             src={file.url}
             alt={file.name}
@@ -82,34 +79,17 @@ function PostImage({
           />
         )}
 
-        {showBlur && <WarningBadge />}
+        {isUnsafe && (
+          <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
+            View{" "}
+            {post.nsfw && post.spoiler
+              ? "NSFW content & spoilers"
+              : post.nsfw
+                ? "View NSFW content"
+                : "View spoilers"}
+          </Badge>
+        )}
       </div>
     </div>
-  );
-}
-
-function WarningBadge() {
-  const post = usePostContext();
-
-  if (post.nsfw && post.spoiler) {
-    return (
-      <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
-        View NSFW content & spoilers
-      </Badge>
-    );
-  }
-
-  if (post.nsfw) {
-    return (
-      <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
-        View NSFW content
-      </Badge>
-    );
-  }
-
-  return (
-    <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
-      View spoilers
-    </Badge>
   );
 }
