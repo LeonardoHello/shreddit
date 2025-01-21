@@ -14,10 +14,14 @@ import { Button } from "../ui/button";
 
 export default function SidebarNavItem({
   communityRelation,
+  canFavorite,
 }: {
   communityRelation: ArrElement<
-    RouterOutput["community"]["getJoinedCommunities"]
+    RouterOutput["community"][
+      | "getJoinedCommunities"
+      | "getModeratedCommunities"]
   >;
+  canFavorite: boolean;
 }) {
   const utils = trpc.useUtils();
 
@@ -31,7 +35,7 @@ export default function SidebarNavItem({
         }
 
         return data.map((userToCommunity) => {
-          if (userToCommunity.communityId !== communityId)
+          if (communityRelation.community.id !== communityId)
             return userToCommunity;
 
           return { ...userToCommunity, favorited };
@@ -44,7 +48,7 @@ export default function SidebarNavItem({
         }
 
         return data.map((userToCommunity) => {
-          if (userToCommunity.communityId !== communityId)
+          if (communityRelation.community.id !== communityId)
             return userToCommunity;
 
           return { ...userToCommunity, favorited };
@@ -62,29 +66,31 @@ export default function SidebarNavItem({
   });
 
   return (
-    <li key={communityRelation.communityId} className="flex">
+    <li key={communityRelation.community.id} className="flex">
       <Button
         variant="ghost"
         size="lg"
-        className="w-full px-4 text-sm font-normal hover:bg-accent/40"
+        className="w-full justify-start px-4 text-sm font-normal hover:bg-accent/40"
         asChild
       >
         <Link href={`/r/${communityRelation.community.name}`}>
           <CommunityImage icon={communityRelation.community.icon} size={32} />
           <h2 className="truncate">r/{communityRelation.community.name}</h2>
-          <Star
-            className={cn("ml-auto size-5 stroke-1", {
-              "fill-foreground text-foreground": communityRelation.favorited,
-            })}
-            onClick={(e) => {
-              e.preventDefault();
+          {canFavorite && (
+            <Star
+              className={cn("ml-auto size-5 stroke-1", {
+                "fill-foreground text-foreground": communityRelation.favorited,
+              })}
+              onClick={(e) => {
+                e.preventDefault();
 
-              toggleFavorite.mutate({
-                communityId: communityRelation.communityId,
-                favorited: !communityRelation.favorited,
-              });
-            }}
-          />
+                toggleFavorite.mutate({
+                  communityId: communityRelation.community.id,
+                  favorited: !communityRelation.favorited,
+                });
+              }}
+            />
+          )}
         </Link>
       </Button>
     </li>

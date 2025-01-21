@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
 import { useRecentCommunityContext } from "@/context/RecentCommunityContext";
-import CommunityImage from "../community/CommunityImage";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import { Button } from "../ui/button";
+import SidebarNavItem from "./SidebarNavItem";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
 export default function SidebarNavRecent() {
@@ -32,19 +29,11 @@ export default function SidebarNavRecent() {
         <nav>
           <ul>
             {state.communities.map((community) => (
-              <li key={community.id} className="flex">
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  className="w-full justify-start px-4 text-sm font-normal tracking-wide hover:bg-accent/40"
-                  asChild
-                >
-                  <Link href={`/r/${community.name}`}>
-                    <CommunityImage icon={community.icon} size={32} />
-                    <h2 className="truncate">r/{community.name}</h2>
-                  </Link>
-                </Button>
-              </li>
+              <SidebarNavItem
+                key={community.id}
+                communityRelation={{ community, favorited: false }}
+                canFavorite={false}
+              />
             ))}
           </ul>
         </nav>

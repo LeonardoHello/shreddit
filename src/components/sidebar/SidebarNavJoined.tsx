@@ -33,8 +33,9 @@ export default function SidebarNavJoined() {
               })
               .map((communityRelation) => (
                 <SidebarNavItem
-                  key={communityRelation.communityId}
+                  key={communityRelation.community.id}
                   communityRelation={communityRelation}
+                  canFavorite
                 />
               ))}
           </ul>
