@@ -12,7 +12,7 @@ import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import { Button } from "../ui/button";
 
-export default function SidebarMenuItemFavorite({
+export default function SidebarNavItem({
   communityRelation,
 }: {
   communityRelation: ArrElement<
@@ -56,7 +56,7 @@ export default function SidebarMenuItemFavorite({
         communityRelation.community.name,
       );
     },
-    onError: async (error) => {
+    onError: (error) => {
       toast.error(error.message);
     },
   });

@@ -4,11 +4,11 @@ import { auth } from "@clerk/nextjs/server";
 
 import { Accordion } from "@/components/ui/accordion";
 import { HydrateClient, trpc } from "@/trpc/server";
-import SidebarMenuJoined from "./SidebarMenuJoined";
-import SidebarMenuMain from "./SidebarMenuMain";
-import SidebarMenuModerated from "./SidebarMenuModerated";
-import SidebarMenuRecent from "./SidebarMenuRecent";
-import SidebarMenuSkeleton from "./SidebarMenuSkeleton";
+import SidebarNavJoined from "./SidebarNavJoined";
+import SidebarNavMain from "./SidebarNavMain";
+import SidebarNavModerated from "./SidebarNavModerated";
+import SidebarNavRecent from "./SidebarNavRecent";
+import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
 export default async function Sidebar({ className }: { className?: string }) {
   const { userId } = await auth();
@@ -26,22 +26,22 @@ export default async function Sidebar({ className }: { className?: string }) {
       }}
       className={className}
     >
-      <SidebarMenuMain userId={userId} />
+      <SidebarNavMain userId={userId} />
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
-        <SidebarMenuRecent />
+        <SidebarNavRecent />
 
         {userId && (
           <>
             <HydrateClient>
-              <Suspense fallback={<SidebarMenuSkeleton length={2} favorite />}>
-                <SidebarMenuModerated />
+              <Suspense fallback={<SidebarNavSkeleton length={2} favorite />}>
+                <SidebarNavModerated />
               </Suspense>
             </HydrateClient>
 
             <HydrateClient>
-              <Suspense fallback={<SidebarMenuSkeleton length={4} favorite />}>
-                <SidebarMenuJoined />
+              <Suspense fallback={<SidebarNavSkeleton length={4} favorite />}>
+                <SidebarNavJoined />
               </Suspense>
             </HydrateClient>
           </>
