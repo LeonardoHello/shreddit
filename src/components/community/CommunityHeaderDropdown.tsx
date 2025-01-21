@@ -9,18 +9,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Community } from "@/db/schema";
 import { trpc } from "@/trpc/client";
+import { RouterOutput } from "@/trpc/routers/_app";
 import { Button } from "../ui/button";
 
 export default function CommunityHeaderDropdown({
   communityId,
   communityName,
-  isFavorite,
-  isMuted,
+  userToCommunity,
 }: {
   communityId: Community["id"];
   communityName: string;
-  isFavorite: boolean;
-  isMuted: boolean;
+  userToCommunity: NonNullable<RouterOutput["community"]["getUserToCommunity"]>;
 }) {
   const utils = trpc.useUtils();
 
@@ -28,7 +27,7 @@ export default function CommunityHeaderDropdown({
     onMutate: (variables) => {
       utils.community.getUserToCommunity.setData(communityName, (updater) => {
         if (!updater) {
-          return { joined: false, favorited: false, muted: false };
+          return { ...userToCommunity, favorited: variables.favorited };
         }
 
         return { ...updater, favorited: variables.favorited };
@@ -53,7 +52,7 @@ export default function CommunityHeaderDropdown({
     onMutate: (variables) => {
       utils.community.getUserToCommunity.setData(communityName, (updater) => {
         if (!updater) {
-          return { joined: false, favorited: false, muted: false };
+          return { ...userToCommunity, muted: variables.muted };
         }
 
         return { ...updater, muted: variables.muted };
@@ -83,21 +82,23 @@ export default function CommunityHeaderDropdown({
           onClick={() => {
             favoriteCommunity.mutate({
               communityId,
-              favorited: !isFavorite,
+              favorited: !userToCommunity.favorited,
             });
           }}
         >
-          {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+          {userToCommunity.favorited
+            ? "Remove from Favorites"
+            : "Add to Favorites"}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
             muteCommunity.mutate({
               communityId,
-              muted: !isMuted,
+              muted: !userToCommunity.muted,
             });
           }}
         >
-          {isMuted ? "Unmute" : "Mute"} r/
+          {userToCommunity.muted ? "Unmute" : "Mute"} r/
           {communityName}
         </DropdownMenuItem>
       </DropdownMenuContent>

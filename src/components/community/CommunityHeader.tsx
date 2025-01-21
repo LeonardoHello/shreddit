@@ -38,6 +38,12 @@ export default function CommunityHeader({
     throw new Error("Community not found");
   }
 
+  const userToCommunityValues = userToCommunity ?? {
+    joined: false,
+    favorited: false,
+    muted: false,
+  };
+
   useEffect(() => {
     dispatch({
       type: ReducerAction.ADD_COMMUNITY,
@@ -55,7 +61,7 @@ export default function CommunityHeader({
     onMutate: (variables) => {
       utils.community.getUserToCommunity.setData(communityName, (updater) => {
         if (!updater) {
-          return { joined: false, favorited: false, muted: false };
+          return { ...userToCommunityValues, joined: variables.joined };
         }
 
         return { ...updater, joined: variables.joined };
@@ -131,24 +137,23 @@ export default function CommunityHeader({
           </Button>
 
           <Button
-            variant={userToCommunity?.joined ? "outline" : "default"}
+            variant={userToCommunityValues.joined ? "outline" : "default"}
             className="rounded-full font-bold"
             onClick={() => {
               joinCommunity.mutate({
                 communityId: community.id,
-                joined: !userToCommunity?.joined,
+                joined: !userToCommunityValues.joined,
               });
             }}
           >
-            {userToCommunity?.joined ? "Joined" : "Join"}
+            {userToCommunityValues.joined ? "Joined" : "Join"}
           </Button>
 
           {currentUserId && (
             <CommunityHeaderDropdown
               communityId={community.id}
               communityName={communityName}
-              isFavorite={userToCommunity?.favorited ?? false}
-              isMuted={userToCommunity?.muted ?? false}
+              userToCommunity={userToCommunityValues}
             />
           )}
         </div>
