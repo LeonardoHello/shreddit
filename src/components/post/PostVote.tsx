@@ -89,10 +89,14 @@ export default function PostVote({
           "hover:bg-rose-700": isUpvoted,
         })}
         onClick={() => {
-          votePost.mutate({
-            postId: state.id,
-            voteStatus: isDownvoted ? "none" : "downvoted",
-          });
+          if (currentUserId) {
+            votePost.mutate({
+              postId: state.id,
+              voteStatus: isDownvoted ? "none" : "downvoted",
+            });
+          } else {
+            clerk.openSignIn();
+          }
         }}
       >
         <ArrowBigDown
