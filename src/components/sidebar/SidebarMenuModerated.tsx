@@ -17,10 +17,6 @@ export default function SidebarMenuModerated() {
   const [moderatedCommunities] =
     trpc.community.getModeratedCommunities.useSuspenseQuery();
 
-  if (!moderatedCommunities || moderatedCommunities.length === 0) {
-    return null;
-  }
-
   return (
     <AccordionItem value="item-2">
       <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
@@ -42,19 +38,21 @@ export default function SidebarMenuModerated() {
             </Button>
           </li>
 
-          {moderatedCommunities
-            .sort((a, b) => {
-              if (a.favorited !== b.favorited) {
-                return b.favorited ? 1 : -1;
-              }
-              return a.community.name.localeCompare(b.community.name);
-            })
-            .map((communityRelation) => (
-              <SidebarMenuItemFavorite
-                key={communityRelation.communityId}
-                communityRelation={communityRelation}
-              />
-            ))}
+          {moderatedCommunities &&
+            moderatedCommunities.length > 0 &&
+            moderatedCommunities
+              .sort((a, b) => {
+                if (a.favorited !== b.favorited) {
+                  return b.favorited ? 1 : -1;
+                }
+                return a.community.name.localeCompare(b.community.name);
+              })
+              .map((communityRelation) => (
+                <SidebarMenuItemFavorite
+                  key={communityRelation.communityId}
+                  communityRelation={communityRelation}
+                />
+              ))}
         </menu>
       </AccordionContent>
     </AccordionItem>
