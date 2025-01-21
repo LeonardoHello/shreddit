@@ -17,9 +17,7 @@ export default function SidebarNavItem({
   canFavorite,
 }: {
   communityRelation: ArrElement<
-    RouterOutput["community"][
-      | "getJoinedCommunities"
-      | "getModeratedCommunities"]
+    RouterOutput["community"]["getJoinedCommunities"]
   >;
   canFavorite: boolean;
 }) {
@@ -31,11 +29,11 @@ export default function SidebarNavItem({
 
       utils.community.getModeratedCommunities.setData(undefined, (data) => {
         if (!data) {
-          return [communityRelation];
+          return [{ ...communityRelation, favorited }];
         }
 
         return data.map((userToCommunity) => {
-          if (communityRelation.community.id !== communityId)
+          if (userToCommunity.community.id !== communityId)
             return userToCommunity;
 
           return { ...userToCommunity, favorited };
@@ -44,7 +42,7 @@ export default function SidebarNavItem({
 
       utils.community.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
-          return [communityRelation];
+          return [{ ...communityRelation, favorited }];
         }
 
         return data.map((userToCommunity) => {

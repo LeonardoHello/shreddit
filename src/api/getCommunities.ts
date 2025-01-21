@@ -14,7 +14,7 @@ export const getModeratedCommunities = db.query.usersToCommunities
         ),
       ),
 
-    columns: { userId: true, communityId: true, favorited: true },
+    columns: { favorited: true },
     with: { community: { columns: { id: true, name: true, icon: true } } },
   })
   .prepare("moderated_communities");
@@ -26,7 +26,7 @@ export const getJoinedCommunities = db.query.usersToCommunities
         eq(userToCommunity.userId, sql.placeholder("currentUserId")),
         eq(userToCommunity.joined, true),
       ),
-    columns: { userId: true, communityId: true, favorited: true },
+    columns: { favorited: true },
     with: { community: { columns: { id: true, name: true, icon: true } } },
   })
   .prepare("joined_communities");

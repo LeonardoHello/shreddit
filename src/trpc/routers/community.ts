@@ -23,8 +23,9 @@ import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 export const communityRouter = createTRPCRouter({
   getCommunityByName: baseProcedure
     .input(CommunitySchema.shape.name)
-    .query(({ input }) => {
-      return getCommunityByName.execute({ communityName: input });
+    .query(async ({ input }) => {
+      const data = await getCommunityByName.execute({ communityName: input });
+      return data ?? null;
     }),
   searchCommunities: baseProcedure.input(z.string()).query(({ input }) => {
     return searchCommunities.execute({ search: `%${input}%` });
@@ -152,26 +153,11 @@ export const communityRouter = createTRPCRouter({
         .returning({ muted: usersToCommunities.muted });
     }),
   createCommunity: protectedProcedure
-    .input(
-      CommunitySchema.shape.name
-        .min(3, {
-          message: "Community names must contain at least 3 characters.",
-        })
-        .max(21, {
-          message: "Community names must contain at most 21 characters.",
-        })
-        .regex(/^[a-zA-Z0-9_]+$/, {
-          message:
-            "Community names can only contain letters, numbers, or underscores.",
-        }),
-    )
+    .input(CommunitySchema.pick({ name: true, description: true }))
     .mutation(({ input, ctx }) => {
       return ctx.db
         .insert(communities)
-        .values({
-          moderatorId: ctx.userId,
-          name: input,
-        })
-        .returning();
+        .values({ moderatorId: ctx.userId, ...input })
+        .returning({ name: communities.name });
     }),
 });
