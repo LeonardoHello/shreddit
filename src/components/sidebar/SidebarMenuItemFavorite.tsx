@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { StarIcon } from "@heroicons/react/24/outline";
+import { Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
@@ -70,15 +70,11 @@ export default function SidebarMenuItemFavorite({
         asChild
       >
         <Link href={`/r/${communityRelation.community.name}`}>
-          <CommunityImage
-            icon={communityRelation.community.icon}
-            size={32}
-            className="border-2"
-          />
+          <CommunityImage icon={communityRelation.community.icon} size={32} />
           <h2 className="truncate">r/{communityRelation.community.name}</h2>
-          <StarIcon
-            className={cn("ml-auto size-6 text-muted-foreground", {
-              "fill-[#0079d3] text-[#0079d3]": communityRelation.favorited,
+          <Star
+            className={cn("ml-auto size-5 stroke-1", {
+              "fill-foreground text-foreground": communityRelation.favorited,
             })}
             onClick={(e) => {
               e.preventDefault();
