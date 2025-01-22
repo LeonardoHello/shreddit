@@ -42,11 +42,11 @@ export default function SidebarNavItem({
 
       utils.community.getJoinedCommunities.setData(undefined, (data) => {
         if (!data) {
-          return [{ ...communityRelation, favorited }];
+          return [];
         }
 
         return data.map((userToCommunity) => {
-          if (communityRelation.community.id !== communityId)
+          if (userToCommunity.community.id !== communityId)
             return userToCommunity;
 
           return { ...userToCommunity, favorited };
