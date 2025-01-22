@@ -27,7 +27,10 @@ export default async function PostPage(props: {
         </Suspense>
 
         <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
-          <RTEComment postId={params.postId} />
+          <RTEComment
+            postId={params.postId}
+            isAuthenticated={auth.userId ? true : false}
+          />
 
           <Separator />
 
