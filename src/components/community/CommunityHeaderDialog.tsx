@@ -1,4 +1,3 @@
-import { User } from "@clerk/nextjs/server";
 import { Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,10 +12,8 @@ import {
 import CommunitySidebar from "./CommunitySidebar";
 
 export default function CommunityHeaderDialog({
-  currentUserId,
   communityName,
 }: {
-  currentUserId: User["id"] | null;
   communityName: string;
 }) {
   return (
@@ -38,11 +35,7 @@ export default function CommunityHeaderDialog({
             information provided.
           </DialogDescription>
         </DialogHeader>
-        <CommunitySidebar
-          currentUserId={currentUserId}
-          communityName={communityName}
-          isDialog
-        />
+        <CommunitySidebar communityName={communityName} isDialog />
       </DialogContent>
     </Dialog>
   );

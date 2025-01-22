@@ -66,10 +66,15 @@ export default function SidebarDialog() {
     },
   });
 
+  const utils = trpc.useUtils();
+
   const createCommunity = trpc.community.createCommunity.useMutation({
     onSuccess: (data) => {
+      utils.community.getJoinedCommunities.invalidate();
+      utils.community.getModeratedCommunities.invalidate();
+
       startTransition(() => {
-        router.replace(`/r/${data[0].name}`);
+        router.replace(`/r/${data[0][0].name}`);
         setIsOpen(false);
         form.reset();
       });

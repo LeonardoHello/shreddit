@@ -4,16 +4,18 @@ import db from "../db";
 export const getModeratedCommunities = db.query.usersToCommunities
   .findMany({
     where: (userToCommunity, { sql, and, eq, exists }) =>
-      and(
-        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
-        exists(
-          db
-            .select()
-            .from(communities)
-            .where(and(eq(communities.moderatorId, userToCommunity.userId))),
-        ),
+      exists(
+        db
+          .select()
+          .from(communities)
+          .where(
+            and(
+              eq(communities.moderatorId, sql.placeholder("currentUserId")),
+              eq(communities.moderatorId, userToCommunity.userId),
+              eq(communities.id, userToCommunity.communityId),
+            ),
+          ),
       ),
-
     columns: { favorited: true },
     with: { community: { columns: { id: true, name: true, icon: true } } },
   })

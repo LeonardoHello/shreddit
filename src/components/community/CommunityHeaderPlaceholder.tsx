@@ -64,10 +64,8 @@ export default function CommunityHeaderPlaceholder({
               <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
                 r/{community.name}
               </h1>
-              <CommunityHeaderDialog
-                currentUserId={null}
-                communityName={communityName}
-              />
+
+              <CommunityHeaderDialog communityName={communityName} />
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>

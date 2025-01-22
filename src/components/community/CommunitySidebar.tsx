@@ -4,19 +4,16 @@ import Link from "next/link";
 
 import { CakeSlice, Globe } from "lucide-react";
 
-import { Community, User } from "@/db/schema";
+import { Community } from "@/db/schema";
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
-import CommunitySidebarDialog from "./CommunitySidebarDialog";
 
 export default function CommunitySidebar({
-  currentUserId,
   communityName,
   isDialog,
 }: {
-  currentUserId: User["id"] | null;
   communityName: Community["name"];
   isDialog?: boolean;
 }) {
@@ -34,14 +31,9 @@ export default function CommunitySidebar({
           !isDialog,
       })}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="truncate font-medium tracking-wide">
-          {community.displayName || community.name}
-        </h2>
-        {currentUserId === community.moderatorId && (
-          <CommunitySidebarDialog community={community} />
-        )}
-      </div>
+      <h2 className="truncate font-medium tracking-wide">
+        {community.displayName || community.name}
+      </h2>
 
       {community.description && (
         <p className="break-words text-sm">{community.description}</p>

@@ -1,5 +1,6 @@
+import { randomUUID } from "crypto";
+
 import { and, eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import { getPostById } from "@/api/getPost";
@@ -59,7 +60,7 @@ export const postRouter = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       const { files, ...post } = input;
 
-      const postId = uuidv4();
+      const postId = randomUUID();
 
       return ctx.db.batch([
         ctx.db

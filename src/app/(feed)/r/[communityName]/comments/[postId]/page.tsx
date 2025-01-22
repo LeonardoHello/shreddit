@@ -42,10 +42,7 @@ export default async function PostPage(props: {
 
       <HydrateClient>
         <Suspense fallback={<CommunitySidebarSkeleton />}>
-          <CommunitySidebar
-            currentUserId={auth.userId}
-            communityName={params.communityName}
-          />
+          <CommunitySidebar communityName={params.communityName} />
         </Suspense>
       </HydrateClient>
     </main>

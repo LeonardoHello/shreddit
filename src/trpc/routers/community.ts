@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -37,7 +39,13 @@ export const communityRouter = createTRPCRouter({
         currentUserId: ctx.userId,
         communityName: input,
       });
-      return data ?? null;
+      return (
+        data ?? {
+          muted: false,
+          favorited: false,
+          joined: false,
+        }
+      );
     }),
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)
@@ -86,10 +94,7 @@ export const communityRouter = createTRPCRouter({
   deleteCommunity: protectedProcedure
     .input(CommunitySchema.shape.id)
     .mutation(({ input, ctx }) => {
-      return ctx.db
-        .delete(communities)
-        .where(eq(communities.id, input))
-        .returning({ name: communities.name });
+      return ctx.db.delete(communities).where(eq(communities.id, input));
     }),
   toggleFavoriteCommunity: protectedProcedure
     .input(
@@ -155,9 +160,17 @@ export const communityRouter = createTRPCRouter({
   createCommunity: protectedProcedure
     .input(CommunitySchema.pick({ name: true, description: true }))
     .mutation(({ input, ctx }) => {
-      return ctx.db
-        .insert(communities)
-        .values({ moderatorId: ctx.userId, ...input })
-        .returning({ name: communities.name });
+      const communityId = randomUUID();
+
+      return ctx.db.batch([
+        ctx.db
+          .insert(communities)
+          .values({ id: communityId, moderatorId: ctx.userId, ...input })
+          .returning({ name: communities.name }),
+        ctx.db.insert(usersToCommunities).values({
+          userId: ctx.userId,
+          communityId,
+        }),
+      ]);
     }),
 });

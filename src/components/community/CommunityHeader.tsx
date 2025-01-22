@@ -15,6 +15,7 @@ import {
 import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
+import CommunityEditDialog from "./CommunityEditDialog";
 import CommunityHeaderDialog from "./CommunityHeaderDialog";
 import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
 import CommunityImage from "./CommunityImage";
@@ -38,12 +39,6 @@ export default function CommunityHeader({
     throw new Error("Community not found");
   }
 
-  const userToCommunityValues = userToCommunity ?? {
-    joined: false,
-    favorited: false,
-    muted: false,
-  };
-
   useEffect(() => {
     dispatch({
       type: ReducerAction.ADD_COMMUNITY,
@@ -61,7 +56,7 @@ export default function CommunityHeader({
     onMutate: (variables) => {
       utils.community.getUserToCommunity.setData(communityName, (updater) => {
         if (!updater) {
-          return { ...userToCommunityValues, joined: variables.joined };
+          return { ...userToCommunity, joined: variables.joined };
         }
 
         return { ...updater, joined: variables.joined };
@@ -103,10 +98,7 @@ export default function CommunityHeader({
               <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
                 r/{community.name}
               </h1>
-              <CommunityHeaderDialog
-                currentUserId={currentUserId}
-                communityName={communityName}
-              />
+              <CommunityHeaderDialog communityName={communityName} />
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>
@@ -137,24 +129,27 @@ export default function CommunityHeader({
           </Button>
 
           <Button
-            variant={userToCommunityValues.joined ? "outline" : "default"}
+            variant={userToCommunity.joined ? "outline" : "default"}
             className="rounded-full font-bold"
             onClick={() => {
               joinCommunity.mutate({
                 communityId: community.id,
-                joined: !userToCommunityValues.joined,
+                joined: !userToCommunity.joined,
               });
             }}
           >
-            {userToCommunityValues.joined ? "Joined" : "Join"}
+            {userToCommunity.joined ? "Joined" : "Join"}
           </Button>
 
           {currentUserId && (
             <CommunityHeaderDropdown
               communityId={community.id}
               communityName={communityName}
-              userToCommunity={userToCommunityValues}
-            />
+              isCommunityModerator={currentUserId === community.moderatorId}
+              userToCommunity={userToCommunity}
+            >
+              <CommunityEditDialog community={community} />
+            </CommunityHeaderDropdown>
           )}
         </div>
       </div>
