@@ -10,7 +10,7 @@ import SidebarNavModerated from "./SidebarNavModerated";
 import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
-export default async function Sidebar({ className }: { className?: string }) {
+export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
   const { userId } = await auth();
 
   if (userId) {
@@ -24,7 +24,11 @@ export default async function Sidebar({ className }: { className?: string }) {
         scrollbarWidth: "thin",
         scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
       }}
-      className={className}
+      className={
+        !isSheet
+          ? "sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 min-w-72 gap-3 overflow-y-auto border-r bg-card p-4 xl:block"
+          : undefined
+      }
     >
       <SidebarNavMain userId={userId} />
 

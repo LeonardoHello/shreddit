@@ -62,12 +62,12 @@ export default function RootLayout({
             <RecentCommunityContextProvider>
               <Header>
                 <SidebarSheet>
-                  <Sidebar />
+                  <Sidebar isSheet />
                 </SidebarSheet>
               </Header>
 
               <div className="flex">
-                <Sidebar className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-72 gap-3 overflow-y-auto border-r bg-card p-4 xl:block" />
+                <Sidebar />
 
                 {children}
               </div>
