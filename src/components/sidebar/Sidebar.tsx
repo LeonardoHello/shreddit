@@ -17,6 +17,7 @@ export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
   if (userId) {
     void trpc.community.getModeratedCommunities.prefetch();
     void trpc.community.getJoinedCommunities.prefetch();
+    void trpc.community.getMutedCommunities.prefetch();
   }
 
   return (
