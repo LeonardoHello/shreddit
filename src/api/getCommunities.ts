@@ -33,6 +33,18 @@ export const getJoinedCommunities = db.query.usersToCommunities
   })
   .prepare("joined_communities");
 
+export const getMutedCommunities = db.query.usersToCommunities
+  .findMany({
+    where: (userToCommunity, { sql, and, eq }) =>
+      and(
+        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
+        eq(userToCommunity.muted, true),
+      ),
+    columns: { favorited: true },
+    with: { community: { columns: { id: true, name: true, icon: true } } },
+  })
+  .prepare("muted_communities");
+
 export const getMyCommunities = db.query.usersToCommunities
   .findMany({
     where: (userToCommunity, { sql, and, eq }) =>
