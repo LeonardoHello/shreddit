@@ -13,7 +13,7 @@ export default function SidebarNavRecent() {
   const state = useRecentCommunityContext();
 
   if (state.isLoading) {
-    return <SidebarNavSkeleton length={4} favorite={false} />;
+    return <SidebarNavSkeleton length={4} />;
   }
 
   if (state.communities.length === 0) {
@@ -32,7 +32,6 @@ export default function SidebarNavRecent() {
               <SidebarNavItem
                 key={community.id}
                 communityRelation={{ community, favorited: false }}
-                canFavorite={false}
               />
             ))}
           </ul>

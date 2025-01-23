@@ -68,6 +68,8 @@ export default function CommunityHeaderDropdown({
       });
     },
     onSuccess: (data) => {
+      utils.community.getMutedCommunities.invalidate();
+
       if (data[0].muted) {
         toast.success(`Muted r/${communityName}.`);
       } else {

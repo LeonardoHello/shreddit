@@ -7,6 +7,7 @@ import { HydrateClient, trpc } from "@/trpc/server";
 import SidebarNavJoined from "./SidebarNavJoined";
 import SidebarNavMain from "./SidebarNavMain";
 import SidebarNavModerated from "./SidebarNavModerated";
+import SidebarNavMuted from "./SidebarNavMuted";
 import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
@@ -38,14 +39,24 @@ export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
         {userId && (
           <>
             <HydrateClient>
-              <Suspense fallback={<SidebarNavSkeleton length={2} favorite />}>
+              <Suspense
+                fallback={<SidebarNavSkeleton length={2} canFavorite />}
+              >
                 <SidebarNavModerated />
               </Suspense>
             </HydrateClient>
 
             <HydrateClient>
-              <Suspense fallback={<SidebarNavSkeleton length={4} favorite />}>
+              <Suspense
+                fallback={<SidebarNavSkeleton length={4} canFavorite />}
+              >
                 <SidebarNavJoined />
+              </Suspense>
+            </HydrateClient>
+
+            <HydrateClient>
+              <Suspense fallback={<SidebarNavSkeleton length={3} />}>
+                <SidebarNavMuted />
               </Suspense>
             </HydrateClient>
           </>

@@ -19,7 +19,7 @@ export default function SidebarNavItem({
   communityRelation: ArrElement<
     RouterOutput["community"]["getJoinedCommunities"]
   >;
-  canFavorite: boolean;
+  canFavorite?: boolean;
 }) {
   const utils = trpc.useUtils();
 

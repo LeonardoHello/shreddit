@@ -4,10 +4,10 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarNavSkeleton({
   length,
-  favorite,
+  canFavorite,
 }: {
   length: number;
-  favorite: boolean;
+  canFavorite?: boolean;
 }) {
   return (
     <nav>
@@ -24,7 +24,7 @@ export default function SidebarNavSkeleton({
                 className="h-4"
                 style={{ width: `${60 + ((index * 20) % 60)}px` }}
               />
-              {favorite && (
+              {canFavorite && (
                 <Star className="ml-auto size-5 animate-pulse fill-primary/10 stroke-1 text-primary/10" />
               )}
             </li>

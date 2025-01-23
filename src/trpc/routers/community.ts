@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   getJoinedCommunities,
   getModeratedCommunities,
+  getMutedCommunities,
 } from "@/api/getCommunities";
 import {
   getCommunityByName,
@@ -73,6 +74,9 @@ export const communityRouter = createTRPCRouter({
   }),
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
     return getJoinedCommunities.execute({ currentUserId: ctx.userId });
+  }),
+  getMutedCommunities: protectedProcedure.query(({ ctx }) => {
+    return getMutedCommunities.execute({ currentUserId: ctx.userId });
   }),
   editCommunity: protectedProcedure
     .input(
