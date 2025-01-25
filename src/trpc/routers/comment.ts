@@ -1,14 +1,20 @@
 import { eq } from "drizzle-orm";
 
+import { getComments } from "@/api/getComment";
 import {
   comments,
   CommentSchema,
   usersToComments,
   UserToCommentSchema,
 } from "@/db/schema";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const commentRouter = createTRPCRouter({
+  getComments: baseProcedure
+    .input(CommentSchema.shape.postId)
+    .query(({ input, ctx }) => {
+      return getComments.execute({ currentUserId: ctx.userId, postId: input });
+    }),
   createComment: protectedProcedure
     .input(
       CommentSchema.pick({ postId: true, parentCommentId: true, text: true }),

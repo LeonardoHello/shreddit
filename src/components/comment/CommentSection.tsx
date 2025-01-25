@@ -1,20 +1,22 @@
+"use client";
+
 import { User } from "@clerk/nextjs/server";
 
-import { getComments } from "@/api/getComment";
 import CommentContextProvider from "@/context/CommentContext";
 import { Post } from "@/db/schema";
+import { trpc } from "@/trpc/client";
 import Comment from "./Comment";
 import CommentSectionEmpty from "./CommentSectionEmpty";
 import CommentThread from "./CommentThread";
 
-export default async function CommentSection({
+export default function CommentSection({
   currentUserId,
   postId,
 }: {
   currentUserId: User["id"] | null;
   postId: Post["id"];
 }) {
-  const commentTree = await getComments.execute({ currentUserId, postId });
+  const [commentTree] = trpc.comment.getComments.useSuspenseQuery(postId);
 
   if (commentTree.length === 0) return <CommentSectionEmpty />;
 

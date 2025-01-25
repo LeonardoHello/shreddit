@@ -18,14 +18,18 @@ export default async function PostPage(props: {
 }) {
   const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  void trpc.community.getCommunityByName.prefetch(params.communityName);
+  trpc.post.getPost.prefetch(params.postId);
+  trpc.comment.getComments.prefetch(params.postId);
+  trpc.community.getCommunityByName.prefetch(params.communityName);
 
   return (
     <main className="container flex grow gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <div className="flex w-0 grow flex-col gap-2">
-        <Suspense fallback={<PostSkeleton />}>
-          <Post currentUserId={auth.userId} postId={params.postId} />
-        </Suspense>
+        <HydrateClient>
+          <Suspense fallback={<PostSkeleton />}>
+            <Post currentUserId={auth.userId} postId={params.postId} />
+          </Suspense>
+        </HydrateClient>
 
         <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
           {auth.userId ? (
@@ -36,12 +40,14 @@ export default async function PostPage(props: {
 
           <Separator />
 
-          <Suspense fallback={<CommentSectionSkeleton />}>
-            <CommentSection
-              currentUserId={auth.userId}
-              postId={params.postId}
-            />
-          </Suspense>
+          <HydrateClient>
+            <Suspense fallback={<CommentSectionSkeleton />}>
+              <CommentSection
+                currentUserId={auth.userId}
+                postId={params.postId}
+              />
+            </Suspense>
+          </HydrateClient>
         </div>
       </div>
 
