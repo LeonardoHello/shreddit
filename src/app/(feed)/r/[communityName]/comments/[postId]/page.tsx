@@ -9,6 +9,7 @@ import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSke
 import Post from "@/components/post/Post";
 import PostSkeleton from "@/components/post/PostSkeleton";
 import RTEComment from "@/components/RTE/RTEComment";
+import RTECommentPlaceholder from "@/components/RTE/RTECommentPlaceholder";
 import { Separator } from "@/components/ui/separator";
 import { HydrateClient, trpc } from "@/trpc/server";
 
@@ -27,10 +28,11 @@ export default async function PostPage(props: {
         </Suspense>
 
         <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
-          <RTEComment
-            postId={params.postId}
-            isAuthenticated={auth.userId ? true : false}
-          />
+          {auth.userId ? (
+            <RTEComment postId={params.postId} />
+          ) : (
+            <RTECommentPlaceholder />
+          )}
 
           <Separator />
 

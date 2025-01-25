@@ -33,16 +33,9 @@ const extensions = [
   }),
 ];
 
-export default function RTEComment({
-  postId,
-  isAuthenticated,
-}: {
-  postId: Post["id"];
-  isAuthenticated: boolean;
-}) {
+export default function RTEComment({ postId }: { postId: Post["id"] }) {
   const editor = useEditor({
     immediatelyRender: false,
-    editable: isAuthenticated,
     editorProps: {
       attributes: {
         class:
