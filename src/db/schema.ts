@@ -158,6 +158,7 @@ export const usersToPosts = pgTable(
     voteStatus: voteStatusEnum().notNull().default("none"),
     saved: boolean().notNull().default(false),
     hidden: boolean().notNull().default(false),
+    ...timestamps,
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.postId] }),

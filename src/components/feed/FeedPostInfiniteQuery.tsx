@@ -70,8 +70,11 @@ export default function FeedPostInfiniteQuery({
       <FeedSort sort={input.sort} />
 
       {pages.map((page) =>
-        page.posts.map((post, index) => (
-          <PostContextProvider key={`${post.id}-${index}`} post={post}>
+        page.posts.map((post) => (
+          <PostContextProvider
+            key={[post.id, post.updatedAt, post.userToPostUpdatedAt].join("-")}
+            post={post}
+          >
             <FeedPost currentUserId={currentUserId} />
           </PostContextProvider>
         )),

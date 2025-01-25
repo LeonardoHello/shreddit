@@ -108,6 +108,14 @@ const postsQueryConfig = (props: {
         AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
         )
         `.as("vote_status"),
+      userToPostUpdatedAt: sql<schema.UserToPost["updatedAt"] | null>`
+        (
+          SELECT updated_at
+          FROM users_to_posts
+          WHERE users_to_posts.post_id = ${post.id}
+            AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+        )
+      `.as("user_to_post_updated_at"),
     }),
     orderBy: (post, { desc, asc }) => {
       switch (props.sort) {

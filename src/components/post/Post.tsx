@@ -22,12 +22,13 @@ export default function Post({
   if (!post) notFound();
 
   return (
-    <PostContextProvider post={post}>
+    <PostContextProvider
+      key={[post.id, post.updatedAt, post.userToPostUpdatedAt].join("-")}
+      post={post}
+    >
       <div className="flex flex-col gap-2 rounded border bg-card px-4 py-2">
         <PostHeader currentUserId={currentUserId} />
-
         <PostBody />
-
         <PostFooter currentUserId={currentUserId} />
       </div>
     </PostContextProvider>
