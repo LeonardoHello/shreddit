@@ -18,9 +18,9 @@ export default async function PostPage(props: {
 }) {
   const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  trpc.post.getPost.prefetch(params.postId);
-  trpc.comment.getComments.prefetch(params.postId);
-  trpc.community.getCommunityByName.prefetch(params.communityName);
+  void trpc.post.getPost.prefetch(params.postId);
+  void trpc.comment.getComments.prefetch(params.postId);
+  void trpc.community.getCommunityByName.prefetch(params.communityName);
 
   return (
     <main className="container flex grow gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">

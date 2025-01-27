@@ -31,12 +31,23 @@ export default function FeedPostInfiniteQuery({
 
   const { procedure, input } = infiniteQueryOptions;
 
-  const [{ pages }, { isFetchingNextPage, fetchNextPage, hasNextPage }] =
-    // @ts-expect-error input is correctly inferred based on procedure
-    trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
+  let infiniteQuery;
+  if (procedure === "getUserPosts") {
+    infiniteQuery = trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-      refetchOnWindowFocus: false,
     });
+  } else if (procedure === "getCommunityPosts") {
+    infiniteQuery = trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    });
+  } else {
+    infiniteQuery = trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    });
+  }
+
+  const [{ pages }, { isFetchingNextPage, fetchNextPage, hasNextPage }] =
+    infiniteQuery;
 
   useEffect(() => {
     if (!ref.current || !hasNextPage || isFetchingNextPage) return;
