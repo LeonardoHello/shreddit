@@ -1,15 +1,10 @@
-import { Suspense } from "react";
-
 import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunityHeaderPlaceholder from "@/components/community/CommunityHeaderPlaceholder";
-import CommunityHeaderSkeleton from "@/components/community/CommunityHeaderSkeleton";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
-import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSkeleton";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
 import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
@@ -39,39 +34,33 @@ export default async function CommunityPage(props: {
   return (
     <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
-        <Suspense fallback={<CommunityHeaderSkeleton />}>
-          {auth.userId && (
-            <CommunityHeader
-              currentUserId={auth.userId}
-              communityName={params.communityName}
-            />
-          )}
-          {!auth.userId && (
-            <CommunityHeaderPlaceholder communityName={params.communityName} />
-          )}
-        </Suspense>
+        {auth.userId && (
+          <CommunityHeader
+            currentUserId={auth.userId}
+            communityName={params.communityName}
+          />
+        )}
+        {!auth.userId && (
+          <CommunityHeaderPlaceholder communityName={params.communityName} />
+        )}
       </HydrateClient>
 
       <div className="flex justify-center gap-4">
         <HydrateClient>
-          <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
-            <FeedPostInfiniteQuery
-              currentUserId={auth.userId}
-              infiniteQueryOptions={{
-                procedure: "getCommunityPosts",
-                input: {
-                  sort,
-                  communityName: params.communityName,
-                },
-              }}
-            />
-          </Suspense>
+          <FeedPostInfiniteQuery
+            currentUserId={auth.userId}
+            infiniteQueryOptions={{
+              procedure: "getCommunityPosts",
+              input: {
+                sort,
+                communityName: params.communityName,
+              },
+            }}
+          />
         </HydrateClient>
 
         <HydrateClient>
-          <Suspense fallback={<CommunitySidebarSkeleton />}>
-            <CommunitySidebar communityName={params.communityName} />
-          </Suspense>
+          <CommunitySidebar communityName={params.communityName} />
         </HydrateClient>
       </div>
     </main>
