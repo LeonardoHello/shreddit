@@ -1,6 +1,10 @@
 import { Skeleton } from "../ui/skeleton";
 
-export default function PostSkeleton() {
+export default function PostSkeleton({
+  postContentHeight,
+}: {
+  postContentHeight?: number;
+}) {
   return (
     <div className="flex w-full flex-col gap-3 rounded border bg-card px-4 py-2">
       <div className="flex items-center justify-between">
@@ -15,7 +19,7 @@ export default function PostSkeleton() {
       </div>
       <div className="flex grow flex-col gap-3">
         <Skeleton className="h-7 w-1/2" />
-        <Skeleton className="h-80" />
+        <Skeleton className="h-80" style={{ height: postContentHeight }} />
       </div>
       <div className="flex gap-2">
         <Skeleton className="h-8 w-[4.5rem] rounded-full" />
