@@ -13,14 +13,14 @@ export default async function HomePage(props: {
     authPromise(),
   ]);
 
+  if (auth.userId === null)
+    throw new Error("Could not load home page information.");
+
   const { data: sort = PostSort.BEST } = z
     .nativeEnum(PostSort)
     .safeParse(searchParams.sort);
 
   void trpc.postFeed.getHomePosts.prefetchInfinite({ sort });
-
-  if (auth.userId === null)
-    throw new Error("Could not load home page information.");
 
   return (
     <main className="container flex grow gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">

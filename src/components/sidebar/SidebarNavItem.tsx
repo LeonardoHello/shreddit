@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
-import type { ArrElement } from "@/types";
+import { PostSort, type ArrElement } from "@/types";
 import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import { Button } from "../ui/button";
@@ -23,6 +23,8 @@ export default function SidebarNavItem({
 }) {
   const utils = trpc.useUtils();
 
+  const { id, name, icon } = communityRelation.community;
+
   const toggleFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
     onMutate: (variables) => {
       const { communityId, favorited } = variables;
@@ -33,8 +35,7 @@ export default function SidebarNavItem({
         }
 
         return data.map((userToCommunity) => {
-          if (userToCommunity.community.id !== communityId)
-            return userToCommunity;
+          if (id !== communityId) return userToCommunity;
 
           return { ...userToCommunity, favorited };
         });
@@ -46,22 +47,43 @@ export default function SidebarNavItem({
         }
 
         return data.map((userToCommunity) => {
-          if (userToCommunity.community.id !== communityId)
-            return userToCommunity;
+          if (id !== communityId) return userToCommunity;
 
           return { ...userToCommunity, favorited };
         });
       });
     },
     onSuccess: () => {
-      utils.community.getUserToCommunity.invalidate(
-        communityRelation.community.name,
-      );
+      utils.community.getUserToCommunity.invalidate(name);
     },
     onError: (error) => {
       toast.error(error.message);
     },
   });
+
+  const prefetchCommunity = () => {
+    const userToCommunity = utils.community.getUserToCommunity;
+    const communityByName = utils.community.getCommunityByName;
+    const communityPosts = utils.postFeed.getCommunityPosts;
+
+    if (!userToCommunity.getData(name)) {
+      void userToCommunity.prefetch(name);
+    }
+    if (!communityByName.getData(name)) {
+      void communityByName.prefetch(name);
+    }
+    if (
+      !communityPosts.getInfiniteData({
+        sort: PostSort.BEST,
+        communityName: name,
+      })
+    ) {
+      void communityPosts.prefetchInfinite({
+        sort: PostSort.BEST,
+        communityName: name,
+      });
+    }
+  };
 
   return (
     <li key={communityRelation.community.id} className="flex">
@@ -69,11 +91,13 @@ export default function SidebarNavItem({
         variant="ghost"
         size="lg"
         className="w-full justify-start px-4 text-sm font-normal hover:bg-accent/40"
+        onTouchStart={prefetchCommunity}
+        onMouseEnter={prefetchCommunity}
         asChild
       >
-        <Link href={`/r/${communityRelation.community.name}`}>
-          <CommunityImage icon={communityRelation.community.icon} size={32} />
-          <h2 className="truncate">r/{communityRelation.community.name}</h2>
+        <Link href={`/r/${name}`}>
+          <CommunityImage icon={icon} size={32} />
+          <h2 className="truncate">r/{name}</h2>
           {canFavorite && (
             <Star
               className={cn("ml-auto size-5 stroke-1", {

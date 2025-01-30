@@ -1,8 +1,28 @@
+"use client";
+
 import Link from "next/link";
 
+import { trpc } from "@/trpc/client";
+import { PostSort } from "@/types";
+
 export default function Logo() {
+  const utils = trpc.useUtils();
+
+  const prefetchAll = () => {
+    const allPosts = utils.postFeed.getAllPosts;
+
+    if (!allPosts.getInfiniteData({ sort: PostSort.BEST })) {
+      utils.postFeed.getAllPosts.prefetchInfinite({ sort: PostSort.BEST });
+    }
+  };
+
   return (
-    <Link href="/" className="flex items-center gap-1.5">
+    <Link
+      href="/"
+      className="flex items-center gap-1.5"
+      onTouchStart={prefetchAll}
+      onMouseEnter={prefetchAll}
+    >
       <LogoIcon className="size-8" />
       <LogoText className="hidden h-6 w-auto md:block" />
     </Link>

@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
 
+import { trpc } from "@/trpc/client";
+import { PostSort } from "@/types";
 import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -17,11 +19,30 @@ export default function SidebarNavMain({
   userId: User["id"] | null;
 }) {
   const pathname = usePathname();
+
   const { user, isSignedIn, isLoaded } = useUser();
+
+  const utils = trpc.useUtils();
 
   const isHome = pathname === "/home";
   const isAll = pathname === "/";
   const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
+
+  const prefetchHome = () => {
+    const homePosts = utils.postFeed.getHomePosts;
+
+    if (!homePosts.getInfiniteData({ sort: PostSort.BEST })) {
+      void homePosts.prefetchInfinite({ sort: PostSort.BEST });
+    }
+  };
+
+  const prefetchAll = () => {
+    const allPosts = utils.postFeed.getAllPosts;
+
+    if (!allPosts.getInfiniteData({ sort: PostSort.BEST })) {
+      void allPosts.prefetchInfinite({ sort: PostSort.BEST });
+    }
+  };
 
   return (
     <nav>
@@ -38,6 +59,8 @@ export default function SidebarNavMain({
                 },
               )}
               asChild
+              onTouchStart={prefetchHome}
+              onMouseEnter={prefetchHome}
             >
               <Link href="/home">
                 {isHome ? <ActiveHomeIcon /> : <InactiveHomeIcon />}
@@ -58,6 +81,8 @@ export default function SidebarNavMain({
               },
             )}
             asChild
+            onTouchStart={prefetchAll}
+            onMouseEnter={prefetchAll}
           >
             <Link href="/">
               {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
