@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { useAuth } from "@clerk/nextjs";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ export default function SidebarNavItem({
   >;
   canFavorite?: boolean;
 }) {
+  const auth = useAuth();
   const utils = trpc.useUtils();
 
   const { id, name, icon } = communityRelation.community;
@@ -66,7 +68,7 @@ export default function SidebarNavItem({
     const communityByName = utils.community.getCommunityByName;
     const communityPosts = utils.postFeed.getCommunityPosts;
 
-    if (!userToCommunity.getData(name)) {
+    if (auth.isSignedIn && !userToCommunity.getData(name)) {
       void userToCommunity.prefetch(name);
     }
     if (!communityByName.getData(name)) {

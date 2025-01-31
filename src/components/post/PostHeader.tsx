@@ -31,7 +31,7 @@ export default function PostHeader({
     const communityByName = utils.community.getCommunityByName;
     const communityPosts = utils.postFeed.getCommunityPosts;
 
-    if (!userToCommunity.getData(state.community.name)) {
+    if (currentUserId && !userToCommunity.getData(state.community.name)) {
       void userToCommunity.prefetch(state.community.name);
     }
     if (!communityByName.getData(state.community.name)) {

@@ -25,7 +25,7 @@ export default function SidebarNavMain({
   const utils = trpc.useUtils();
 
   const isHome = pathname === "/home";
-  const isAll = pathname === "/";
+  const isAll = pathname === "/" || (!userId && isHome);
   const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
 
   const prefetchHome = () => {
