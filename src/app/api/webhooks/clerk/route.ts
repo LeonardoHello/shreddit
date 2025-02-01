@@ -60,6 +60,8 @@ export async function POST(req: Request) {
       await db.insert(users).values({
         id: data.id,
         username: data.username ?? data.id,
+        firstName: data.first_name,
+        lastName: data.last_name,
         imageUrl: data.image_url,
       });
       break;
@@ -69,6 +71,8 @@ export async function POST(req: Request) {
         .update(users)
         .set({
           username: data.username ?? data.id,
+          firstName: data.first_name,
+          lastName: data.last_name,
           imageUrl: data.image_url,
         })
         .where(eq(users.id, data.id));
