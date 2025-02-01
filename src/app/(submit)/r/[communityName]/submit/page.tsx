@@ -87,7 +87,7 @@ export default async function CommunitySubmitPage(props: {
         <div className="text-xs font-medium text-zinc-500">
           Please be mindful of shreddit&apos;s{" "}
           <Link
-            href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
+            href="https://8t3elu199k.ufs.sh/f/g5bSfwFnFPCkRkEFEiqpn1qKl6SiV3r29vPEcIbwQWhFJLda"
             className="text-blue-500"
             target="_blank"
           >
@@ -95,7 +95,7 @@ export default async function CommunitySubmitPage(props: {
           </Link>{" "}
           and practice good{" "}
           <Link
-            href="https://utfs.io/f/6d2aac46-9ced-4376-abf4-d6be13b2a4ab-pmcoca.jpg"
+            href="https://8t3elu199k.ufs.sh/f/g5bSfwFnFPCkBi3Y10kkBcL4w7KYtTz1H053rVO2JmXuq9AF"
             className="text-blue-500"
             target="_blank"
           >
