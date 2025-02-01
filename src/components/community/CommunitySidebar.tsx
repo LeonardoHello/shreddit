@@ -31,13 +31,18 @@ export default function CommunitySidebar({
           !isDialog,
       })}
     >
-      <h2 className="truncate font-medium tracking-wide">
-        {community.displayName || community.name}
+      <h2 className="truncate text-lg font-bold tracking-wide">
+        r/{community.name}
       </h2>
 
-      {community.description && (
-        <p className="break-words text-sm">{community.description}</p>
-      )}
+      <div className="flex flex-col items-start text-sm">
+        {community.displayName && (
+          <h3 className="truncate font-bold">{community.displayName}</h3>
+        )}
+        {community.description && (
+          <p className="break-words">{community.description}</p>
+        )}
+      </div>
 
       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">

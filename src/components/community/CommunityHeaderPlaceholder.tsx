@@ -4,8 +4,16 @@ import { useEffect } from "react";
 import Image from "next/image";
 
 import { useClerk } from "@clerk/nextjs";
-import { Plus } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   ReducerAction,
   useRecentCommunityDispatchContext,
@@ -13,8 +21,8 @@ import {
 import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
-import CommunityHeaderDialog from "./CommunityHeaderDialog";
 import CommunityImage from "./CommunityImage";
+import CommunitySidebar from "./CommunitySidebar";
 
 export default function CommunityHeaderPlaceholder({
   communityName,
@@ -65,7 +73,27 @@ export default function CommunityHeaderPlaceholder({
                 r/{community.name}
               </h1>
 
-              <CommunityHeaderDialog communityName={communityName} />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 rounded-full text-muted-foreground lg:hidden"
+                  >
+                    <Info className="size-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-card">
+                  <DialogHeader className="sr-only">
+                    <DialogTitle>Community Information</DialogTitle>
+                    <DialogDescription>
+                      This dialog displays details about the community. Please
+                      review the information provided.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CommunitySidebar communityName={communityName} isDialog />
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>

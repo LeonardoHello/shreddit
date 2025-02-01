@@ -5,9 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { User } from "@clerk/nextjs/server";
-import { Plus } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   ReducerAction,
   useRecentCommunityDispatchContext,
@@ -16,9 +24,9 @@ import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
 import CommunityEditDialog from "./CommunityEditDialog";
-import CommunityHeaderDialog from "./CommunityHeaderDialog";
 import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
 import CommunityImage from "./CommunityImage";
+import CommunitySidebar from "./CommunitySidebar";
 
 export default function CommunityHeader({
   currentUserId,
@@ -98,7 +106,28 @@ export default function CommunityHeader({
               <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
                 r/{community.name}
               </h1>
-              <CommunityHeaderDialog communityName={communityName} />
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 rounded-full text-muted-foreground lg:hidden"
+                  >
+                    <Info className="size-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-card">
+                  <DialogHeader className="sr-only">
+                    <DialogTitle>Community Information</DialogTitle>
+                    <DialogDescription>
+                      This dialog displays details about the community. Please
+                      review the information provided.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CommunitySidebar communityName={communityName} isDialog />
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>
