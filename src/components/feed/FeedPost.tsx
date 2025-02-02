@@ -29,15 +29,7 @@ export default function FeedPost({
   }
 
   // don't hide posts on user filter feed
-  if (
-    state.isHidden &&
-    !(
-      pathname.endsWith("/downvoted") ||
-      pathname.endsWith("/hidden") ||
-      pathname.endsWith("/saved") ||
-      pathname.endsWith("/upvoted")
-    )
-  ) {
+  if (state.isHidden && !pathname.startsWith("/u/")) {
     return <FeedPostHidden />;
   }
 

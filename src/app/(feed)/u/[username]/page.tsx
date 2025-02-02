@@ -1,10 +1,7 @@
-import { Suspense } from "react";
-
 import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import FeedPostInfiniteQuerySkeleton from "@/components/feed/FeedPostInfiniteQuerySkeleton";
 import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
@@ -15,7 +12,6 @@ export default async function UserPage(props: {
   const [params, searchParams, currentUser] = await Promise.all([
     props.params,
     props.searchParams,
-    // currentUser function is deduped from layout
     currentUserPromise(),
   ]);
 
@@ -30,18 +26,16 @@ export default async function UserPage(props: {
 
   return (
     <HydrateClient>
-      <Suspense fallback={<FeedPostInfiniteQuerySkeleton />}>
-        <FeedPostInfiniteQuery
-          currentUserId={currentUser && currentUser.id}
-          infiniteQueryOptions={{
-            procedure: "getUserPosts",
-            input: {
-              sort,
-              username: params.username,
-            },
-          }}
-        />
-      </Suspense>
+      <FeedPostInfiniteQuery
+        currentUserId={currentUser && currentUser.id}
+        infiniteQueryOptions={{
+          procedure: "getUserPosts",
+          input: {
+            sort,
+            username: params.username,
+          },
+        }}
+      />
     </HydrateClient>
   );
 }

@@ -26,7 +26,7 @@ export default function CommunitySidebar({
 
   return (
     <div
-      className={cn("flex flex-col gap-2", {
+      className={cn("flex flex-col gap-2.5", {
         "sticky top-16 z-10 hidden h-fit w-80 rounded border bg-card px-3 py-2 lg:flex":
           !isDialog,
       })}
@@ -35,12 +35,14 @@ export default function CommunitySidebar({
         r/{community.name}
       </h2>
 
-      <div className="flex flex-col items-start text-sm">
+      <div className="items-start text-sm">
         {community.displayName && (
           <h3 className="truncate font-bold">{community.displayName}</h3>
         )}
         {community.description && (
-          <p className="break-words">{community.description}</p>
+          <p className="break-words text-muted-foreground">
+            {community.description}
+          </p>
         )}
       </div>
 

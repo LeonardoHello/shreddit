@@ -1,58 +1,48 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { onion } from "@lucide/lab";
-import { Cake, Dot, Icon } from "lucide-react";
+import { Cake, Icon } from "lucide-react";
 
-import type { getUserByName } from "@/api/getUser";
+import { RouterOutput } from "@/trpc/routers/_app";
 import getOnions from "@/utils/calculateOnions";
-import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import userBackground from "@public/userBackground.jpg";
+import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Separator } from "../ui/separator";
 
-type user = NonNullable<Awaited<ReturnType<typeof getUserByName.execute>>>;
-
-export default function UserInfo({ user }: { user: user }) {
+export default function UserSidebar({
+  user,
+  isDialog,
+}: {
+  user: NonNullable<RouterOutput["user"]["getUserByName"]>;
+  isDialog?: boolean;
+}) {
   return (
-    <div className="sticky top-4 flex flex-col gap-3 scroll-auto rounded border border-zinc-700/70 bg-zinc-900 p-3 pt-2 shadow-lg shadow-zinc-950">
-      <Image
-        src={userBackground}
-        alt="galaxy"
-        priority
-        quality={10}
-        className="absolute left-0 top-0 h-24 rounded-t object-cover object-center"
-      />
-      <Image
-        src={user.imageUrl}
-        alt="user background"
-        priority
-        width={84}
-        height={84}
-        className="z-10 mt-8 self-center rounded-full"
-      />
-      <div className="flex flex-col items-center gap-0.5">
-        <h1 className="max-w-[302px] text-nowrap break-words text-center text-2xl">
-          {user.username}
-        </h1>
-        <h2 className="flex items-center text-xs text-zinc-500">
-          <span className="max-w-[10rem] break-words text-center">
+    <div
+      className={cn("flex flex-col gap-2.5", {
+        "sticky top-16 z-10 hidden h-fit w-80 rounded border bg-card px-3 py-2 lg:flex":
+          !isDialog,
+      })}
+    >
+      <div className="flex items-center gap-1.5">
+        <Avatar>
+          <AvatarImage src={user.imageUrl} />
+          <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
+        </Avatar>
+        <div>
+          <h2 className="truncate font-bold leading-tight">
+            {user.firstName} {user.lastName}{" "}
+            {!user.firstName && !user.lastName && user.username}
+          </h2>
+          <div className="flex gap-1 text-xs text-muted-foreground">
             u/{user.username}
-          </span>
-          <Dot className="size-3" />
-          <time
-            dateTime={user.createdAt.toISOString()}
-            title={user.createdAt.toLocaleDateString("hr-HR")}
-          >
-            {getRelativeTimeString(user.createdAt)}
-          </time>
-        </h2>
+          </div>
+        </div>
       </div>
-
-      <hr className="border-zinc-700/70" />
 
       <div className="flex justify-between">
         <div className="space-y-1">
-          <div className="font-medium">Onions</div>
+          <div className="text-xs text-muted-foreground">Onions</div>
           <div className="flex items-center gap-1">
             <Icon iconNode={onion} className="size-4" />
             <div className="text-xs text-zinc-500">
@@ -64,7 +54,7 @@ export default function UserInfo({ user }: { user: user }) {
           </div>
         </div>
         <div className="space-y-1">
-          <div className="font-medium">Onion day</div>
+          <div className="text-xs text-muted-foreground">Onion day</div>
           <div className="flex items-center gap-1">
             <Cake className="size-4" />
             <div className="text-xs text-zinc-500">
@@ -81,12 +71,18 @@ export default function UserInfo({ user }: { user: user }) {
 
       {user.communities.length > 0 && (
         <>
-          <hr className="border-zinc-700/70" />
-          <div>
-            <h1 className="mb-4 max-w-[15rem] font-bold tracking-wide text-zinc-500">
+          <Separator />
+          <div className="flex flex-col gap-2">
+            <h1 className="text-sm uppercase text-muted-foreground">
               Moderator of these communities
             </h1>
-            <div className="flex h-56 flex-col gap-3.5 overflow-y-scroll">
+            <div
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
+              }}
+              className="flex max-h-56 flex-col gap-3.5 overflow-y-auto"
+            >
               {user.communities.map((community) => (
                 <div key={community.id} className="flex items-center gap-1.5">
                   <CommunityImage icon={community.icon} size={32} />
