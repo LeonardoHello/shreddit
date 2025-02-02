@@ -31,7 +31,7 @@ export default function SidebarNavRecent() {
             {state.communities.map((community) => (
               <SidebarNavItem
                 key={community.id}
-                communityRelation={{ community, favorited: false }}
+                userToCommunity={{ community, favorited: false }}
               />
             ))}
           </ul>

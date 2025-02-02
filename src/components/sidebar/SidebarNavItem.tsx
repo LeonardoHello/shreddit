@@ -14,10 +14,10 @@ import CommunityImage from "../community/CommunityImage";
 import { Button } from "../ui/button";
 
 export default function SidebarNavItem({
-  communityRelation,
+  userToCommunity,
   canFavorite,
 }: {
-  communityRelation: ArrElement<
+  userToCommunity: ArrElement<
     RouterOutput["community"]["getJoinedCommunities"]
   >;
   canFavorite?: boolean;
@@ -25,33 +25,35 @@ export default function SidebarNavItem({
   const auth = useAuth();
   const utils = trpc.useUtils();
 
-  const { id, name, icon } = communityRelation.community;
+  const { name, icon } = userToCommunity.community;
 
   const toggleFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
     onMutate: (variables) => {
       const { communityId, favorited } = variables;
 
-      utils.community.getModeratedCommunities.setData(undefined, (data) => {
-        if (!data) {
+      utils.community.getModeratedCommunities.setData(undefined, (updater) => {
+        if (!updater) {
           return [];
         }
 
-        return data.map((userToCommunity) => {
-          if (id !== communityId) return userToCommunity;
+        return updater.map((_userToCommunity) => {
+          if (communityId !== _userToCommunity.community.id)
+            return _userToCommunity;
 
-          return { ...userToCommunity, favorited };
+          return { ..._userToCommunity, favorited };
         });
       });
 
-      utils.community.getJoinedCommunities.setData(undefined, (data) => {
-        if (!data) {
+      utils.community.getJoinedCommunities.setData(undefined, (updater) => {
+        if (!updater) {
           return [];
         }
 
-        return data.map((userToCommunity) => {
-          if (id !== communityId) return userToCommunity;
+        return updater.map((_userToCommunity) => {
+          if (communityId !== _userToCommunity.community.id)
+            return _userToCommunity;
 
-          return { ...userToCommunity, favorited };
+          return { ..._userToCommunity, favorited };
         });
       });
     },
@@ -88,7 +90,7 @@ export default function SidebarNavItem({
   };
 
   return (
-    <li key={communityRelation.community.id} className="flex">
+    <li key={userToCommunity.community.id} className="flex">
       <Button
         variant="ghost"
         size="lg"
@@ -103,14 +105,14 @@ export default function SidebarNavItem({
           {canFavorite && (
             <Star
               className={cn("ml-auto size-5 stroke-1", {
-                "fill-foreground text-foreground": communityRelation.favorited,
+                "fill-foreground text-foreground": userToCommunity.favorited,
               })}
               onClick={(e) => {
                 e.preventDefault();
 
                 toggleFavorite.mutate({
-                  communityId: communityRelation.community.id,
-                  favorited: !communityRelation.favorited,
+                  communityId: userToCommunity.community.id,
+                  favorited: !userToCommunity.favorited,
                 });
               }}
             />

@@ -31,10 +31,10 @@ export default function SidebarNavMuted() {
                 }
                 return a.community.name.localeCompare(b.community.name);
               })
-              .map((communityRelation) => (
+              .map((userToCommunity) => (
                 <SidebarNavItem
-                  key={communityRelation.community.id}
-                  communityRelation={communityRelation}
+                  key={userToCommunity.community.id}
+                  userToCommunity={userToCommunity}
                 />
               ))}
           </ul>
