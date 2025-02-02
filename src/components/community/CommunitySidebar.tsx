@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 
-import { CakeSlice, Globe } from "lucide-react";
+import { CakeSlice, Globe, Info } from "lucide-react";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Community } from "@/db/schema";
 import { trpc } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 
 export default function CommunitySidebar({
@@ -17,6 +25,44 @@ export default function CommunitySidebar({
   communityName: Community["name"];
   isDialog?: boolean;
 }) {
+  if (isDialog) {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 rounded-full text-muted-foreground lg:hidden"
+          >
+            <Info className="size-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="bg-card">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Community Information</DialogTitle>
+            <DialogDescription>
+              This dialog displays details about the community. Please review
+              the information provided.
+            </DialogDescription>
+          </DialogHeader>
+          <CommunitySidebarContent communityName={communityName} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded border bg-card px-3 py-2 lg:flex">
+      <CommunitySidebarContent communityName={communityName} />
+    </div>
+  );
+}
+
+function CommunitySidebarContent({
+  communityName,
+}: {
+  communityName: Community["name"];
+}) {
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
 
@@ -25,19 +71,14 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div
-      className={cn("flex flex-col gap-2.5", {
-        "sticky top-16 z-10 hidden h-fit w-80 rounded border bg-card px-3 py-2 lg:flex":
-          !isDialog,
-      })}
-    >
-      <h2 className="truncate text-lg font-bold tracking-wide">
+    <>
+      <h2 className="break-words text-lg font-bold tracking-wide">
         r/{community.name}
       </h2>
 
-      <div className="items-start text-sm">
+      <div className="text-sm">
         {community.displayName && (
-          <h3 className="truncate font-bold">{community.displayName}</h3>
+          <h3 className="break-words font-bold">{community.displayName}</h3>
         )}
         {community.description && (
           <p className="break-words text-muted-foreground">
@@ -118,6 +159,6 @@ export default function CommunitySidebar({
           </span>
         </Link>
       </div>
-    </div>
+    </>
   );
 }

@@ -47,7 +47,7 @@ export default function UserNavigation({ username }: { username: string }) {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full lg:hidden"
+            className="min-w-9 rounded-full lg:hidden"
           >
             <Ellipsis className="size-5" />
           </Button>

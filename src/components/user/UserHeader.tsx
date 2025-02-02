@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import { User } from "@clerk/nextjs/server";
 import { Info } from "lucide-react";
 
 import {
@@ -19,10 +18,8 @@ import UserNavigation from "./UserNavigation";
 import UserSidebar from "./UserSidebar";
 
 export default function UserHeader({
-  currentUserId,
   user,
 }: {
-  currentUserId: User["id"] | null;
   user: NonNullable<RouterOutput["user"]["getUserByName"]>;
 }) {
   return (
@@ -44,15 +41,14 @@ export default function UserHeader({
           <div>
             <div className="flex items-center gap-1">
               <h1 className="self-center break-all text-lg font-bold lg:text-2xl">
-                {user.firstName} {user.lastName}{" "}
-                {!user.firstName && !user.lastName && user.username}
+                {user.username}
               </h1>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-7 rounded-full text-muted-foreground lg:hidden"
+                    className="size-7 min-w-7 rounded-full text-muted-foreground lg:hidden"
                   >
                     <Info className="size-4" />
                   </Button>
@@ -69,15 +65,13 @@ export default function UserHeader({
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="text-xs text-muted-foreground">
+            <div className="break-all text-xs text-muted-foreground">
               u/{user.username}
             </div>
           </div>
         </div>
 
-        {currentUserId === user.id && (
-          <UserNavigation username={user.username} />
-        )}
+        <UserNavigation username={user.username} />
       </div>
     </div>
   );

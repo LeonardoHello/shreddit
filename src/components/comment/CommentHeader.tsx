@@ -25,7 +25,7 @@ export default function CommentHeader() {
       <div className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link
           href={`/u/${state.author.username}`}
-          className="font-extrabold hover:underline"
+          className="break-all font-extrabold hover:underline"
         >
           {state.author.username}
         </Link>

@@ -27,7 +27,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
             asChild
           >
             <Link href={{ pathname, query: { sort: PostSort.BEST } }}>
-              <Rocket className="size-6" />
+              <Rocket className="size-5 stroke-[1.5] sm:size-6" />
               <span className="hidden sm:inline-block">Best</span>
             </Link>
           </Button>
@@ -41,7 +41,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
             asChild
           >
             <Link href={{ pathname, query: { sort: PostSort.HOT } }}>
-              <Flame className="size-6" />
+              <Flame className="size-5 stroke-[1.5] sm:size-6" />
               <span className="hidden sm:inline-block">Hot</span>
             </Link>
           </Button>
@@ -55,7 +55,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
             asChild
           >
             <Link href={{ pathname, query: { sort: PostSort.NEW } }}>
-              <Tag className="size-6" />
+              <Tag className="size-5 stroke-[1.5] sm:size-6" />
               <span className="hidden sm:inline-block">New</span>
             </Link>
           </Button>
@@ -69,7 +69,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
             asChild
           >
             <Link href={{ pathname, query: { sort: PostSort.CONTROVERSIAL } }}>
-              <MessageSquareText className="size-6" />
+              <MessageSquareText className="size-5 stroke-[1.5] sm:size-6" />
               <span className="hidden sm:inline-block">Controversial</span>
             </Link>
           </Button>

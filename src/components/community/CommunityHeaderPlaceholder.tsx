@@ -69,7 +69,7 @@ export default function CommunityHeaderPlaceholder({
           />
           <div>
             <div className="flex items-center gap-1">
-              <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
+              <h1 className="self-center break-words text-lg font-extrabold lg:text-3xl">
                 r/{community.name}
               </h1>
 

@@ -5,17 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { User } from "@clerk/nextjs/server";
-import { Info, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   ReducerAction,
   useRecentCommunityDispatchContext,
@@ -107,27 +99,7 @@ export default function CommunityHeader({
                 r/{community.name}
               </h1>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7 rounded-full text-muted-foreground lg:hidden"
-                  >
-                    <Info className="size-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-card">
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Community Information</DialogTitle>
-                    <DialogDescription>
-                      This dialog displays details about the community. Please
-                      review the information provided.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CommunitySidebar communityName={communityName} isDialog />
-                </DialogContent>
-              </Dialog>
+              <CommunitySidebar communityName={communityName} isDialog />
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>
@@ -150,10 +122,14 @@ export default function CommunityHeader({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant={"outline"} className="rounded-full" asChild>
+          <Button
+            variant={"outline"}
+            className="w-9 rounded-full sm:w-auto"
+            asChild
+          >
             <Link href={`/r/${communityName}/submit`}>
               <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
-              <span className="capitalize">create post</span>
+              <span className="hidden capitalize sm:block">create post</span>
             </Link>
           </Button>
 

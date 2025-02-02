@@ -70,7 +70,7 @@ export default function PostHeader({
                 onTouchStart={prefetchCommunity}
                 onMouseEnter={prefetchCommunity}
                 onClick={(e) => e.stopPropagation()}
-                className="font-extrabold text-foreground hover:opacity-80"
+                className="break-all font-extrabold text-foreground hover:opacity-80"
               >
                 r/{state.community.name}
               </Link>
@@ -89,7 +89,7 @@ export default function PostHeader({
             <Link
               href={`/u/${state.author.username}`}
               onClick={(e) => e.stopPropagation()}
-              className="hover:opacity-80"
+              className="break-all hover:opacity-80"
             >
               {state.author.username}
             </Link>
@@ -108,10 +108,11 @@ export default function PostHeader({
                 {state.author.username.slice(0, 2)}
               </AvatarFallback>
             </Avatar>
-            <span className="font-extrabold group-hover:opacity-80">
+            <span className="break-all font-extrabold group-hover:opacity-80">
               u/{state.author.username}
             </span>
           </Link>
+
           <span>•</span>
           {hydrated ? (
             <time
@@ -134,7 +135,7 @@ export default function PostHeader({
             className="group flex items-center gap-1.5 text-xs text-foreground"
           >
             <CommunityImage icon={state.community.icon} size={24} />
-            <span className="font-extrabold group-hover:opacity-80">
+            <span className="break-all font-extrabold group-hover:opacity-80">
               r/{state.community.name}
             </span>
           </Link>

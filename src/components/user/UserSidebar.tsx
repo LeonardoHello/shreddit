@@ -29,12 +29,12 @@ export default function UserSidebar({
           <AvatarImage src={user.imageUrl} />
           <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
         </Avatar>
-        <div>
-          <h2 className="truncate font-bold leading-tight">
+        <div className="flex flex-col">
+          <div className="break-words font-bold leading-tight">
             {user.firstName} {user.lastName}{" "}
             {!user.firstName && !user.lastName && user.username}
-          </h2>
-          <div className="flex gap-1 text-xs text-muted-foreground">
+          </div>
+          <div className="flex gap-1 break-words text-xs text-muted-foreground">
             u/{user.username}
           </div>
         </div>
