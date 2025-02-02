@@ -94,7 +94,7 @@ export default function CommunityHeader({
         placeholder="blur"
       />
 
-      <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center lg:gap-4">
+      <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center">
         <div className="flex items-center gap-2 lg:max-h-10">
           <CommunityImage
             icon={community.icon}
