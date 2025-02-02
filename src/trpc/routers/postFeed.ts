@@ -150,7 +150,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort),
-        username: UserSchema.shape.username,
+        userId: UserSchema.shape.id,
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -166,7 +166,7 @@ export const postFeedRouter = createTRPCRouter({
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
         offset: input.cursor,
-        username: input.username,
+        userId: input.userId,
       });
 
       let nextCursor: typeof input.cursor = undefined;
@@ -181,6 +181,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort),
+        userId: UserSchema.shape.id,
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -196,6 +197,7 @@ export const postFeedRouter = createTRPCRouter({
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
         offset: input.cursor,
+        userId: input.userId,
       });
 
       let nextCursor: typeof input.cursor = undefined;
@@ -210,6 +212,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort),
+        userId: UserSchema.shape.id,
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -225,6 +228,7 @@ export const postFeedRouter = createTRPCRouter({
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
         offset: input.cursor,
+        userId: input.userId,
       });
 
       let nextCursor: typeof input.cursor = undefined;
@@ -239,6 +243,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort),
+        userId: UserSchema.shape.id,
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -254,6 +259,7 @@ export const postFeedRouter = createTRPCRouter({
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
         offset: input.cursor,
+        userId: input.userId,
       });
 
       let nextCursor: typeof input.cursor = undefined;
@@ -268,6 +274,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         cursor: z.number().nullish(),
         sort: z.nativeEnum(PostSort),
+        userId: UserSchema.shape.id,
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -283,6 +290,7 @@ export const postFeedRouter = createTRPCRouter({
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
         offset: input.cursor,
+        userId: input.userId,
       });
 
       let nextCursor: typeof input.cursor = undefined;

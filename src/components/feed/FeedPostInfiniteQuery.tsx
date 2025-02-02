@@ -32,7 +32,13 @@ export default function FeedPostInfiniteQuery({
   const { procedure, input } = infiniteQueryOptions;
 
   let infiniteQuery;
-  if (procedure === "getUserPosts") {
+  if (
+    procedure === "getUserPosts" ||
+    procedure === "getSavedPosts" ||
+    procedure === "getHiddenPosts" ||
+    procedure === "getUpvotedPosts" ||
+    procedure === "getDownvotedPosts"
+  ) {
     infiniteQuery = trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
     });

@@ -15,7 +15,7 @@ const hideFilter = {
 
 const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
   const { sql, exists, and, eq } = filter;
-
+  // TODO: add community name to the query
   return exists(
     db
       .select()

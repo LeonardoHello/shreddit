@@ -1,22 +1,25 @@
 import { notFound } from "next/navigation";
 
-import { currentUser as currentUserPromise } from "@clerk/nextjs/server";
+import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
+import { trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
 export default async function UpvotedPage(props: {
   params: Promise<{ username: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const [params, searchParams, currentUser] = await Promise.all([
+  const [params, searchParams, auth] = await Promise.all([
     props.params,
     props.searchParams,
-    currentUserPromise(),
+    authPromise(),
   ]);
 
-  if (currentUser && currentUser.username !== params.username) notFound();
+  const user = await trpc.user.getUserByName(params.username);
+
+  if (!user) notFound();
 
   const { data: sort = PostSort.BEST } = z
     .nativeEnum(PostSort)
@@ -24,10 +27,10 @@ export default async function UpvotedPage(props: {
 
   return (
     <FeedPostInfiniteQuery
-      currentUserId={currentUser && currentUser.id}
+      currentUserId={auth.userId}
       infiniteQueryOptions={{
         procedure: "getUpvotedPosts",
-        input: { sort },
+        input: { sort, userId: user.id },
       }}
     />
   );

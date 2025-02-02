@@ -23,7 +23,7 @@ const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
       .where(
         and(
           eq(usersToPosts.postId, post.id),
-          eq(usersToPosts.userId, sql.placeholder("currentUserId")),
+          eq(usersToPosts.userId, sql.placeholder("userId")),
           eq(usersToPosts.voteStatus, "downvoted"),
         ),
       ),
