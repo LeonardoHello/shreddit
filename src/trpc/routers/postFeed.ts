@@ -176,7 +176,7 @@ export const postFeedRouter = createTRPCRouter({
 
       return { posts, nextCursor };
     }),
-  getUpvotedPosts: protectedProcedure
+  getUpvotedPosts: baseProcedure
     .input(
       z.object({
         cursor: z.number().nullish(),
@@ -207,7 +207,7 @@ export const postFeedRouter = createTRPCRouter({
 
       return { posts, nextCursor };
     }),
-  getDownvotedPosts: protectedProcedure
+  getDownvotedPosts: baseProcedure
     .input(
       z.object({
         cursor: z.number().nullish(),
@@ -238,7 +238,7 @@ export const postFeedRouter = createTRPCRouter({
 
       return { posts, nextCursor };
     }),
-  getSavedPosts: protectedProcedure
+  getSavedPosts: baseProcedure
     .input(
       z.object({
         cursor: z.number().nullish(),
@@ -269,7 +269,7 @@ export const postFeedRouter = createTRPCRouter({
 
       return { posts, nextCursor };
     }),
-  getHiddenPosts: protectedProcedure
+  getHiddenPosts: baseProcedure
     .input(
       z.object({
         cursor: z.number().nullish(),
