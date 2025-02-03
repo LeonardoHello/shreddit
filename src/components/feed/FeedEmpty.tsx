@@ -1,10 +1,6 @@
-import Link from "next/link";
-
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
-import { Button } from "../ui/button";
-
-export default function FeedEmpty({ username }: { username?: string }) {
+export default function FeedEmpty() {
   return (
     <div className="relative flex grow flex-col rounded border border-border/50">
       {Array.from({ length: 6 }).map((_, i) => (
@@ -28,19 +24,6 @@ export default function FeedEmpty({ username }: { username?: string }) {
         <h1 className="text-lg font-medium">
           hmm... looks like nothing has been posted yet
         </h1>
-        {/* TODO */}
-        {username && (
-          <>
-            <h2 className="text-sm">
-              Be the first to till this fertile swamp.
-            </h2>
-            <Button variant="outline" className="rounded-full" asChild>
-              <Link href="/submit" className="rounded-full">
-                Create Post
-              </Link>
-            </Button>
-          </>
-        )}
       </div>
     </div>
   );
