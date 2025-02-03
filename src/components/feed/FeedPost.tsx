@@ -57,7 +57,7 @@ export default function FeedPost({
       onTouchStart={prefetchPost}
       onMouseEnter={prefetchPost}
       onClick={() => {
-        router.push(`/r/${state.community.name}/comments/${state.id}`);
+        router.push(`/r/${state.community.name}/comments/${state.id}#post`);
       }}
     >
       <PostHeader currentUserId={currentUserId} />
