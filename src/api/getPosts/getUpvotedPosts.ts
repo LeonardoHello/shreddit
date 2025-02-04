@@ -1,5 +1,5 @@
 import db from "@/db";
-import { usersToPosts } from "@/db/schema";
+import { users, usersToPosts } from "@/db/schema";
 import {
   bestPostsQueryConfig,
   controversialPostsQueryConfig,
@@ -20,10 +20,16 @@ const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
     db
       .select()
       .from(usersToPosts)
+      .innerJoin(
+        users,
+        and(
+          eq(users.id, usersToPosts.userId),
+          eq(users.username, sql.placeholder("username")),
+        ),
+      )
       .where(
         and(
           eq(usersToPosts.postId, post.id),
-          eq(usersToPosts.userId, sql.placeholder("userId")),
           eq(usersToPosts.voteStatus, "upvoted"),
         ),
       ),

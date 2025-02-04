@@ -1,4 +1,5 @@
 import db from "@/db";
+import { users } from "@/db/schema";
 import {
   bestPostsQueryConfig,
   controversialPostsQueryConfig,
@@ -13,9 +14,19 @@ const userPostsFilter = {
 };
 
 const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
-  const { sql, eq } = filter;
+  const { sql, eq, exists, and } = filter;
 
-  return eq(post.authorId, sql.placeholder("userId"));
+  return exists(
+    db
+      .select()
+      .from(users)
+      .where(
+        and(
+          eq(users.id, post.authorId),
+          eq(users.username, sql.placeholder("username")),
+        ),
+      ),
+  );
 };
 
 export const getUserBestPosts = db.query.posts

@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-
 import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
@@ -17,17 +15,13 @@ export default async function UserPage(props: {
     authPromise(),
   ]);
 
-  const user = await trpc.user.getUserByName(params.username);
-
-  if (!user) notFound();
-
   const { data: sort = PostSort.BEST } = z
     .nativeEnum(PostSort)
     .safeParse(searchParams.sort);
 
   void trpc.postFeed.getUserPosts.prefetchInfinite({
     sort,
-    userId: user.id,
+    username: params.username,
   });
 
   return (
@@ -38,7 +32,7 @@ export default async function UserPage(props: {
           procedure: "getUserPosts",
           input: {
             sort,
-            userId: user.id,
+            username: params.username,
           },
         }}
       />

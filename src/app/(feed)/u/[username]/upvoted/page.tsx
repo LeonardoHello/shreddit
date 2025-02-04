@@ -1,10 +1,8 @@
-import { notFound } from "next/navigation";
-
 import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { trpc } from "@/trpc/server";
+import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
 export default async function UpvotedPage(props: {
@@ -17,21 +15,24 @@ export default async function UpvotedPage(props: {
     authPromise(),
   ]);
 
-  const user = await trpc.user.getUserByName(params.username);
-
-  if (!user) notFound();
-
   const { data: sort = PostSort.BEST } = z
     .nativeEnum(PostSort)
     .safeParse(searchParams.sort);
 
+  void trpc.postFeed.getUpvotedPosts.prefetchInfinite({
+    sort,
+    username: params.username,
+  });
+
   return (
-    <FeedPostInfiniteQuery
-      currentUserId={auth.userId}
-      infiniteQueryOptions={{
-        procedure: "getUpvotedPosts",
-        input: { sort, userId: user.id },
-      }}
-    />
+    <HydrateClient>
+      <FeedPostInfiniteQuery
+        currentUserId={auth.userId}
+        infiniteQueryOptions={{
+          procedure: "getUpvotedPosts",
+          input: { sort, username: params.username },
+        }}
+      />
+    </HydrateClient>
   );
 }
