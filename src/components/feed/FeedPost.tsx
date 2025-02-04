@@ -3,7 +3,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
 import PostBody from "../post/PostBody";
 import PostFooter from "../post/PostFooter";
 import PostHeader from "../post/PostHeader";
@@ -17,7 +16,6 @@ export default function FeedPost({
   const pathname = usePathname();
   const router = useRouter();
 
-  const utils = trpc.useUtils();
   const state = usePostContext();
 
   if (state.isDeleted) {
@@ -33,29 +31,15 @@ export default function FeedPost({
     return <FeedPostHidden />;
   }
 
-  const prefetchPost = () => {
-    router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
-
-    const post = utils.post.getPost;
-    const comments = utils.comment.getComments;
-    const communityByName = utils.community.getCommunityByName;
-
-    if (!post.getData(state.id)) {
-      void post.prefetch(state.id);
-    }
-    if (!comments.getData(state.id)) {
-      void comments.prefetch(state.id);
-    }
-    if (!communityByName.getData(state.community.name)) {
-      void communityByName.prefetch(state.community.name);
-    }
-  };
-
   return (
     <div
       className="flex cursor-pointer flex-col gap-2 rounded border bg-card px-4 py-2 hover:border-ring/50"
-      onTouchStart={prefetchPost}
-      onMouseEnter={prefetchPost}
+      onTouchStart={() => {
+        router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
+      }}
+      onMouseEnter={() => {
+        router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
+      }}
       onClick={() => {
         router.push(`/r/${state.community.name}/comments/${state.id}#post`);
       }}

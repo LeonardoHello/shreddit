@@ -7,8 +7,6 @@ import { User } from "@clerk/nextjs/server";
 
 import { usePostContext } from "@/context/PostContext";
 import useHydration from "@/hooks/useHydration";
-import { trpc } from "@/trpc/client";
-import { PostSort } from "@/types";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -21,34 +19,8 @@ export default function PostHeader({
 }) {
   const { communityName } = useParams();
 
-  const utils = trpc.useUtils();
-
   const state = usePostContext();
   const hydrated = useHydration();
-
-  const prefetchCommunity = () => {
-    const userToCommunity = utils.community.getUserToCommunity;
-    const communityByName = utils.community.getCommunityByName;
-    const communityPosts = utils.postFeed.getCommunityPosts;
-
-    if (currentUserId && !userToCommunity.getData(state.community.name)) {
-      void userToCommunity.prefetch(state.community.name);
-    }
-    if (!communityByName.getData(state.community.name)) {
-      void communityByName.prefetch(state.community.name);
-    }
-    if (
-      !communityPosts.getInfiniteData({
-        sort: PostSort.BEST,
-        communityName: state.community.name,
-      })
-    ) {
-      void communityPosts.prefetchInfinite({
-        sort: PostSort.BEST,
-        communityName: state.community.name,
-      });
-    }
-  };
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -86,8 +58,6 @@ export default function PostHeader({
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Link
             href={`/r/${state.community.name}`}
-            onTouchStart={prefetchCommunity}
-            onMouseEnter={prefetchCommunity}
             onClick={(e) => e.stopPropagation()}
             className="group flex items-center gap-1.5 text-xs text-foreground"
           >
