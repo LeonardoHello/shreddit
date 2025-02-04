@@ -3,26 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { useUser } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
 
 import { trpc } from "@/trpc/client";
 import { PostSort } from "@/types";
 import { cn } from "@/utils/cn";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarNavMain({
   userId,
-  children,
 }: {
   userId: User["id"] | null;
-  children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
+  const { user, isSignedIn, isLoaded } = useUser();
 
   const utils = trpc.useUtils();
 
   const isHome = pathname === "/home";
   const isAll = pathname === "/" || (!userId && isHome);
+  const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
 
   const prefetchHome = () => {
     const homePosts = utils.postFeed.getHomePosts;
@@ -87,7 +91,38 @@ export default function SidebarNavMain({
           </Button>
         </li>
 
-        {children}
+        {userId && !isLoaded && (
+          <div className="flex h-10 items-center gap-2 px-4">
+            <Skeleton className="size-6 rounded-full" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+        )}
+
+        {userId && isLoaded && isSignedIn && (
+          <li>
+            <Button
+              variant="ghost"
+              size="lg"
+              className={cn(
+                "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
+                {
+                  "bg-accent text-accent-foreground hover:bg-accent": isProfile,
+                },
+              )}
+              asChild
+            >
+              <Link href={`/u/${user.username}`}>
+                <Avatar className="size-6">
+                  <AvatarImage src={user.imageUrl} />
+                  <AvatarFallback className="uppercase">
+                    {user.username?.slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <h2 className="capitalize">view profile</h2>
+              </Link>
+            </Button>
+          </li>
+        )}
       </ul>
     </nav>
   );

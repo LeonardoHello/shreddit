@@ -4,14 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 
 import { Accordion } from "@/components/ui/accordion";
 import { HydrateClient, trpc } from "@/trpc/server";
-import { Skeleton } from "../ui/skeleton";
 import SidebarNavJoined from "./SidebarNavJoined";
 import SidebarNavMain from "./SidebarNavMain";
 import SidebarNavModerated from "./SidebarNavModerated";
 import SidebarNavMuted from "./SidebarNavMuted";
 import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
-import SidebarNavUser from "./SidebarNavUser";
 
 export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
   const { userId } = await auth();
@@ -34,20 +32,7 @@ export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
           : undefined
       }
     >
-      <SidebarNavMain userId={userId}>
-        {userId && (
-          <Suspense
-            fallback={
-              <li className="flex h-10 items-center gap-2 px-4">
-                <Skeleton className="size-6 rounded-full" />
-                <Skeleton className="h-4 w-20" />
-              </li>
-            }
-          >
-            <SidebarNavUser />
-          </Suspense>
-        )}
-      </SidebarNavMain>
+      <SidebarNavMain userId={userId} />
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
         <SidebarNavRecent />
