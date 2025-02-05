@@ -7,22 +7,19 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { trpc } from "@/trpc/client";
+import { PostFileSchema } from "@/db/schema";
 import { UploadDropzone } from "@/utils/uploadthing";
+
+const postFileSchema = PostFileSchema.pick({
+  key: true,
+  url: true,
+  name: true,
+  thumbHash: true,
+}).array();
 
 export default function SubmitDropzone() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
-
-  const createThumbHash = trpc.file.createThumbHash.useMutation({
-    onSuccess: (data) => {
-      dispatch({
-        type: ReducerAction.SET_FILES,
-        nextFiles: data,
-      });
-      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
-    },
-  });
 
   return (
     <UploadDropzone
@@ -47,14 +44,27 @@ export default function SubmitDropzone() {
         },
       }}
       className="mt-0 min-h-[18rem] rounded border border-zinc-700/70"
-      onClientUploadComplete={(res) => {
-        createThumbHash.mutate(
-          res.map((file) => ({
-            name: file.name,
-            key: file.key,
-            url: file.url,
-          })),
-        );
+      onClientUploadComplete={async (res) => {
+        const files = res.map((file) => ({
+          name: file.name,
+          key: file.key,
+          url: file.url,
+        }));
+
+        const response = await fetch("/api/thumbHash", {
+          method: "POST",
+          body: JSON.stringify(files),
+        });
+
+        const data = await response.json();
+
+        const parsedFiles = postFileSchema.parse(data);
+
+        dispatch({
+          type: ReducerAction.SET_FILES,
+          nextFiles: parsedFiles,
+        });
+        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
       }}
       onUploadError={(e) => {
         toast.error(e.message);
