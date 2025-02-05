@@ -3,8 +3,10 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function RTESkeleton({
   content,
+  isSubmitPage = false,
 }: {
   content?: string | TrustedHTML;
+  isSubmitPage?: boolean;
 }) {
   return (
     <div className="rounded border bg-card">
@@ -18,11 +20,13 @@ export default function RTESkeleton({
         dangerouslySetInnerHTML={{ __html: content ?? "" }}
       />
 
-      <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
-        <Skeleton className="w-16 rounded-full" />
+      {!isSubmitPage && (
+        <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
+          <Skeleton className="w-16 rounded-full" />
 
-        <Skeleton className="w-[88px] rounded-full" />
-      </div>
+          <Skeleton className="w-[88px] rounded-full" />
+        </div>
+      )}
     </div>
   );
 }

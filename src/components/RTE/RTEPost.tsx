@@ -65,7 +65,7 @@ export default function RTEPost() {
   });
 
   if (!editor) {
-    return <RTEpostLoading />;
+    return <RTEpostLoading isSubmitPage />;
   }
 
   return (
