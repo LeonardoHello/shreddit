@@ -1,6 +1,5 @@
-import { randomUUID } from "crypto";
-
 import { eq } from "drizzle-orm";
+import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import {
@@ -185,7 +184,7 @@ export const communityRouter = createTRPCRouter({
   createCommunity: protectedProcedure
     .input(CommunitySchema.pick({ name: true, description: true }))
     .mutation(({ input, ctx }) => {
-      const communityId = randomUUID();
+      const communityId = uuidv4();
 
       return ctx.db.batch([
         ctx.db

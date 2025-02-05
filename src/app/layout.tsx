@@ -28,6 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const preferredRegion = ["fra1"];
+export const runtime = "edge";
 
 export default function RootLayout({
   children,
