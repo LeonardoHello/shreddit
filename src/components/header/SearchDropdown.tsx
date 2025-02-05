@@ -15,7 +15,7 @@ export default function SearchDropdown({
   searchedValue: string;
 }) {
   const searchedCommunities = trpc.community.searchCommunities.useQuery(
-    searchedValue,
+    { search: searchedValue, limit: 4 },
     {
       initialData: [],
       refetchOnWindowFocus: false,
@@ -68,10 +68,8 @@ export default function SearchDropdown({
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
-                    }).format(community.usersToCommunities.length)}{" "}
-                    {community.usersToCommunities.length === 1
-                      ? "member"
-                      : "members"}
+                    }).format(community.memberCount)}{" "}
+                    {community.memberCount === 1 ? "member" : "members"}
                   </span>
                 </div>
               </div>

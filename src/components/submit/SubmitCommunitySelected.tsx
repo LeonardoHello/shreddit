@@ -1,51 +1,32 @@
 "use client";
 
-import { use } from "react";
+import { ChevronDown } from "lucide-react";
 
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-
-import { getSelectedCommunity } from "@/api/getCommunity";
-import { useDropdownContext } from "@/context/DropdownContext";
+import { trpc } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunitySelected({
-  children,
-  selectedCommunityPromise,
+  communityName,
 }: {
-  children: React.ReactNode;
-  selectedCommunityPromise: ReturnType<typeof getSelectedCommunity.execute>;
+  communityName: string;
 }) {
-  const { isOpen, setIsOpen } = useDropdownContext();
+  const [selectedCommunity] =
+    trpc.community.getSelectedCommunity.useSuspenseQuery(communityName);
 
-  if (isOpen) {
-    return children;
-  }
-
-  const selectedCommunity = use(selectedCommunityPromise);
-
-  if (!selectedCommunity) throw new Error("Community doesn't exist");
+  if (!selectedCommunity)
+    throw new Error("There was a problem with a community selection.");
 
   return (
-    <div className="relative flex w-72 flex-col rounded bg-inherit bg-zinc-900">
-      <button
-        className="flex basis-full select-none items-center gap-2 rounded border border-zinc-700/70 p-2"
-        onClick={() => setIsOpen(true)}
-      >
-        <CommunityImage icon={selectedCommunity.icon} size={24} />
+    <>
+      <CommunityImage
+        size={24}
+        icon={selectedCommunity.icon}
+        className="size-6"
+      />
 
-        <h1 className="grow truncate text-start text-sm font-medium">
-          r/{selectedCommunity.name}
-        </h1>
+      <span className="truncate">r/{selectedCommunity.name}</span>
 
-        <ChevronDownIcon
-          className="ml-auto h-4 w-4 min-w-[1rem] stroke-2 text-zinc-500"
-          onClick={(e) => {
-            e.stopPropagation();
-
-            setIsOpen(!isOpen);
-          }}
-        />
-      </button>
-    </div>
+      <ChevronDown className="ml-auto size-5 text-muted-foreground" />
+    </>
   );
 }

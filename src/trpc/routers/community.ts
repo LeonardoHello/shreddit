@@ -7,10 +7,12 @@ import {
   getJoinedCommunities,
   getModeratedCommunities,
   getMutedCommunities,
+  getMyCommunities,
 } from "@/api/getCommunities";
 import {
   getCommunityByName,
   getCommunityImage,
+  getSelectedCommunity,
   getUserToCommunity,
 } from "@/api/getCommunity";
 import { searchCommunities } from "@/api/search";
@@ -30,9 +32,25 @@ export const communityRouter = createTRPCRouter({
       const data = await getCommunityByName.execute({ communityName: input });
       return data ?? null;
     }),
-  searchCommunities: baseProcedure.input(z.string()).query(({ input }) => {
-    return searchCommunities.execute({ search: `%${input}%` });
-  }),
+  getSelectedCommunity: protectedProcedure
+    .input(CommunitySchema.shape.name)
+    .query(async ({ input }) => {
+      const data = await getSelectedCommunity.execute({ communityName: input });
+      return data ?? null;
+    }),
+  searchCommunities: baseProcedure
+    .input(
+      z.object({
+        search: z.string(),
+        limit: z.number().positive().optional(),
+      }),
+    )
+    .query(({ input }) => {
+      return searchCommunities.execute({
+        search: `%${input.search}%`,
+        limit: input.limit,
+      });
+    }),
   getUserToCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(async ({ input, ctx }) => {
@@ -53,6 +71,9 @@ export const communityRouter = createTRPCRouter({
     .query(({ input }) => {
       return getCommunityImage.execute({ communityName: input });
     }),
+  getMyCommunities: protectedProcedure.query(({ ctx }) => {
+    return getMyCommunities.execute({ currentUserId: ctx.userId });
+  }),
   getRecentCommunities: baseProcedure
     .input(
       CommunitySchema.pick({

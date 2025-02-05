@@ -34,12 +34,6 @@ export const getSelectedCommunity = db.query.communities
     where: (community, { sql, eq }) =>
       eq(community.name, sql.placeholder("communityName")),
     columns: { id: true, name: true, icon: true },
-    with: {
-      usersToCommunities: {
-        columns: { userId: true },
-        where: (userToCommunity, { eq }) => eq(userToCommunity.joined, true),
-      },
-    },
   })
   .prepare("selected_community");
 

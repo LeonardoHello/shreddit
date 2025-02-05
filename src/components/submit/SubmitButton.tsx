@@ -1,12 +1,11 @@
 "use client";
 
-import { use, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { getSelectedCommunity } from "@/api/getCommunity";
 import {
   ReducerAction,
   useSubmitContext,
@@ -15,13 +14,15 @@ import {
 import { trpc } from "@/trpc/client";
 import { PostType } from "@/types";
 import { cn } from "@/utils/cn";
+import { Button } from "../ui/button";
 
 export default function SubmitButton({
-  selectedCommunityPromise,
+  communityName,
 }: {
-  selectedCommunityPromise: ReturnType<typeof getSelectedCommunity.execute>;
+  communityName: string;
 }) {
-  const selectedCommunity = use(selectedCommunityPromise);
+  const [selectedCommunity] =
+    trpc.community.getSelectedCommunity.useSuspenseQuery(communityName);
 
   if (!selectedCommunity)
     throw new Error("There was a problem with a community selection.");
@@ -80,39 +81,34 @@ export default function SubmitButton({
     (state.postType === PostType.IMAGE && state.files.length === 0);
 
   return (
-    <div className="flex flex-col items-end gap-4 p-4">
-      <button
-        className={cn(
-          "inline-flex h-8 w-16 items-center justify-center gap-2 rounded-full bg-zinc-300 text-sm font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
-          {
-            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
-          },
-        )}
-        disabled={isDisabled}
-        aria-disabled={isDisabled}
-        onClick={() => {
-          if (isDisabled) return;
+    <Button
+      className={cn("order-2 self-end rounded-full", {
+        "cursor-not-allowed": isDisabled,
+      })}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
+      onClick={() => {
+        if (isDisabled) return;
 
-          const { files, ...post } = state;
+        const { files, ...post } = state;
 
-          if (state.postType === PostType.TEXT) {
-            createPostText.mutate({
-              ...post,
-              communityId: selectedCommunity.id,
-            });
-          } else if (state.postType === PostType.IMAGE) {
-            // text is set to null
-            createPostImage.mutate({
-              ...post,
-              communityId: selectedCommunity.id,
-              files,
-            });
-          }
-        }}
-      >
-        {isMutating && <Loader2 className="size-4 animate-spin" />}
-        {!isMutating && "Post"}
-      </button>
-    </div>
+        if (state.postType === PostType.TEXT) {
+          createPostText.mutate({
+            ...post,
+            communityId: selectedCommunity.id,
+          });
+        } else if (state.postType === PostType.IMAGE) {
+          // text is set to null
+          createPostImage.mutate({
+            ...post,
+            communityId: selectedCommunity.id,
+            files,
+          });
+        }
+      }}
+    >
+      {isMutating && <Loader2 className="size-4 animate-spin" />}
+      {!isMutating && "Post"}
+    </Button>
   );
 }

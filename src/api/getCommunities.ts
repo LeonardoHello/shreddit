@@ -1,4 +1,4 @@
-import { communities } from "@/db/schema";
+import { communities, usersToCommunities } from "@/db/schema";
 import db from "../db";
 
 export const getModeratedCommunities = db.query.usersToCommunities
@@ -45,25 +45,31 @@ export const getMutedCommunities = db.query.usersToCommunities
   })
   .prepare("muted_communities");
 
-export const getMyCommunities = db.query.usersToCommunities
+export const getMyCommunities = db.query.communities
   .findMany({
-    where: (userToCommunity, { sql, and, eq }) =>
-      and(
-        eq(userToCommunity.userId, sql.placeholder("currentUserId")),
-        eq(userToCommunity.joined, true),
+    where: (community, { sql, and, eq, exists }) =>
+      exists(
+        db
+          .select()
+          .from(usersToCommunities)
+          .where(
+            and(
+              eq(usersToCommunities.communityId, community.id),
+              eq(usersToCommunities.userId, sql.placeholder("currentUserId")),
+              eq(usersToCommunities.joined, true),
+            ),
+          ),
       ),
-    columns: {},
-    with: {
-      community: {
-        columns: { id: true, name: true, icon: true },
-        with: {
-          usersToCommunities: {
-            columns: { userId: true },
-            where: (userToCommunity, { eq }) =>
-              eq(userToCommunity.joined, true),
-          },
-        },
-      },
-    },
+    columns: { id: true, name: true, icon: true },
+    extras: (community, { sql }) => ({
+      memberCount: sql<number>`
+        (
+          SELECT COUNT(*) 
+          FROM users_to_communities 
+          WHERE users_to_communities.community_id = ${community.id} 
+            AND users_to_communities.joined = true
+        )
+      `.as("member_count"),
+    }),
   })
   .prepare("selectable_communities");
