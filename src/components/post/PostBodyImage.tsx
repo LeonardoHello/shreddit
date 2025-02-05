@@ -74,7 +74,6 @@ function PostImage({
             fill
             sizes={imageSizes}
             placeholder="blur"
-            priority
             blurDataURL={placeholderURL}
             className="object-contain"
           />
