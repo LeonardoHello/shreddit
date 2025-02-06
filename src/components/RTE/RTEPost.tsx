@@ -24,6 +24,7 @@ import {
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
+import { Progress } from "../ui/progress";
 import { Toggle } from "../ui/toggle";
 import RTEPostButtons from "./RTEPostButtons";
 import RTESkeleton from "./RTESkeleton";
@@ -87,24 +88,10 @@ function ImageButton({ editor }: { editor: Editor }) {
       return files;
     },
     onUploadProgress: (p) => {
-      toast(
-        <div
-          className={cn("w-full rounded-full bg-zinc-800", {
-            "animate-pulse": p === 100,
-          })}
-        >
-          <div
-            className="rounded-full bg-zinc-400 p-0.5 text-center text-xs font-medium leading-none text-zinc-950"
-            style={{ width: p < 10 ? "10%" : p + "%" }}
-          >
-            {p < 10 ? 10 : p}%
-          </div>
-        </div>,
-        {
-          id: toastId,
-          duration: 1000 * 99,
-        },
-      );
+      toast.info(<Progress value={p} />, {
+        id: toastId,
+        duration: 1000 * 99,
+      });
     },
     onClientUploadComplete: (res) => {
       editor
