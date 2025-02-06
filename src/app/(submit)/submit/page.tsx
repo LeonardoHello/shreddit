@@ -25,7 +25,7 @@ export default async function SubmitPage() {
         </SubmitCommunity>
       </HydrateClient>
 
-      <Button className="order-2 cursor-not-allowed self-end rounded-full">
+      <Button className="order-2 self-end rounded-full" disabled>
         Post
       </Button>
     </>

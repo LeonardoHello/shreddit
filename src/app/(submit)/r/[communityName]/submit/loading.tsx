@@ -12,10 +12,7 @@ export default function Loading() {
         <ChevronDown className="ml-auto size-5 text-muted-foreground" />
       </Button>
 
-      <Button
-        className="order-2 cursor-not-allowed self-end rounded-full"
-        disabled
-      >
+      <Button className="order-2 self-end rounded-full" disabled>
         Post
       </Button>
     </>

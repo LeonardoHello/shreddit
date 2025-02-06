@@ -13,7 +13,6 @@ import {
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import { PostType } from "@/types";
-import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 
 export default function SubmitButton({
@@ -82,9 +81,7 @@ export default function SubmitButton({
 
   return (
     <Button
-      className={cn("order-2 self-end rounded-full", {
-        "cursor-not-allowed": isDisabled,
-      })}
+      className="order-2 self-end rounded-full"
       disabled={isDisabled}
       aria-disabled={isDisabled}
       onClick={() => {

@@ -41,7 +41,9 @@ export default function FeedPost({
         router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
       }}
       onClick={() => {
-        router.push(`/r/${state.community.name}/comments/${state.id}#post`);
+        if (!state.isEditing) {
+          router.push(`/r/${state.community.name}/comments/${state.id}#post`);
+        }
       }}
     >
       <PostHeader currentUserId={currentUserId} />
