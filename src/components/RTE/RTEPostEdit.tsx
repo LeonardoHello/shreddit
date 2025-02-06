@@ -2,13 +2,7 @@ import { useCallback } from "react";
 
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  BubbleMenu,
-  Editor,
-  EditorContent,
-  FloatingMenu,
-  useEditor,
-} from "@tiptap/react";
+import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
 import { Image as ImageIcon } from "lucide-react";
@@ -27,8 +21,9 @@ import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEMarkButtons from "./RTEMarkButtons";
-import RTENodeButtons from "./RTENodeButtons";
+import { Button } from "../ui/button";
+import { Toggle } from "../ui/toggle";
+import RTEPostButtons from "./RTEPostButtons";
 import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
@@ -62,43 +57,23 @@ export default function PostEditRTE() {
 
   return (
     <div
-      className={cn("cursor-auto rounded border border-zinc-700/70", {
-        "border-zinc-300": editor.isFocused,
-      })}
+      className={cn("rounded-lg border", { "border-ring": editor.isFocused })}
       onClick={(e) => {
         e.stopPropagation();
       }}
     >
-      <BubbleMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTEMarkButtons editor={editor} />
-      </BubbleMenu>
-
-      <FloatingMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTENodeButtons editor={editor} />
-      </FloatingMenu>
-
-      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
-        <RTEMarkButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtonImage editor={editor} />
-      </div>
+      <RTEPostButtons editor={editor}>
+        <ImageButton editor={editor} />
+      </RTEPostButtons>
 
       <EditorContent editor={editor} />
 
-      <RTEPostEditActionButtons editor={editor} />
+      <ActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
+function ActionButtons({ editor }: { editor: Editor }) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
@@ -121,41 +96,39 @@ function RTEPostEditActionButtons({ editor }: { editor: Editor }) {
   const isDisabled = editPost.isPending || state.isDisabled;
 
   return (
-    <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
-      <button
-        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
+    <div className="flex justify-end gap-2 p-2">
+      <Button
+        size="sm"
+        variant="secondary"
         onClick={() => {
           editor.commands.setContent(state.text);
           dispatch({ type: ReducerAction.CANCEL_EDIT });
         }}
+        className="rounded-full"
       >
         Cancel
-      </button>
+      </Button>
 
-      <button
-        className={cn(
-          "inline-flex items-center justify-center gap-2 rounded-full bg-zinc-300 px-4 text-xs font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
-          {
-            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
-          },
-        )}
+      <Button
+        size="sm"
         disabled={isDisabled}
         onClick={() => {
-          if (isDisabled) return;
-
-          editPost.mutate({
-            id: state.id,
-            text: prettifyHTML(editor.getHTML()),
-          });
+          if (!isDisabled) {
+            editPost.mutate({
+              id: state.id,
+              text: prettifyHTML(editor.getHTML()),
+            });
+          }
         }}
+        className="rounded-full"
       >
         Edit
-      </button>
+      </Button>
     </div>
   );
 }
 
-function RTENodeButtonImage({ editor }: { editor: Editor }) {
+function ImageButton({ editor }: { editor: Editor }) {
   const dispatch = usePostDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
@@ -218,13 +191,11 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
   });
 
   return (
-    <div
-      {...getRootProps()}
-      className="cursor-pointer p-1 transition-colors hover:rounded hover:bg-zinc-700/70"
-      title={"Image"}
-    >
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <ImageIcon color={editor.isActive("image") ? "#d4d4d8" : "#71717a"} />
+      <Toggle pressed={false}>
+        <ImageIcon />
+      </Toggle>
     </div>
   );
 }

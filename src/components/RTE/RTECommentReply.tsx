@@ -6,9 +6,7 @@ import { useRouter } from "next/navigation";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
-  BubbleMenu,
   EditorContent,
-  FloatingMenu,
   useEditor,
   useEditorState,
   type Editor,
@@ -25,8 +23,8 @@ import {
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import RTEMarkButtons from "./RTEMarkButtons";
-import RTENodeButtons from "./RTENodeButtons";
+import { Button } from "../ui/button";
+import RTECommentButtons from "./RTECommentButtons";
 import RTEcommentLoading from "./RTESkeleton";
 
 const extensions = [
@@ -55,38 +53,18 @@ export default function RTECommentReply() {
 
   return (
     <div
-      className={cn("rounded border border-zinc-700/70", {
-        "border-zinc-300": editor.isFocused,
-      })}
+      className={cn("rounded-lg border", { "border-ring": editor.isFocused })}
     >
-      <BubbleMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTEMarkButtons editor={editor} />
-      </BubbleMenu>
-
-      <FloatingMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTENodeButtons editor={editor} />
-      </FloatingMenu>
-
-      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
-        <RTEMarkButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtons editor={editor} />
-      </div>
+      <RTECommentButtons editor={editor} />
 
       <EditorContent editor={editor} />
 
-      <RTECommentReplyActionButtons editor={editor} />
+      <ActionButtons editor={editor} />
     </div>
   );
 }
 
-function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
+function ActionButtons({ editor }: { editor: Editor }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -126,38 +104,35 @@ function RTECommentReplyActionButtons({ editor }: { editor: Editor }) {
   const isDisabled = editorState.isEmpty || isMutating;
 
   return (
-    <div className="flex h-10 justify-end gap-2 rounded-b p-1.5">
-      <button
-        className="rounded-full bg-zinc-800 px-4 text-xs font-bold tracking-wide text-zinc-300 transition-colors hover:bg-zinc-700"
+    <div className="flex justify-end gap-2 p-2">
+      <Button
+        size="sm"
+        variant="secondary"
         onClick={() => {
           dispatch({ type: ReducerAction.CANCEL_REPLY });
         }}
+        className="rounded-full"
       >
         Cancel
-      </button>
+      </Button>
 
-      <button
-        className={cn(
-          "inline-flex w-16 items-center justify-center gap-2 rounded-full bg-zinc-300 text-xs font-bold tracking-wide text-zinc-800 transition-opacity enabled:hover:opacity-80",
-          {
-            "cursor-not-allowed bg-zinc-400 text-zinc-700": isDisabled,
-          },
-        )}
+      <Button
+        size="sm"
         disabled={isDisabled}
-        aria-disabled={isDisabled}
         onClick={() => {
-          if (isDisabled) return;
-
-          createComment.mutate({
-            postId: state.postId,
-            parentCommentId: state.id,
-            text: prettifyHTML(editor.getHTML()),
-          });
+          if (!isDisabled) {
+            createComment.mutate({
+              postId: state.postId,
+              parentCommentId: state.id,
+              text: prettifyHTML(editor.getHTML()),
+            });
+          }
         }}
+        className="rounded-full"
       >
         {isMutating && <Loader2 className="size-4 animate-spin" />}
         {!isMutating && "Reply"}
-      </button>
+      </Button>
     </div>
   );
 }

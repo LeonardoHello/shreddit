@@ -5,12 +5,7 @@ import { useCallback } from "react";
 import ExtensionBubbleMenu from "@tiptap/extension-bubble-menu";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import {
-  BubbleMenu,
-  EditorContent,
-  FloatingMenu,
-  useEditor,
-} from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
@@ -29,9 +24,9 @@ import {
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
-import RTEMarkButtons from "./RTEMarkButtons";
-import RTENodeButtons from "./RTENodeButtons";
-import RTEpostLoading from "./RTESkeleton";
+import { Toggle } from "../ui/toggle";
+import RTEPostButtons from "./RTEPostButtons";
+import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
   StarterKit,
@@ -65,38 +60,16 @@ export default function RTEPost() {
   });
 
   if (!editor) {
-    return <RTEpostLoading isSubmitPage />;
+    return <RTESkeleton isSubmitPage />;
   }
 
   return (
     <div
-      className={cn("rounded border border-zinc-700/70", {
-        "border-zinc-300": editor.isFocused,
-      })}
+      className={cn("rounded-lg border", { "border-ring": editor.isFocused })}
     >
-      <BubbleMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTEMarkButtons editor={editor} />
-      </BubbleMenu>
-
-      <FloatingMenu
-        editor={editor}
-        className="rounded-md border border-zinc-700/70 bg-zinc-900 p-1 sm:hidden"
-      >
-        <RTENodeButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtonImage editor={editor} />
-      </FloatingMenu>
-
-      <div className="hidden flex-wrap gap-2 rounded-t bg-zinc-800 p-1 sm:flex">
-        <RTEMarkButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtons editor={editor} />
-        <div className="h-4 w-px self-center bg-zinc-700/70" />
-        <RTENodeButtonImage editor={editor} />
-      </div>
+      <RTEPostButtons editor={editor}>
+        <ImageButton editor={editor} />
+      </RTEPostButtons>
 
       <EditorContent editor={editor} />
     </div>
@@ -105,7 +78,7 @@ export default function RTEPost() {
 
 const toastId = "loading_toast";
 
-function RTENodeButtonImage({ editor }: { editor: Editor }) {
+function ImageButton({ editor }: { editor: Editor }) {
   const dispatch = useSubmitDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
@@ -172,13 +145,11 @@ function RTENodeButtonImage({ editor }: { editor: Editor }) {
   });
 
   return (
-    <div
-      {...getRootProps()}
-      className="cursor-pointer p-1 transition-colors hover:rounded hover:bg-zinc-700/70"
-      title={"Image"}
-    >
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <ImageIcon color={editor.isActive("image") ? "#d4d4d8" : "#71717a"} />
+      <Toggle pressed={false}>
+        <ImageIcon />
+      </Toggle>
     </div>
   );
 }
