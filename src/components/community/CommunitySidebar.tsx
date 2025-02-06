@@ -52,7 +52,7 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded border bg-card px-3 py-2 lg:flex">
+    <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 lg:flex">
       <CommunitySidebarContent communityName={communityName} />
     </div>
   );

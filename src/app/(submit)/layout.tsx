@@ -16,8 +16,8 @@ export default async function SubmitLayout({
 
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
-      <div className="w-0 grow rounded border bg-card px-4 py-3">
-        <h1 className="mb-3 text-2xl font-bold tracking-wide">Create post</h1>
+      <div className="flex w-0 grow flex-col gap-3 rounded-lg border bg-card px-4 py-3">
+        <h1 className="text-2xl font-bold tracking-wide">Create post</h1>
 
         <SubmitContextProvider>
           <div className="flex flex-col gap-2">
@@ -28,8 +28,8 @@ export default async function SubmitLayout({
         </SubmitContextProvider>
       </div>
 
-      <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded border bg-card p-4 text-sm lg:flex">
-        <div className="rounded bg-zinc-900">
+      <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm lg:flex">
+        <div>
           <div className="mb-2 flex items-center gap-2">
             <Image src={logo} alt="logo" className="size-8" />
             <h2 className="text-base font-medium">Posting to Shreddit</h2>

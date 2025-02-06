@@ -58,9 +58,6 @@ export default function PostEditRTE() {
   return (
     <div
       className={cn("rounded-lg border", { "border-ring": editor.isFocused })}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
     >
       <RTEPostButtons editor={editor}>
         <ImageButton editor={editor} />

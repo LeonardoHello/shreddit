@@ -8,7 +8,7 @@ export default function Loading() {
     <main className="flex grow flex-col gap-2">
       <PostSkeleton />
 
-      <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
+      <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 pb-8">
         <RTESkeleton />
 
         <Separator />

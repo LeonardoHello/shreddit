@@ -21,7 +21,7 @@ export default async function PostPage(props: {
         <Post currentUserId={auth.userId} postId={params.postId} />
       </HydrateClient>
 
-      <div className="flex flex-col gap-4 rounded border bg-card p-4 pb-8">
+      <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 pb-8">
         {auth.userId ? (
           <RTEComment postId={params.postId} />
         ) : (

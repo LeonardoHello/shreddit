@@ -33,7 +33,7 @@ export default function FeedPost({
 
   return (
     <div
-      className="flex cursor-pointer flex-col gap-2 rounded border bg-card px-4 py-2 hover:border-ring/50"
+      className="flex cursor-pointer flex-col gap-2 rounded-lg border bg-card px-4 py-2 hover:border-ring/50"
       onTouchStart={() => {
         router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
       }}

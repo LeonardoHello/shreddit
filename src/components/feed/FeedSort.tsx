@@ -17,7 +17,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
   const isControversial = sort === PostSort.CONTROVERSIAL;
 
   return (
-    <nav className="rounded border bg-card p-2">
+    <nav className="rounded-lg border bg-card p-2">
       <ul className="flex justify-around gap-1 font-bold text-muted-foreground">
         <li>
           <Button
