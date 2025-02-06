@@ -1,6 +1,8 @@
 import { RouterOutput } from "@/trpc/routers/_app";
 import type { ArrElement } from "@/types";
 
+// TODO: This is a temporary function to calculate the number of onions a user has.
+// It will be replaced with a more efficient function in the future.
 export default function calculateOnions(
   user: ArrElement<RouterOutput["user"]["searchUsers"]>,
 ) {
