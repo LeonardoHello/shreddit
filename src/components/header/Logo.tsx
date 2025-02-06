@@ -11,7 +11,7 @@ export default function Logo({ userId }: { userId: User["id"] | null }) {
 
   return (
     <Link href={href} className="flex items-center gap-1.5">
-      <Image src={logo} alt="logo" className="size-8" priority />
+      <Image src={logo} alt="logo" className="size-8 min-w-8" priority />
       <Image
         src={logoText}
         alt="logo"

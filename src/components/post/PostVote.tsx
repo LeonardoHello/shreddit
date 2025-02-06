@@ -72,6 +72,7 @@ export default function PostVote({
             "fill-foreground": isUpvoted,
           })}
         />
+        <span className="sr-only">Upvote</span>
       </Button>
 
       <div className="text-xs font-bold">
@@ -104,6 +105,7 @@ export default function PostVote({
             "fill-foreground": isDownvoted,
           })}
         />
+        <span className="sr-only">Downvote</span>
       </Button>
     </div>
   );

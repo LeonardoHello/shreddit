@@ -32,6 +32,7 @@ export default function SidebarSheet({
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full xl:hidden">
           <Menu />
+          <span className="sr-only">Open sidebar</span>
         </Button>
       </SheetTrigger>
       <SheetContent

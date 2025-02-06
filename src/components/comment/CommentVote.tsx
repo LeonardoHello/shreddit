@@ -65,6 +65,7 @@ export default function CommentVote({
             "fill-rose-600 text-rose-600": isUpvoted,
           })}
         />
+        <span className="sr-only">Upvote</span>
       </Button>
 
       <div className="text-xs font-bold">
@@ -93,6 +94,7 @@ export default function CommentVote({
             "fill-indigo-500 text-indigo-500": isDownvoted,
           })}
         />
+        <span className="sr-only">Downvote</span>
       </Button>
     </div>
   );

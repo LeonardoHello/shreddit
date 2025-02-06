@@ -28,7 +28,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
           >
             <Link href={{ pathname, query: { sort: PostSort.BEST } }}>
               <Rocket className="size-5 stroke-[1.5] sm:size-6" />
-              <span className="hidden sm:inline-block">Best</span>
+              <span className="sr-only sm:not-sr-only">Best</span>
             </Link>
           </Button>
         </li>
@@ -42,7 +42,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
           >
             <Link href={{ pathname, query: { sort: PostSort.HOT } }}>
               <Flame className="size-5 stroke-[1.5] sm:size-6" />
-              <span className="hidden sm:inline-block">Hot</span>
+              <span className="sr-only sm:not-sr-only">Hot</span>
             </Link>
           </Button>
         </li>
@@ -56,7 +56,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
           >
             <Link href={{ pathname, query: { sort: PostSort.NEW } }}>
               <Tag className="size-5 stroke-[1.5] sm:size-6" />
-              <span className="hidden sm:inline-block">New</span>
+              <span className="sr-only sm:not-sr-only">New</span>
             </Link>
           </Button>
         </li>
@@ -70,7 +70,7 @@ export default function FeedSort({ sort }: { sort: PostSort }) {
           >
             <Link href={{ pathname, query: { sort: PostSort.CONTROVERSIAL } }}>
               <MessageSquareText className="size-5 stroke-[1.5] sm:size-6" />
-              <span className="hidden sm:inline-block">Controversial</span>
+              <span className="sr-only sm:not-sr-only">Controversial</span>
             </Link>
           </Button>
         </li>
