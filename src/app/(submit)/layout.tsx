@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import SubmitTabs from "@/components/submit/SubmitTabs";
+import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
 import { trpc } from "@/trpc/server";
@@ -16,16 +16,15 @@ export default async function SubmitLayout({
 
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
-      <div className="flex w-0 grow flex-col gap-2 rounded border bg-card px-4 py-3">
-        <h1 className="text-2xl font-bold tracking-wide">Create a post</h1>
-
-        <Separator />
+      <div className="w-0 grow rounded border bg-card px-4 py-3">
+        <h1 className="mb-3 text-2xl font-bold tracking-wide">Create post</h1>
 
         <SubmitContextProvider>
-          {children}
-
-          <SubmitTabs />
-          <Separator />
+          <div className="flex flex-col gap-2">
+            {children}
+            <SubmitForm />
+            <Separator />
+          </div>
         </SubmitContextProvider>
       </div>
 

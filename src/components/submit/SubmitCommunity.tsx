@@ -79,7 +79,7 @@ export default function SubmitCommunity({
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
         }}
-        className="z-0 max-h-96 w-64 overflow-y-auto bg-card sm:w-72"
+        className="z-0 max-h-96 w-60 overflow-y-auto bg-card sm:w-72"
       >
         <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
           search communities
@@ -105,7 +105,7 @@ export default function SubmitCommunity({
               <AvatarImage src={imageUrl} />
               <AvatarFallback>{username?.slice(0, 2)}</AvatarFallback>
             </Avatar>
-            <span className="max-w-44 truncate text-sm sm:max-w-52">
+            <span className="max-w-40 truncate text-sm sm:max-w-52">
               u/{username}
             </span>
           </Link>
@@ -138,7 +138,7 @@ export default function SubmitCommunity({
                       icon={community.icon}
                     />
                     <div className="flex flex-col">
-                      <div className="max-w-44 truncate text-sm sm:max-w-52">
+                      <div className="max-w-40 truncate text-sm sm:max-w-52">
                         r/{community.name}
                       </div>
                       <div className="text-2xs text-muted-foreground">
@@ -167,7 +167,7 @@ export default function SubmitCommunity({
                     icon={community.icon}
                   />
                   <div className="flex flex-col">
-                    <div className="max-w-44 truncate text-sm sm:max-w-52">
+                    <div className="max-w-40 truncate text-sm sm:max-w-52">
                       r/{community.name}
                     </div>
                     <div className="text-2xs text-muted-foreground">

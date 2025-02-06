@@ -27,12 +27,12 @@ const icons: Record<PostType, React.JSX.Element> = {
 
 const maxTitleLength = 300;
 
-export default function SubmitTabs() {
+export default function SubmitForm() {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
       <div className="relative flex items-center">
         <Input
           placeholder="Title"
@@ -47,7 +47,7 @@ export default function SubmitTabs() {
             });
           }}
         />
-        <div className="absolute right-3 text-2xs font-bold text-zinc-500">
+        <div className="absolute right-3 text-2xs font-bold text-muted-foreground">
           {state.title.length}/{maxTitleLength}
         </div>
       </div>
@@ -114,6 +114,6 @@ export default function SubmitTabs() {
           nsfw
         </Button>
       </div>
-    </div>
+    </>
   );
 }

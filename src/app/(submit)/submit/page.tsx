@@ -16,7 +16,7 @@ export default async function SubmitPage() {
         <SubmitCommunity username={user.username} imageUrl={user.imageUrl}>
           <Button
             variant={"outline"}
-            className="h-10 w-64 border-border sm:w-72"
+            className="h-10 w-60 border-border sm:w-72"
           >
             <CircleDashed className="size-6 text-muted-foreground" />
             <span>Choose a community</span>
