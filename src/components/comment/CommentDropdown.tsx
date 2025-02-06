@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 
 import { Ellipsis, Pencil, Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -21,16 +20,20 @@ import { trpc } from "@/trpc/client";
 import { Button } from "../ui/button";
 
 export default function CommentDropdown() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
+  const utils = trpc.useUtils();
+
   const deleteComment = trpc.comment.deleteComment.useMutation({
     onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
+      startTransition(async () => {
+        await Promise.all([
+          utils.post.getPost.invalidate(state.postId),
+          utils.comment.getComments.invalidate(state.postId),
+        ]);
       });
 
       toast.success("Comment deleted successfully.");

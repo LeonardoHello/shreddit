@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -67,16 +66,20 @@ function ActionButtons({
   editor: Editor;
   postId: Post["id"];
 }) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const utils = trpc.useUtils();
 
   const createComment = trpc.comment.createComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
     },
     onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
+      startTransition(async () => {
+        await Promise.all([
+          utils.post.getPost.invalidate(postId),
+          utils.comment.getComments.invalidate(postId),
+        ]);
       });
 
       editor.commands.clearContent();

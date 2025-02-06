@@ -6,13 +6,14 @@ import {
   Italic,
   List,
   ListOrdered,
+  Loader2,
   Quote,
   SquareCode,
   Strikethrough,
 } from "lucide-react";
 
+import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Skeleton } from "../ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 
 export default function RTESkeleton({
@@ -32,10 +33,19 @@ export default function RTESkeleton({
       />
 
       {!isSubmitPage && (
-        <div className="flex h-10 justify-end gap-2 rounded-t p-1.5">
-          <Skeleton className="w-16 rounded-full" />
+        <div className="flex justify-end gap-2 p-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled
+            className="rounded-full"
+          >
+            Clear
+          </Button>
 
-          <Skeleton className="w-[88px] rounded-full" />
+          <Button size="sm" disabled className="rounded-full">
+            <Loader2 className="size-4 animate-spin" />
+          </Button>
         </div>
       )}
     </div>

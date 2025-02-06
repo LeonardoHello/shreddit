@@ -89,7 +89,12 @@ export default function FeedPostInfiniteQuery({
       {pages.map((page) =>
         page.posts.map((post) => (
           <PostContextProvider
-            key={[post.id, post.updatedAt, post.userToPostUpdatedAt].join("-")}
+            key={[
+              post.id,
+              post.updatedAt,
+              post.userToPostUpdatedAt,
+              post.commentCount,
+            ].join("-")}
             post={post}
           >
             <FeedPost currentUserId={currentUserId} />

@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -65,19 +64,23 @@ export default function RTECommentReply() {
 }
 
 function ActionButtons({ editor }: { editor: Editor }) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
+
+  const utils = trpc.useUtils();
 
   const createComment = trpc.comment.createComment.useMutation({
     onMutate: () => {
       editor.setEditable(false);
     },
     onSuccess: () => {
-      startTransition(() => {
-        router.refresh();
+      startTransition(async () => {
+        await Promise.all([
+          utils.post.getPost.invalidate(state.postId),
+          utils.comment.getComments.invalidate(state.postId),
+        ]);
       });
 
       dispatch({ type: ReducerAction.CANCEL_REPLY });

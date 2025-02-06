@@ -23,7 +23,12 @@ export default function Post({
 
   return (
     <PostContextProvider
-      key={[post.id, post.updatedAt, post.userToPostUpdatedAt].join("-")}
+      key={[
+        post.id,
+        post.updatedAt,
+        post.userToPostUpdatedAt,
+        post.commentCount,
+      ].join("-")}
       post={post}
     >
       <div className="flex flex-col gap-2 rounded-lg border bg-card px-4 py-2">
