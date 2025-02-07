@@ -1,5 +1,9 @@
+import { Suspense } from "react";
+
 import UserHeader from "@/components/user/UserHeader";
+import UserHeaderSkeleton from "@/components/user/UserHeaderSkeleton";
 import UserSidebar from "@/components/user/UserSidebar";
+import UserSidebarSkeleton from "@/components/user/UserSidebarSkeleton";
 import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
@@ -18,13 +22,17 @@ export default async function UserLayout(props: {
   return (
     <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
-        <UserHeader username={params.username} />
-
-        <div className="flex justify-center gap-4">
+        <div className="order-2 flex justify-center gap-4">
           {props.children}
 
-          <UserSidebar username={params.username} />
+          <Suspense fallback={<UserSidebarSkeleton />}>
+            <UserSidebar username={params.username} />
+          </Suspense>
         </div>
+
+        <Suspense fallback={<UserHeaderSkeleton />}>
+          <UserHeader username={params.username} />
+        </Suspense>
       </HydrateClient>
     </main>
   );
