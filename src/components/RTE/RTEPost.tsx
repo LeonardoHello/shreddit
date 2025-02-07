@@ -21,6 +21,7 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
+import { PostType } from "@/types";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
@@ -66,7 +67,10 @@ export default function RTEPost() {
 
   return (
     <div
-      className={cn("rounded-lg border", { "border-ring": editor.isFocused })}
+      className={cn("rounded-lg border", {
+        "border-ring": editor.isFocused,
+        "border-dashed": state.postType === PostType.IMAGE,
+      })}
     >
       <RTEPostButtons editor={editor}>
         <ImageButton editor={editor} />

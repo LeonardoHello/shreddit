@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -21,7 +22,10 @@ export const postRouter = createTRPCRouter({
         currentUserId: ctx.userId,
         postId: input,
       });
-      return post ?? null;
+
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return post;
     }),
   createTextPost: protectedProcedure
     .input(
