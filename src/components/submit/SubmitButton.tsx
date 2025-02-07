@@ -23,9 +23,6 @@ export default function SubmitButton({
   const [selectedCommunity] =
     trpc.community.getSelectedCommunity.useSuspenseQuery(communityName);
 
-  if (!selectedCommunity)
-    throw new Error("There was a problem with a community selection.");
-
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 

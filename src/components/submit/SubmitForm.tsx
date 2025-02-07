@@ -1,7 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
 import { Check, ImageIcon, LetterText, Plus } from "lucide-react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,13 +10,10 @@ import {
 } from "@/context/SubmitContext";
 import { PostType } from "@/types";
 import { cn } from "@/utils/cn";
+import RTEPost from "../RTE/RTEPost";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-
-const RTEPost = dynamic(() => import("@/components/RTE/RTEPost"));
-const SubmitDropzone = dynamic(
-  () => import("@/components/submit/SubmitDropzone"),
-);
+import SubmitDropzone from "./SubmitDropzone";
 
 const icons: Record<PostType, React.JSX.Element> = {
   [PostType.TEXT]: <LetterText className="size-6 stroke-[1.5]" />,
@@ -78,7 +73,6 @@ export default function SubmitForm() {
         <TabsContent value={PostType.TEXT}>
           <RTEPost />
         </TabsContent>
-
         <TabsContent value={PostType.IMAGE}>
           <SubmitDropzone />
         </TabsContent>

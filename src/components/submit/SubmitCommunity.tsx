@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 
-import { User } from "@clerk/nextjs/server";
 import { toast } from "sonner";
 
 import {
@@ -20,18 +19,13 @@ import {
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
 
 export default function SubmitCommunity({
   children,
-  username,
-  imageUrl,
 }: {
   children: React.ReactNode;
-  username: User["username"];
-  imageUrl: User["imageUrl"];
 }) {
   const [myCommunities] = trpc.community.getMyCommunities.useSuspenseQuery();
 
@@ -96,25 +90,8 @@ export default function SubmitCommunity({
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
-          your profile
-        </DropdownMenuLabel>
-        <DropdownMenuItem className="h-11" asChild>
-          <Link href={`/u/${username}`}>
-            <Avatar className="size-8">
-              <AvatarImage src={imageUrl} />
-              <AvatarFallback>{username?.slice(0, 2)}</AvatarFallback>
-            </Avatar>
-            <span className="max-w-40 truncate text-sm sm:max-w-52">
-              u/{username}
-            </span>
-          </Link>
-        </DropdownMenuItem>
-
-        {state.communitySearch.length > 0 && (
+        {state.communitySearch.length !== 0 && (
           <>
-            <DropdownMenuSeparator />
-
             <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
               searched communities
             </DropdownMenuLabel>
@@ -131,7 +108,7 @@ export default function SubmitCommunity({
             {!isFetching &&
               searchedCommunities.map((community) => (
                 <DropdownMenuItem key={community.id} className="h-11" asChild>
-                  <Link href={`/r/${community.name}/submit`}>
+                  <Link href={`/submit/r/${community.name}`}>
                     <CommunityImage
                       size={32}
                       className={"min-h-8 min-w-8"}
@@ -153,14 +130,12 @@ export default function SubmitCommunity({
 
         {state.communitySearch.length === 0 && (
           <>
-            <DropdownMenuSeparator />
-
             <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
               Your communities
             </DropdownMenuLabel>
             {myCommunities.map((community) => (
               <DropdownMenuItem key={community.id} className="h-11" asChild>
-                <Link href={`/r/${community.name}/submit`}>
+                <Link href={`/submit/r/${community.name}`}>
                   <CommunityImage
                     size={32}
                     className={"min-h-8 min-w-8"}

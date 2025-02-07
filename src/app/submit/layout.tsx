@@ -4,28 +4,26 @@ import Link from "next/link";
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
-import { trpc } from "@/trpc/server";
 import logo from "@public/logo.svg";
 
-export default async function SubmitLayout({
+export default function SubmitLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  void trpc.community.getMyCommunities.prefetch();
-
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <div className="flex w-0 grow flex-col gap-3 rounded-lg border bg-card px-4 py-3">
         <h1 className="text-2xl font-bold tracking-wide">Create post</h1>
 
-        <SubmitContextProvider>
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          <SubmitContextProvider>
             {children}
             <SubmitForm />
-            <Separator />
-          </div>
-        </SubmitContextProvider>
+          </SubmitContextProvider>
+
+          <Separator />
+        </div>
       </div>
 
       <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm lg:flex">
