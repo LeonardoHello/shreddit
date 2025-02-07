@@ -1,27 +1,16 @@
+"use client";
+
 import Image from "next/image";
 
-import { Info } from "lucide-react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { RouterOutput } from "@/trpc/routers/_app";
+import { trpc } from "@/trpc/client";
 import userBackground from "@public/userBackground.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
 import UserNavigation from "./UserNavigation";
 import UserSidebar from "./UserSidebar";
 
-export default function UserHeader({
-  user,
-}: {
-  user: NonNullable<RouterOutput["user"]["getUserByName"]>;
-}) {
+export default function UserHeader({ username }: { username: string }) {
+  const [user] = trpc.user.getUserByName.useSuspenseQuery(username);
+
   return (
     <div className="flex flex-col rounded-lg border bg-card">
       <Image
@@ -32,7 +21,7 @@ export default function UserHeader({
       />
 
       <div className="flex flex-row items-center justify-between gap-4 px-4 py-2.5">
-        <div className="flex items-center gap-2 lg:max-h-12">
+        <div className="flex items-center gap-2 lg:max-h-10">
           <Avatar className="size-12 border-card bg-card lg:size-24 lg:self-end lg:border-4">
             <AvatarImage src={user.imageUrl} />
             <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
@@ -40,31 +29,13 @@ export default function UserHeader({
 
           <div>
             <div className="flex items-center gap-1">
-              <h1 className="self-center break-all text-lg font-bold lg:text-2xl">
+              <h1 className="self-center break-all text-lg font-bold leading-none lg:text-2xl">
                 {user.username}
               </h1>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7 min-w-7 rounded-full text-muted-foreground lg:hidden"
-                  >
-                    <Info className="size-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-card">
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Community Information</DialogTitle>
-                    <DialogDescription>
-                      This dialog displays details about the community. Please
-                      review the information provided.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <UserSidebar user={user} isDialog />
-                </DialogContent>
-              </Dialog>
+
+              <UserSidebar username={username} isDialog />
             </div>
+
             <div className="break-all text-xs text-muted-foreground">
               u/{user.username}
             </div>

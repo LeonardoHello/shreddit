@@ -1,29 +1,73 @@
+"use client";
+
 import Link from "next/link";
 
 import { onion } from "@lucide/lab";
-import { Cake, Icon } from "lucide-react";
+import { Cake, Icon, Info } from "lucide-react";
 
-import { RouterOutput } from "@/trpc/routers/_app";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { trpc } from "@/trpc/client";
 import getOnions from "@/utils/calculateOnions";
-import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 
 export default function UserSidebar({
-  user,
+  username,
   isDialog,
 }: {
-  user: NonNullable<RouterOutput["user"]["getUserByName"]>;
+  username: string;
   isDialog?: boolean;
 }) {
+  if (isDialog) {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7 min-w-7 rounded-full text-muted-foreground lg:hidden"
+          >
+            <Info className="size-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="bg-card">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Community Information</DialogTitle>
+            <DialogDescription>
+              This dialog displays details about the community. Please review
+              the information provided.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-2.5">
+            <UserSidebarContent username={username} />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <div
-      className={cn("flex flex-col gap-2.5", {
-        "sticky top-16 z-10 hidden h-fit w-80 rounded-lg border bg-card px-3 py-2 lg:flex":
-          !isDialog,
-      })}
-    >
+    <div className="sticky top-16 z-10 flex h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2">
+      <UserSidebarContent username={username} />
+    </div>
+  );
+}
+
+function UserSidebarContent({ username }: { username: string }) {
+  const [user] = trpc.user.getUserByName.useSuspenseQuery(username);
+
+  return (
+    <>
       <div className="flex items-center gap-1.5">
         <Avatar>
           <AvatarImage src={user.imageUrl} />
@@ -110,6 +154,6 @@ export default function UserSidebar({
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }

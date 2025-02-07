@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { getUserByName } from "@/api/getUser";
@@ -10,7 +11,10 @@ export const userRouter = createTRPCRouter({
     .input(UserSchema.shape.username)
     .query(async ({ input }) => {
       const user = await getUserByName.execute({ username: input });
-      return user ?? null;
+
+      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return user;
     }),
   searchUsers: baseProcedure.input(z.string()).query(({ input }) => {
     return searchUsers.execute({ search: `%${input}%` });

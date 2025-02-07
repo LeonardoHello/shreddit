@@ -2,7 +2,6 @@ import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
 export default async function DownvotedPage(props: {
@@ -19,20 +18,13 @@ export default async function DownvotedPage(props: {
     .nativeEnum(PostSort)
     .safeParse(searchParams.sort);
 
-  void trpc.postFeed.getDownvotedPosts.prefetchInfinite({
-    sort,
-    username: params.username,
-  });
-
   return (
-    <HydrateClient>
-      <FeedPostInfiniteQuery
-        currentUserId={auth.userId}
-        infiniteQueryOptions={{
-          procedure: "getDownvotedPosts",
-          input: { sort, username: params.username },
-        }}
-      />
-    </HydrateClient>
+    <FeedPostInfiniteQuery
+      currentUserId={auth.userId}
+      infiniteQueryOptions={{
+        procedure: "getDownvotedPosts",
+        input: { sort, username: params.username },
+      }}
+    />
   );
 }

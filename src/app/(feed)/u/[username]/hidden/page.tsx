@@ -2,7 +2,6 @@ import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { HydrateClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types";
 
 export default async function HiddenPage(props: {
@@ -19,20 +18,13 @@ export default async function HiddenPage(props: {
     .nativeEnum(PostSort)
     .safeParse(searchParams.sort);
 
-  void trpc.postFeed.getHiddenPosts.prefetchInfinite({
-    sort,
-    username: params.username,
-  });
-
   return (
-    <HydrateClient>
-      <FeedPostInfiniteQuery
-        currentUserId={auth.userId}
-        infiniteQueryOptions={{
-          procedure: "getHiddenPosts",
-          input: { sort, username: params.username },
-        }}
-      />
-    </HydrateClient>
+    <FeedPostInfiniteQuery
+      currentUserId={auth.userId}
+      infiniteQueryOptions={{
+        procedure: "getHiddenPosts",
+        input: { sort, username: params.username },
+      }}
+    />
   );
 }
