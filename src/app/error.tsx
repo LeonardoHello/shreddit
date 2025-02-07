@@ -10,7 +10,7 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <main className="grid min-h-screen grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
+    <main className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center">
         <p className="text-base font-semibold text-rose-500">
           Oops! Something Went Wrong
