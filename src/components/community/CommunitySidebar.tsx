@@ -66,10 +66,6 @@ function CommunitySidebarContent({
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
 
-  if (!community) {
-    throw new Error("Community not found");
-  }
-
   return (
     <>
       <h2 className="break-words text-lg font-bold tracking-wide">

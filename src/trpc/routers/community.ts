@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
@@ -23,19 +24,24 @@ import {
 } from "@/db/schema";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
-// TODO: rename prcedures for consistency
 export const communityRouter = createTRPCRouter({
   getCommunityByName: baseProcedure
     .input(CommunitySchema.shape.name)
     .query(async ({ input }) => {
       const data = await getCommunityByName.execute({ communityName: input });
-      return data ?? null;
+
+      if (!data) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return data;
     }),
   getSelectedCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(async ({ input }) => {
       const data = await getSelectedCommunity.execute({ communityName: input });
-      return data ?? null;
+
+      if (!data) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return data;
     }),
   searchCommunities: baseProcedure
     .input(

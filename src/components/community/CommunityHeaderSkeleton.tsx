@@ -2,7 +2,7 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function CommunityHeaderSkeleton() {
   return (
-    <Skeleton className="rounded-lg border bg-card">
+    <div className="rounded-lg border bg-card">
       <Skeleton className="h-20 w-full rounded-b-none rounded-t-lg md:h-32" />
 
       <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center">
@@ -19,6 +19,6 @@ export default function CommunityHeaderSkeleton() {
           <Skeleton className="size-9 rounded-full" />
         </div>
       </div>
-    </Skeleton>
+    </div>
   );
 }

@@ -28,15 +28,13 @@ export default async function CommunityLayout(props: {
         {!auth.userId && (
           <CommunityHeaderPlaceholder communityName={params.communityName} />
         )}
-      </HydrateClient>
 
-      <div className="flex justify-center gap-4">
-        {props.children}
+        <div className="flex justify-center gap-4">
+          {props.children}
 
-        <HydrateClient>
           <CommunitySidebar communityName={params.communityName} />
-        </HydrateClient>
-      </div>
+        </div>
+      </HydrateClient>
     </main>
   );
 }

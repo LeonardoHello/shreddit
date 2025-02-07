@@ -38,29 +38,19 @@ export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
         <SidebarNavRecent />
 
         {userId && (
-          <>
-            <HydrateClient>
-              <Suspense
-                fallback={<SidebarNavSkeleton length={2} canFavorite />}
-              >
-                <SidebarNavModerated />
-              </Suspense>
-            </HydrateClient>
+          <HydrateClient>
+            <Suspense fallback={<SidebarNavSkeleton length={2} canFavorite />}>
+              <SidebarNavModerated />
+            </Suspense>
 
-            <HydrateClient>
-              <Suspense
-                fallback={<SidebarNavSkeleton length={4} canFavorite />}
-              >
-                <SidebarNavJoined />
-              </Suspense>
-            </HydrateClient>
+            <Suspense fallback={<SidebarNavSkeleton length={4} canFavorite />}>
+              <SidebarNavJoined />
+            </Suspense>
 
-            <HydrateClient>
-              <Suspense fallback={<SidebarNavSkeleton length={3} />}>
-                <SidebarNavMuted />
-              </Suspense>
-            </HydrateClient>
-          </>
+            <Suspense fallback={<SidebarNavSkeleton length={3} />}>
+              <SidebarNavMuted />
+            </Suspense>
+          </HydrateClient>
         )}
       </Accordion>
     </div>

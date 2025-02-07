@@ -3,24 +3,13 @@
 import { useEffect } from "react";
 import Image from "next/image";
 
-import { useClerk } from "@clerk/nextjs";
-import { Info, Plus } from "lucide-react";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   ReducerAction,
   useRecentCommunityDispatchContext,
 } from "@/context/RecentCommunityContext";
+import useHydration from "@/hooks/useHydration";
 import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
-import { Button } from "../ui/button";
 import CommunityImage from "./CommunityImage";
 import CommunitySidebar from "./CommunitySidebar";
 
@@ -29,18 +18,16 @@ export default function CommunityHeaderPlaceholder({
 }: {
   communityName: string;
 }) {
-  const dispatch = useRecentCommunityDispatchContext();
-
-  const clerk = useClerk();
-
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
 
-  if (!community) {
-    throw new Error("Community not found");
-  }
+  const dispatch = useRecentCommunityDispatchContext();
+
+  const isHydrated = useHydration();
 
   useEffect(() => {
+    if (!isHydrated) return;
+
     dispatch({
       type: ReducerAction.ADD_COMMUNITY,
       community: {
@@ -49,7 +36,7 @@ export default function CommunityHeaderPlaceholder({
         icon: community.icon,
       },
     });
-  }, [dispatch, community.icon, community.id, community.name]);
+  }, [dispatch, community.icon, community.id, community.name, isHydrated]);
 
   return (
     <div className="flex flex-col rounded-lg border bg-card">
@@ -73,27 +60,7 @@ export default function CommunityHeaderPlaceholder({
                 r/{community.name}
               </h1>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7 rounded-full text-muted-foreground lg:hidden"
-                  >
-                    <Info className="size-4" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-card">
-                  <DialogHeader className="sr-only">
-                    <DialogTitle>Community Information</DialogTitle>
-                    <DialogDescription>
-                      This dialog displays details about the community. Please
-                      review the information provided.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CommunitySidebar communityName={communityName} isDialog />
-                </DialogContent>
-              </Dialog>
+              <CommunitySidebar communityName={communityName} isDialog />
             </div>
             <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
               <span>
@@ -115,27 +82,7 @@ export default function CommunityHeaderPlaceholder({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant={"outline"}
-            className="rounded-full"
-            onClick={() => {
-              clerk.openSignIn();
-            }}
-          >
-            <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
-            <span className="capitalize">create post</span>
-          </Button>
-
-          <Button
-            className="rounded-full font-bold capitalize"
-            onClick={() => {
-              clerk.openSignIn();
-            }}
-          >
-            join
-          </Button>
-        </div>
+        <div className="flex items-center gap-3"></div>
       </div>
     </div>
   );
