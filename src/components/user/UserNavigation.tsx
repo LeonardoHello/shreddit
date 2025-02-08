@@ -19,24 +19,34 @@ export default function UserNavigation({ username }: { username: string }) {
 
   const tabs = [
     {
-      label: "overview",
+      label: "Posts",
       href: `/u/${username}`,
+      isActive:
+        pathname.startsWith(`/u/${username}`) &&
+        !pathname.startsWith(`/u/${username}/saved`) &&
+        !pathname.startsWith(`/u/${username}/hidden`) &&
+        !pathname.startsWith(`/u/${username}/upvoted`) &&
+        !pathname.startsWith(`/u/${username}/downvoted`),
     },
     {
-      label: "saved",
+      label: "Saved",
       href: `/u/${username}/saved`,
+      isActive: pathname.startsWith(`/u/${username}/saved`),
     },
     {
-      label: "hidden",
+      label: "Hidden",
       href: `/u/${username}/hidden`,
+      isActive: pathname.startsWith(`/u/${username}/hidden`),
     },
     {
-      label: "upvoted",
+      label: "Upvoted",
       href: `/u/${username}/upvoted`,
+      isActive: pathname.startsWith(`/u/${username}/upvoted`),
     },
     {
-      label: "downvoted",
+      label: "Downvoted",
       href: `/u/${username}/downvoted`,
+      isActive: pathname.startsWith(`/u/${username}/downvoted`),
     },
   ];
 
@@ -56,9 +66,7 @@ export default function UserNavigation({ username }: { username: string }) {
           {tabs.map((tab) => (
             <DropdownMenuItem
               key={tab.label}
-              className={cn(
-                pathname === tab.href && "bg-accent text-accent-foreground",
-              )}
+              className={cn(tab.isActive && "bg-accent text-accent-foreground")}
               asChild
             >
               <Link href={tab.href}>{tab.label}</Link>
@@ -72,7 +80,7 @@ export default function UserNavigation({ username }: { username: string }) {
           {tabs.map((tab) => (
             <li key={tab.label}>
               <Button
-                variant={pathname === tab.href ? "default" : "outline"}
+                variant={tab.isActive ? "default" : "outline"}
                 asChild
                 className="rounded-full"
               >

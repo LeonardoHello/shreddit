@@ -19,8 +19,10 @@ export default function SidebarNavMain({
 
   const { user, isSignedIn, isLoaded } = useUser();
 
-  const isHome = pathname === "/home" || (pathname === "/" && isAuthenticated);
-  const isAll = pathname === "/all" || (pathname === "/" && !isAuthenticated);
+  const isHome =
+    pathname.startsWith("/home") || (pathname === "/" && isAuthenticated);
+  const isAll =
+    pathname.startsWith("/all") || (pathname === "/" && !isAuthenticated);
   const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
 
   return (

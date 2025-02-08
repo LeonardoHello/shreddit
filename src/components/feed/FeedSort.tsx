@@ -16,22 +16,36 @@ export default function FeedSort({
   const pathname = usePathname();
   const {
     sort = PostSort.BEST,
-
     username = "",
     communityName = "",
   } = useParams();
 
   function getHref() {
-    if (pathname.startsWith("/r")) {
-      return `/r/${communityName}`;
-    } else if (pathname.startsWith("/u")) {
-      return `/u/${username}`;
-    } else if (pathname.startsWith("/home")) {
+    if (pathname.startsWith("/home")) {
       return "/home";
     } else if (pathname.startsWith("/all")) {
       return "/all";
+    } else if (pathname.startsWith("/r")) {
+      return `/r/${communityName}`;
+    } else if (
+      pathname.startsWith(`/u/${username}`) &&
+      !pathname.startsWith(`/u/${username}/saved`) &&
+      !pathname.startsWith(`/u/${username}/hidden`) &&
+      !pathname.startsWith(`/u/${username}/upvoted`) &&
+      !pathname.startsWith(`/u/${username}/downvoted`)
+    ) {
+      return `/u/${username}`;
+    } else if (pathname.startsWith(`/u/${username}/saved`)) {
+      return `/u/${username}/saved`;
+    } else if (pathname.startsWith(`/u/${username}/hidden`)) {
+      return `/u/${username}/hidden`;
+    } else if (pathname.startsWith(`/u/${username}/upvoted`)) {
+      return `/u/${username}/upvoted`;
+    } else if (pathname.startsWith(`/u/${username}/downvoted`)) {
+      return `/u/${username}/downvoted`;
     } else {
-      return isAuthenticated ? "/home" : "/";
+      // in case of root path
+      return isAuthenticated ? "/home" : "/all";
     }
   }
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+import { PostSort } from "./types";
+
 const isProtectedRoute = createRouteMatcher(["/home(.*)", "/submit(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
@@ -13,9 +15,9 @@ export default clerkMiddleware(async (auth, req) => {
 
   if (req.nextUrl.pathname === "/") {
     if (userId) {
-      return NextResponse.rewrite(new URL("/home", req.url));
+      return NextResponse.rewrite(new URL(`/home/${PostSort.BEST}`, req.url));
     } else {
-      return NextResponse.rewrite(new URL("/all", req.url));
+      return NextResponse.rewrite(new URL(`/all/${PostSort.BEST}`, req.url));
     }
   }
 });
