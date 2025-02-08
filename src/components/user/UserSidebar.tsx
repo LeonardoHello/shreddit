@@ -57,7 +57,7 @@ export default function UserSidebar({
   }
 
   return (
-    <div className="sticky top-16 z-10 flex h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2">
+    <div className="sticky top-16 z-10 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 lg:flex">
       <UserSidebarContent username={username} />
     </div>
   );
