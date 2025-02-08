@@ -32,7 +32,7 @@ export default async function Sidebar({ isSheet }: { isSheet?: boolean }) {
           : undefined
       }
     >
-      <SidebarNavMain userId={userId} />
+      <SidebarNavMain isAuthenticated={!!userId} />
 
       <Accordion type="multiple" defaultValue={["item-1", "item-2", "item-3"]}>
         <SidebarNavRecent />

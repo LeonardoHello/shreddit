@@ -8,11 +8,15 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth();
 
   if (!userId && isProtectedRoute(req)) {
-    if (req.nextUrl.pathname === "/home") {
-      return NextResponse.rewrite(new URL("/", req.url));
-    }
-
     return redirectToSignIn();
+  }
+
+  if (req.nextUrl.pathname === "/") {
+    if (userId) {
+      return NextResponse.rewrite(new URL("/home", req.url));
+    } else {
+      return NextResponse.rewrite(new URL("/all", req.url));
+    }
   }
 });
 

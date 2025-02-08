@@ -27,7 +27,7 @@ export default async function Header({
         {/* sidebar */}
         {children}
 
-        <Logo userId={userId} />
+        <Logo />
       </div>
 
       <Search />

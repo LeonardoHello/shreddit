@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useUser } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
 
 import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -12,22 +11,22 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarNavMain({
-  userId,
+  isAuthenticated,
 }: {
-  userId: User["id"] | null;
+  isAuthenticated: boolean;
 }) {
   const pathname = usePathname();
 
   const { user, isSignedIn, isLoaded } = useUser();
 
-  const isHome = pathname === "/home";
-  const isAll = pathname === "/" || (!userId && isHome);
+  const isHome = pathname === "/home" || (pathname === "/" && isAuthenticated);
+  const isAll = pathname === "/all" || (pathname === "/" && !isAuthenticated);
   const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
 
   return (
     <nav>
       <ul className="w-full self-center border-b pb-3">
-        {userId && (
+        {isAuthenticated && (
           <li>
             <Button
               variant="ghost"
@@ -60,21 +59,21 @@ export default function SidebarNavMain({
             )}
             asChild
           >
-            <Link href="/">
+            <Link href="/all">
               {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
               <h2 className="capitalize">all</h2>
             </Link>
           </Button>
         </li>
 
-        {userId && !isLoaded && (
+        {isAuthenticated && !isLoaded && (
           <div className="flex h-10 items-center gap-2 px-4">
             <Skeleton className="size-6 rounded-full" />
             <Skeleton className="h-4 w-20" />
           </div>
         )}
 
-        {userId && isLoaded && isSignedIn && (
+        {isAuthenticated && isLoaded && isSignedIn && (
           <li>
             <Button
               variant="ghost"
