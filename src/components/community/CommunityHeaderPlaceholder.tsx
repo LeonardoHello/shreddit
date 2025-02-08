@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import Image from "next/image";
 
+import { useClerk } from "@clerk/nextjs";
+import { Plus } from "lucide-react";
+
 import {
   ReducerAction,
   useRecentCommunityDispatchContext,
@@ -10,6 +13,7 @@ import {
 import useHydration from "@/hooks/useHydration";
 import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
+import { Button } from "../ui/button";
 import CommunityImage from "./CommunityImage";
 import CommunitySidebar from "./CommunitySidebar";
 
@@ -37,6 +41,8 @@ export default function CommunityHeaderPlaceholder({
       },
     });
   }, [dispatch, community.icon, community.id, community.name, isHydrated]);
+
+  const clerk = useClerk();
 
   return (
     <div className="flex flex-col rounded-lg border bg-card">
@@ -82,7 +88,27 @@ export default function CommunityHeaderPlaceholder({
           </div>
         </div>
 
-        <div className="flex items-center gap-3"></div>
+        <div className="flex items-center gap-3">
+          <Button
+            variant={"outline"}
+            className="rounded-full"
+            onClick={() => {
+              clerk.openSignIn();
+            }}
+          >
+            <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+            <span className="capitalize">create post</span>
+          </Button>
+
+          <Button
+            className="rounded-full font-bold capitalize"
+            onClick={() => {
+              clerk.openSignIn();
+            }}
+          >
+            join
+          </Button>
+        </div>
       </div>
     </div>
   );
