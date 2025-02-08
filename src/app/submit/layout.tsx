@@ -4,13 +4,16 @@ import Link from "next/link";
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
+import { HydrateClient, trpc } from "@/trpc/server";
 import logo from "@public/logo.svg";
 
-export default function SubmitLayout({
+export default async function SubmitLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  void trpc.community.getMyCommunities.prefetch();
+
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <div className="flex w-0 grow flex-col gap-3 rounded-lg border bg-card px-4 py-3">
@@ -18,7 +21,7 @@ export default function SubmitLayout({
 
         <div className="flex flex-col gap-2">
           <SubmitContextProvider>
-            {children}
+            <HydrateClient>{children}</HydrateClient>
             <SubmitForm />
           </SubmitContextProvider>
 

@@ -5,19 +5,14 @@ import UserHeaderSkeleton from "@/components/user/UserHeaderSkeleton";
 import UserSidebar from "@/components/user/UserSidebar";
 import UserSidebarSkeleton from "@/components/user/UserSidebarSkeleton";
 import { HydrateClient, trpc } from "@/trpc/server";
-import { PostSort } from "@/types";
 
 export default async function UserLayout(props: {
   children: React.ReactNode;
-  params: Promise<{ username: string }>;
+  params: Promise<{ username: string; sort: string }>;
 }) {
   const params = await props.params;
 
   void trpc.user.getUserByName.prefetch(params.username);
-  void trpc.postFeed.getUserPosts.prefetchInfinite({
-    sort: PostSort.BEST,
-    username: params.username,
-  });
 
   return (
     <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">

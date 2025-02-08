@@ -5,18 +5,11 @@ import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types";
 
 export default async function CommunityPage(props: {
-  params: Promise<{ communityName: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ communityName: string; sort: string }>;
 }) {
-  const [params, searchParams, auth] = await Promise.all([
-    props.params,
-    props.searchParams,
-    authPromise(),
-  ]);
+  const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  const { data: sort = PostSort.BEST } = z
-    .nativeEnum(PostSort)
-    .safeParse(searchParams.sort);
+  const sort = z.nativeEnum(PostSort).parse(params.sort);
 
   return (
     <FeedPostInfiniteQuery

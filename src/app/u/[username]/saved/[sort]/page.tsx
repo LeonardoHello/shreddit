@@ -5,24 +5,17 @@ import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types";
 
 export default async function UserPage(props: {
-  params: Promise<{ username: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ username: string; sort: string }>;
 }) {
-  const [params, searchParams, auth] = await Promise.all([
-    props.params,
-    props.searchParams,
-    authPromise(),
-  ]);
+  const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  const { data: sort = PostSort.BEST } = z
-    .nativeEnum(PostSort)
-    .safeParse(searchParams.sort);
+  const sort = z.nativeEnum(PostSort).parse(params.sort);
 
   return (
     <FeedPostInfiniteQuery
       currentUserId={auth.userId}
       infiniteQueryOptions={{
-        procedure: "getUserPosts",
+        procedure: "getSavedPosts",
         input: {
           sort,
           username: params.username,
