@@ -4,10 +4,10 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export default function UserHeaderSkeleton() {
-  const tabs = ["overview", "saved", "hidden", "upvoted", "downvoted"];
+  const tabs = ["Posts", "Saved", "Hidden", "Upvoted", "Downvoted"];
 
   return (
-    <Skeleton className="rounded-lg border bg-card">
+    <div className="rounded-lg border bg-card">
       <Skeleton className="h-20 w-full rounded-b-none rounded-t-lg lg:h-32" />
 
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
@@ -36,6 +36,6 @@ export default function UserHeaderSkeleton() {
           <Ellipsis className="size-5" />
         </Button>
       </div>
-    </Skeleton>
+    </div>
   );
 }
