@@ -30,7 +30,12 @@ export const communityRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const data = await getCommunityByName.execute({ communityName: input });
 
-      if (!data) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!data)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "The community you are looking for doesn't exist or has been deleted by the moderator.",
+        });
 
       return data;
     }),
@@ -39,7 +44,12 @@ export const communityRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const data = await getSelectedCommunity.execute({ communityName: input });
 
-      if (!data) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!data)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "The community you are looking for doesn't exist or has been deleted by the moderator.",
+        });
 
       return data;
     }),

@@ -23,7 +23,12 @@ export const postRouter = createTRPCRouter({
         postId: input,
       });
 
-      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!post)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "The post you are looking for doesn't exist or has been deleted by the author.",
+        });
 
       return post;
     }),

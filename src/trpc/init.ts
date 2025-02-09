@@ -46,7 +46,10 @@ export const protectedProcedure = baseProcedure.use(async (opts) => {
   const { ctx } = opts;
 
   if (!ctx.userId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "You must be logged in to access this resource.",
+    });
   }
 
   return opts.next({

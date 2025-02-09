@@ -12,7 +12,12 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const user = await getUserByName.execute({ username: input });
 
-      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!user)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "The user you are looking for doesn't exist or has been deleted.",
+        });
 
       return user;
     }),

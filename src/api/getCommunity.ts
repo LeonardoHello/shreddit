@@ -58,6 +58,7 @@ export const getUserToCommunity = db.query.usersToCommunities
   })
   .prepare("user_to_community");
 
+// TODO: Add a function to get the community image URL
 export const getCommunityImage = db.query.communities
   .findFirst({
     where: (community, { eq, sql }) =>
