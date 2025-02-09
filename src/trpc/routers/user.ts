@@ -16,7 +16,7 @@ export const userRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message:
-            "The user you are looking for doesn't exist or has been deleted.",
+            "The user you are looking for doesn't exist or has deleted their account.",
         });
 
       return user;
