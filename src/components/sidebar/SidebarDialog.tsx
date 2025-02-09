@@ -116,7 +116,7 @@ export default function SidebarDialog() {
           Create Community
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card">
+      <DialogContent className="max-h-screen overflow-y-auto bg-card">
         <DialogHeader>
           <DialogTitle>Tell us about your community</DialogTitle>
           <DialogDescription>

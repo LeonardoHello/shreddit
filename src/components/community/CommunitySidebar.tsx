@@ -37,7 +37,7 @@ export default function CommunitySidebar({
             <Info className="size-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="bg-card">
+        <DialogContent className="max-h-screen overflow-y-auto bg-card">
           <DialogHeader className="sr-only">
             <DialogTitle>Community Information</DialogTitle>
             <DialogDescription>
