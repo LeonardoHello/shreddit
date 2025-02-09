@@ -1,23 +1,25 @@
 "use client";
 
-import { use } from "react";
+import { notFound } from "next/navigation";
 
 import { User } from "@clerk/nextjs/server";
 
 import PostContextProvider from "@/context/PostContext";
-import { RouterOutput } from "@/trpc/routers/_app";
+import { trpc } from "@/trpc/client";
 import PostBody from "./PostBody";
 import PostFooter from "./PostFooter";
 import PostHeader from "./PostHeader";
 
 export default function Post({
   currentUserId,
-  postPromise,
+  postId,
 }: {
   currentUserId: User["id"] | null;
-  postPromise: Promise<RouterOutput["post"]["getPost"]>;
+  postId: string;
 }) {
-  const post = use(postPromise);
+  const [post] = trpc.post.getPost.useSuspenseQuery(postId);
+
+  if (!post) notFound();
 
   return (
     <PostContextProvider

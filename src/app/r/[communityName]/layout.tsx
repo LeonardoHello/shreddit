@@ -15,7 +15,6 @@ export default async function CommunityLayout(props: {
 }) {
   const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  // TODO: fail on first try
   if (auth.userId) {
     void trpc.community.getUserToCommunity.prefetch(params.communityName);
   }

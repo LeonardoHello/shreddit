@@ -1,23 +1,21 @@
 "use client";
 
-import { use } from "react";
-
 import { User } from "@clerk/nextjs/server";
 
 import CommentContextProvider from "@/context/CommentContext";
-import { RouterOutput } from "@/trpc/routers/_app";
+import { trpc } from "@/trpc/client";
 import Comment from "./Comment";
 import CommentSectionEmpty from "./CommentSectionEmpty";
 import CommentThread from "./CommentThread";
 
 export default function CommentSection({
   currentUserId,
-  commentsPromise,
+  postId,
 }: {
   currentUserId: User["id"] | null;
-  commentsPromise: Promise<RouterOutput["comment"]["getComments"]>;
+  postId: string;
 }) {
-  const commentTree = use(commentsPromise);
+  const [commentTree] = trpc.comment.getComments.useSuspenseQuery(postId);
 
   if (commentTree.length === 0) return <CommentSectionEmpty />;
 
