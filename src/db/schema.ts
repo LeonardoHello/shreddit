@@ -275,7 +275,7 @@ export type Post = InferSelectModel<typeof posts>;
 export type UserToPost = InferSelectModel<typeof usersToPosts>;
 export type PostFile = InferSelectModel<typeof postFiles>;
 export type Comment = InferSelectModel<typeof comments>;
-export type UserToComments = InferSelectModel<typeof usersToComments>;
+export type UserToComment = InferSelectModel<typeof usersToComments>;
 
 export const UserSchema = createSelectSchema(users);
 export const CommunitySchema = createSelectSchema(communities);

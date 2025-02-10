@@ -1,4 +1,4 @@
-import { UserToComments } from "@/db/schema";
+import { UserToComment } from "@/db/schema";
 import db from "../db";
 
 export const getComments = db.query.comments
@@ -24,7 +24,7 @@ export const getComments = db.query.comments
             AND users_to_comments.vote_status = 'downvoted'
         )
       `.as("vote_count"),
-      voteStatus: sql<UserToComments["voteStatus"] | null>`
+      voteStatus: sql<UserToComment["voteStatus"] | null>`
       (
         SELECT vote_status
         FROM users_to_comments
