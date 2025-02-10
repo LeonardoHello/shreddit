@@ -8,7 +8,7 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { PostType } from "@/types";
+import { PostType } from "@/types/enums";
 import { cn } from "@/utils/cn";
 import RTEPost from "../RTE/RTEPost";
 import { Button } from "../ui/button";

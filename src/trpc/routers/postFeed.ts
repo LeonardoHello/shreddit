@@ -50,7 +50,7 @@ import {
 } from "@/api/getPosts/getUserPosts";
 import { CommunitySchema } from "@/db/schema/communities";
 import { UserSchema } from "@/db/schema/users";
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const postFeedRouter = createTRPCRouter({

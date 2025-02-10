@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { usePostContext } from "@/context/PostContext";
-import { ArrElement } from "@/types";
+import { ArrElement } from "@/types/helpers";
 import { Badge } from "../ui/badge";
 
 export default function PostBodyImage({ isUnsafe }: { isUnsafe: boolean }) {

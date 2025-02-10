@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
-import { type ArrElement } from "@/types";
+import { type ArrElement } from "@/types/helpers";
 import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import { Button } from "../ui/button";

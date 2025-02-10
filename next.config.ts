@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 
 const nextConfig: NextConfig = {
   experimental: {

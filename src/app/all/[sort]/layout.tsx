@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 
 import { HydrateClient, trpc } from "@/trpc/server";
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 
 export default async function AllSortLayout(props: {
   children: React.ReactNode;

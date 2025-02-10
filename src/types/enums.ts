@@ -1,5 +1,3 @@
-export type ArrElement<Arr> = Arr extends readonly (infer T)[] ? T : never;
-
 export enum PostSort {
   BEST = "best",
   HOT = "hot",

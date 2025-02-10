@@ -2,11 +2,11 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import { getComments } from "@/api/getComment";
-import { ArrElement } from "@/types";
+import { RouterOutput } from "@/trpc/routers/_app";
+import { ArrElement } from "@/types/helpers";
 import { calculateVotes } from "@/utils/calculateVotes";
 
-type Comment = ArrElement<Awaited<ReturnType<typeof getComments.execute>>>;
+type Comment = ArrElement<RouterOutput["comment"]["getComments"]>;
 
 type ReducerState = Comment & {
   isEditing: boolean;

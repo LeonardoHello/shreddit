@@ -1,8 +1,8 @@
 import { User } from "@clerk/nextjs/server";
 
-import type { getComments } from "@/api/getComment";
 import CommentContextProvider from "@/context/CommentContext";
 import { Comment as CommentType } from "@/db/schema/comments";
+import { RouterOutput } from "@/trpc/routers/_app";
 import Comment from "./Comment";
 
 export default function CommentThread({
@@ -12,7 +12,7 @@ export default function CommentThread({
 }: {
   currentUserId: User["id"] | null;
   commentId: CommentType["id"];
-  replies: Awaited<ReturnType<typeof getComments.execute>>;
+  replies: RouterOutput["comment"]["getComments"];
 }) {
   const currentReplies = replies.filter(
     (reply) => reply.parentCommentId === commentId,

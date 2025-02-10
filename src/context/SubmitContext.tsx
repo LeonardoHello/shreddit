@@ -3,7 +3,7 @@
 import { createContext, useContext, useReducer } from "react";
 
 import type { Post, PostFile } from "@/db/schema/posts";
-import { PostType } from "@/types";
+import { PostType } from "@/types/enums";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   communitySearch: string;

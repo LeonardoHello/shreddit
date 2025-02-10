@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import db from "@/db";
 import { usersToCommunities } from "@/db/schema/communities";
 import { usersToPosts, UserToPost } from "@/db/schema/posts";
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 import { monthAgo } from "./getLastMonthDate";
 
 export type PostsQueryConfig = NonNullable<

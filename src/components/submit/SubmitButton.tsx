@@ -12,7 +12,7 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
-import { PostType } from "@/types";
+import { PostType } from "@/types/enums";
 import { Button } from "../ui/button";
 
 export default function SubmitButton({

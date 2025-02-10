@@ -2,7 +2,7 @@ import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 
 export default async function CommunityPage(props: {
   params: Promise<{ communityName: string; sort: string }>;

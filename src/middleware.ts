@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-import { PostSort } from "./types";
+import { PostSort } from "./types/enums";
 
 const isProtectedRoute = createRouteMatcher(["/home(.*)", "/submit(.*)"]);
 

@@ -5,7 +5,7 @@ import { useParams, usePathname } from "next/navigation";
 
 import { Flame, MessageSquareText, Rocket, Tag } from "lucide-react";
 
-import { PostSort } from "@/types";
+import { PostSort } from "@/types/enums";
 import { Button } from "../ui/button";
 
 export default function FeedSort({
