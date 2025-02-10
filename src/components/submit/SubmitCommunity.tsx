@@ -36,7 +36,7 @@ export default function SubmitCommunity({
 
   const { data: searchedCommunities, isFetching } =
     trpc.community.searchCommunities.useQuery(
-      { search: state.communitySearch },
+      { search: state.communitySearch, limit: 10 },
       {
         initialData: [],
         refetchOnMount: false,
