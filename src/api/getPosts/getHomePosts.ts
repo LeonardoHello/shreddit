@@ -1,17 +1,7 @@
 import db from "@/db";
 import { usersToCommunities } from "@/db/schema/communities";
-import {
-  bestPostsQueryConfig,
-  controversialPostsQueryConfig,
-  hotPostsQueryConfig,
-  newPostsQueryConfig,
-  type PostsQueryConfig,
-} from "@/utils/postsQueryConfig";
-
-const hideFilter = {
-  hideHidden: true,
-  hideCommunityMuted: true,
-};
+import { PostSort } from "@/types/enums";
+import { PostsQueryConfig, postsQueryConfig } from "@/utils/postsQueryConfig";
 
 const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
   const { sql, exists, and, eq } = filter;
@@ -30,46 +20,55 @@ const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
   );
 };
 
+const homePosts = (postSort: PostSort) =>
+  postsQueryConfig({
+    postSort,
+    hideHiddenPosts: true,
+    hideMutedCommunityPosts: true,
+  });
+
 export const getHomeBestPosts = db.query.posts
   .findMany({
-    ...bestPostsQueryConfig(hideFilter),
+    ...homePosts(PostSort.BEST),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        bestPostsQueryConfig(hideFilter).where(post, filter),
+        homePosts(PostSort.BEST).where(post, filter),
       ),
   })
+
   .prepare("home_best_posts");
 
 export const getHomeHotPosts = db.query.posts
   .findMany({
-    ...hotPostsQueryConfig(hideFilter),
+    ...homePosts(PostSort.HOT),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        hotPostsQueryConfig(hideFilter).where(post, filter),
+        homePosts(PostSort.HOT).where(post, filter),
       ),
   })
   .prepare("home_hot_posts");
 
 export const getHomeNewPosts = db.query.posts
   .findMany({
-    ...newPostsQueryConfig(hideFilter),
+    ...homePosts(PostSort.NEW),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        newPostsQueryConfig(hideFilter).where(post, filter),
+        homePosts(PostSort.NEW).where(post, filter),
       ),
   })
+
   .prepare("home_new_posts");
 
 export const getHomeControversialPosts = db.query.posts
   .findMany({
-    ...controversialPostsQueryConfig(hideFilter),
+    ...homePosts(PostSort.CONTROVERSIAL),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        controversialPostsQueryConfig(hideFilter).where(post, filter),
+        homePosts(PostSort.CONTROVERSIAL).where(post, filter),
       ),
   })
   .prepare("home_controversial_posts");

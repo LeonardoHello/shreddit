@@ -1,17 +1,7 @@
 import db from "@/db";
 import { users } from "@/db/schema/users";
-import {
-  bestPostsQueryConfig,
-  controversialPostsQueryConfig,
-  hotPostsQueryConfig,
-  newPostsQueryConfig,
-  PostsQueryConfig,
-} from "@/utils/postsQueryConfig";
-
-const userPostsFilter = {
-  hideHidden: false,
-  hideCommunityMuted: false,
-};
+import { PostSort } from "@/types/enums";
+import { postsQueryConfig, PostsQueryConfig } from "@/utils/postsQueryConfig";
 
 const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
   const { sql, eq, exists, and } = filter;
@@ -31,44 +21,48 @@ const whereConfig: PostsQueryConfig["where"] = (post, filter) => {
 
 export const getUserBestPosts = db.query.posts
   .findMany({
-    ...bestPostsQueryConfig(userPostsFilter),
+    ...postsQueryConfig({ postSort: PostSort.BEST }),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        bestPostsQueryConfig(userPostsFilter).where(post, filter),
+        postsQueryConfig({ postSort: PostSort.BEST }).where(post, filter),
       ),
   })
+
   .prepare("user_best_posts");
 
 export const getUserHotPosts = db.query.posts
   .findMany({
-    ...hotPostsQueryConfig(userPostsFilter),
+    ...postsQueryConfig({ postSort: PostSort.HOT }),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        hotPostsQueryConfig(userPostsFilter).where(post, filter),
+        postsQueryConfig({ postSort: PostSort.HOT }).where(post, filter),
       ),
   })
   .prepare("user_hot_posts");
 
 export const getUserNewPosts = db.query.posts
   .findMany({
-    ...newPostsQueryConfig(userPostsFilter),
+    ...postsQueryConfig({ postSort: PostSort.NEW }),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        newPostsQueryConfig(userPostsFilter).where(post, filter),
+        postsQueryConfig({ postSort: PostSort.NEW }).where(post, filter),
       ),
   })
   .prepare("user_new_posts");
 
 export const getUserControversialPosts = db.query.posts
   .findMany({
-    ...controversialPostsQueryConfig(userPostsFilter),
+    ...postsQueryConfig({ postSort: PostSort.CONTROVERSIAL }),
     where: (post, filter) =>
       filter.and(
         whereConfig(post, filter),
-        controversialPostsQueryConfig(userPostsFilter).where(post, filter),
+        postsQueryConfig({ postSort: PostSort.CONTROVERSIAL }).where(
+          post,
+          filter,
+        ),
       ),
   })
   .prepare("user_controversial_posts");

@@ -1,28 +1,26 @@
 import db from "@/db";
-import {
-  bestPostsQueryConfig,
-  controversialPostsQueryConfig,
-  hotPostsQueryConfig,
-  newPostsQueryConfig,
-} from "@/utils/postsQueryConfig";
+import { PostSort } from "@/types/enums";
+import { postsQueryConfig } from "@/utils/postsQueryConfig";
 
-const hideFilter = {
-  hideHidden: true,
-  hideCommunityMuted: true,
-};
+const allPosts = (postSort: PostSort) =>
+  postsQueryConfig({
+    postSort,
+    hideHiddenPosts: true,
+    hideMutedCommunityPosts: true,
+  });
 
 export const getAllBestPosts = db.query.posts
-  .findMany(bestPostsQueryConfig(hideFilter))
+  .findMany(allPosts(PostSort.BEST))
   .prepare("all_best_posts");
 
 export const getAllHotPosts = db.query.posts
-  .findMany(hotPostsQueryConfig(hideFilter))
+  .findMany(allPosts(PostSort.HOT))
   .prepare("all_hot_posts");
 
 export const getAllNewPosts = db.query.posts
-  .findMany(newPostsQueryConfig(hideFilter))
+  .findMany(allPosts(PostSort.NEW))
   .prepare("all_posts");
 
 export const getAllControversialPosts = db.query.posts
-  .findMany(controversialPostsQueryConfig(hideFilter))
+  .findMany(allPosts(PostSort.CONTROVERSIAL))
   .prepare("all_controversial_posts");

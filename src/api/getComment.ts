@@ -13,15 +13,15 @@ export const getComments = db.query.comments
     extras: (comment, { sql }) => ({
       voteCount: sql<number>`
         (
-          SELECT COUNT(*)
+          SELECT COALESCE(SUM(
+            CASE 
+              WHEN vote_status = 'upvoted' THEN 1
+              WHEN vote_status = 'downvoted' THEN -1
+              ELSE 0
+            END
+          ), 0)
           FROM users_to_comments
           WHERE users_to_comments.comment_id = ${comment.id}
-            AND users_to_comments.vote_status = 'upvoted'
-        ) - (
-          SELECT COUNT(*)
-          FROM users_to_comments
-          WHERE users_to_comments.comment_id = ${comment.id}
-            AND users_to_comments.vote_status = 'downvoted'
         )
       `.as("vote_count"),
       voteStatus: sql<UserToComment["voteStatus"] | null>`
