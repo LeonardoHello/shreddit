@@ -1,5 +1,5 @@
 import db from "@/db";
-import { communities } from "@/db/schema";
+import { communities } from "@/db/schema/communities";
 import {
   bestPostsQueryConfig,
   controversialPostsQueryConfig,

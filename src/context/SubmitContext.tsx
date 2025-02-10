@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import type { Post, PostFile } from "@/db/schema";
+import type { Post, PostFile } from "@/db/schema/posts";
 import { PostType } from "@/types";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {

@@ -2,7 +2,7 @@ import { User } from "@clerk/nextjs/server";
 
 import type { getComments } from "@/api/getComment";
 import CommentContextProvider from "@/context/CommentContext";
-import { Comment as CommentType } from "@/db/schema";
+import { Comment as CommentType } from "@/db/schema/comments";
 import Comment from "./Comment";
 
 export default function CommentThread({

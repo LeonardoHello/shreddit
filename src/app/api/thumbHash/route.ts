@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import sharp from "sharp";
 import * as thumbhash from "thumbhash";
 
-import { PostFileSchema } from "@/db/schema";
+import { PostFileSchema } from "@/db/schema/posts";
 
 const postFileSchema = PostFileSchema.pick({
   key: true,

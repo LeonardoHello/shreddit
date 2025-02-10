@@ -11,7 +11,7 @@ import {
   PostSchema,
   usersToPosts,
   UserToPostSchema,
-} from "@/db/schema";
+} from "@/db/schema/posts";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const postRouter = createTRPCRouter({

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCommentContext } from "@/context/CommentContext";
-import type { User } from "@/db/schema";
+import type { User } from "@/db/schema/users";
 import RTECommentReply from "../RTE/RTECommentReply";
 import CommentBody from "./CommentBody";
 import CommentFooter from "./CommentFooter";

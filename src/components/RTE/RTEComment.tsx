@@ -14,7 +14,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import type { Post } from "@/db/schema";
+import type { Post } from "@/db/schema/posts";
 import { trpc } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";

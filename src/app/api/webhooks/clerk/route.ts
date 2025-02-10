@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { Webhook } from "svix";
 
 import db from "@/db";
-import { users } from "@/db/schema";
+import { users } from "@/db/schema/users";
 
 export async function POST(req: Request) {
   const SIGNING_SECRET = process.env.SIGNING_SECRET;

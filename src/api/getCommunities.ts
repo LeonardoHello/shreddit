@@ -1,4 +1,4 @@
-import { communities, usersToCommunities } from "@/db/schema";
+import { communities, usersToCommunities } from "@/db/schema/communities";
 import db from "../db";
 
 export const getModeratedCommunities = db.query.usersToCommunities

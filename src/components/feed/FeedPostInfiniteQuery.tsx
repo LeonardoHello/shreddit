@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import PostContextProvider from "@/context/PostContext";
-import type { User } from "@/db/schema";
+import type { User } from "@/db/schema/users";
 import { trpc } from "@/trpc/client";
 import { AppRouter, RouterInput } from "@/trpc/routers/_app";
 import FeedEmpty from "./FeedEmpty";

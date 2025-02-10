@@ -6,7 +6,7 @@ import {
   CommentSchema,
   usersToComments,
   UserToCommentSchema,
-} from "@/db/schema";
+} from "@/db/schema/comments";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const commentRouter = createTRPCRouter({

@@ -1,15 +1,13 @@
-import { DBQueryConfig, ExtractTablesWithRelations, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import db from "@/db";
+import { usersToCommunities } from "@/db/schema/communities";
+import { usersToPosts, UserToPost } from "@/db/schema/posts";
 import { PostSort } from "@/types";
-import * as schema from "../db/schema";
 import { monthAgo } from "./getLastMonthDate";
 
-export type PostsQueryConfig = DBQueryConfig<
-  "many",
-  true,
-  ExtractTablesWithRelations<typeof schema>,
-  ExtractTablesWithRelations<typeof schema>["posts"]
+export type PostsQueryConfig = NonNullable<
+  Parameters<(typeof db)["query"]["posts"]["findMany"]>[0]
 >;
 
 const postsQueryConfig = (props: {
@@ -31,15 +29,12 @@ const postsQueryConfig = (props: {
           ? notExists(
               db
                 .select()
-                .from(schema.usersToPosts)
+                .from(usersToPosts)
                 .where(
                   and(
-                    eq(schema.usersToPosts.postId, post.id),
-                    eq(
-                      schema.usersToPosts.userId,
-                      sql.placeholder("currentUserId"),
-                    ),
-                    eq(schema.usersToPosts.hidden, true),
+                    eq(usersToPosts.postId, post.id),
+                    eq(usersToPosts.userId, sql.placeholder("currentUserId")),
+                    eq(usersToPosts.hidden, true),
                   ),
                 ),
             )
@@ -48,15 +43,15 @@ const postsQueryConfig = (props: {
           ? notExists(
               db
                 .select()
-                .from(schema.usersToCommunities)
+                .from(usersToCommunities)
                 .where(
                   and(
-                    eq(schema.usersToCommunities.communityId, post.communityId),
+                    eq(usersToCommunities.communityId, post.communityId),
                     eq(
-                      schema.usersToCommunities.userId,
+                      usersToCommunities.userId,
                       sql.placeholder("currentUserId"),
                     ),
-                    eq(schema.usersToCommunities.muted, true),
+                    eq(usersToCommunities.muted, true),
                   ),
                 ),
             )
@@ -84,7 +79,7 @@ const postsQueryConfig = (props: {
           WHERE comments.post_id = ${post.id}
         )
       `.as("comment_count"),
-      isSaved: sql<schema.UserToPost["saved"] | null>`
+      isSaved: sql<UserToPost["saved"] | null>`
         (
           SELECT saved
           FROM users_to_posts
@@ -92,7 +87,7 @@ const postsQueryConfig = (props: {
             AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
         )
       `.as("is_saved"),
-      isHidden: sql<schema.UserToPost["hidden"] | null>`
+      isHidden: sql<UserToPost["hidden"] | null>`
         (
           SELECT hidden
           FROM users_to_posts
@@ -100,7 +95,7 @@ const postsQueryConfig = (props: {
             AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
         )
       `.as("is_hidden"),
-      voteStatus: sql<schema.UserToPost["voteStatus"] | null>`
+      voteStatus: sql<UserToPost["voteStatus"] | null>`
       (
         SELECT vote_status
         FROM users_to_posts
@@ -108,7 +103,7 @@ const postsQueryConfig = (props: {
         AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
         )
         `.as("vote_status"),
-      userToPostUpdatedAt: sql<schema.UserToPost["updatedAt"] | null>`
+      userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
         (
           SELECT updated_at
           FROM users_to_posts

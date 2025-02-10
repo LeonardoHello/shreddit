@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Community } from "@/db/schema";
+import { Community } from "@/db/schema/communities";
 import { trpc } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
 import { Button } from "../ui/button";

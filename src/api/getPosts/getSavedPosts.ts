@@ -1,5 +1,6 @@
 import db from "@/db";
-import { users, usersToPosts } from "@/db/schema";
+import { usersToPosts } from "@/db/schema/posts";
+import { users } from "@/db/schema/users";
 import {
   bestPostsQueryConfig,
   controversialPostsQueryConfig,

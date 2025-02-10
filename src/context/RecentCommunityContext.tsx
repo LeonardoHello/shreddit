@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useReducer } from "react";
 
-import { Community, CommunitySchema } from "@/db/schema";
+import { Community, CommunitySchema } from "@/db/schema/communities";
 
 type RecentCommunity = Pick<Community, "id" | "name" | "icon">;
 type ReducerState = {

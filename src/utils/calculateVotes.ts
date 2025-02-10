@@ -1,4 +1,4 @@
-import { UserToPost } from "@/db/schema";
+import { UserToPost } from "@/db/schema/posts";
 
 export const calculateVotes = ({
   voteCount,

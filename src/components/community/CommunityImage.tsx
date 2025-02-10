@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { Community } from "@/db/schema";
+import { Community } from "@/db/schema/communities";
 import { cn } from "@/utils/cn";
 
 export default function CommunityImage({

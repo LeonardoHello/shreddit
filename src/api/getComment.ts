@@ -1,4 +1,4 @@
-import { UserToComment } from "@/db/schema";
+import { UserToComment } from "@/db/schema/comments";
 import db from "../db";
 
 export const getComments = db.query.comments

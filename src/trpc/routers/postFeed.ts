@@ -48,7 +48,8 @@ import {
   getUserHotPosts,
   getUserNewPosts,
 } from "@/api/getPosts/getUserPosts";
-import { CommunitySchema, UserSchema } from "@/db/schema";
+import { CommunitySchema } from "@/db/schema/communities";
+import { UserSchema } from "@/db/schema/users";
 import { PostSort } from "@/types";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 

@@ -21,7 +21,7 @@ import {
   CommunitySchema,
   usersToCommunities,
   UserToCommunitySchema,
-} from "@/db/schema";
+} from "@/db/schema/communities";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const communityRouter = createTRPCRouter({

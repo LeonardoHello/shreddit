@@ -1,4 +1,4 @@
-import { communities } from "@/db/schema";
+import { communities } from "@/db/schema/communities";
 import { monthAgo } from "@/utils/getLastMonthDate";
 import db from "../db";
 

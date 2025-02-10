@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { getUserByName } from "@/api/getUser";
 import { searchUsers } from "@/api/search";
-import { UserSchema } from "@/db/schema";
+import { UserSchema } from "@/db/schema/users";
 import { baseProcedure, createTRPCRouter } from "../init";
 
 export const userRouter = createTRPCRouter({
