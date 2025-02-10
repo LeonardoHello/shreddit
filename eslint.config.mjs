@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 
 import { FlatCompat } from "@eslint/eslintrc";
 import pluginQuery from "@tanstack/eslint-plugin-query";
+import pluginDrizzle from "eslint-plugin-drizzle";
 import reactCompiler from "eslint-plugin-react-compiler";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,7 +24,6 @@ const eslintConfig = [
       ],
     },
   },
-  ...pluginQuery.configs["flat/recommended"],
   {
     plugins: {
       "react-compiler": reactCompiler,
@@ -32,6 +32,16 @@ const eslintConfig = [
       "react-compiler/react-compiler": "error",
     },
   },
+  {
+    plugins: {
+      drizzle: pluginDrizzle,
+    },
+    rules: {
+      "drizzle/enforce-delete-with-where": "error",
+      "drizzle/enforce-update-with-where": "error",
+    },
+  },
+  ...pluginQuery.configs["flat/recommended"],
 ];
 
 export default eslintConfig;
