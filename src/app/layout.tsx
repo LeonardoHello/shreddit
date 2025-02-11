@@ -8,13 +8,18 @@ import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
-import Sidebar from "@/components/sidebar/Sidebar";
-import SidebarSheet from "@/components/sidebar/SidebarSheet";
 import { Toaster } from "@/components/ui/sonner";
 import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 import { TRPCProvider } from "@/trpc/client";
 
 import "./globals.css";
+
+import { AppSidebar } from "@/components/sidebar/AppSidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 const reddit_sans = Reddit_Sans({
   subsets: ["latin"],
@@ -61,17 +66,17 @@ export default function RootLayout({
             />
 
             <RecentCommunityContextProvider>
-              <Header>
-                <SidebarSheet>
-                  <Sidebar isSheet />
-                </SidebarSheet>
-              </Header>
+              <SidebarProvider>
+                <AppSidebar />
 
-              <div className="flex">
-                <Sidebar />
+                <SidebarInset>
+                  <Header>
+                    <SidebarTrigger className="-ml-1 [&_svg]:stroke-[1.5]" />
+                  </Header>
 
-                {children}
-              </div>
+                  {children}
+                </SidebarInset>
+              </SidebarProvider>
             </RecentCommunityContextProvider>
           </TRPCProvider>
           <Toaster closeButton />

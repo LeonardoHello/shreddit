@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -52,7 +52,11 @@ const formSchema = z.object({
   }),
 });
 
-export default function SidebarDialog() {
+export default function SidebarDialog({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -106,16 +110,7 @@ export default function SidebarDialog() {
 
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="lg"
-          className="w-full justify-start px-4 text-sm font-normal hover:bg-accent/40"
-        >
-          <Plus className="size-8 stroke-1" />
-          Create Community
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-h-screen overflow-y-auto bg-card">
         <DialogHeader>
           <DialogTitle>Tell us about your community</DialogTitle>

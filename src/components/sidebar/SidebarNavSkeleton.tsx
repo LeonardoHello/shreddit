@@ -12,11 +12,11 @@ export default function SidebarNavSkeleton({
   return (
     <nav>
       <ul>
-        <div className="flex flex-1 items-center justify-between p-4">
+        <div className="flex flex-1 items-center justify-between px-6 py-4">
           <Skeleton className="h-3 w-24" />
           <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
         </div>
-        <div className="border-b pb-4">
+        <div className="border-b px-4 pb-4">
           {Array.from({ length }).map((_, index) => (
             <li key={index} className="flex h-10 items-center gap-2 px-4">
               <Skeleton className="size-8 rounded-full" />

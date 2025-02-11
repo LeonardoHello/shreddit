@@ -3,37 +3,26 @@ import Link from "next/link";
 import {
   ClerkLoaded,
   ClerkLoading,
+  SignedIn,
+  SignedOut,
   SignInButton,
   UserButton,
 } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
 import { Plus } from "lucide-react";
 
-import Logo from "@/components/header/Logo";
 import Search from "@/components/header/Search";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
-export default async function Header({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { userId } = await auth();
-
+export default function Header({ children }: { children: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-20 col-span-2 flex h-14 justify-between gap-5 border-b bg-card px-4 py-2">
-      <div className="flex select-none items-center gap-1.5">
-        {/* sidebar */}
-        {children}
-
-        <Logo />
-      </div>
+    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card px-4">
+      {children}
 
       <Search />
 
-      {userId && (
-        <div className="flex items-center gap-2 self-center">
+      <SignedIn>
+        <div className="flex items-center gap-2">
           <Button
             variant={"ghost"}
             className="w-9 rounded-full md:w-auto"
@@ -54,10 +43,10 @@ export default async function Header({
             />
           </ClerkLoaded>
         </div>
-      )}
+      </SignedIn>
 
-      {!userId && (
-        <div className="flex items-center gap-2 self-center">
+      <SignedOut>
+        <div className="flex items-center gap-2">
           <ClerkLoading>
             <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
               Sign in
@@ -71,7 +60,7 @@ export default async function Header({
             </SignInButton>
           </ClerkLoaded>
         </div>
-      )}
+      </SignedOut>
     </header>
   );
 }

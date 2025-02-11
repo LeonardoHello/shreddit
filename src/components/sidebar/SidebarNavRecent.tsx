@@ -1,16 +1,29 @@
 "use client";
 
+import Link from "next/link";
+
+import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { useRecentCommunityContext } from "@/context/RecentCommunityContext";
+import CommunityImage from "../community/CommunityImage";
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
-import SidebarNavItem from "./SidebarNavItem";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
 export default function SidebarNavRecent() {
   const state = useRecentCommunityContext();
+
+  const { isMobile, setOpenMobile } = useSidebar();
 
   if (state.isLoading) {
     return <SidebarNavSkeleton length={4} />;
@@ -21,22 +34,35 @@ export default function SidebarNavRecent() {
   }
 
   return (
-    <AccordionItem value="item-1">
-      <AccordionTrigger className="px-4 text-xs font-light uppercase tracking-widest text-muted-foreground hover:no-underline">
-        recent
-      </AccordionTrigger>
-      <AccordionContent>
-        <nav>
-          <ul>
-            {state.communities.map((community) => (
-              <SidebarNavItem
-                key={community.id}
-                userToCommunity={{ community, favorited: false }}
-              />
-            ))}
-          </ul>
-        </nav>
-      </AccordionContent>
-    </AccordionItem>
+    <SidebarGroup>
+      <AccordionItem value="recent">
+        <SidebarGroupLabel asChild className="group/label">
+          <AccordionTrigger>RECENT</AccordionTrigger>
+        </SidebarGroupLabel>
+        <AccordionContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {state.communities.map((community) => (
+                <SidebarMenuItem key={community.id}>
+                  <SidebarMenuButton
+                    asChild
+                    onClick={() => {
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
+                    }}
+                  >
+                    <Link href={`/r/${community.name}`}>
+                      <CommunityImage icon={community.icon} size={32} />
+                      <span>r/{community.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </AccordionContent>
+      </AccordionItem>
+    </SidebarGroup>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -56,7 +56,7 @@ export default function Search() {
 
   return (
     <div
-      className="static flex max-w-xl grow flex-col bg-inherit sm:relative"
+      className="static flex h-12 max-w-xl grow flex-col bg-inherit sm:relative"
       ref={dropdownRef}
     >
       <div className="relative flex basis-full sm:static">

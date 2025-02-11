@@ -5,103 +5,102 @@ import { usePathname } from "next/navigation";
 
 import { useUser } from "@clerk/nextjs";
 
-import { cn } from "@/utils/cn";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "../ui/sidebar";
 import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarNavMain({
-  isAuthenticated,
+  isSignedIn,
 }: {
-  isAuthenticated: boolean;
+  isSignedIn: boolean;
 }) {
   const pathname = usePathname();
 
-  const { user, isSignedIn, isLoaded } = useUser();
+  const { user } = useUser();
 
   const isHome =
-    pathname.startsWith("/home") || (pathname === "/" && isAuthenticated);
+    pathname.startsWith("/home") || (isSignedIn && pathname === "/");
   const isAll =
-    pathname.startsWith("/all") || (pathname === "/" && !isAuthenticated);
-  const isProfile = isSignedIn && pathname.startsWith(`/u/${user.username}`);
+    pathname.startsWith("/all") || (!isSignedIn && pathname === "/");
+  const isProfile = pathname.startsWith(`/u/${user?.username}`);
+
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
-    <nav>
-      <ul className="w-full self-center border-b pb-3">
-        {isAuthenticated && (
-          <li>
-            <Button
-              variant="ghost"
-              size="lg"
-              className={cn(
-                "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
-                {
-                  "bg-accent text-accent-foreground hover:bg-accent": isHome,
-                },
-              )}
-              asChild
-            >
-              <Link href="/home">
-                {isHome ? <ActiveHomeIcon /> : <InactiveHomeIcon />}
-                <h2 className="capitalize">home</h2>
-              </Link>
-            </Button>
-          </li>
-        )}
-
-        <li>
-          <Button
-            variant="ghost"
-            size="lg"
-            className={cn(
-              "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
-              {
-                "bg-accent text-accent-foreground hover:bg-accent": isAll,
-              },
-            )}
+    <SidebarMenu>
+      {isSignedIn && (
+        <SidebarMenuItem>
+          <SidebarMenuButton
             asChild
+            isActive={isHome}
+            onClick={() => {
+              if (isMobile) {
+                setOpenMobile(false);
+              }
+            }}
           >
-            <Link href="/all">
-              {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
-              <h2 className="capitalize">all</h2>
+            <Link href={"/home"}>
+              {isHome ? <ActiveHomeIcon /> : <InactiveHomeIcon />}
+              <span>Home</span>
             </Link>
-          </Button>
-        </li>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
 
-        {isAuthenticated && !isLoaded && (
-          <div className="flex h-10 items-center gap-2 px-4">
-            <Skeleton className="size-6 rounded-full" />
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          asChild
+          isActive={isAll}
+          onClick={() => {
+            if (isMobile) {
+              setOpenMobile(false);
+            }
+          }}
+        >
+          <Link href={"/all"}>
+            {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
+            <span>All</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+
+      {isSignedIn && user && (
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            asChild
+            isActive={isProfile}
+            onClick={() => {
+              if (isMobile) {
+                setOpenMobile(false);
+              }
+            }}
+          >
+            <Link href={`/u/${user.username}`}>
+              <Avatar className="size-5">
+                <AvatarImage src={user.imageUrl} />
+                <AvatarFallback className="uppercase">
+                  {user.username?.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <span>Profile</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
+      {isSignedIn && !user && (
+        <SidebarMenuItem>
+          <SidebarMenuButton>
+            <Skeleton className="size-5 rounded-full" />
             <Skeleton className="h-4 w-20" />
-          </div>
-        )}
-
-        {isAuthenticated && isLoaded && isSignedIn && (
-          <li>
-            <Button
-              variant="ghost"
-              size="lg"
-              className={cn(
-                "w-full justify-start px-4 text-sm font-normal hover:bg-accent/40",
-                {
-                  "bg-accent text-accent-foreground hover:bg-accent": isProfile,
-                },
-              )}
-              asChild
-            >
-              <Link href={`/u/${user.username}`}>
-                <Avatar className="size-6">
-                  <AvatarImage src={user.imageUrl} />
-                  <AvatarFallback className="uppercase">
-                    {user.username?.slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <h2 className="capitalize">view profile</h2>
-              </Link>
-            </Button>
-          </li>
-        )}
-      </ul>
-    </nav>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      )}
+    </SidebarMenu>
   );
 }
 
