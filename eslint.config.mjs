@@ -15,33 +15,22 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
+  ...pluginQuery.configs["flat/recommended"],
   {
+    plugins: {
+      "react-compiler": reactCompiler,
+      drizzle: pluginDrizzle,
+    },
     rules: {
-      // https://eslint.org/docs/latest/rules/no-unused-vars#ignorerestsiblings
       "@typescript-eslint/no-unused-vars": [
         "error",
         { ignoreRestSiblings: true },
       ],
-    },
-  },
-  {
-    plugins: {
-      "react-compiler": reactCompiler,
-    },
-    rules: {
       "react-compiler/react-compiler": "error",
-    },
-  },
-  {
-    plugins: {
-      drizzle: pluginDrizzle,
-    },
-    rules: {
       "drizzle/enforce-delete-with-where": "error",
       "drizzle/enforce-update-with-where": "error",
     },
   },
-  ...pluginQuery.configs["flat/recommended"],
 ];
 
 export default eslintConfig;
