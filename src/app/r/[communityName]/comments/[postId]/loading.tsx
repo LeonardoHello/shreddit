@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Loading() {
   return (
-    <main className="flex grow flex-col gap-2">
+    <div className="flex grow flex-col gap-2">
       <PostSkeleton />
 
       <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 pb-8">
@@ -15,6 +15,6 @@ export default function Loading() {
 
         <CommentSectionSkeleton />
       </div>
-    </main>
+    </div>
   );
 }

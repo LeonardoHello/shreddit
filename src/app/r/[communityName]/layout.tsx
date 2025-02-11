@@ -21,7 +21,7 @@ export default async function CommunityLayout(props: {
   void trpc.community.getCommunityByName.prefetch(params.communityName);
 
   return (
-    <main className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
+    <div className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
       <HydrateClient>
         <div className="order-2 flex justify-center gap-4">
           {props.children}
@@ -44,6 +44,6 @@ export default async function CommunityLayout(props: {
           )}
         </Suspense>
       </HydrateClient>
-    </main>
+    </div>
   );
 }

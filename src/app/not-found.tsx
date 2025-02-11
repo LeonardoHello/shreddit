@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <main className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
+    <div className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center">
         <Badge variant="secondary" className="mb-2">
           404
@@ -30,6 +30,6 @@ export default function NotFound() {
           </Button>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

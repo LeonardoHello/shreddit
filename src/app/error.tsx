@@ -26,7 +26,7 @@ export default function Error({
     const { message, data } = error;
 
     return (
-      <main className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
+      <div className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
         <div className="text-center">
           <Badge variant="secondary" className="mb-2">
             {data ? data.httpStatus : "4xx"}
@@ -50,12 +50,12 @@ export default function Error({
             </Button>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
+    <div className="grid grow place-items-center px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center">
         <Badge variant="secondary" className="mb-2">
           5xx
@@ -80,6 +80,6 @@ export default function Error({
           </Button>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
