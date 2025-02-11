@@ -29,7 +29,7 @@ export default async function SubmitLayout({
         </div>
       </div>
 
-      <div className="sticky top-16 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm lg:flex">
+      <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm lg:flex">
         <div>
           <div className="mb-2 flex items-center gap-2">
             <Image src={logo} alt="logo" className="size-8" />
