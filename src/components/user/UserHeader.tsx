@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 import { trpc } from "@/trpc/client";
-import userBackground from "@public/userBackground.jpg";
+import userBanner from "@public/userBanner.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import UserNavigation from "./UserNavigation";
 import UserSidebar from "./UserSidebar";
@@ -14,7 +14,7 @@ export default function UserHeader({ username }: { username: string }) {
   return (
     <div className="flex flex-col rounded-lg border bg-card">
       <Image
-        src={userBackground}
+        src={userBanner}
         alt="shrek themed community banner"
         className="h-20 w-full rounded-t-lg object-cover lg:h-32"
         placeholder="blur"
