@@ -88,6 +88,7 @@ export default function CommunityHeaderDropdown({
     onSuccess: () => {
       utils.community.getJoinedCommunities.invalidate();
       utils.community.getModeratedCommunities.invalidate();
+      utils.community.getMutedCommunities.invalidate();
 
       toast.success("Community deleted successfully.");
     },
