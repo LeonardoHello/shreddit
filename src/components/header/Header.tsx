@@ -6,13 +6,13 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
-  UserButton,
 } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 
 import Search from "@/components/header/Search";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import ProfileButton from "./ProfileButton";
 
 export default function Header({ children }: { children: React.ReactNode }) {
   return (
@@ -38,9 +38,7 @@ export default function Header({ children }: { children: React.ReactNode }) {
             <Skeleton className="size-8 rounded-full" />
           </ClerkLoading>
           <ClerkLoaded>
-            <UserButton
-              appearance={{ elements: { userButtonAvatarBox: "size-8" } }}
-            />
+            <ProfileButton />
           </ClerkLoaded>
         </div>
       </SignedIn>
@@ -53,6 +51,7 @@ export default function Header({ children }: { children: React.ReactNode }) {
             </Button>
           </ClerkLoading>
           <ClerkLoaded>
+            {/* TODO: Add sign in button */}
             <SignInButton mode="modal">
               <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
                 Sign in

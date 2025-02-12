@@ -3,16 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useUser } from "@clerk/nextjs";
-
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "../ui/sidebar";
-import { Skeleton } from "../ui/skeleton";
 
 export default function SidebarNavMain({
   isSignedIn,
@@ -21,85 +17,52 @@ export default function SidebarNavMain({
 }) {
   const pathname = usePathname();
 
-  const { user } = useUser();
-
   const isHome =
     pathname.startsWith("/home") || (isSignedIn && pathname === "/");
   const isAll =
     pathname.startsWith("/all") || (!isSignedIn && pathname === "/");
-  const isProfile = pathname.startsWith(`/u/${user?.username}`);
+
+  const items = [
+    {
+      label: "Home",
+      href: "/home",
+      isActive: isHome,
+      icon: isHome ? ActiveHomeIcon : InactiveHomeIcon,
+      authRequired: true,
+    },
+    {
+      label: "All",
+      href: "/all",
+      isActive: isAll,
+      icon: isAll ? ActiveAllIcon : InactiveAllIcon,
+      authRequired: false,
+    },
+  ];
 
   const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <SidebarMenu>
-      {isSignedIn && (
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            asChild
-            isActive={isHome}
-            onClick={() => {
-              if (isMobile) {
-                setOpenMobile(false);
-              }
-            }}
-          >
-            <Link href={"/home"}>
-              {isHome ? <ActiveHomeIcon /> : <InactiveHomeIcon />}
-              <span>Home</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
-
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          asChild
-          isActive={isAll}
-          onClick={() => {
-            if (isMobile) {
-              setOpenMobile(false);
-            }
-          }}
-        >
-          <Link href={"/all"}>
-            {isAll ? <ActiveAllIcon /> : <InactiveAllIcon />}
-            <span>All</span>
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-
-      {isSignedIn && user && (
-        <SidebarMenuItem>
-          <SidebarMenuButton
-            asChild
-            isActive={isProfile}
-            onClick={() => {
-              if (isMobile) {
-                setOpenMobile(false);
-              }
-            }}
-          >
-            <Link href={`/u/${user.username}`}>
-              <Avatar className="size-5">
-                <AvatarImage src={user.imageUrl} />
-                <AvatarFallback className="uppercase">
-                  {user.username?.slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <span>Profile</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
-      {isSignedIn && !user && (
-        <SidebarMenuItem>
-          <SidebarMenuButton>
-            <Skeleton className="size-5 rounded-full" />
-            <Skeleton className="h-4 w-20" />
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      )}
+      {items
+        .filter((item) => isSignedIn || !item.authRequired)
+        .map((item) => (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={item.isActive}
+              onClick={() => {
+                if (isMobile) {
+                  setOpenMobile(false);
+                }
+              }}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
     </SidebarMenu>
   );
 }
