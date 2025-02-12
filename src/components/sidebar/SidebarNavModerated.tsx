@@ -10,7 +10,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuBadge,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
@@ -96,7 +96,6 @@ export default function SidebarNavModerated() {
                     <SidebarMenuItem key={userToCommunity.community.id}>
                       <SidebarMenuButton
                         asChild
-                        className="pr-8"
                         onClick={() => {
                           if (isMobile) {
                             setOpenMobile(false);
@@ -111,11 +110,8 @@ export default function SidebarNavModerated() {
                           <span>r/{userToCommunity.community.name}</span>
                         </Link>
                       </SidebarMenuButton>
-                      <SidebarMenuBadge
-                        className="pointer-events-auto cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-
+                      <SidebarMenuAction
+                        onClick={() => {
                           toggleFavorite.mutate(
                             {
                               communityId: userToCommunity.community.id,
@@ -135,12 +131,12 @@ export default function SidebarNavModerated() {
                         }}
                       >
                         <Star
-                          className={cn("ml-auto size-5 stroke-1", {
+                          className={cn("stroke-1", {
                             "fill-foreground text-foreground":
                               userToCommunity.favorited,
                           })}
                         />
-                      </SidebarMenuBadge>
+                      </SidebarMenuAction>
                     </SidebarMenuItem>
                   ))}
             </SidebarMenu>
