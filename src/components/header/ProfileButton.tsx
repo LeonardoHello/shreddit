@@ -1,11 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { UserButton, useUser } from "@clerk/nextjs";
 import { User } from "lucide-react";
 
 import { Skeleton } from "../ui/skeleton";
 
 export default function ProfileButton() {
+  const router = useRouter();
+
   const { user } = useUser();
 
   if (!user) {
@@ -13,15 +17,25 @@ export default function ProfileButton() {
   }
 
   return (
-    <UserButton appearance={{ elements: { userButtonAvatarBox: "size-8" } }}>
-      <UserButton.MenuItems>
-        <UserButton.Link
-          label="Profile"
-          labelIcon={<User className="size-4 stroke-[2.5]" />}
-          href={`/u/${user.username}`}
-        />
-        <UserButton.Action label="manageAccount" />
-      </UserButton.MenuItems>
-    </UserButton>
+    <div
+      className="rounded-full"
+      onMouseEnter={() => {
+        router.prefetch(`/u/${user.username}`);
+      }}
+      onTouchStart={() => {
+        router.prefetch(`/u/${user.username}`);
+      }}
+    >
+      <UserButton appearance={{ elements: { userButtonAvatarBox: "size-8" } }}>
+        <UserButton.MenuItems>
+          <UserButton.Link
+            label="Profile"
+            labelIcon={<User className="size-4 stroke-[2.5]" />}
+            href={`/u/${user.username}`}
+          />
+          <UserButton.Action label="manageAccount" />
+        </UserButton.MenuItems>
+      </UserButton>
+    </div>
   );
 }
