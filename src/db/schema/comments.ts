@@ -10,8 +10,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
-import { voteStatusEnum } from "../enums";
 import { timestamps } from "../helpers";
+import { voteStatusEnum } from "./enums";
 import { posts } from "./posts";
 import { users } from "./users";
 

@@ -10,10 +10,10 @@ import {
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
-import { voteStatusEnum } from "../enums";
 import { timestamps, uploadthingFile } from "../helpers";
 import { comments } from "./comments";
 import { communities } from "./communities";
+import { voteStatusEnum } from "./enums";
 import { users } from "./users";
 
 export const posts = pgTable(
