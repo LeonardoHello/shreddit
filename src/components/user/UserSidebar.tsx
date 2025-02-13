@@ -14,7 +14,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { trpc } from "@/trpc/client";
-import getOnions from "@/utils/calculateOnions";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -93,7 +92,7 @@ function UserSidebarContent({ username }: { username: string }) {
               {new Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(getOnions(user))}
+              }).format(user.onionCount)}
             </div>
           </div>
         </div>
@@ -142,10 +141,8 @@ function UserSidebarContent({ username }: { username: string }) {
                       {new Intl.NumberFormat("en-US", {
                         notation: "compact",
                         maximumFractionDigits: 1,
-                      }).format(community.usersToCommunities.length)}{" "}
-                      {community.usersToCommunities.length === 1
-                        ? "member"
-                        : "members"}
+                      }).format(community.memberCount)}{" "}
+                      {community.memberCount === 1 ? "member" : "members"}
                     </div>
                   </div>
                 </div>

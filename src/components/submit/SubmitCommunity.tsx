@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 
-import { toast } from "sonner";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,11 +38,6 @@ export default function SubmitCommunity({
       {
         initialData: [],
         refetchOnMount: false,
-        retry: 2,
-        throwOnError: () => {
-          toast.error("There was a problem with fetching the communities");
-          return false;
-        },
       },
     );
 

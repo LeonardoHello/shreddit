@@ -51,7 +51,6 @@ export default function Header({ children }: { children: React.ReactNode }) {
             </Button>
           </ClerkLoading>
           <ClerkLoaded>
-            {/* TODO: Add sign in button */}
             <SignInButton mode="modal">
               <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
                 Sign in
