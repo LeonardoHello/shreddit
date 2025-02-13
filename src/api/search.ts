@@ -19,7 +19,7 @@ export const searchUsers = db.query.users
             END
           ), 0)
           FROM users_to_posts
-          WHERE users_to_posts.user_id = ${user.id}
+          WHERE users_to_posts.user_id = ${user.id}::text
         ) + 
         (
           SELECT COALESCE(SUM(
@@ -30,7 +30,7 @@ export const searchUsers = db.query.users
             END
           ), 0)
           FROM users_to_comments
-          WHERE users_to_comments.user_id = ${user.id}
+          WHERE users_to_comments.user_id = ${user.id}::text
         ) + 
         (
           SELECT COUNT(*) 
@@ -39,7 +39,7 @@ export const searchUsers = db.query.users
             SELECT 1
             FROM communities
             WHERE communities.id = users_to_communities.community_id
-              AND communities.moderator_id = ${user.id}
+              AND communities.moderator_id = ${user.id}::text
           )
         )
       `.as("onion_count"),
