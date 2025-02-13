@@ -18,7 +18,7 @@ export default function ProfileButton() {
 
   return (
     <div
-      className="rounded-full"
+      className="flex items-center"
       onMouseEnter={() => {
         router.prefetch(`/u/${user.username}`);
       }}
