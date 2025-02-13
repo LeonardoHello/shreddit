@@ -6,14 +6,12 @@ import type { Post, PostFile } from "@/db/schema/posts";
 import { PostType } from "@/types/enums";
 
 type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
-  communitySearch: string;
   postType: PostType;
   files: Pick<PostFile, "key" | "url" | "name" | "thumbHash">[];
   isDisabled: boolean;
 };
 
 export enum ReducerAction {
-  SEARCH_COMMUNITY,
   SET_POST_TYPE,
   SET_TITLE,
   SET_TEXT,
@@ -25,7 +23,6 @@ export enum ReducerAction {
 }
 
 type ReducerActionType =
-  | { type: typeof ReducerAction.SEARCH_COMMUNITY; nextCommunitySearch: string }
   | { type: typeof ReducerAction.SET_POST_TYPE; postType: PostType }
   | {
       type: typeof ReducerAction.SET_TITLE;
@@ -49,9 +46,6 @@ const reducer = (
   action: ReducerActionType,
 ): ReducerState => {
   switch (action.type) {
-    case ReducerAction.SEARCH_COMMUNITY:
-      return { ...state, communitySearch: action.nextCommunitySearch };
-
     case ReducerAction.SET_POST_TYPE:
       return { ...state, postType: action.postType };
 
@@ -92,7 +86,6 @@ export default function SubmitContextProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(reducer, {
-    communitySearch: "",
     postType: PostType.TEXT,
     title: "",
     text: null,

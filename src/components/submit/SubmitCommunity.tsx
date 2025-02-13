@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -10,15 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ReducerAction,
-  useSubmitContext,
-  useSubmitDispatchContext,
-} from "@/context/SubmitContext";
 import { trpc } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
+
+const limit = 10;
 
 export default function SubmitCommunity({
   children,
@@ -27,33 +25,23 @@ export default function SubmitCommunity({
 }) {
   const [myCommunities] = trpc.community.getMyCommunities.useSuspenseQuery();
 
-  const state = useSubmitContext();
-  const dispatch = useSubmitDispatchContext();
+  const [searchValue, setSearchValue] = useState("");
 
   const utils = trpc.useUtils();
 
-  const { data: searchedCommunities, isFetching } =
-    trpc.community.searchCommunities.useQuery(
-      { search: state.communitySearch, limit: 10 },
-      {
-        initialData: [],
-        refetchOnMount: false,
-      },
-    );
-
-  const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
     const searchedValue = e.currentTarget.value.replaceAll(
       /[^a-zA-Z0-9_-]/g,
       "",
     );
 
-    await utils.community.searchCommunities.cancel();
-
-    dispatch({
-      type: ReducerAction.SEARCH_COMMUNITY,
-      nextCommunitySearch: searchedValue,
+    utils.community.searchCommunities.cancel({
+      search: searchValue,
+      limit,
     });
+
+    setSearchValue(searchedValue);
   };
 
   return (
@@ -76,52 +64,18 @@ export default function SubmitCommunity({
           <Input
             className="mb-2 h-8"
             autoFocus
-            defaultValue={state.communitySearch}
+            defaultValue={searchValue}
             onChange={onInputChange}
           />
         </div>
 
         <DropdownMenuSeparator />
 
-        {state.communitySearch.length !== 0 && (
-          <>
-            <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
-              searched communities
-            </DropdownMenuLabel>
-            {isFetching && (
-              <DropdownMenuItem className="h-11" disabled>
-                <Skeleton className="size-8 rounded-full" />
-
-                <div className="flex flex-col gap-1">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-2 w-16" />
-                </div>
-              </DropdownMenuItem>
-            )}
-            {!isFetching &&
-              searchedCommunities.map((community) => (
-                <DropdownMenuItem key={community.id} className="h-11" asChild>
-                  <Link href={`/submit/r/${community.name}`}>
-                    <CommunityImage
-                      size={32}
-                      className={"min-h-8 min-w-8"}
-                      icon={community.icon}
-                    />
-                    <div className="flex flex-col">
-                      <div className="max-w-40 truncate text-sm sm:max-w-52">
-                        r/{community.name}
-                      </div>
-                      <div className="text-2xs text-muted-foreground">
-                        {community.memberCount} members
-                      </div>
-                    </div>
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-          </>
+        {searchValue.length !== 0 && (
+          <SubmitCommunityDropdown searchValue={searchValue} />
         )}
 
-        {state.communitySearch.length === 0 && (
+        {searchValue.length === 0 && (
           <>
             <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
               Your communities
@@ -151,3 +105,55 @@ export default function SubmitCommunity({
     </DropdownMenu>
   );
 }
+
+const SubmitCommunityDropdown = memo(
+  ({ searchValue }: { searchValue: string }) => {
+    const { data: searchedCommunities, isFetching } =
+      trpc.community.searchCommunities.useQuery(
+        { search: searchValue, limit },
+        {
+          initialData: [],
+        },
+      );
+
+    return (
+      <>
+        <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
+          searched communities
+        </DropdownMenuLabel>
+        {isFetching && (
+          <DropdownMenuItem className="h-11" disabled>
+            <Skeleton className="size-8 rounded-full" />
+
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-2 w-16" />
+            </div>
+          </DropdownMenuItem>
+        )}
+        {!isFetching &&
+          searchedCommunities.map((community) => (
+            <DropdownMenuItem key={community.id} className="h-11" asChild>
+              <Link href={`/submit/r/${community.name}`}>
+                <CommunityImage
+                  size={32}
+                  className={"min-h-8 min-w-8"}
+                  icon={community.icon}
+                />
+                <div className="flex flex-col">
+                  <div className="max-w-40 truncate text-sm sm:max-w-52">
+                    r/{community.name}
+                  </div>
+                  <div className="text-2xs text-muted-foreground">
+                    {community.memberCount} members
+                  </div>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          ))}
+      </>
+    );
+  },
+);
+
+SubmitCommunityDropdown.displayName = "SubmitCommunityDropdown";
