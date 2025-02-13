@@ -9,14 +9,14 @@ import {
 } from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 
-import Search from "@/components/header/Search";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import ProfileButton from "./ProfileButton";
+import { Search } from "./Search";
 
 export default function Header({ children }: { children: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card px-4">
+    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-card px-4">
       {children}
 
       <Search />

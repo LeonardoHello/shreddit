@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function useDropdown() {
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+export default function useDropdown(
+  ref: React.RefObject<HTMLDivElement | null>,
+) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const clickListener = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -25,7 +23,7 @@ export default function useDropdown() {
     return () => {
       document.removeEventListener("mousedown", clickListener);
     };
-  }, [isOpen]);
+  }, [isOpen, ref]);
 
-  return { dropdownRef, isOpen, setIsOpen };
+  return { ref, isOpen, setIsOpen };
 }

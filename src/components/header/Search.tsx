@@ -1,29 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
+import { memo, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { SearchIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import * as motion from "motion/react-client";
 
 import useDropdown from "@/hooks/useDropdown";
 import { trpc } from "@/trpc/client";
-import { cn } from "@/utils/cn";
+import CommunityImage from "../community/CommunityImage";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import SearchSkeleton from "./SearchSkeleton";
 
-const SearchDropdown = dynamic(() => import("./SearchDropdown"));
+const limit = 4;
 
-export default function Search() {
-  const pathname = usePathname();
+export function Search() {
   const [searchedValue, setSearchedValue] = useState("");
+  const ref = useRef<HTMLInputElement>(null);
 
-  const { dropdownRef, isOpen, setIsOpen } = useDropdown();
-
-  useEffect(() => {
-    setIsOpen(false);
-    return () => {
-      setIsOpen(false);
-    };
-  }, [pathname, setIsOpen]);
+  const { ref: dropdownRef, isOpen, setIsOpen } = useDropdown(ref);
 
   const utils = trpc.useUtils();
 
@@ -40,56 +39,153 @@ export default function Search() {
     ]);
 
     setSearchedValue(searchedValue);
-
-    if (searchedValue.length === 0 && isOpen === true) {
-      setIsOpen(false);
-    } else if (searchedValue.length > 0 && isOpen === false) {
-      setIsOpen(true);
-    }
   };
 
-  const onInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.currentTarget.value.length > 0) {
-      setIsOpen(true);
-    }
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setSearchedValue("");
   };
 
   return (
     <div
-      className="static flex h-12 max-w-xl grow flex-col bg-inherit sm:relative"
       ref={dropdownRef}
+      className="max-w-md grow sm:relative lg:max-w-md xl:max-w-lg"
     >
-      <div className="relative flex basis-full sm:static">
-        <label
-          htmlFor="search"
-          className="absolute left-4 self-center"
-          onClick={(e) => {
-            if (searchedValue.length === 0) return;
-
-            if (isOpen) {
-              e.preventDefault();
-              setIsOpen(false);
-            }
-          }}
-        >
-          <MagnifyingGlassIcon className="h-6 w-6 text-zinc-500" />
-        </label>
-        <input
+      <div className="relative">
+        <Label htmlFor="search" className="sr-only">
+          Search Shreddit
+        </Label>
+        <Input
           id="search"
           placeholder="Search Shreddit"
+          className="h-10 rounded-full bg-input pl-11"
           autoComplete="off"
-          className={cn(
-            "w-full min-w-0 rounded-full bg-zinc-400/10 pl-12 pr-6 text-sm text-zinc-300 outline-none ring-1 ring-inset ring-zinc-700/70 placeholder:text-zinc-500 hover:bg-inherit hover:ring-zinc-300 focus:rounded-b-none focus:rounded-t-[1.25rem] focus:bg-inherit focus:ring-zinc-300",
-            {
-              "rounded-b-none rounded-t-[1.25rem] bg-zinc-400/10": isOpen,
-            },
-          )}
+          value={searchedValue}
           onChange={onInputChange}
-          onFocus={onInputFocus}
+          onFocus={() => setIsOpen(true)}
         />
+        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 select-none stroke-[1.5] opacity-50" />
       </div>
 
-      {isOpen && <SearchDropdown searchedValue={searchedValue} />}
+      <AnimatePresence>
+        {isOpen && searchedValue.length !== 0 && (
+          <SearchDropdown
+            searchedValue={searchedValue}
+            closeDropdown={closeDropdown}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+const SearchDropdown = memo(
+  ({
+    searchedValue,
+    closeDropdown,
+  }: {
+    searchedValue: string;
+    closeDropdown: () => void;
+  }) => {
+    const { data: searchedCommunities, isLoading: isLoadingCommunities } =
+      trpc.community.searchCommunities.useQuery({
+        search: searchedValue,
+        limit,
+      });
+    const { data: searchedUsers, isLoading: isLoadingUsers } =
+      trpc.user.searchUsers.useQuery(searchedValue);
+
+    const isLoading = isLoadingCommunities || isLoadingUsers;
+
+    return (
+      <motion.div
+        key="box"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{
+          duration: 0.2,
+          scale: { type: "spring", visualDuration: 0.2, bounce: 0.4 },
+        }}
+        style={{
+          scrollbarWidth: "thin",
+          colorScheme: "dark",
+          scrollbarColor: "hsl(var(--muted-foreground)/.4) transparent",
+        }}
+        className="absolute left-2 top-[60px] flex max-h-[min(calc(100vh-4rem),24rem)] w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto rounded-xl border bg-card p-2 sm:left-0 sm:top-12 sm:w-full"
+      >
+        {isLoading && <SearchSkeleton />}
+
+        {!isLoading && searchedCommunities?.length !== 0 && (
+          <div className="flex flex-col gap-1">
+            <div className="mx-4 text-sm font-medium">Communities</div>
+            {searchedCommunities?.map((community) => (
+              <Button
+                key={community.name}
+                variant={"ghost"}
+                asChild
+                className="h-12 justify-start"
+                onClick={closeDropdown}
+              >
+                <Link href={`/r/${community.name}`}>
+                  <CommunityImage icon={community.icon} size={28} />
+                  <div className="w-0 grow">
+                    <div className="truncate text-sm font-medium">
+                      r/{community.name}
+                    </div>
+                    <div className="truncate text-xs text-muted-foreground">
+                      {new Intl.NumberFormat("en-US", {
+                        notation: "compact",
+                        maximumFractionDigits: 1,
+                      }).format(community.memberCount)}{" "}
+                      {community.memberCount === 1 ? "member" : "members"}
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && searchedUsers?.length !== 0 && (
+          <div className="flex flex-col gap-1">
+            <div className="mx-4 text-sm font-medium">Users</div>
+            {searchedUsers?.map((user) => (
+              <Button
+                key={user.username}
+                variant={"ghost"}
+                asChild
+                className="h-12 justify-start"
+                onClick={closeDropdown}
+              >
+                <Link href={`/u/${user.username}`}>
+                  <Image
+                    src={user.imageUrl}
+                    alt="community image"
+                    height={28}
+                    width={28}
+                    className="rounded-full"
+                  />
+                  <div className="w-0 grow">
+                    <div className="truncate text-sm font-medium">
+                      u/{user.username}
+                    </div>
+                    <div className="truncate text-xs text-muted-foreground">
+                      {new Intl.NumberFormat("en-US", {
+                        notation: "compact",
+                        maximumFractionDigits: 1,
+                      }).format(user.onionCount)}{" "}
+                      {user.onionCount === 1 ? "onion" : "onions"}
+                    </div>
+                  </div>
+                </Link>
+              </Button>
+            ))}
+          </div>
+        )}
+      </motion.div>
+    );
+  },
+);
+
+SearchDropdown.displayName = "SearchDropdown";
