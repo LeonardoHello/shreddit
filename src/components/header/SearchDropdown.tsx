@@ -3,10 +3,8 @@ import Link from "next/link";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Dot } from "lucide-react";
-import { toast } from "sonner";
 
 import { trpc } from "@/trpc/client";
-import calculateOnions from "@/utils/calculateOnions";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SearchDropdown({
@@ -18,25 +16,13 @@ export default function SearchDropdown({
     { search: searchedValue, limit: 4 },
     {
       initialData: [],
-      refetchOnWindowFocus: false,
-      staleTime: 0,
-      retry: 2,
-      throwOnError: () => {
-        toast.error("There was a problem with fetching the communities");
-        return false;
-      },
+      refetchOnMount: false,
     },
   );
 
   const searchedUsers = trpc.user.searchUsers.useQuery(searchedValue, {
     initialData: [],
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-    retry: 2,
-    throwOnError: () => {
-      toast.error("There was a problem with fetching the users");
-      return false;
-    },
+    refetchOnMount: false,
   });
 
   return (
@@ -105,8 +91,8 @@ export default function SearchDropdown({
                     {new Intl.NumberFormat("en-US", {
                       notation: "compact",
                       maximumFractionDigits: 1,
-                    }).format(calculateOnions(user))}{" "}
-                    {calculateOnions(user) === 1 ? "onion" : "onions"}
+                    }).format(user.onionCount)}{" "}
+                    {user.onionCount === 1 ? "onion" : "onions"}
                   </span>
                 </div>
               </div>
