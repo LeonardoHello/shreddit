@@ -108,20 +108,15 @@ export default function SubmitCommunity({
 
 const SubmitCommunityDropdown = memo(
   ({ searchValue }: { searchValue: string }) => {
-    const { data: searchedCommunities, isFetching } =
-      trpc.community.searchCommunities.useQuery(
-        { search: searchValue, limit },
-        {
-          initialData: [],
-        },
-      );
+    const { data: searchedCommunities, isLoading } =
+      trpc.community.searchCommunities.useQuery({ search: searchValue, limit });
 
     return (
       <>
         <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
           searched communities
         </DropdownMenuLabel>
-        {isFetching && (
+        {isLoading && (
           <DropdownMenuItem className="h-11" disabled>
             <Skeleton className="size-8 rounded-full" />
 
@@ -131,8 +126,8 @@ const SubmitCommunityDropdown = memo(
             </div>
           </DropdownMenuItem>
         )}
-        {!isFetching &&
-          searchedCommunities.map((community) => (
+        {!isLoading &&
+          searchedCommunities?.map((community) => (
             <DropdownMenuItem key={community.id} className="h-11" asChild>
               <Link href={`/submit/r/${community.name}`}>
                 <CommunityImage
