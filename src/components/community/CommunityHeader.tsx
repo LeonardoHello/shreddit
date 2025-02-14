@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
+import { useClerk } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
 
 import {
   ReducerAction,
@@ -16,6 +15,8 @@ import useHydration from "@/hooks/useHydration";
 import { trpc } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import CommunityDeleteDialog from "./CommunityDeleteDialog";
 import CommunityEditDialog from "./CommunityEditDialog";
 import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
 import CommunityImage from "./CommunityImage";
@@ -25,16 +26,15 @@ export default function CommunityHeader({
   currentUserId,
   communityName,
 }: {
-  currentUserId: User["id"];
+  currentUserId: User["id"] | null;
   communityName: string;
 }) {
   const [community] =
     trpc.community.getCommunityByName.useSuspenseQuery(communityName);
-  const [userToCommunity] =
-    trpc.community.getUserToCommunity.useSuspenseQuery(communityName);
 
   const dispatch = useRecentCommunityDispatchContext();
 
+  const clerk = useClerk();
   const isHydrated = useHydration();
 
   useEffect(() => {
@@ -49,33 +49,6 @@ export default function CommunityHeader({
       },
     });
   }, [dispatch, community.icon, community.id, community.name, isHydrated]);
-
-  const utils = trpc.useUtils();
-
-  const joinCommunity = trpc.community.toggleJoinCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getUserToCommunity.setData(communityName, (updater) => {
-        if (!updater) {
-          return { ...userToCommunity, joined: variables.joined };
-        }
-
-        return { ...updater, joined: variables.joined };
-      });
-    },
-    onSuccess: (data) => {
-      utils.community.getCommunityByName.invalidate(communityName);
-      utils.community.getJoinedCommunities.invalidate();
-
-      if (data[0].joined) {
-        toast.success(`Joined r/${community.name}`);
-      } else {
-        toast.success(`Left r/${community.name}`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
 
   return (
     <div className="flex flex-col rounded-lg border bg-card">
@@ -121,42 +94,50 @@ export default function CommunityHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant={"outline"}
-            className="w-9 rounded-full sm:w-auto"
-            asChild
-          >
-            <Link href={`/submit/r/${communityName}`}>
+        {!currentUserId && (
+          <div className="flex items-center gap-3">
+            <Button
+              variant={"outline"}
+              className="rounded-full"
+              onClick={() => {
+                clerk.openSignIn();
+              }}
+            >
               <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
-              <span className="hidden capitalize sm:block">create post</span>
-            </Link>
-          </Button>
+              <span className="capitalize">create post</span>
+            </Button>
 
-          <Button
-            variant={userToCommunity.joined ? "outline" : "default"}
-            className="rounded-full font-bold"
-            onClick={() => {
-              joinCommunity.mutate({
-                communityId: community.id,
-                joined: !userToCommunity.joined,
-              });
-            }}
+            <Button
+              className="rounded-full font-bold capitalize"
+              onClick={() => {
+                clerk.openSignIn();
+              }}
+            >
+              join
+            </Button>
+          </div>
+        )}
+
+        {currentUserId && (
+          <Suspense
+            fallback={
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-9 w-32 rounded-full" />
+                <Skeleton className="h-9 w-20 rounded-full" />
+                <Skeleton className="size-9 rounded-full" />
+              </div>
+            }
           >
-            {userToCommunity.joined ? "Joined" : "Join"}
-          </Button>
-
-          {currentUserId && (
             <CommunityHeaderDropdown
               communityId={community.id}
               communityName={communityName}
               isCommunityModerator={currentUserId === community.moderatorId}
-              userToCommunity={userToCommunity}
             >
               <CommunityEditDialog community={community} />
+              <CommunityDeleteDialog communityId={community.id} />
             </CommunityHeaderDropdown>
-          )}
-        </div>
+          </Suspense>
+        )}
       </div>
     </div>
   );

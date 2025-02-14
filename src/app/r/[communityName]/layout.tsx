@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { auth as authPromise } from "@clerk/nextjs/server";
 
 import CommunityHeader from "@/components/community/CommunityHeader";
-import CommunityHeaderPlaceholder from "@/components/community/CommunityHeaderPlaceholder";
 import CommunityHeaderSkeleton from "@/components/community/CommunityHeaderSkeleton";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
 import CommunitySidebarSkeleton from "@/components/community/CommunitySidebarSkeleton";
@@ -32,16 +31,10 @@ export default async function CommunityLayout(props: {
         </div>
 
         <Suspense fallback={<CommunityHeaderSkeleton />}>
-          {auth.userId && (
-            <CommunityHeader
-              currentUserId={auth.userId}
-              communityName={params.communityName}
-            />
-          )}
-
-          {!auth.userId && (
-            <CommunityHeaderPlaceholder communityName={params.communityName} />
-          )}
+          <CommunityHeader
+            currentUserId={auth.userId}
+            communityName={params.communityName}
+          />
         </Suspense>
       </HydrateClient>
     </div>
