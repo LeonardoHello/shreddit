@@ -8,6 +8,7 @@ import {
   useCommentDispatchContext,
 } from "@/context/CommentContext";
 import { Button } from "../ui/button";
+import CommentDeleteDialog from "./CommentDeleteDialog";
 import CommentDropdown from "./CommentDropdown";
 import CommentVote from "./CommentVote";
 
@@ -41,7 +42,11 @@ export default function CommentFooter({
         <span className="hidden sm:inline-block">Reply</span>
       </Button>
 
-      {currentUserId === state.authorId && <CommentDropdown />}
+      {currentUserId === state.authorId && (
+        <CommentDropdown>
+          <CommentDeleteDialog />
+        </CommentDropdown>
+      )}
     </div>
   );
 }
