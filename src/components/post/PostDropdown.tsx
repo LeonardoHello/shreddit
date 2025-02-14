@@ -1,7 +1,5 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-
 import { User } from "@clerk/nextjs/server";
 import {
   AlertTriangle,
@@ -30,16 +28,16 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { trpc } from "@/trpc/client";
+import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 
 export default function PostDropdown({
+  children,
   currentUserId,
 }: {
+  children: React.ReactNode;
   currentUserId: User["id"];
 }) {
-  const { postId } = useParams();
-  const router = useRouter();
-
   const post = usePostContext();
   const dispatch = usePostDispatchContext();
 
@@ -75,22 +73,6 @@ export default function PostDropdown({
       } else {
         toast.success("Post unhidden successfully.");
       }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const deletePost = trpc.post.deletePost.useMutation({
-    onMutate: () => {
-      dispatch({ type: ReducerAction.DELETE });
-    },
-    onSuccess: () => {
-      if (postId) {
-        router.replace("/");
-      }
-
-      toast.success("Post deleted successfully.");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -136,116 +118,116 @@ export default function PostDropdown({
   });
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-7 rounded-full">
-          <Ellipsis className="size-4 stroke-[2.5]" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="rounded bg-card"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        <DropdownMenuItem
-          onClick={() => {
-            savePost.mutate({ saved: !post.isSaved, postId: post.id });
+    <AlertDialog>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="size-7 rounded-full">
+            <Ellipsis className="size-4 stroke-[2.5]" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="rounded bg-card"
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         >
-          {post.isSaved && (
+          <DropdownMenuItem
+            onClick={() => {
+              savePost.mutate({ saved: !post.isSaved, postId: post.id });
+            }}
+          >
+            {post.isSaved && (
+              <>
+                <BookmarkCheck />
+                <span>Remove from saved</span>
+              </>
+            )}
+            {!post.isSaved && (
+              <>
+                <Bookmark />
+                <span>Save</span>
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              hidePost.mutate({ hidden: !post.isHidden, postId: post.id });
+            }}
+          >
+            {post.isHidden && (
+              <>
+                <EyeOff />
+                <span>Remove from hidden</span>
+              </>
+            )}
+            {!post.isHidden && (
+              <>
+                <Eye />
+                <span>Hide</span>
+              </>
+            )}
+          </DropdownMenuItem>
+          {currentUserId === post.authorId && (
             <>
-              <BookmarkCheck />
-              <span>Remove from saved</span>
-            </>
-          )}
-          {!post.isSaved && (
-            <>
-              <Bookmark />
-              <span>Save</span>
-            </>
-          )}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            hidePost.mutate({ hidden: !post.isHidden, postId: post.id });
-          }}
-        >
-          {post.isHidden && (
-            <>
-              <EyeOff />
-              <span>Remove from hidden</span>
-            </>
-          )}
-          {!post.isHidden && (
-            <>
-              <Eye />
-              <span>Hide</span>
-            </>
-          )}
-        </DropdownMenuItem>
-        {currentUserId === post.authorId && (
-          <>
-            {post.files.length === 0 && (
+              {post.files.length === 0 && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    dispatch({ type: ReducerAction.TOGGLE_EDIT });
+                  }}
+                >
+                  <Pencil />
+                  <span>Edit post</span>
+                </DropdownMenuItem>
+              )}
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem>
+                  <Trash />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+
               <DropdownMenuItem
                 onClick={() => {
-                  dispatch({ type: ReducerAction.TOGGLE_EDIT });
+                  setSpoiler.mutate({ id: post.id, spoiler: !post.spoiler });
                 }}
               >
-                <Pencil />
-                <span>Edit post</span>
+                {post.spoiler && (
+                  <>
+                    <AlertTriangle />
+                    <span>Remove spoiler tag</span>
+                  </>
+                )}
+                {!post.spoiler && (
+                  <>
+                    <Triangle />
+                    <span>Add spoiler tag</span>
+                  </>
+                )}
               </DropdownMenuItem>
-            )}
-            <DropdownMenuItem
-              onClick={() => {
-                if (!deletePost.isPending) {
-                  deletePost.mutate(post.id);
-                }
-              }}
-            >
-              <Trash />
-              <span>Delete</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setSpoiler.mutate({ id: post.id, spoiler: !post.spoiler });
-              }}
-            >
-              {post.spoiler && (
-                <>
-                  <AlertTriangle />
-                  <span>Remove spoiler tag</span>
-                </>
-              )}
-              {!post.spoiler && (
-                <>
-                  <Triangle />
-                  <span>Add spoiler tag</span>
-                </>
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setNSFW.mutate({ id: post.id, nsfw: !post.nsfw });
-              }}
-            >
-              {post.nsfw && (
-                <>
-                  <ShieldX />
-                  <span>Remove NSFW tag</span>
-                </>
-              )}
-              {!post.nsfw && (
-                <>
-                  <Shield />
-                  <span>Add NSFW tag</span>
-                </>
-              )}
-            </DropdownMenuItem>
-          </>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+              <DropdownMenuItem
+                onClick={() => {
+                  setNSFW.mutate({ id: post.id, nsfw: !post.nsfw });
+                }}
+              >
+                {post.nsfw && (
+                  <>
+                    <ShieldX />
+                    <span>Remove NSFW tag</span>
+                  </>
+                )}
+                {!post.nsfw && (
+                  <>
+                    <Shield />
+                    <span>Add NSFW tag</span>
+                  </>
+                )}
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {children}
+    </AlertDialog>
   );
 }

@@ -10,6 +10,7 @@ import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import PostDeleteDialog from "./PostDeleteDialog";
 import PostDropdown from "./PostDropdown";
 
 export default function PostHeader({
@@ -17,7 +18,7 @@ export default function PostHeader({
 }: {
   currentUserId: User["id"] | null;
 }) {
-  const { communityName } = useParams();
+  const { communityName, postId } = useParams();
 
   const state = usePostContext();
   const hydrated = useHydration();
@@ -80,7 +81,11 @@ export default function PostHeader({
         </div>
       )}
 
-      {currentUserId && <PostDropdown currentUserId={currentUserId} />}
+      {currentUserId && (
+        <PostDropdown currentUserId={currentUserId}>
+          <PostDeleteDialog isPostPage={typeof postId === "string"} />
+        </PostDropdown>
+      )}
     </div>
   );
 }
