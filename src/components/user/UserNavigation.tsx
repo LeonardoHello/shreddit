@@ -11,6 +11,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
@@ -57,11 +59,13 @@ export default function UserNavigation({ username }: { username: string }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button className="xl:hidden">
-            <span>{currentTab ? currentTab.label : "Posts"}</span>
+            <span>{currentTab ? currentTab.label : tabs[0].label}</span>
             <ChevronDown className="size-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-card">
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           {tabs.map((tab) => (
             <DropdownMenuItem
               key={tab.label}

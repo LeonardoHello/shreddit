@@ -6,6 +6,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -32,11 +34,12 @@ export default function CommentDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="rounded bg-card"
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
+          <DropdownMenuLabel>Comment options</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               dispatch({ type: ReducerAction.TOGGLE_EDIT });

@@ -54,7 +54,7 @@ export default function SubmitCommunity({
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
         }}
-        className="z-0 max-h-96 w-60 overflow-y-auto bg-card sm:w-72"
+        className="z-0 max-h-96 w-60 overflow-y-auto sm:w-72"
       >
         <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
           search communities

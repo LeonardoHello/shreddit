@@ -7,6 +7,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Community } from "@/db/schema/communities";
@@ -139,7 +141,9 @@ export default function CommunityHeaderDropdown({
                 <Ellipsis className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded bg-card">
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Community options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
                   favoriteCommunity.mutate({

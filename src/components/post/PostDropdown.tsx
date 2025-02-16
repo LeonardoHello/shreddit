@@ -20,6 +20,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -127,11 +129,12 @@ export default function PostDropdown({
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"
-          className="rounded bg-card"
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
+          <DropdownMenuLabel>Post options</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               savePost.mutate({ saved: !post.isSaved, postId: post.id });

@@ -1,4 +1,4 @@
-import { Ellipsis } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -18,22 +18,19 @@ export default function UserHeaderSkeleton() {
           <Skeleton className="h-8 w-40 self-center" />
         </div>
 
-        <ul className="hidden gap-2 lg:flex">
+        <ul className="hidden gap-2 xl:flex">
           {tabs.map((tab) => (
             <li key={tab}>
-              <Button variant={"outline"} disabled className="rounded-full">
+              <Button variant={"link"} disabled>
                 {tab}
               </Button>
             </li>
           ))}
         </ul>
-        <Button
-          variant="outline"
-          size="icon"
-          disabled
-          className="min-w-9 rounded-full lg:hidden"
-        >
-          <Ellipsis className="size-5" />
+
+        <Button className="xl:hidden">
+          <Skeleton className="h-4 w-12" />
+          <ChevronDown className="size-4" />
         </Button>
       </div>
     </div>
