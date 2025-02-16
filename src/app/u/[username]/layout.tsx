@@ -15,7 +15,7 @@ export default async function UserLayout(props: {
   void trpc.user.getUserByName.prefetch(params.username);
 
   return (
-    <div className="container flex grow flex-col gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
+    <div className="container flex grow flex-col gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
       <HydrateClient>
         <div className="order-2 flex justify-center gap-4">
           {props.children}

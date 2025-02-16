@@ -33,7 +33,7 @@ export default function UserSidebar({
           <Button
             variant="ghost"
             size="icon"
-            className="size-7 min-w-7 rounded-full text-muted-foreground lg:hidden"
+            className="size-7 min-w-7 rounded-full text-muted-foreground xl:hidden"
           >
             <Info className="size-4" />
           </Button>
@@ -56,7 +56,7 @@ export default function UserSidebar({
   }
 
   return (
-    <div className="sticky top-[72px] z-10 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 lg:flex">
+    <div className="sticky top-[72px] z-10 hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 xl:flex">
       <UserSidebarContent username={username} />
     </div>
   );

@@ -57,7 +57,7 @@ export default function UserNavigation({ username }: { username: string }) {
           <Button
             variant="outline"
             size="icon"
-            className="min-w-9 rounded-full lg:hidden"
+            className="min-w-9 rounded-full xl:hidden"
           >
             <Ellipsis className="size-5" />
           </Button>
@@ -75,7 +75,7 @@ export default function UserNavigation({ username }: { username: string }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <nav className="hidden lg:block">
+      <nav className="hidden xl:block">
         <ul className="flex gap-2">
           {tabs.map((tab) => (
             <li key={tab.label}>

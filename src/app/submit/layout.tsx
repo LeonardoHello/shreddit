@@ -15,7 +15,7 @@ export default async function SubmitLayout({
   void trpc.community.getMyCommunities.prefetch();
 
   return (
-    <div className="container flex grow items-start gap-4 p-2 pb-6 xl:max-w-[992px] 2xl:max-w-[1080px]">
+    <div className="container flex grow items-start gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
       <div className="flex w-0 grow flex-col gap-3 rounded-lg border bg-card px-4 py-3">
         <h1 className="text-2xl font-bold tracking-wide">Create post</h1>
 
@@ -29,7 +29,7 @@ export default async function SubmitLayout({
         </div>
       </div>
 
-      <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm lg:flex">
+      <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm xl:flex">
         <div>
           <div className="mb-2 flex items-center gap-2">
             <Image src={logo} alt="logo" className="size-8" />
