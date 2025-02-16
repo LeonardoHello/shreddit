@@ -3,7 +3,7 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function UserSidebarSkeleton() {
   return (
-    <div className="hidden w-80 flex-col gap-3 self-start rounded-lg border bg-card px-3 py-2 lg:flex">
+    <div className="hidden w-80 flex-col gap-3 self-start rounded-lg border bg-card px-3 py-2 xl:flex">
       <Skeleton className="h-5 w-40" />
 
       <div className="flex flex-col gap-1">
