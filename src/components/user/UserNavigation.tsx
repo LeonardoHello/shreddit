@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { Ellipsis } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
@@ -50,19 +50,18 @@ export default function UserNavigation({ username }: { username: string }) {
     },
   ];
 
+  const currentTab = tabs.find((tab) => tab.isActive);
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="min-w-9 rounded-full xl:hidden"
-          >
-            <Ellipsis className="size-5" />
+          <Button className="xl:hidden">
+            <span>{currentTab ? currentTab.label : "Posts"}</span>
+            <ChevronDown className="size-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="rounded bg-card">
+        <DropdownMenuContent align="end" className="bg-card">
           {tabs.map((tab) => (
             <DropdownMenuItem
               key={tab.label}
@@ -79,11 +78,7 @@ export default function UserNavigation({ username }: { username: string }) {
         <ul className="flex gap-2">
           {tabs.map((tab) => (
             <li key={tab.label}>
-              <Button
-                variant={tab.isActive ? "default" : "outline"}
-                asChild
-                className="rounded-full"
-              >
+              <Button variant={tab.isActive ? "default" : "link"} asChild>
                 <Link href={tab.href}>{tab.label}</Link>
               </Button>
             </li>
