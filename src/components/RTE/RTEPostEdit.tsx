@@ -143,7 +143,7 @@ function ImageButton({ editor }: { editor: Editor }) {
         .focus()
         .forEach(res, (file, { commands }) => {
           return commands.setImage({
-            src: file.url,
+            src: file.appUrl,
             alt: file.name,
           });
         })

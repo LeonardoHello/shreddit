@@ -48,7 +48,7 @@ export default function SubmitDropzone() {
         const files = res.map((file) => ({
           name: file.name,
           key: file.key,
-          url: file.url,
+          url: file.appUrl,
         }));
 
         const response = await fetch("/api/thumbHash", {

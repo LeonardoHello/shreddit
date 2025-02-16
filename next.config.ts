@@ -9,9 +9,13 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { hostname: "img.clerk.com", protocol: "https", port: "" },
-      { hostname: "utfs.io", protocol: "https", port: "" },
-      { hostname: "www.redditstatic.com", protocol: "https", port: "" },
+      { protocol: "https", hostname: "img.clerk.com", port: "" },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        pathname: "/a/8t3elu199k/**",
+        port: "",
+      },
     ],
   },
   async rewrites() {
