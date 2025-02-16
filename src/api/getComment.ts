@@ -7,7 +7,6 @@ export const getComments = db.query.comments
       eq(comment.postId, sql.placeholder("postId")),
     with: {
       author: true,
-      usersToComments: true,
       post: { columns: { authorId: true } },
     },
     extras: (comment, { sql }) => ({
