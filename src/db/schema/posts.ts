@@ -1,7 +1,6 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
 import {
   boolean,
-  index,
   pgTable,
   primaryKey,
   text,
@@ -68,8 +67,7 @@ export const usersToPosts = pgTable(
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.postId] }),
-    index().on(t.userId),
-    index().on(t.postId),
+    uniqueIndex().on(t.userId, t.postId),
   ],
 );
 

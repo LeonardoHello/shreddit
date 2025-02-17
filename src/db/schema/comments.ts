@@ -1,6 +1,5 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
 import {
-  index,
   pgTable,
   primaryKey,
   text,
@@ -65,8 +64,7 @@ export const usersToComments = pgTable(
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.commentId] }),
-    index().on(t.userId),
-    index().on(t.commentId),
+    uniqueIndex().on(t.userId, t.commentId),
   ],
 );
 
