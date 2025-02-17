@@ -46,12 +46,8 @@ export const getUserByName = db.query.users
         (
           SELECT COUNT(*) 
           FROM users_to_communities
-          WHERE EXISTS (
-            SELECT 1
-            FROM communities
-            WHERE communities.id = users_to_communities.community_id
-              AND communities.moderator_id = ${user.id}
-          )
+          WHERE users_to_communities.user_id = ${user.id}
+            AND users_to_communities.joined = true
         )
       `.as("onion_count"),
     }),
