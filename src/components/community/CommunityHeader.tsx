@@ -68,13 +68,13 @@ export default function CommunityHeader({
           />
           <div>
             <div className="flex items-center gap-1">
-              <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
+              <h1 className="self-center break-all text-lg font-extrabold xl:text-3xl">
                 r/{community.name}
               </h1>
 
               <CommunitySidebar communityName={communityName} isDialog />
             </div>
-            <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
+            <div className="flex gap-1 text-xs text-muted-foreground xl:hidden">
               <span>
                 {new Intl.NumberFormat("en-US", {
                   notation: "compact",

@@ -29,13 +29,13 @@ export default function UserHeader({ username }: { username: string }) {
 
           <div>
             <div className="flex items-center gap-1">
-              <h1 className="self-center break-all text-lg font-extrabold lg:text-3xl">
+              <h1 className="self-center break-all text-lg font-extrabold xl:text-3xl">
                 u/{user.username}
               </h1>
 
               <UserSidebar username={username} isDialog />
             </div>
-            <div className="flex gap-1 text-xs text-muted-foreground lg:hidden">
+            <div className="flex gap-1 text-xs text-muted-foreground xl:hidden">
               {new Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
