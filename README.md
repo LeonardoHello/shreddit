@@ -30,6 +30,7 @@ Shreddit is a full-stack social media platform inspired by Reddit, designed to p
 - **Real-time Search**: Implements a real-time search feature, allowing users to quickly find content and communities.
 - **Advanced Sidebar Navigation**: Features a collapsible and mobile-friendly sidebar for easy navigation.
 - **Error Handling**: Provides user-friendly error messages and recovery options in case of server issues.
+- **Adherence to Best Practices**: Leverages ESLint configurations from React Query, React Compiler, and Drizzle, ensuring consistent code quality.
 
 # Usage
 
