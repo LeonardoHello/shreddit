@@ -42,7 +42,7 @@ export default function FeedPost({
       }}
       onClick={() => {
         if (!state.isEditing) {
-          router.push(`/r/${state.community.name}/comments/${state.id}#post`);
+          router.push(`/r/${state.community.name}/comments/${state.id}`);
         }
       }}
     >

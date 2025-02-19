@@ -12,7 +12,7 @@ export default async function PostPage(props: {
   const [params, auth] = await Promise.all([props.params, authPromise()]);
 
   return (
-    <div id="post" className="flex w-0 grow scroll-mt-16 flex-col gap-2">
+    <div className="flex w-0 grow flex-col gap-2">
       <Post currentUserId={auth.userId} postId={params.postId} />
 
       <div className="flex flex-col gap-4 rounded-lg border bg-card p-4 pb-8">
