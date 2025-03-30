@@ -10,7 +10,7 @@ import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
 import { Toaster } from "@/components/ui/sonner";
 import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
-import { TRPCProvider } from "@/trpc/client";
+import { TRPCReactProvider } from "@/trpc/client";
 
 import "./globals.css";
 
@@ -54,7 +54,7 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning>
         <body className={`${reddit_sans.className} antialiased`}>
-          <TRPCProvider>
+          <TRPCReactProvider>
             <NextSSRPlugin
               /**
                * The `extractRouterConfig` will extract **only** the route configs
@@ -78,7 +78,7 @@ export default function RootLayout({
                 </SidebarInset>
               </SidebarProvider>
             </RecentCommunityContextProvider>
-          </TRPCProvider>
+          </TRPCReactProvider>
           <Toaster closeButton />
         </body>
       </html>
