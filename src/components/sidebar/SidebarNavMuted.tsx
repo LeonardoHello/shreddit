@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -11,7 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 import {
   AccordionContent,
@@ -20,10 +22,13 @@ import {
 } from "../ui/accordion";
 
 export default function SidebarNavMuted() {
-  const [mutedCommunities] =
-    trpc.community.getMutedCommunities.useSuspenseQuery();
-
   const { isMobile, setOpenMobile } = useSidebar();
+
+  const trpc = useTRPC();
+
+  const { data: mutedCommunities } = useSuspenseQuery(
+    trpc.community.getMutedCommunities.queryOptions(),
+  );
 
   if (mutedCommunities.length === 0) {
     return null;

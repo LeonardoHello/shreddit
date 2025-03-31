@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -23,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
 import { Textarea } from "../ui/textarea";
 
@@ -44,30 +45,35 @@ export default function CommunityEditDialog({
 }: {
   community: Community;
 }) {
-  const utils = trpc.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const editCommunity = trpc.community.editCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getCommunityByName.setData(community.name, (updater) => {
-        if (!updater) {
-          return community;
-        }
+  const communityQueryKey = trpc.community.getCommunityByName.queryKey();
 
-        return {
-          ...updater,
-          displayName: variables.displayName,
-          memberNickname: variables.memberNickname,
-          description: variables.description,
-        };
-      });
-    },
-    onSuccess: () => {
-      toast.success("Community successfully edited");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const editCommunity = useMutation(
+    trpc.community.editCommunity.mutationOptions({
+      onMutate: (variables) => {
+        queryClient.setQueryData(communityQueryKey, (updater) => {
+          if (!updater) {
+            return community;
+          }
+
+          return {
+            ...updater,
+            displayName: variables.displayName,
+            memberNickname: variables.memberNickname,
+            description: variables.description,
+          };
+        });
+      },
+      onSuccess: () => {
+        toast.success("Community successfully edited");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({

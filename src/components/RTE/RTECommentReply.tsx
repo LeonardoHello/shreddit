@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -19,7 +20,7 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
@@ -69,29 +70,34 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-  const createComment = trpc.comment.createComment.useMutation({
-    onMutate: () => {
-      editor.setEditable(false);
-    },
-    onSuccess: () => {
-      startTransition(async () => {
-        await Promise.all([
-          utils.post.getPost.invalidate(state.postId),
-          utils.comment.getComments.invalidate(state.postId),
-        ]);
-      });
+  const getPostQueryKey = trpc.post.getPost.queryKey(state.postId);
+  const getCommentsQueryKey = trpc.comment.getComments.queryKey(state.postId);
 
-      dispatch({ type: ReducerAction.CANCEL_REPLY });
+  const createComment = useMutation(
+    trpc.comment.createComment.mutationOptions({
+      onMutate: () => {
+        editor.setEditable(false);
+      },
+      onSuccess: () => {
+        startTransition(async () => {
+          queryClient.invalidateQueries({
+            queryKey: [getPostQueryKey, getCommentsQueryKey],
+          });
+        });
 
-      toast.success("Reply successfully posted.");
-    },
-    onError: (error) => {
-      editor.setEditable(true);
-      toast.error(error.message);
-    },
-  });
+        dispatch({ type: ReducerAction.CANCEL_REPLY });
+
+        toast.success("Reply successfully posted.");
+      },
+      onError: (error) => {
+        editor.setEditable(true);
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const editorState = useEditorState({
     editor,

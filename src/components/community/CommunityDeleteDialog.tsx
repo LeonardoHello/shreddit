@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -11,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 
 export default function CommunityDeleteDialog({
   communityId,
@@ -19,23 +20,38 @@ export default function CommunityDeleteDialog({
   communityId: string;
 }) {
   const router = useRouter();
-  const utils = trpc.useUtils();
 
-  const deleteCommunity = trpc.community.deleteCommunity.useMutation({
-    onMutate: () => {
-      router.replace("/");
-    },
-    onSuccess: () => {
-      utils.community.getJoinedCommunities.invalidate();
-      utils.community.getModeratedCommunities.invalidate();
-      utils.community.getMutedCommunities.invalidate();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-      toast.success("Community deleted successfully.");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const joinedCommunitiesQueryKey =
+    trpc.community.getJoinedCommunities.queryKey();
+  const moderatedCommunitiesQueryKey =
+    trpc.community.getModeratedCommunities.queryKey();
+  const mutedCommunitiesQueryKey =
+    trpc.community.getMutedCommunities.queryKey();
+
+  const deleteCommunity = useMutation(
+    trpc.community.deleteCommunity.mutationOptions({
+      onMutate: () => {
+        router.replace("/");
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [
+            joinedCommunitiesQueryKey,
+            moderatedCommunitiesQueryKey,
+            mutedCommunitiesQueryKey,
+          ],
+        });
+
+        toast.success("Community deleted successfully.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <AlertDialogContent>

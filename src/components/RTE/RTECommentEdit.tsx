@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -14,7 +15,7 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
@@ -65,20 +66,24 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const editComment = trpc.comment.editComment.useMutation({
-    onMutate: () => {
-      editor.setEditable(false);
-      dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });
-      dispatch({ type: ReducerAction.CANCEL_EDIT });
-    },
-    onSuccess: () => {
-      toast.success("Comment successfully edited.");
-    },
-    onError: (error) => {
-      editor.setEditable(true);
-      toast.error(error.message);
-    },
-  });
+  const trpc = useTRPC();
+
+  const editComment = useMutation(
+    trpc.comment.editComment.mutationOptions({
+      onMutate: () => {
+        editor.setEditable(false);
+        dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });
+        dispatch({ type: ReducerAction.CANCEL_EDIT });
+      },
+      onSuccess: () => {
+        toast.success("Comment successfully edited.");
+      },
+      onError: (error) => {
+        editor.setEditable(true);
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const editorState = useEditorState({
     editor,

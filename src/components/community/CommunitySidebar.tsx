@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { CakeSlice, Globe, Info } from "lucide-react";
 
 import {
@@ -13,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Community } from "@/db/schema/communities";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -63,8 +64,11 @@ function CommunitySidebarContent({
 }: {
   communityName: Community["name"];
 }) {
-  const [community] =
-    trpc.community.getCommunityByName.useSuspenseQuery(communityName);
+  const trpc = useTRPC();
+
+  const { data: community } = useSuspenseQuery(
+    trpc.community.getCommunityByName.queryOptions(communityName),
+  );
 
   return (
     <>

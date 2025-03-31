@@ -32,9 +32,6 @@ export const metadata: Metadata = {
     "Your Gateway to the Shredditverse - Discover, Share, and Discuss the Best Content on the Swamp. Join Our Thriving Online Community and Explore a World of Diverse Subshreddits, Discussions, and Memes. Connect with Shrek-Minded Ogres on Shreddit Today!",
 };
 
-export const preferredRegion = ["fra1"];
-export const runtime = "edge";
-
 export default function RootLayout({
   children,
 }: {

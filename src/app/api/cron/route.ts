@@ -1,11 +1,15 @@
 import { UTApi } from "uploadthing/server";
 
-import { getFiles } from "@/api/getFiles";
+import db from "@/db";
+
+export const runtime = "edge";
 
 // TODO: Add cron job to delete files from uploadthing that are not in the database
 export async function GET() {
   const utapi = new UTApi();
-  const files = await getFiles;
+  const files = await db.query.postFiles.findMany({
+    columns: { key: true },
+  });
 
   const destructuredFiles = files.map(({ key }) => key);
   // default opts.limit 500

@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,7 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -70,31 +71,40 @@ export default function SidebarDialog({
     },
   });
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-  const createCommunity = trpc.community.createCommunity.useMutation({
-    onSuccess: (data) => {
-      utils.community.getJoinedCommunities.invalidate();
-      utils.community.getModeratedCommunities.invalidate();
+  const moderatedCommunitiesQueryKey =
+    trpc.community.getModeratedCommunities.queryKey();
+  const joinedCommunitiesQueryKey =
+    trpc.community.getJoinedCommunities.queryKey();
 
-      startTransition(() => {
-        router.replace(`/r/${data[0][0].name}`);
-        setIsOpen(false);
-        form.reset();
-      });
-    },
-    onError: (error) => {
-      if (
-        error.message ===
-        'duplicate key value violates unique constraint "communities_name_unique"'
-      ) {
-        const values = form.getValues();
-        toast.error(`"r/${values.name}" is already taken`);
-      } else {
-        toast.error(error.message);
-      }
-    },
-  });
+  const createCommunity = useMutation(
+    trpc.community.createCommunity.mutationOptions({
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: [moderatedCommunitiesQueryKey, joinedCommunitiesQueryKey],
+        });
+
+        startTransition(() => {
+          router.replace(`/r/${data[0][0].name}`);
+          setIsOpen(false);
+          form.reset();
+        });
+      },
+      onError: (error) => {
+        if (
+          error.message ===
+          'duplicate key value violates unique constraint "communities_name_unique"'
+        ) {
+          const values = form.getValues();
+          toast.error(`"r/${values.name}" is already taken`);
+        } else {
+          toast.error(error.message);
+        }
+      },
+    }),
+  );
 
   // 1. Define your form.
 

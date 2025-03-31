@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -16,7 +17,7 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 
 export default function PostDeleteDialog({
   isPostPage,
@@ -28,21 +29,25 @@ export default function PostDeleteDialog({
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const deletePost = trpc.post.deletePost.useMutation({
-    onMutate: () => {
-      dispatch({ type: ReducerAction.DELETE });
-    },
-    onSuccess: () => {
-      if (isPostPage) {
-        router.replace("/");
-      }
+  const trpc = useTRPC();
 
-      toast.success("Post deleted successfully.");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const deletePost = useMutation(
+    trpc.post.deletePost.mutationOptions({
+      onMutate: () => {
+        dispatch({ type: ReducerAction.DELETE });
+      },
+      onSuccess: () => {
+        if (isPostPage) {
+          router.replace("/");
+        }
+
+        toast.success("Post deleted successfully.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <AlertDialogContent

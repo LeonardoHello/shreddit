@@ -2,14 +2,20 @@
 
 import Image from "next/image";
 
-import { trpc } from "@/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { useTRPC } from "@/trpc/client";
 import userBanner from "@public/userBanner.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import UserNavigation from "./UserNavigation";
 import UserSidebar from "./UserSidebar";
 
 export default function UserHeader({ username }: { username: string }) {
-  const [user] = trpc.user.getUserByName.useSuspenseQuery(username);
+  const trpc = useTRPC();
+
+  const { data: user } = useSuspenseQuery(
+    trpc.user.getUserByName.queryOptions(username),
+  );
 
   return (
     <div className="flex flex-col rounded-lg border bg-card">

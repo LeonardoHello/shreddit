@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 
-import { getComments } from "@/api/getComment";
 import {
   comments,
   CommentSchema,
   usersToComments,
+  UserToComment,
   UserToCommentSchema,
 } from "@/db/schema/comments";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
@@ -13,7 +13,37 @@ export const commentRouter = createTRPCRouter({
   getComments: baseProcedure
     .input(CommentSchema.shape.postId)
     .query(({ input, ctx }) => {
-      return getComments.execute({ currentUserId: ctx.userId, postId: input });
+      return ctx.db.query.comments.findMany({
+        where: (comment, { eq }) => eq(comment.postId, input),
+        with: {
+          author: true,
+          post: { columns: { authorId: true } },
+        },
+        extras: (comment, { sql }) => ({
+          voteCount: sql<number>`
+              (
+                SELECT COALESCE(SUM(
+                  CASE 
+                    WHEN vote_status = 'upvoted' THEN 1
+                    WHEN vote_status = 'downvoted' THEN -1
+                    ELSE 0
+                  END
+                ), 0)
+                FROM users_to_comments
+                WHERE users_to_comments.comment_id = ${comment.id}
+              )
+            `.as("vote_count"),
+          voteStatus: sql<UserToComment["voteStatus"] | null>`
+            (
+              SELECT vote_status
+              FROM users_to_comments
+              WHERE users_to_comments.comment_id = ${comment.id}
+                AND users_to_comments.user_id = ${ctx.userId}
+            )
+          `.as("vote_status"),
+        }),
+        orderBy: (post, { desc }) => desc(post.createdAt),
+      });
     }),
   createComment: protectedProcedure
     .input(

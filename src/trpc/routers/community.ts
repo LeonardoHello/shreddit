@@ -4,31 +4,41 @@ import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
 import {
-  getJoinedCommunities,
-  getModeratedCommunities,
-  getMutedCommunities,
-  getMyCommunities,
-} from "@/api/getCommunities";
-import {
-  getCommunityByName,
-  getCommunityImage,
-  getSelectedCommunity,
-  getUserToCommunity,
-} from "@/api/getCommunity";
-import { searchCommunities } from "@/api/search";
-import {
   communities,
   CommunitySchema,
   usersToCommunities,
   UserToCommunitySchema,
 } from "@/db/schema/communities";
+import { monthAgo } from "@/utils/getLastMonthDate";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const communityRouter = createTRPCRouter({
   getCommunityByName: baseProcedure
     .input(CommunitySchema.shape.name)
-    .query(async ({ input }) => {
-      const data = await getCommunityByName.execute({ communityName: input });
+    .query(async ({ input, ctx }) => {
+      const data = await ctx.db.query.communities.findFirst({
+        where: (community, { eq }) => eq(community.name, input),
+        with: { moderator: true },
+        extras: (community, { sql }) => ({
+          memberCount: sql<number>`
+            (
+              SELECT COUNT(*) 
+              FROM users_to_communities 
+              WHERE users_to_communities.community_id = ${community.id} 
+                AND users_to_communities.joined = true
+            )
+          `.as("member_count"),
+          newMemberCount: sql<number>`
+            (
+              SELECT COUNT(*) 
+              FROM users_to_communities 
+              WHERE users_to_communities.community_id = ${community.id} 
+                AND users_to_communities.joined = true 
+                AND users_to_communities.joined_at > ${monthAgo}
+            )
+          `.as("new_member_count"),
+        }),
+      });
 
       if (!data)
         throw new TRPCError({
@@ -41,8 +51,11 @@ export const communityRouter = createTRPCRouter({
     }),
   getSelectedCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
-    .query(async ({ input }) => {
-      const data = await getSelectedCommunity.execute({ communityName: input });
+    .query(async ({ input, ctx }) => {
+      const data = await ctx.db.query.communities.findFirst({
+        where: (community, { eq }) => eq(community.name, input),
+        columns: { id: true, name: true, icon: true },
+      });
 
       if (!data)
         throw new TRPCError({
@@ -60,19 +73,46 @@ export const communityRouter = createTRPCRouter({
         limit: z.number().positive().optional(),
       }),
     )
-    .query(({ input }) => {
-      return searchCommunities.execute({
-        search: `%${input.search}%`,
+    .query(({ input, ctx }) => {
+      return ctx.db.query.communities.findMany({
         limit: input.limit,
+        where: (community, { ilike }) =>
+          ilike(community.name, `%${input.search}%`),
+        columns: { id: true, name: true, icon: true },
+        extras: (community, { sql }) => ({
+          memberCount: sql<number>`
+              (
+                SELECT COUNT(*) 
+                FROM users_to_communities 
+                WHERE users_to_communities.community_id = ${community.id} 
+                  AND users_to_communities.joined = true
+              )
+            `.as("member_count"),
+        }),
       });
     }),
   getUserToCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
     .query(async ({ input, ctx }) => {
-      const data = await getUserToCommunity.execute({
-        currentUserId: ctx.userId,
-        communityName: input,
+      const data = await ctx.db.query.usersToCommunities.findFirst({
+        where: (userToCommunity, { and, eq, exists }) =>
+          and(
+            eq(userToCommunity.userId, ctx.userId),
+            exists(
+              ctx.db
+                .select()
+                .from(communities)
+                .where(
+                  and(
+                    eq(communities.id, userToCommunity.communityId),
+                    eq(communities.name, input),
+                  ),
+                ),
+            ),
+          ),
+        columns: { favorited: true, muted: true, joined: true },
       });
+
       return (
         data ?? {
           muted: false,
@@ -83,36 +123,80 @@ export const communityRouter = createTRPCRouter({
     }),
   getCommunityImage: protectedProcedure
     .input(CommunitySchema.shape.name)
-    .query(({ input }) => {
-      return getCommunityImage.execute({ communityName: input });
+    .query(({ input, ctx }) => {
+      return ctx.db.query.communities.findFirst({
+        where: (community, { eq }) => eq(community.name, input),
+        columns: { icon: true },
+      });
     }),
   getMyCommunities: protectedProcedure.query(({ ctx }) => {
-    return getMyCommunities.execute({ currentUserId: ctx.userId });
+    return ctx.db.query.communities.findMany({
+      where: (community, { and, eq, exists }) =>
+        exists(
+          ctx.db
+            .select()
+            .from(usersToCommunities)
+            .where(
+              and(
+                eq(usersToCommunities.communityId, community.id),
+                eq(usersToCommunities.userId, ctx.userId),
+                eq(usersToCommunities.joined, true),
+              ),
+            ),
+        ),
+      columns: { id: true, name: true, icon: true },
+      extras: (community, { sql }) => ({
+        memberCount: sql<number>`
+          (
+            SELECT COUNT(*) 
+            FROM users_to_communities 
+            WHERE users_to_communities.community_id = ${community.id} 
+              AND users_to_communities.joined = true
+          )
+        `.as("member_count"),
+      }),
+    });
   }),
-  getRecentCommunities: baseProcedure
-    .input(
-      CommunitySchema.pick({
-        id: true,
-        name: true,
-        icon: true,
-      })
-        .array()
-        .nullable(),
-    )
-    .query(({ input }) => {
-      if (!input) {
-        return [];
-      }
-      return input;
-    }),
   getModeratedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getModeratedCommunities.execute({ currentUserId: ctx.userId });
+    return ctx.db.query.usersToCommunities.findMany({
+      where: (userToCommunity, { and, eq, exists }) =>
+        exists(
+          ctx.db
+            .select()
+            .from(communities)
+            .where(
+              and(
+                eq(communities.moderatorId, ctx.userId),
+                eq(communities.moderatorId, userToCommunity.userId),
+                eq(communities.id, userToCommunity.communityId),
+              ),
+            ),
+        ),
+      columns: { favorited: true },
+      with: { community: { columns: { id: true, name: true, icon: true } } },
+    });
   }),
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getJoinedCommunities.execute({ currentUserId: ctx.userId });
+    return ctx.db.query.usersToCommunities.findMany({
+      where: (userToCommunity, { and, eq }) =>
+        and(
+          eq(userToCommunity.userId, ctx.userId),
+          eq(userToCommunity.joined, true),
+        ),
+      columns: { favorited: true },
+      with: { community: { columns: { id: true, name: true, icon: true } } },
+    });
   }),
   getMutedCommunities: protectedProcedure.query(({ ctx }) => {
-    return getMutedCommunities.execute({ currentUserId: ctx.userId });
+    return ctx.db.query.usersToCommunities.findMany({
+      where: (userToCommunity, { and, eq }) =>
+        and(
+          eq(userToCommunity.userId, ctx.userId),
+          eq(userToCommunity.muted, true),
+        ),
+      columns: { favorited: true },
+      with: { community: { columns: { id: true, name: true, icon: true } } },
+    });
   }),
   editCommunity: protectedProcedure
     .input(

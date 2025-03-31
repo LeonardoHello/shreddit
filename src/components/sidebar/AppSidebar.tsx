@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { auth } from "@clerk/nextjs/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import {
   Sidebar,
@@ -9,7 +10,7 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { HydrateClient, trpc } from "@/trpc/server";
+import { getQueryClient, trpc } from "@/trpc/server";
 import { Accordion } from "../ui/accordion";
 import SidebarLogo from "./SidebarLogo";
 import SidebarNavJoined from "./SidebarNavJoined";
@@ -22,10 +23,18 @@ import SidebarNavSkeleton from "./SidebarNavSkeleton";
 export async function AppSidebar() {
   const { userId } = await auth();
 
+  const queryClient = getQueryClient();
+
   if (userId) {
-    void trpc.community.getModeratedCommunities.prefetch();
-    void trpc.community.getJoinedCommunities.prefetch();
-    void trpc.community.getMutedCommunities.prefetch();
+    void queryClient.prefetchQuery(
+      trpc.community.getModeratedCommunities.queryOptions(),
+    );
+    void queryClient.prefetchQuery(
+      trpc.community.getJoinedCommunities.queryOptions(),
+    );
+    void queryClient.prefetchQuery(
+      trpc.community.getMutedCommunities.queryOptions(),
+    );
   }
 
   return (
@@ -52,7 +61,7 @@ export async function AppSidebar() {
           <SidebarSeparator />
 
           {userId && (
-            <HydrateClient>
+            <HydrationBoundary state={dehydrate(queryClient)}>
               <Suspense
                 fallback={<SidebarNavSkeleton length={2} canFavorite />}
               >
@@ -76,7 +85,7 @@ export async function AppSidebar() {
               </Suspense>
 
               <SidebarSeparator />
-            </HydrateClient>
+            </HydrationBoundary>
           )}
         </Accordion>
       </SidebarContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { User } from "@clerk/nextjs/server";
+import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Bookmark,
@@ -29,7 +30,7 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 
@@ -43,81 +44,91 @@ export default function PostDropdown({
   const post = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const savePost = trpc.post.savePost.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_SAVE,
-        save: variables.saved,
-      });
-    },
-    onSuccess: (data) => {
-      if (data[0].saved) {
-        toast.success("Post saved successfully.");
-      } else {
-        toast.success("Post unsaved successfully.");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const trpc = useTRPC();
 
-  const hidePost = trpc.post.hidePost.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_HIDE,
-        hide: variables.hidden,
-      });
-    },
-    onSuccess: (data) => {
-      if (data[0].hidden) {
-        toast.success("Post hidden successfully.");
-      } else {
-        toast.success("Post unhidden successfully.");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const savePost = useMutation(
+    trpc.post.savePost.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_SAVE,
+          save: variables.saved,
+        });
+      },
+      onSuccess: (data) => {
+        if (data[0].saved) {
+          toast.success("Post saved successfully.");
+        } else {
+          toast.success("Post unsaved successfully.");
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
-  const setSpoiler = trpc.post.setPostSpoiler.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_SPOILER,
-        spoiler: variables.spoiler,
-      });
-    },
-    onSuccess: (data) => {
-      if (data[0].spoiler) {
-        toast.success("Post has been marked as spoiler");
-      } else {
-        toast.success("Post has been un-marked as a spoiler");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const hidePost = useMutation(
+    trpc.post.hidePost.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_HIDE,
+          hide: variables.hidden,
+        });
+      },
+      onSuccess: (data) => {
+        if (data[0].hidden) {
+          toast.success("Post hidden successfully.");
+        } else {
+          toast.success("Post unhidden successfully.");
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
-  const setNSFW = trpc.post.setPostNSFW.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_NSFW,
-        nsfw: variables.nsfw,
-      });
-    },
-    onSuccess: (data) => {
-      if (data[0].nsfw) {
-        toast.success("Post has been marked as spoiler");
-      } else {
-        toast.success("Post has been un-marked as a spoiler");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const setSpoiler = useMutation(
+    trpc.post.setPostSpoiler.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_SPOILER,
+          spoiler: variables.spoiler,
+        });
+      },
+      onSuccess: (data) => {
+        if (data[0].spoiler) {
+          toast.success("Post has been marked as spoiler");
+        } else {
+          toast.success("Post has been un-marked as a spoiler");
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const setNSFW = useMutation(
+    trpc.post.setPostNSFW.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_NSFW,
+          nsfw: variables.nsfw,
+        });
+      },
+      onSuccess: (data) => {
+        if (data[0].nsfw) {
+          toast.success("Post has been marked as spoiler");
+        } else {
+          toast.success("Post has been un-marked as a spoiler");
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <AlertDialog>

@@ -5,6 +5,7 @@ import Image from "next/image";
 
 import { useClerk } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
 import {
@@ -12,7 +13,7 @@ import {
   useRecentCommunityDispatchContext,
 } from "@/context/RecentCommunityContext";
 import useHydration from "@/hooks/useHydration";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -29,8 +30,11 @@ export default function CommunityHeader({
   currentUserId: User["id"] | null;
   communityName: string;
 }) {
-  const [community] =
-    trpc.community.getCommunityByName.useSuspenseQuery(communityName);
+  const trpc = useTRPC();
+
+  const { data: community } = useSuspenseQuery(
+    trpc.community.getCommunityByName.queryOptions(communityName),
+  );
 
   const dispatch = useRecentCommunityDispatchContext();
 

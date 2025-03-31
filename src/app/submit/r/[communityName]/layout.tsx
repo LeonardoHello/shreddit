@@ -1,6 +1,8 @@
 import React from "react";
 
-import { HydrateClient, trpc } from "@/trpc/server";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { getQueryClient, trpc } from "@/trpc/server";
 
 export default async function CommunitySubmitLayout(props: {
   children: React.ReactNode;
@@ -8,7 +10,15 @@ export default async function CommunitySubmitLayout(props: {
 }) {
   const params = await props.params;
 
-  void trpc.community.getSelectedCommunity.prefetch(params.communityName);
+  const queryClient = getQueryClient();
 
-  return <HydrateClient>{props.children}</HydrateClient>;
+  void queryClient.prefetchQuery(
+    trpc.community.getSelectedCommunity.queryOptions(params.communityName),
+  );
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      {props.children}
+    </HydrationBoundary>
+  );
 }

@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -11,7 +12,7 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { PostType } from "@/types/enums";
 import { Button } from "../ui/button";
 
@@ -20,8 +21,11 @@ export default function SubmitButton({
 }: {
   communityName: string;
 }) {
-  const [selectedCommunity] =
-    trpc.community.getSelectedCommunity.useSuspenseQuery(communityName);
+  const trpc = useTRPC();
+
+  const { data: selectedCommunity } = useSuspenseQuery(
+    trpc.community.getSelectedCommunity.queryOptions(communityName),
+  );
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -29,43 +33,47 @@ export default function SubmitButton({
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
-  const createPostText = trpc.post.createTextPost.useMutation({
-    onMutate: () => {
-      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
-    },
-    onSuccess: (data) => {
-      const post = data[0];
+  const createPostText = useMutation(
+    trpc.post.createTextPost.mutationOptions({
+      onMutate: () => {
+        dispatch({ type: ReducerAction.DISABLE_SUBMIT });
+      },
+      onSuccess: (data) => {
+        const post = data[0];
 
-      startTransition(() => {
-        router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
-      });
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSettled: () => {
-      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
-    },
-  });
+        startTransition(() => {
+          router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSettled: () => {
+        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+      },
+    }),
+  );
 
-  const createPostImage = trpc.post.createImagePost.useMutation({
-    onMutate: () => {
-      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
-    },
-    onSuccess: (data) => {
-      const post = data[0][0];
+  const createPostImage = useMutation(
+    trpc.post.createImagePost.mutationOptions({
+      onMutate: () => {
+        dispatch({ type: ReducerAction.DISABLE_SUBMIT });
+      },
+      onSuccess: (data) => {
+        const post = data[0][0];
 
-      startTransition(() => {
-        router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
-      });
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSettled: () => {
-      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
-    },
-  });
+        startTransition(() => {
+          router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSettled: () => {
+        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+      },
+    }),
+  );
 
   const isMutating =
     isPending || createPostText.isPending || createPostImage.isPending;

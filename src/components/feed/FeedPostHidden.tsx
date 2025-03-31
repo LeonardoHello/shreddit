@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -5,30 +6,34 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 
 export default function FeedPostHidden() {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const hidePost = trpc.post.hidePost.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_HIDE,
-        hide: variables.hidden,
-      });
-    },
-    onSuccess: (data) => {
-      if (data[0].hidden) {
-        toast.success("Post hidden successfully.");
-      } else {
-        toast.success("Post unhidden successfully.");
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const trpc = useTRPC();
+
+  const hidePost = useMutation(
+    trpc.post.hidePost.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_HIDE,
+          hide: variables.hidden,
+        });
+      },
+      onSuccess: (data) => {
+        if (data[0].hidden) {
+          toast.success("Post hidden successfully.");
+        } else {
+          toast.success("Post unhidden successfully.");
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <div className="flex h-20 items-center justify-between gap-3 rounded border bg-card p-4 hover:border-ring/50">

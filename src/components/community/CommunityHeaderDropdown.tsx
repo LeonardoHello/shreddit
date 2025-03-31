@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Ellipsis, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -12,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Community } from "@/db/schema/communities";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
@@ -28,84 +33,108 @@ export default function CommunityHeaderDropdown({
   communityName: string;
   isCommunityModerator: boolean;
 }) {
-  const [userToCommunity] =
-    trpc.community.getUserToCommunity.useSuspenseQuery(communityName);
+  const trpc = useTRPC();
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
-  const joinCommunity = trpc.community.toggleJoinCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getUserToCommunity.setData(communityName, (updater) => {
-        if (!updater) {
-          return { ...userToCommunity, joined: variables.joined };
+  const { data: userToCommunity } = useSuspenseQuery(
+    trpc.community.getUserToCommunity.queryOptions(communityName),
+  );
+
+  const userToCommunityQueryKey =
+    trpc.community.getUserToCommunity.queryKey(communityName);
+  const communityByNameQueryKey =
+    trpc.community.getCommunityByName.queryKey(communityName);
+  const moderatedCommunitiesQueryKey =
+    trpc.community.getModeratedCommunities.queryKey();
+  const joinedCommunitiesQueryKey =
+    trpc.community.getJoinedCommunities.queryKey();
+  const mutedCommunitiesQueryKey =
+    trpc.community.getMutedCommunities.queryKey();
+
+  const joinCommunity = useMutation(
+    trpc.community.toggleJoinCommunity.mutationOptions({
+      onMutate: (variables) => {
+        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+          if (!updater) {
+            return { ...userToCommunity, joined: variables.joined };
+          }
+
+          return { ...updater, joined: variables.joined };
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: [communityByNameQueryKey, joinedCommunitiesQueryKey],
+        });
+
+        if (data[0].joined) {
+          toast.success(`Joined r/${communityName}`);
+        } else {
+          toast.success(`Left r/${communityName}`);
         }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
-        return { ...updater, joined: variables.joined };
-      });
-    },
-    onSuccess: (data) => {
-      utils.community.getCommunityByName.invalidate(communityName);
-      utils.community.getJoinedCommunities.invalidate();
+  const favoriteCommunity = useMutation(
+    trpc.community.toggleFavoriteCommunity.mutationOptions({
+      onMutate: (variables) => {
+        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+          if (!updater) {
+            return { ...userToCommunity, favorited: variables.favorited };
+          }
 
-      if (data[0].joined) {
-        toast.success(`Joined r/${communityName}`);
-      } else {
-        toast.success(`Left r/${communityName}`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+          return { ...updater, favorited: variables.favorited };
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: [moderatedCommunitiesQueryKey, joinedCommunitiesQueryKey],
+        });
 
-  const favoriteCommunity = trpc.community.toggleFavoriteCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getUserToCommunity.setData(communityName, (updater) => {
-        if (!updater) {
-          return { ...userToCommunity, favorited: variables.favorited };
+        if (data[0].favorited) {
+          toast.success(`Added r/${communityName} to favorites.`);
+        } else {
+          toast.success(`Removed r/${communityName} from favorites.`);
         }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
-        return { ...updater, favorited: variables.favorited };
-      });
-    },
-    onSuccess: (data) => {
-      utils.community.getJoinedCommunities.invalidate();
-      utils.community.getModeratedCommunities.invalidate();
+  const muteCommunity = useMutation(
+    trpc.community.toggleMuteCommunity.mutationOptions({
+      onMutate: (variables) => {
+        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+          if (!updater) {
+            return { ...userToCommunity, muted: variables.muted };
+          }
 
-      if (data[0].favorited) {
-        toast.success(`Added r/${communityName} to favorites.`);
-      } else {
-        toast.success(`Removed r/${communityName} from favorites.`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+          return { ...updater, muted: variables.muted };
+        });
+      },
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({
+          queryKey: [mutedCommunitiesQueryKey],
+        });
 
-  const muteCommunity = trpc.community.toggleMuteCommunity.useMutation({
-    onMutate: (variables) => {
-      utils.community.getUserToCommunity.setData(communityName, (updater) => {
-        if (!updater) {
-          return { ...userToCommunity, muted: variables.muted };
+        if (data[0].muted) {
+          toast.success(`Muted r/${communityName}.`);
+        } else {
+          toast.success(`Unmuted r/${communityName}.`);
         }
-
-        return { ...updater, muted: variables.muted };
-      });
-    },
-    onSuccess: (data) => {
-      utils.community.getMutedCommunities.invalidate();
-
-      if (data[0].muted) {
-        toast.success(`Muted r/${communityName}.`);
-      } else {
-        toast.success(`Unmuted r/${communityName}.`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <div className="flex items-center gap-3">

@@ -4,6 +4,12 @@ import { memo, useState } from "react";
 import Link from "next/link";
 
 import {
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -11,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
@@ -23,11 +29,19 @@ export default function SubmitCommunity({
 }: {
   children: React.ReactNode;
 }) {
-  const [myCommunities] = trpc.community.getMyCommunities.useSuspenseQuery();
-
   const [searchValue, setSearchValue] = useState("");
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
+
+  const { data: myCommunities } = useSuspenseQuery(
+    trpc.community.getMyCommunities.queryOptions(),
+  );
+
+  const searchCommunitiesQueryKey = trpc.community.searchCommunities.queryKey({
+    search: searchValue,
+    limit,
+  });
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
@@ -36,10 +50,7 @@ export default function SubmitCommunity({
       "",
     );
 
-    utils.community.searchCommunities.cancel({
-      search: searchValue,
-      limit,
-    });
+    queryClient.cancelQueries({ queryKey: searchCommunitiesQueryKey });
 
     setSearchValue(searchedValue);
   };
@@ -108,8 +119,14 @@ export default function SubmitCommunity({
 
 const SubmitCommunityDropdown = memo(
   ({ searchValue }: { searchValue: string }) => {
-    const { data: searchedCommunities, isLoading } =
-      trpc.community.searchCommunities.useQuery({ search: searchValue, limit });
+    const trpc = useTRPC();
+
+    const { data: searchedCommunities, isLoading } = useQuery(
+      trpc.community.searchCommunities.queryOptions({
+        search: searchValue,
+        limit,
+      }),
+    );
 
     return (
       <>

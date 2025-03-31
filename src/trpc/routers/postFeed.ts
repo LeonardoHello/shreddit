@@ -1,56 +1,9 @@
 import { z } from "zod";
 
-import {
-  getAllBestPosts,
-  getAllControversialPosts,
-  getAllHotPosts,
-  getAllNewPosts,
-} from "@/api/getPosts/getAllPosts";
-import {
-  getCommunityBestPosts,
-  getCommunityControversialPosts,
-  getCommunityHotPosts,
-  getCommunityNewPosts,
-} from "@/api/getPosts/getCommunityPosts";
-import {
-  getDownvotedBestPosts,
-  getDownvotedControversialPosts,
-  getDownvotedHotPosts,
-  getDownvotedNewPosts,
-} from "@/api/getPosts/getDownvotedPosts";
-import {
-  getHiddenBestPosts,
-  getHiddenControversialPosts,
-  getHiddenHotPosts,
-  getHiddenNewPosts,
-} from "@/api/getPosts/getHiddenPosts";
-import {
-  getHomeBestPosts,
-  getHomeControversialPosts,
-  getHomeHotPosts,
-  getHomeNewPosts,
-} from "@/api/getPosts/getHomePosts";
-import {
-  getSavedBestPosts,
-  getSavedControversialPosts,
-  getSavedHotPosts,
-  getSavedNewPosts,
-} from "@/api/getPosts/getSavedPosts";
-import {
-  getUpvotedBestPosts,
-  getUpvotedControversialPosts,
-  getUpvotedHotPosts,
-  getUpvotedNewPosts,
-} from "@/api/getPosts/getUpvotedPosts";
-import {
-  getUserBestPosts,
-  getUserControversialPosts,
-  getUserHotPosts,
-  getUserNewPosts,
-} from "@/api/getPosts/getUserPosts";
 import { CommunitySchema } from "@/db/schema/communities";
 import { UserSchema } from "@/db/schema/users";
 import { PostSort } from "@/types/enums";
+import { postFeedQuery } from "@/utils/postFeedQuery";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const postFeedRouter = createTRPCRouter({
@@ -64,15 +17,14 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getAllHotPosts,
-        [PostSort.NEW]: getAllNewPosts,
-        [PostSort.CONTROVERSIAL]: getAllControversialPosts,
-        [PostSort.BEST]: getAllBestPosts,
-      };
+      const allPosts = postFeedQuery("all");
 
-      // Get the appropriate query function or default to BEST
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: allPosts(PostSort.BEST),
+        [PostSort.HOT]: allPosts(PostSort.HOT),
+        [PostSort.NEW]: allPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: allPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -94,14 +46,14 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getHomeHotPosts,
-        [PostSort.NEW]: getHomeNewPosts,
-        [PostSort.CONTROVERSIAL]: getHomeControversialPosts,
-        [PostSort.BEST]: getHomeBestPosts,
-      };
+      const homePosts = postFeedQuery("home");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: homePosts(PostSort.BEST),
+        [PostSort.HOT]: homePosts(PostSort.HOT),
+        [PostSort.NEW]: homePosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: homePosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -124,14 +76,14 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getCommunityHotPosts,
-        [PostSort.NEW]: getCommunityNewPosts,
-        [PostSort.CONTROVERSIAL]: getCommunityControversialPosts,
-        [PostSort.BEST]: getCommunityBestPosts,
-      };
+      const communityPosts = postFeedQuery("community");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: communityPosts(PostSort.BEST),
+        [PostSort.HOT]: communityPosts(PostSort.HOT),
+        [PostSort.NEW]: communityPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: communityPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -154,16 +106,15 @@ export const postFeedRouter = createTRPCRouter({
         username: UserSchema.shape.username,
       }),
     )
-
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getUserHotPosts,
-        [PostSort.NEW]: getUserNewPosts,
-        [PostSort.CONTROVERSIAL]: getUserControversialPosts,
-        [PostSort.BEST]: getUserBestPosts,
-      };
+      const userPosts = postFeedQuery("user");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: userPosts(PostSort.BEST),
+        [PostSort.HOT]: userPosts(PostSort.HOT),
+        [PostSort.NEW]: userPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: userPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -186,16 +137,15 @@ export const postFeedRouter = createTRPCRouter({
         username: UserSchema.shape.username,
       }),
     )
-
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getUpvotedHotPosts,
-        [PostSort.NEW]: getUpvotedNewPosts,
-        [PostSort.CONTROVERSIAL]: getUpvotedControversialPosts,
-        [PostSort.BEST]: getUpvotedBestPosts,
-      };
+      const upvotedPosts = postFeedQuery("upvoted");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: upvotedPosts(PostSort.BEST),
+        [PostSort.HOT]: upvotedPosts(PostSort.HOT),
+        [PostSort.NEW]: upvotedPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: upvotedPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -218,16 +168,15 @@ export const postFeedRouter = createTRPCRouter({
         username: UserSchema.shape.username,
       }),
     )
-
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getDownvotedHotPosts,
-        [PostSort.NEW]: getDownvotedNewPosts,
-        [PostSort.CONTROVERSIAL]: getDownvotedControversialPosts,
-        [PostSort.BEST]: getDownvotedBestPosts,
-      };
+      const downvotedPosts = postFeedQuery("downvoted");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: downvotedPosts(PostSort.BEST),
+        [PostSort.HOT]: downvotedPosts(PostSort.HOT),
+        [PostSort.NEW]: downvotedPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: downvotedPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -251,14 +200,14 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getSavedHotPosts,
-        [PostSort.NEW]: getSavedNewPosts,
-        [PostSort.CONTROVERSIAL]: getSavedControversialPosts,
-        [PostSort.BEST]: getSavedBestPosts,
-      };
+      const savedPosts = postFeedQuery("saved");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: savedPosts(PostSort.BEST),
+        [PostSort.HOT]: savedPosts(PostSort.HOT),
+        [PostSort.NEW]: savedPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: savedPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,
@@ -282,14 +231,14 @@ export const postFeedRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const sortQueries = {
-        [PostSort.HOT]: getHiddenHotPosts,
-        [PostSort.NEW]: getHiddenNewPosts,
-        [PostSort.CONTROVERSIAL]: getHiddenControversialPosts,
-        [PostSort.BEST]: getHiddenBestPosts,
-      };
+      const hiddenPosts = postFeedQuery("hidden");
 
-      const queryFn = sortQueries[input.sort];
+      const queryFn = {
+        [PostSort.BEST]: hiddenPosts(PostSort.BEST),
+        [PostSort.HOT]: hiddenPosts(PostSort.HOT),
+        [PostSort.NEW]: hiddenPosts(PostSort.NEW),
+        [PostSort.CONTROVERSIAL]: hiddenPosts(PostSort.CONTROVERSIAL),
+      }[input.sort];
 
       const posts = await queryFn.execute({
         currentUserId: ctx.userId,

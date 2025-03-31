@@ -1,9 +1,10 @@
 "use client";
 
 import { User } from "@clerk/nextjs/server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import CommentContextProvider from "@/context/CommentContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import Comment from "./Comment";
 import CommentSectionEmpty from "./CommentSectionEmpty";
 import CommentThread from "./CommentThread";
@@ -15,7 +16,11 @@ export default function CommentSection({
   currentUserId: User["id"] | null;
   postId: string;
 }) {
-  const [commentTree] = trpc.comment.getComments.useSuspenseQuery(postId);
+  const trpc = useTRPC();
+
+  const { data: commentTree } = useSuspenseQuery(
+    trpc.comment.getComments.queryOptions(postId),
+  );
 
   if (commentTree.length === 0) return <CommentSectionEmpty />;
 

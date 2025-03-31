@@ -3,9 +3,10 @@
 import { notFound } from "next/navigation";
 
 import { User } from "@clerk/nextjs/server";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import PostContextProvider from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import PostBody from "./PostBody";
 import PostFooter from "./PostFooter";
 import PostHeader from "./PostHeader";
@@ -17,7 +18,11 @@ export default function Post({
   currentUserId: User["id"] | null;
   postId: string;
 }) {
-  const [post] = trpc.post.getPost.useSuspenseQuery(postId);
+  const trpc = useTRPC();
+
+  const { data: post } = useSuspenseQuery(
+    trpc.post.getPost.queryOptions(postId),
+  );
 
   if (!post) notFound();
 

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 
+import { useMutation } from "@tanstack/react-query";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
@@ -17,7 +18,7 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { useUploadThing } from "@/utils/uploadthing";
@@ -75,21 +76,25 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const editPost = trpc.post.editPost.useMutation({
-    onMutate: () => {
-      dispatch({
-        type: ReducerAction.SET_TEXT,
-        text: prettifyHTML(editor.getHTML()),
-      });
-      dispatch({ type: ReducerAction.CANCEL_EDIT });
-    },
-    onSuccess: () => {
-      toast.success("Post successfully edited.");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const trpc = useTRPC();
+
+  const editPost = useMutation(
+    trpc.post.editPost.mutationOptions({
+      onMutate: () => {
+        dispatch({
+          type: ReducerAction.SET_TEXT,
+          text: prettifyHTML(editor.getHTML()),
+        });
+        dispatch({ type: ReducerAction.CANCEL_EDIT });
+      },
+      onSuccess: () => {
+        toast.success("Post successfully edited.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const isDisabled = editPost.isPending || state.isDisabled;
 

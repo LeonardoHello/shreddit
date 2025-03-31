@@ -1,8 +1,9 @@
 "use client";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 
 export default function SubmitCommunitySelected({
@@ -10,8 +11,11 @@ export default function SubmitCommunitySelected({
 }: {
   communityName: string;
 }) {
-  const [selectedCommunity] =
-    trpc.community.getSelectedCommunity.useSuspenseQuery(communityName);
+  const trpc = useTRPC();
+
+  const { data: selectedCommunity } = useSuspenseQuery(
+    trpc.community.getSelectedCommunity.queryOptions(communityName),
+  );
 
   if (!selectedCommunity)
     throw new Error("There was a problem with a community selection.");

@@ -2,6 +2,7 @@
 
 import { useClerk } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
+import { useMutation } from "@tanstack/react-query";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,7 +11,7 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 
@@ -24,17 +25,21 @@ export default function CommentVote({
 
   const clerk = useClerk();
 
-  const voteComment = trpc.comment.voteComment.useMutation({
-    onMutate: (variables) => {
-      dispatch({
-        type: ReducerAction.SET_VOTE,
-        vote: variables.voteStatus,
-      });
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const trpc = useTRPC();
+
+  const voteComment = useMutation(
+    trpc.comment.voteComment.mutationOptions({
+      onMutate: (variables) => {
+        dispatch({
+          type: ReducerAction.SET_VOTE,
+          vote: variables.voteStatus,
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const isUpvoted = state.voteStatus === "upvoted";
   const isDownvoted = state.voteStatus === "downvoted";

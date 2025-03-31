@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -15,7 +16,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Post } from "@/db/schema/posts";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
@@ -68,31 +69,36 @@ function ActionButtons({
 }) {
   const [isPending, startTransition] = useTransition();
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-  const createComment = trpc.comment.createComment.useMutation({
-    onMutate: () => {
-      editor.setEditable(false);
-    },
-    onSuccess: () => {
-      startTransition(async () => {
-        await Promise.all([
-          utils.post.getPost.invalidate(postId),
-          utils.comment.getComments.invalidate(postId),
-        ]);
-      });
+  const getPostQueryKey = trpc.post.getPost.queryKey(postId);
+  const getCommentsQueryKey = trpc.comment.getComments.queryKey(postId);
 
-      editor.commands.clearContent();
+  const createComment = useMutation(
+    trpc.comment.createComment.mutationOptions({
+      onMutate: () => {
+        editor.setEditable(false);
+      },
+      onSuccess: () => {
+        startTransition(() => {
+          queryClient.invalidateQueries({
+            queryKey: [getPostQueryKey, getCommentsQueryKey],
+          });
+        });
 
-      toast.success("Comment successfully posted.");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-    onSettled: () => {
-      editor.setEditable(true);
-    },
-  });
+        editor.commands.clearContent();
+
+        toast.success("Comment successfully posted.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSettled: () => {
+        editor.setEditable(true);
+      },
+    }),
+  );
 
   const isMutating = isPending || createComment.isPending;
 

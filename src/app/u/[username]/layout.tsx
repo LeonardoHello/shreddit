@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
 import UserHeader from "@/components/user/UserHeader";
 import UserHeaderSkeleton from "@/components/user/UserHeaderSkeleton";
 import UserSidebar from "@/components/user/UserSidebar";
 import UserSidebarSkeleton from "@/components/user/UserSidebarSkeleton";
-import { HydrateClient, trpc } from "@/trpc/server";
+import { getQueryClient, trpc } from "@/trpc/server";
 
 export default async function UserLayout(props: {
   children: React.ReactNode;
@@ -12,11 +14,15 @@ export default async function UserLayout(props: {
 }) {
   const params = await props.params;
 
-  void trpc.user.getUserByName.prefetch(params.username);
+  const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery(
+    trpc.user.getUserByName.queryOptions(params.username),
+  );
 
   return (
     <div className="container flex grow flex-col gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
-      <HydrateClient>
+      <HydrationBoundary state={dehydrate(queryClient)}>
         <div className="order-2 flex justify-center gap-4">
           {props.children}
 
@@ -28,7 +34,7 @@ export default async function UserLayout(props: {
         <Suspense fallback={<UserHeaderSkeleton />}>
           <UserHeader username={params.username} />
         </Suspense>
-      </HydrateClient>
+      </HydrationBoundary>
     </div>
   );
 }

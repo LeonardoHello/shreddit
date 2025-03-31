@@ -2,9 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+
 import PostContextProvider from "@/context/PostContext";
 import type { User } from "@/db/schema/users";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { AppRouter, RouterInput } from "@/trpc/routers/_app";
 import FeedEmpty from "./FeedEmpty";
 import FeedPost from "./FeedPost";
@@ -31,11 +33,27 @@ export default function FeedPostInfiniteQuery({
 
   const { procedure, input } = infiniteQueryOptions;
 
-  const [{ pages }, { isFetchingNextPage, fetchNextPage, hasNextPage }] =
-    // @ts-expect-error - typesafety is assured in the component importing this
-    trpc.postFeed[procedure].useSuspenseInfiniteQuery(input, {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    });
+  const trpc = useTRPC();
+
+  // not all procedures are using the same QueryOptions
+  const {
+    data: { pages },
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useSuspenseInfiniteQuery(
+    procedure === "getAllPosts" || procedure === "getHomePosts"
+      ? trpc.postFeed[procedure].infiniteQueryOptions(input, {
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        })
+      : procedure === "getCommunityPosts"
+        ? trpc.postFeed[procedure].infiniteQueryOptions(input, {
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
+          })
+        : trpc.postFeed[procedure].infiniteQueryOptions(input, {
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
+          }),
+  );
 
   useEffect(() => {
     if (!ref.current || !hasNextPage || isFetchingNextPage) return;

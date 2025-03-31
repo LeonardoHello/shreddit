@@ -4,12 +4,13 @@ import { memo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 
 import useDropdown from "@/hooks/useDropdown";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -24,7 +25,11 @@ export function Search() {
 
   const { ref: dropdownRef, isOpen, setIsOpen } = useDropdown(ref);
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
+
+  const searchCommunitiesQueryKey = trpc.community.searchCommunities.queryKey();
+  const searchUsersQueryKey = trpc.user.searchUsers.queryKey();
 
   const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
@@ -33,10 +38,9 @@ export function Search() {
       "",
     );
 
-    await Promise.all([
-      utils.community.searchCommunities.cancel(),
-      utils.user.searchUsers.cancel(),
-    ]);
+    queryClient.cancelQueries({
+      queryKey: [searchCommunitiesQueryKey, searchUsersQueryKey],
+    });
 
     setSearchedValue(searchedValue);
   };
@@ -87,13 +91,18 @@ const SearchDropdown = memo(
     searchedValue: string;
     closeDropdown: () => void;
   }) => {
+    const trpc = useTRPC();
+
     const { data: searchedCommunities, isLoading: isLoadingCommunities } =
-      trpc.community.searchCommunities.useQuery({
-        search: searchedValue,
-        limit,
-      });
-    const { data: searchedUsers, isLoading: isLoadingUsers } =
-      trpc.user.searchUsers.useQuery(searchedValue);
+      useQuery(
+        trpc.community.searchCommunities.queryOptions({
+          search: searchedValue,
+          limit,
+        }),
+      );
+    const { data: searchedUsers, isLoading: isLoadingUsers } = useQuery(
+      trpc.user.searchUsers.queryOptions(searchedValue),
+    );
 
     const isLoading = isLoadingCommunities || isLoadingUsers;
 

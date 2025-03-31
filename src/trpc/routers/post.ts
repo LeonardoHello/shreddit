@@ -3,13 +3,13 @@ import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
-import { getPostById } from "@/api/getPost";
 import {
   postFiles,
   PostFileSchema,
   posts,
   PostSchema,
   usersToPosts,
+  UserToPost,
   UserToPostSchema,
 } from "@/db/schema/posts";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
@@ -18,9 +18,69 @@ export const postRouter = createTRPCRouter({
   getPost: baseProcedure
     .input(PostSchema.shape.id)
     .query(async ({ input, ctx }) => {
-      const post = await getPostById.execute({
-        currentUserId: ctx.userId,
-        postId: input,
+      const post = await ctx.db.query.posts.findFirst({
+        where: (post, { eq }) => eq(post.id, input),
+        with: {
+          community: { columns: { name: true, icon: true } },
+          author: { columns: { username: true, imageUrl: true } },
+          files: {
+            columns: { id: true, name: true, url: true, thumbHash: true },
+          },
+        },
+        extras: (post, { sql }) => ({
+          voteCount: sql<number>`
+            (
+              SELECT COALESCE(SUM(
+                CASE 
+                  WHEN vote_status = 'upvoted' THEN 1
+                  WHEN vote_status = 'downvoted' THEN -1
+                  ELSE 0
+                END
+              ), 0)
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+            )
+          `.as("vote_count"),
+          commentCount: sql<number>`
+            (
+              SELECT COUNT(*)
+              FROM comments
+              WHERE comments.post_id = ${post.id}
+            )
+          `.as("comment_count"),
+          isSaved: sql<UserToPost["saved"] | null>`
+            (
+              SELECT saved
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+            )
+          `.as("is_saved"),
+          isHidden: sql<UserToPost["hidden"] | null>`
+            (
+              SELECT hidden
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+            )
+          `.as("is_hidden"),
+          voteStatus: sql<UserToPost["voteStatus"] | null>`
+            (
+              SELECT vote_status
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+            )
+          `.as("vote_status"),
+          userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
+            (
+              SELECT updated_at
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+            )
+          `.as("user_to_post_updated_at"),
+        }),
       });
 
       if (!post)

@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -12,24 +13,31 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCommentContext } from "@/context/CommentContext";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 
 export default function CommentDeleteDialog() {
   const state = useCommentContext();
 
-  const utils = trpc.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const deleteComment = trpc.comment.deleteComment.useMutation({
-    onSuccess: () => {
-      utils.post.getPost.invalidate(state.postId);
-      utils.comment.getComments.invalidate(state.postId);
+  const postQueryKey = trpc.post.getPost.queryKey(state.postId);
+  const commentsQueryKey = trpc.comment.getComments.queryKey(state.postId);
 
-      toast.success("Comment deleted successfully.");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const deleteComment = useMutation(
+    trpc.comment.deleteComment.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: [postQueryKey, commentsQueryKey],
+        });
+
+        toast.success("Comment deleted successfully.");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   return (
     <AlertDialogContent>

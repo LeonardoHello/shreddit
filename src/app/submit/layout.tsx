@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
-import { HydrateClient, trpc } from "@/trpc/server";
+import { getQueryClient, trpc } from "@/trpc/server";
 import logo from "@public/logo.svg";
 
 export default async function SubmitLayout({
@@ -12,7 +14,11 @@ export default async function SubmitLayout({
 }: {
   children: React.ReactNode;
 }) {
-  void trpc.community.getMyCommunities.prefetch();
+  const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery(
+    trpc.community.getMyCommunities.queryOptions(),
+  );
 
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
@@ -21,7 +27,9 @@ export default async function SubmitLayout({
 
         <div className="flex flex-col gap-2">
           <SubmitContextProvider>
-            <HydrateClient>{children}</HydrateClient>
+            <HydrationBoundary state={dehydrate(queryClient)}>
+              {children}
+            </HydrationBoundary>
             <SubmitForm />
           </SubmitContextProvider>
 

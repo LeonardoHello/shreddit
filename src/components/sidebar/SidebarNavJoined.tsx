@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import { toast } from "sonner";
 
@@ -15,7 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import {
@@ -25,42 +30,51 @@ import {
 } from "../ui/accordion";
 
 export default function SidebarNavJoined() {
-  const [joinedCommunities] =
-    trpc.community.getJoinedCommunities.useSuspenseQuery();
+  const queryClient = useQueryClient();
+  const trpc = useTRPC();
 
-  const utils = trpc.useUtils();
+  const { data: joinedCommunities } = useSuspenseQuery(
+    trpc.community.getJoinedCommunities.queryOptions(),
+  );
 
-  const toggleFavorite = trpc.community.toggleFavoriteCommunity.useMutation({
-    onMutate: (variables) => {
-      const { communityId, favorited } = variables;
+  const moderatedCommunitiesQueryKey =
+    trpc.community.getModeratedCommunities.queryKey();
+  const joinedCommunitiesQueryKey =
+    trpc.community.getJoinedCommunities.queryKey();
 
-      utils.community.getModeratedCommunities.setData(undefined, (updater) => {
-        if (!updater) {
-          return [];
-        }
+  const toggleFavorite = useMutation(
+    trpc.community.toggleFavoriteCommunity.mutationOptions({
+      onMutate: (variables) => {
+        const { communityId, favorited } = variables;
 
-        return updater.map((_userToCommunity) => {
-          if (communityId !== _userToCommunity.community.id)
-            return _userToCommunity;
+        queryClient.setQueryData(moderatedCommunitiesQueryKey, (updater) => {
+          if (!updater) {
+            return [];
+          }
 
-          return { ..._userToCommunity, favorited };
+          return updater.map((_userToCommunity) => {
+            if (communityId !== _userToCommunity.community.id)
+              return _userToCommunity;
+
+            return { ..._userToCommunity, favorited };
+          });
         });
-      });
 
-      utils.community.getJoinedCommunities.setData(undefined, (updater) => {
-        if (!updater) {
-          return [];
-        }
+        queryClient.setQueryData(joinedCommunitiesQueryKey, (updater) => {
+          if (!updater) {
+            return [];
+          }
 
-        return updater.map((_userToCommunity) => {
-          if (communityId !== _userToCommunity.community.id)
-            return _userToCommunity;
+          return updater.map((_userToCommunity) => {
+            if (communityId !== _userToCommunity.community.id)
+              return _userToCommunity;
 
-          return { ..._userToCommunity, favorited };
+            return { ..._userToCommunity, favorited };
+          });
         });
-      });
-    },
-  });
+      },
+    }),
+  );
 
   const { setOpenMobile, isMobile } = useSidebar();
 
@@ -112,9 +126,14 @@ export default function SidebarNavJoined() {
                           },
                           {
                             onSuccess: () => {
-                              utils.community.getUserToCommunity.invalidate(
-                                userToCommunity.community.name,
-                              );
+                              const userToCommunityQueryKey =
+                                trpc.community.getUserToCommunity.queryKey(
+                                  userToCommunity.community.name,
+                                );
+
+                              queryClient.invalidateQueries({
+                                queryKey: userToCommunityQueryKey,
+                              });
                             },
                             onError: (error) => {
                               toast.error(error.message);

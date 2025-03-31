@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { z } from "zod";
 
-import { HydrateClient, trpc } from "@/trpc/server";
+import { getQueryClient, trpc } from "@/trpc/server";
 
 export default async function PostLayout(props: {
   children: React.ReactNode;
@@ -14,8 +15,16 @@ export default async function PostLayout(props: {
 
   if (!success) notFound();
 
-  void trpc.post.getPost.prefetch(params.postId);
-  void trpc.comment.getComments.prefetch(params.postId);
+  const queryClient = getQueryClient();
 
-  return <HydrateClient>{props.children}</HydrateClient>;
+  void queryClient.prefetchQuery(trpc.post.getPost.queryOptions(params.postId));
+  void queryClient.prefetchQuery(
+    trpc.comment.getComments.queryOptions(params.postId),
+  );
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      {props.children}
+    </HydrationBoundary>
+  );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { onion } from "@lucide/lab";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Cake, Icon, Info } from "lucide-react";
 
 import {
@@ -13,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { trpc } from "@/trpc/client";
+import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -63,7 +64,11 @@ export default function UserSidebar({
 }
 
 function UserSidebarContent({ username }: { username: string }) {
-  const [user] = trpc.user.getUserByName.useSuspenseQuery(username);
+  const trpc = useTRPC();
+
+  const { data: user } = useSuspenseQuery(
+    trpc.user.getUserByName.queryOptions(username),
+  );
 
   return (
     <>
