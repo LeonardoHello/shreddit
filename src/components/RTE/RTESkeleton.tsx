@@ -28,7 +28,7 @@ export default function RTESkeleton({
       <RTEButtons />
 
       <div
-        className="prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-4 py-2 focus:outline-none"
+        className="prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-4 py-2 focus:outline-hidden"
         dangerouslySetInnerHTML={{ __html: content ?? "" }}
       />
 

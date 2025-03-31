@@ -51,7 +51,7 @@ export default function RootLayout({
         variables: { colorPrimary: "#f43f5e" },
       }}
     >
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" suppressHydrationWarning className="dark">
         <body className={`${reddit_sans.className} antialiased`}>
           <TRPCReactProvider>
             <NextSSRPlugin

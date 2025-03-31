@@ -27,7 +27,7 @@ export default function PostBodyText() {
         className="prose prose-sm prose-zinc prose-invert max-w-none break-words"
         dangerouslySetInnerHTML={{ __html: state.text ?? "" }}
       />
-      <div className="absolute top-0 h-full w-full bg-gradient-to-b from-transparent to-zinc-900" />
+      <div className="absolute top-0 h-full w-full bg-linear-to-b from-transparent to-zinc-900" />
     </div>
   );
 }

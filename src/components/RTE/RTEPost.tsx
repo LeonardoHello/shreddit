@@ -50,7 +50,7 @@ export default function RTEPost() {
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none py-2 px-4 focus:outline-hidden",
       },
     },
     onUpdate: ({ editor }) => {

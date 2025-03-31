@@ -40,7 +40,7 @@ export default function RTECommentEdit() {
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-none",
+          "prose prose-sm prose-zinc prose-invert min-h-[8rem] max-w-none px-5 py-2 focus:outline-hidden",
       },
     },
   });
