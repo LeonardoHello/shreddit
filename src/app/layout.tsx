@@ -21,6 +21,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+export const preferredRegion = ["fra1"];
+
 const reddit_sans = Reddit_Sans({
   subsets: ["latin"],
   display: "swap",

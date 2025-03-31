@@ -2,6 +2,7 @@ import { UTApi } from "uploadthing/server";
 
 import db from "@/db";
 
+export const preferredRegion = ["fra1"];
 export const runtime = "edge";
 
 // TODO: Add cron job to delete files from uploadthing that are not in the database
