@@ -46,7 +46,7 @@ export default function PostVote({
 
   return (
     <div
-      className={cn("flex items-center rounded-full bg-secondary", {
+      className={cn("bg-secondary flex items-center rounded-full", {
         "bg-rose-600": isUpvoted,
         "bg-indigo-500": isDownvoted,
       })}

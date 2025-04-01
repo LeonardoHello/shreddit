@@ -62,13 +62,13 @@ export function Search() {
         <Input
           id="search"
           placeholder="Search Shreddit"
-          className="h-10 rounded-full bg-input pl-11"
+          className="bg-input h-10 rounded-full pl-11"
           autoComplete="off"
           value={searchedValue}
           onChange={onInputChange}
           onFocus={() => setIsOpen(true)}
         />
-        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 select-none stroke-[1.5] opacity-50" />
+        <SearchIcon className="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 stroke-[1.5] opacity-50 select-none" />
       </div>
 
       <AnimatePresence>
@@ -121,7 +121,7 @@ const SearchDropdown = memo(
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/.4) transparent",
         }}
-        className="absolute left-2 top-[60px] flex max-h-[min(calc(100vh-4rem),24rem)] w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto rounded-xl border bg-card p-2 sm:left-0 sm:top-12 sm:w-full"
+        className="bg-card absolute top-[60px] left-2 flex max-h-[min(calc(100vh-4rem),24rem)] w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto rounded-xl border p-2 sm:top-12 sm:left-0 sm:w-full"
       >
         {isLoading && <SearchSkeleton />}
 
@@ -142,7 +142,7 @@ const SearchDropdown = memo(
                     <div className="truncate text-sm font-medium">
                       r/{community.name}
                     </div>
-                    <div className="truncate text-xs text-muted-foreground">
+                    <div className="text-muted-foreground truncate text-xs">
                       {new Intl.NumberFormat("en-US", {
                         notation: "compact",
                         maximumFractionDigits: 1,
@@ -179,7 +179,7 @@ const SearchDropdown = memo(
                     <div className="truncate text-sm font-medium">
                       u/{user.username}
                     </div>
-                    <div className="truncate text-xs text-muted-foreground">
+                    <div className="text-muted-foreground truncate text-xs">
                       {new Intl.NumberFormat("en-US", {
                         notation: "compact",
                         maximumFractionDigits: 1,

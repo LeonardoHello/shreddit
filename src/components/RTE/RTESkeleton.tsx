@@ -24,7 +24,7 @@ export default function RTESkeleton({
   isSubmitPage?: boolean;
 }) {
   return (
-    <div className="rounded-lg border bg-card">
+    <div className="bg-card rounded-lg border">
       <RTEButtons />
 
       <div

@@ -9,14 +9,14 @@ export default function RTECommentButtons({ editor }: { editor: Editor }) {
     <>
       <BubbleMenu
         editor={editor}
-        className="rounded-lg border bg-card p-1 sm:hidden"
+        className="bg-card rounded-lg border p-1 sm:hidden"
       >
         <RTEMarks editor={editor} />
       </BubbleMenu>
 
       <FloatingMenu
         editor={editor}
-        className="overflow-x-auto rounded-lg border bg-card p-1 sm:hidden"
+        className="bg-card overflow-x-auto rounded-lg border p-1 sm:hidden"
         tippyOptions={{ maxWidth: 200 }}
       >
         <RTENodes editor={editor} />

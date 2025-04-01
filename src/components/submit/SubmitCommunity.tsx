@@ -67,7 +67,7 @@ export default function SubmitCommunity({
         }}
         className="z-0 max-h-96 w-60 overflow-y-auto sm:w-72"
       >
-        <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
+        <DropdownMenuLabel className="text-2xs text-muted-foreground uppercase">
           search communities
         </DropdownMenuLabel>
 
@@ -88,7 +88,7 @@ export default function SubmitCommunity({
 
         {searchValue.length === 0 && (
           <>
-            <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
+            <DropdownMenuLabel className="text-2xs text-muted-foreground uppercase">
               Your communities
             </DropdownMenuLabel>
             {myCommunities.map((community) => (
@@ -130,7 +130,7 @@ const SubmitCommunityDropdown = memo(
 
     return (
       <>
-        <DropdownMenuLabel className="text-2xs uppercase text-muted-foreground">
+        <DropdownMenuLabel className="text-2xs text-muted-foreground uppercase">
           searched communities
         </DropdownMenuLabel>
         {isLoading && (

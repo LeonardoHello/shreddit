@@ -87,7 +87,7 @@ export default function FeedSort({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={"outline"} className="self-start border-border">
+        <Button variant={"outline"} className="border-border self-start">
           {currentTab ? currentTab.label : tabs[0].label}
           <ChevronDown className="size-4" />
         </Button>

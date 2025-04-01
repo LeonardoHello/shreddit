@@ -21,7 +21,7 @@ export default function CommentSectionSkeleton() {
 function CommentSkeleton({ children }: { children?: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex select-none items-center gap-1 text-muted">
+      <div className="text-muted flex items-center gap-1 select-none">
         <Skeleton className="size-7 rounded-full" />
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-3 w-20" />
@@ -30,7 +30,7 @@ function CommentSkeleton({ children }: { children?: React.ReactNode }) {
       <div className="ml-3 flex grow flex-col gap-2 border-l-2 pl-4">
         <Skeleton className="h-12" />
         <div className="flex items-center gap-2">
-          <div className="flex select-none items-center gap-1 text-muted">
+          <div className="text-muted flex items-center gap-1 select-none">
             <ArrowBigUp className="size-6 rounded" />
             <Skeleton className="h-3 w-4" />
             <ArrowBigDown className="size-6 rounded" />

@@ -96,7 +96,7 @@ export default function CommunityEditDialog({
   }
 
   return (
-    <DialogContent className="max-h-screen overflow-y-auto bg-card">
+    <DialogContent className="bg-card max-h-screen overflow-y-auto">
       <DialogHeader>
         <DialogTitle>Edit community details widget</DialogTitle>
         <DialogDescription>

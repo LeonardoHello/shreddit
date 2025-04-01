@@ -33,12 +33,12 @@ export default function CommunitySidebar({
           <Button
             variant="ghost"
             size="icon"
-            className="size-7 rounded-full text-muted-foreground xl:hidden"
+            className="text-muted-foreground size-7 rounded-full xl:hidden"
           >
             <Info className="size-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-h-screen overflow-y-auto bg-card">
+        <DialogContent className="bg-card max-h-screen overflow-y-auto">
           <DialogHeader className="sr-only">
             <DialogTitle>Community Information</DialogTitle>
             <DialogDescription>
@@ -53,7 +53,7 @@ export default function CommunitySidebar({
   }
 
   return (
-    <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 xl:flex">
+    <div className="bg-card sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border px-3 py-2 xl:flex">
       <CommunitySidebarContent communityName={communityName} />
     </div>
   );
@@ -72,22 +72,22 @@ function CommunitySidebarContent({
 
   return (
     <>
-      <h2 className="break-words text-lg font-bold tracking-wide">
+      <h2 className="text-lg font-bold tracking-wide break-words">
         r/{community.name}
       </h2>
 
       <div className="text-sm">
         {community.displayName && (
-          <h3 className="break-words font-bold">{community.displayName}</h3>
+          <h3 className="font-bold break-words">{community.displayName}</h3>
         )}
         {community.description && (
-          <p className="break-words text-muted-foreground">
+          <p className="text-muted-foreground break-words">
             {community.description}
           </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex flex-col gap-1 text-xs">
         <div className="flex items-center gap-2">
           <CakeSlice className="size-4" />
           <p>
@@ -118,7 +118,7 @@ function CommunitySidebarContent({
               maximumFractionDigits: 1,
             }).format(community.memberCount)}
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-muted-foreground text-xs">
             {community.memberNickname || "Memebers"}
           </div>
         </div>
@@ -133,7 +133,7 @@ function CommunitySidebarContent({
               maximumFractionDigits: 1,
             }).format(community.newMemberCount)}
           </div>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-muted-foreground text-xs">
             New {community.memberNickname || "memebers"}
           </div>
         </div>
@@ -143,7 +143,7 @@ function CommunitySidebarContent({
       <Separator />
 
       <div className="flex flex-col items-start gap-1">
-        <div className="text-sm uppercase text-muted-foreground">Moderator</div>
+        <div className="text-muted-foreground text-sm uppercase">Moderator</div>
         <Link
           href={`/u/${community.moderator.username}`}
           className="inline-flex w-full items-center gap-2"

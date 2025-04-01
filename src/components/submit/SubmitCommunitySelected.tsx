@@ -30,7 +30,7 @@ export default function SubmitCommunitySelected({
 
       <span className="truncate">r/{selectedCommunity.name}</span>
 
-      <ChevronDown className="ml-auto size-5 text-muted-foreground" />
+      <ChevronDown className="text-muted-foreground ml-auto size-5" />
     </>
   );
 }

@@ -22,16 +22,16 @@ export default function CommentHeader() {
         />
       </Link>
 
-      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+      <div className="text-muted-foreground flex items-center gap-1 text-xs">
         <Link
           href={`/u/${state.author.username}`}
-          className="break-all font-extrabold hover:underline"
+          className="font-extrabold break-all hover:underline"
         >
           {state.author.username}
         </Link>
 
         {state.authorId === state.post.authorId && (
-          <div className="font-bold uppercase text-blue-500">op</div>
+          <div className="font-bold text-blue-500 uppercase">op</div>
         )}
 
         <span>•</span>

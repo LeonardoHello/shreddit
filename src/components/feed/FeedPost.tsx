@@ -20,7 +20,7 @@ export default function FeedPost({
 
   if (state.isDeleted) {
     return (
-      <div className="flex h-20 items-center gap-3 rounded border bg-card p-4">
+      <div className="bg-card flex h-20 items-center gap-3 rounded border p-4">
         <div className="font-semibold capitalize">post deleted</div>
       </div>
     );
@@ -33,7 +33,7 @@ export default function FeedPost({
 
   return (
     <div
-      className="flex cursor-pointer flex-col gap-2 rounded-lg border bg-card px-4 py-2 hover:border-ring/50"
+      className="bg-card hover:border-ring/50 flex cursor-pointer flex-col gap-2 rounded-lg border px-4 py-2"
       onTouchStart={() => {
         router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
       }}

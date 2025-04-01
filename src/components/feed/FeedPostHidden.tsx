@@ -36,7 +36,7 @@ export default function FeedPostHidden() {
   );
 
   return (
-    <div className="flex h-20 items-center justify-between gap-3 rounded border bg-card p-4 hover:border-ring/50">
+    <div className="bg-card hover:border-ring/50 flex h-20 items-center justify-between gap-3 rounded border p-4">
       <div className="font-semibold capitalize">post hidden</div>
       <button
         className="rounded-full bg-zinc-800 px-4 py-2"

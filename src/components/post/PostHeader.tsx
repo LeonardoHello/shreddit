@@ -26,11 +26,11 @@ export default function PostHeader({
   return (
     <div className="flex items-center justify-between gap-2">
       {communityName ? (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-1 text-xs">
           <Link
             href={`/u/${state.author.username}`}
             onClick={(e) => e.stopPropagation()}
-            className="group flex items-center gap-1.5 text-foreground"
+            className="group text-foreground flex items-center gap-1.5"
           >
             <Avatar className="size-6">
               <AvatarImage src={state.author.imageUrl} />
@@ -38,7 +38,7 @@ export default function PostHeader({
                 {state.author.username.slice(0, 2)}
               </AvatarFallback>
             </Avatar>
-            <span className="break-all font-extrabold group-hover:opacity-80">
+            <span className="font-extrabold break-all group-hover:opacity-80">
               u/{state.author.username}
             </span>
           </Link>
@@ -56,14 +56,14 @@ export default function PostHeader({
           )}
         </div>
       ) : (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-1 text-xs">
           <Link
             href={`/r/${state.community.name}`}
             onClick={(e) => e.stopPropagation()}
-            className="group flex items-center gap-1.5 text-xs text-foreground"
+            className="group text-foreground flex items-center gap-1.5 text-xs"
           >
             <CommunityImage icon={state.community.icon} size={24} />
-            <span className="break-all font-extrabold group-hover:opacity-80">
+            <span className="font-extrabold break-all group-hover:opacity-80">
               r/{state.community.name}
             </span>
           </Link>

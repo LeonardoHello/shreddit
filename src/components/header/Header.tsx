@@ -16,7 +16,7 @@ import { Search } from "./Search";
 
 export default function Header({ children }: { children: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-card px-4">
+    <header className="bg-card sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4">
       {children}
 
       <Search />
@@ -46,13 +46,13 @@ export default function Header({ children }: { children: React.ReactNode }) {
       <SignedOut>
         <div className="flex items-center gap-2">
           <ClerkLoading>
-            <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
+            <Button className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90">
               Sign in
             </Button>
           </ClerkLoading>
           <ClerkLoaded>
             <SignInButton mode="modal">
-              <Button className="rounded-full bg-rose-600 text-foreground hover:bg-rose-600/90">
+              <Button className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90">
                 Sign in
               </Button>
             </SignInButton>

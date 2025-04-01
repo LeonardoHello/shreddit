@@ -22,7 +22,7 @@ export default async function SubmitLayout({
 
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
-      <div className="flex w-0 grow flex-col gap-3 rounded-lg border bg-card px-4 py-3">
+      <div className="bg-card flex w-0 grow flex-col gap-3 rounded-lg border px-4 py-3">
         <h1 className="text-2xl font-bold tracking-wide">Create post</h1>
 
         <div className="flex flex-col gap-2">
@@ -37,7 +37,7 @@ export default async function SubmitLayout({
         </div>
       </div>
 
-      <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card p-4 text-sm xl:flex">
+      <div className="bg-card sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border p-4 text-sm xl:flex">
         <div>
           <div className="mb-2 flex items-center gap-2">
             <Image src={logo} alt="logo" className="size-8" />

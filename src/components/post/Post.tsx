@@ -36,7 +36,7 @@ export default function Post({
       ].join("-")}
       post={post}
     >
-      <div className="flex flex-col gap-2 rounded-lg border bg-card px-4 py-2">
+      <div className="bg-card flex flex-col gap-2 rounded-lg border px-4 py-2">
         <PostHeader currentUserId={currentUserId} />
         <PostBody />
         <PostFooter currentUserId={currentUserId} />

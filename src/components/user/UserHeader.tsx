@@ -18,7 +18,7 @@ export default function UserHeader({ username }: { username: string }) {
   );
 
   return (
-    <div className="flex flex-col rounded-lg border bg-card">
+    <div className="bg-card flex flex-col rounded-lg border">
       <Image
         src={userBanner}
         alt="shrek themed community banner"
@@ -28,20 +28,20 @@ export default function UserHeader({ username }: { username: string }) {
 
       <div className="flex flex-row items-center justify-between gap-4 px-4 py-2.5">
         <div className="flex items-center gap-2 lg:max-h-10">
-          <Avatar className="size-12 border-card bg-card lg:size-24 lg:self-end lg:border-4">
+          <Avatar className="border-card bg-card size-12 lg:size-24 lg:self-end lg:border-4">
             <AvatarImage src={user.imageUrl} />
             <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
           </Avatar>
 
           <div>
             <div className="flex items-center gap-1">
-              <h1 className="self-center break-all text-lg font-extrabold xl:text-3xl">
+              <h1 className="self-center text-lg font-extrabold break-all xl:text-3xl">
                 u/{user.username}
               </h1>
 
               <UserSidebar username={username} isDialog />
             </div>
-            <div className="flex gap-1 text-xs text-muted-foreground xl:hidden">
+            <div className="text-muted-foreground flex gap-1 text-xs xl:hidden">
               {new Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,

@@ -42,7 +42,7 @@ export default function SubmitForm() {
             });
           }}
         />
-        <div className="absolute right-3 text-2xs font-bold text-muted-foreground">
+        <div className="text-2xs text-muted-foreground absolute right-3 font-bold">
           {state.title.length}/{maxTitleLength}
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function SubmitForm() {
       <div className="flex items-center gap-2">
         <Button
           variant={state.spoiler ? "default" : "outline"}
-          className={cn("rounded-full font-normal capitalize tracking-wide", {
+          className={cn("rounded-full font-normal tracking-wide capitalize", {
             "bg-background text-foreground hover:bg-background/90":
               state.spoiler,
           })}
@@ -96,8 +96,8 @@ export default function SubmitForm() {
 
         <Button
           variant={state.nsfw ? "default" : "outline"}
-          className={cn("rounded-full font-normal uppercase tracking-wide", {
-            "bg-rose-500 text-background hover:bg-rose-500/90": state.nsfw,
+          className={cn("rounded-full font-normal tracking-wide uppercase", {
+            "text-background bg-rose-500 hover:bg-rose-500/90": state.nsfw,
           })}
           onClick={() => {
             dispatch({ type: ReducerAction.TOGGLE_NSFW });

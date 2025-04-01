@@ -7,13 +7,13 @@ export default function UserHeaderSkeleton() {
   const tabs = ["Posts", "Saved", "Hidden", "Upvoted", "Downvoted"];
 
   return (
-    <div className="rounded-lg border bg-card">
-      <Skeleton className="h-20 w-full rounded-b-none rounded-t-lg lg:h-32" />
+    <div className="bg-card rounded-lg border">
+      <Skeleton className="h-20 w-full rounded-t-lg rounded-b-none lg:h-32" />
 
       <div className="flex items-center justify-between gap-4 px-4 py-2.5">
         <div className="flex items-center gap-2 lg:max-h-10">
-          <div className="z-10 rounded-full bg-card lg:self-end">
-            <Skeleton className="size-12 rounded-full border-card lg:size-24 lg:border-4" />
+          <div className="bg-card z-10 rounded-full lg:self-end">
+            <Skeleton className="border-card size-12 rounded-full lg:size-24 lg:border-4" />
           </div>
           <Skeleton className="h-8 w-40 self-center" />
         </div>

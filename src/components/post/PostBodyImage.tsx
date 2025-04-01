@@ -80,7 +80,7 @@ function PostImage({
         )}
 
         {isUnsafe && (
-          <Badge className="absolute self-center justify-self-center rounded-full bg-background text-foreground hover:bg-background/80">
+          <Badge className="bg-background text-foreground hover:bg-background/80 absolute self-center justify-self-center rounded-full">
             View{" "}
             {post.nsfw && post.spoiler
               ? "NSFW content & spoilers"

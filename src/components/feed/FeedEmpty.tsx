@@ -2,20 +2,20 @@ import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 export default function FeedEmpty() {
   return (
-    <div className="relative flex grow flex-col rounded border border-border/50">
+    <div className="border-border/50 relative flex grow flex-col rounded border">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex gap-2 bg-card p-2 opacity-20">
-          <div className="flex select-none flex-col items-center gap-4 text-muted-foreground">
+        <div key={i} className="bg-card flex gap-2 p-2 opacity-20">
+          <div className="text-muted-foreground flex flex-col items-center gap-4 select-none">
             <ArrowUpCircle className="h-8 w-8 rounded" />
             <ArrowDownCircle className="h-8 w-8 rounded" />
           </div>
-          <div className="min-h-full w-32 rounded bg-muted-foreground/25" />
+          <div className="bg-muted-foreground/25 min-h-full w-32 rounded" />
           <div className="flex grow flex-col gap-2">
-            <div className="h-6 w-2/3 rounded bg-muted-foreground/25" />
-            <div className="h-3 w-2/3 rounded bg-muted-foreground/25" />
+            <div className="bg-muted-foreground/25 h-6 w-2/3 rounded" />
+            <div className="bg-muted-foreground/25 h-3 w-2/3 rounded" />
             <div className="mt-auto flex h-3 w-1/3 gap-2">
-              <div className="w-6 rounded bg-muted-foreground/25" />
-              <div className="grow rounded bg-muted-foreground/25" />
+              <div className="bg-muted-foreground/25 w-6 rounded" />
+              <div className="bg-muted-foreground/25 grow rounded" />
             </div>
           </div>
         </div>

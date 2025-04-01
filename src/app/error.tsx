@@ -36,7 +36,7 @@ export default function Error({
             {data ? data.code.replaceAll("_", " ") : "CLIENT ERROR"}
           </h1>
 
-          <p className="mt-6 font-semibold leading-7 text-muted-foreground sm:text-lg">
+          <p className="text-muted-foreground mt-6 leading-7 font-semibold sm:text-lg">
             {message}
           </p>
 
@@ -65,7 +65,7 @@ export default function Error({
           INTERNAL SERVER ERROR
         </h1>
 
-        <p className="mt-6 font-semibold leading-7 text-muted-foreground sm:text-lg">
+        <p className="text-muted-foreground mt-6 leading-7 font-semibold sm:text-lg">
           An unexpected error occurred while processing your request. Please try
           again later.
         </p>

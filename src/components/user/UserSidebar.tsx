@@ -34,12 +34,12 @@ export default function UserSidebar({
           <Button
             variant="ghost"
             size="icon"
-            className="size-7 min-w-7 rounded-full text-muted-foreground xl:hidden"
+            className="text-muted-foreground size-7 min-w-7 rounded-full xl:hidden"
           >
             <Info className="size-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-h-screen overflow-y-auto bg-card">
+        <DialogContent className="bg-card max-h-screen overflow-y-auto">
           <DialogHeader className="sr-only">
             <DialogTitle>Community Information</DialogTitle>
             <DialogDescription>
@@ -57,7 +57,7 @@ export default function UserSidebar({
   }
 
   return (
-    <div className="sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border bg-card px-3 py-2 xl:flex">
+    <div className="bg-card sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border px-3 py-2 xl:flex">
       <UserSidebarContent username={username} />
     </div>
   );
@@ -78,11 +78,11 @@ function UserSidebarContent({ username }: { username: string }) {
           <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <div className="break-words font-bold leading-tight">
+          <div className="leading-tight font-bold break-words">
             {user.firstName} {user.lastName}{" "}
             {!user.firstName && !user.lastName && user.username}
           </div>
-          <div className="flex gap-1 break-words text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex gap-1 text-xs break-words">
             u/{user.username}
           </div>
         </div>
@@ -90,7 +90,7 @@ function UserSidebarContent({ username }: { username: string }) {
 
       <div className="flex justify-between">
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground">Onions</div>
+          <div className="text-muted-foreground text-xs">Onions</div>
           <div className="flex items-center gap-1">
             <Icon iconNode={onion} className="size-4" />
             <div className="text-xs text-zinc-500">
@@ -102,7 +102,7 @@ function UserSidebarContent({ username }: { username: string }) {
           </div>
         </div>
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground">Onion day</div>
+          <div className="text-muted-foreground text-xs">Onion day</div>
           <div className="flex items-center gap-1">
             <Cake className="size-4" />
             <div className="text-xs text-zinc-500">
@@ -121,7 +121,7 @@ function UserSidebarContent({ username }: { username: string }) {
         <>
           <Separator />
           <div className="flex flex-col gap-2">
-            <h1 className="text-sm uppercase text-muted-foreground">
+            <h1 className="text-muted-foreground text-sm uppercase">
               Moderator of these communities
             </h1>
             <div

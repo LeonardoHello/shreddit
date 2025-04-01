@@ -14,7 +14,7 @@ export default function SidebarNavSkeleton({
       <ul className="px-4 py-2">
         <div className="flex flex-1 items-center justify-between px-2 py-3">
           <Skeleton className="h-3 w-24" />
-          <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
+          <ChevronUp className="text-muted-foreground size-4 shrink-0" />
         </div>
         <div className="flex flex-col gap-1 pb-4">
           {Array.from({ length }).map((_, index) => (
@@ -25,7 +25,7 @@ export default function SidebarNavSkeleton({
                 style={{ width: `${60 + ((index * 20) % 60)}px` }}
               />
               {canFavorite && (
-                <Star className="ml-auto size-5 animate-pulse fill-primary/10 stroke-1 text-primary/10" />
+                <Star className="fill-primary/10 text-primary/10 ml-auto size-5 animate-pulse stroke-1" />
               )}
             </li>
           ))}

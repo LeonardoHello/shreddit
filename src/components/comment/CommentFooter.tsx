@@ -23,7 +23,7 @@ export default function CommentFooter({
   const clerk = useClerk();
 
   return (
-    <div className="flex items-center text-muted-foreground">
+    <div className="text-muted-foreground flex items-center">
       <CommentVote currentUserId={currentUserId} />
 
       <Button

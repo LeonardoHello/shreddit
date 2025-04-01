@@ -11,7 +11,7 @@ export default async function CommunitySubmitPage(props: {
   return (
     <>
       <SubmitCommunity>
-        <Button variant={"outline"} className="h-10 w-60 border-border sm:w-72">
+        <Button variant={"outline"} className="border-border h-10 w-60 sm:w-72">
           <SubmitCommunitySelected communityName={params.communityName} />
         </Button>
       </SubmitCommunity>

@@ -121,7 +121,7 @@ export default function SidebarDialog({
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-screen overflow-y-auto bg-card">
+      <DialogContent className="bg-card max-h-screen overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Tell us about your community</DialogTitle>
           <DialogDescription>
@@ -148,7 +148,7 @@ export default function SidebarDialog({
                   </FormControl>
                   <div className="inline-flex w-full justify-between px-1">
                     <FormMessage />
-                    <div className="ml-auto text-xs text-muted-foreground">
+                    <div className="text-muted-foreground ml-auto text-xs">
                       {nameMaxLength - field.value.length}
                     </div>
                   </div>
@@ -173,7 +173,7 @@ export default function SidebarDialog({
                   </FormControl>
                   <div className="inline-flex w-full px-1">
                     <FormMessage />
-                    <div className="ml-auto text-xs text-muted-foreground">
+                    <div className="text-muted-foreground ml-auto text-xs">
                       {descriptionMaxLength - field.value.length}
                     </div>
                   </div>

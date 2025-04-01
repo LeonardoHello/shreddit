@@ -17,14 +17,14 @@ export default function RTEPostButtons({
     <>
       <BubbleMenu
         editor={editor}
-        className="rounded-lg border bg-card p-1 sm:hidden"
+        className="bg-card rounded-lg border p-1 sm:hidden"
       >
         <RTEMarkButtons editor={editor} />
       </BubbleMenu>
 
       <FloatingMenu
         editor={editor}
-        className="flex items-center gap-2 overflow-x-auto rounded-lg border bg-card p-1 sm:hidden"
+        className="bg-card flex items-center gap-2 overflow-x-auto rounded-lg border p-1 sm:hidden"
         tippyOptions={{ maxWidth: 200 }}
       >
         <RTENodeButtons editor={editor} />

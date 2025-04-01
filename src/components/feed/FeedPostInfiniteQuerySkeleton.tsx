@@ -7,7 +7,7 @@ import { Skeleton } from "../ui/skeleton";
 export default function FeedPostInfiniteQuerySkeleton() {
   return (
     <div className="flex grow flex-col gap-2">
-      <Button variant={"outline"} disabled className="self-start border-border">
+      <Button variant={"outline"} disabled className="border-border self-start">
         <Skeleton className="h-4 w-12" />
         <ChevronDown className="size-4" />
       </Button>
