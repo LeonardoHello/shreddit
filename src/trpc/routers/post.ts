@@ -53,7 +53,7 @@ export const postRouter = createTRPCRouter({
               SELECT saved
               FROM users_to_posts
               WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+                AND users_to_posts.user_id = ${ctx.userId}
             )
           `.as("is_saved"),
           isHidden: sql<UserToPost["hidden"] | null>`
@@ -61,7 +61,7 @@ export const postRouter = createTRPCRouter({
               SELECT hidden
               FROM users_to_posts
               WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+                AND users_to_posts.user_id = ${ctx.userId}
             )
           `.as("is_hidden"),
           voteStatus: sql<UserToPost["voteStatus"] | null>`
@@ -69,7 +69,7 @@ export const postRouter = createTRPCRouter({
               SELECT vote_status
               FROM users_to_posts
               WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+                AND users_to_posts.user_id = ${ctx.userId}
             )
           `.as("vote_status"),
           userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
@@ -77,7 +77,7 @@ export const postRouter = createTRPCRouter({
               SELECT updated_at
               FROM users_to_posts
               WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${sql.placeholder("currentUserId")}
+                AND users_to_posts.user_id = ${ctx.userId}
             )
           `.as("user_to_post_updated_at"),
         }),
