@@ -4,22 +4,22 @@ import { Reddit_Sans } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { Analytics } from "@vercel/analytics/next";
 import { extractRouterConfig } from "uploadthing/server";
 
 import { ourFileRouter } from "@/app/api/uploadthing/core";
 import Header from "@/components/header/Header";
-import { Toaster } from "@/components/ui/sonner";
-import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
-import { TRPCReactProvider } from "@/trpc/client";
-
-import "./globals.css";
-
 import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
+import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
+import { TRPCReactProvider } from "@/trpc/client";
+
+import "./globals.css";
 
 const reddit_sans = Reddit_Sans({
   subsets: ["latin"],
@@ -72,6 +72,7 @@ export default function RootLayout({
                   </Header>
 
                   {children}
+                  <Analytics />
                 </SidebarInset>
               </SidebarProvider>
             </RecentCommunityContextProvider>
