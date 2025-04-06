@@ -72,9 +72,6 @@ function ActionButtons({
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const getPostQueryKey = trpc.post.getPost.queryKey(postId);
-  const getCommentsQueryKey = trpc.comment.getComments.queryKey(postId);
-
   const createComment = useMutation(
     trpc.comment.createComment.mutationOptions({
       onMutate: () => {
@@ -83,7 +80,7 @@ function ActionButtons({
       onSuccess: () => {
         startTransition(() => {
           queryClient.invalidateQueries({
-            queryKey: [getPostQueryKey, getCommentsQueryKey],
+            queryKey: trpc.comment.getComments.queryKey(postId),
           });
         });
 

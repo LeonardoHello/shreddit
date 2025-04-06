@@ -21,14 +21,11 @@ export default function CommentDeleteDialog() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const postQueryKey = trpc.post.getPost.queryKey(state.postId);
-  const commentsQueryKey = trpc.comment.getComments.queryKey(state.postId);
-
   const deleteComment = useMutation(
     trpc.comment.deleteComment.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [postQueryKey, commentsQueryKey],
+          queryKey: trpc.comment.getComments.queryKey(state.postId),
         });
 
         toast.success("Comment deleted successfully.");

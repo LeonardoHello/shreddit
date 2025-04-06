@@ -24,13 +24,6 @@ export default function CommunityDeleteDialog({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const joinedCommunitiesQueryKey =
-    trpc.community.getJoinedCommunities.queryKey();
-  const moderatedCommunitiesQueryKey =
-    trpc.community.getModeratedCommunities.queryKey();
-  const mutedCommunitiesQueryKey =
-    trpc.community.getMutedCommunities.queryKey();
-
   const deleteCommunity = useMutation(
     trpc.community.deleteCommunity.mutationOptions({
       onMutate: () => {
@@ -38,11 +31,13 @@ export default function CommunityDeleteDialog({
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: [
-            joinedCommunitiesQueryKey,
-            moderatedCommunitiesQueryKey,
-            mutedCommunitiesQueryKey,
-          ],
+          queryKey: trpc.community.getJoinedCommunities.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.community.getModeratedCommunities.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.community.getMutedCommunities.queryKey(),
         });
 
         toast.success("Community deleted successfully.");

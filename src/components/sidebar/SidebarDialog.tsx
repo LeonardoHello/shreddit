@@ -74,16 +74,14 @@ export default function SidebarDialog({
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const moderatedCommunitiesQueryKey =
-    trpc.community.getModeratedCommunities.queryKey();
-  const joinedCommunitiesQueryKey =
-    trpc.community.getJoinedCommunities.queryKey();
-
   const createCommunity = useMutation(
     trpc.community.createCommunity.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({
-          queryKey: [moderatedCommunitiesQueryKey, joinedCommunitiesQueryKey],
+          queryKey: trpc.community.getModeratedCommunities.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.community.getJoinedCommunities.queryKey(),
         });
 
         startTransition(() => {

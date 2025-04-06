@@ -73,18 +73,15 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const queryClient = useQueryClient();
   const trpc = useTRPC();
 
-  const getPostQueryKey = trpc.post.getPost.queryKey(state.postId);
-  const getCommentsQueryKey = trpc.comment.getComments.queryKey(state.postId);
-
   const createComment = useMutation(
     trpc.comment.createComment.mutationOptions({
       onMutate: () => {
         editor.setEditable(false);
       },
       onSuccess: () => {
-        startTransition(async () => {
+        startTransition(() => {
           queryClient.invalidateQueries({
-            queryKey: [getPostQueryKey, getCommentsQueryKey],
+            queryKey: trpc.comment.getComments.queryKey(state.postId),
           });
         });
 

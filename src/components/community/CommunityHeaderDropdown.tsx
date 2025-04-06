@@ -43,14 +43,8 @@ export default function CommunityHeaderDropdown({
 
   const userToCommunityQueryKey =
     trpc.community.getUserToCommunity.queryKey(communityName);
-  const communityByNameQueryKey =
-    trpc.community.getCommunityByName.queryKey(communityName);
-  const moderatedCommunitiesQueryKey =
-    trpc.community.getModeratedCommunities.queryKey();
   const joinedCommunitiesQueryKey =
     trpc.community.getJoinedCommunities.queryKey();
-  const mutedCommunitiesQueryKey =
-    trpc.community.getMutedCommunities.queryKey();
 
   const joinCommunity = useMutation(
     trpc.community.toggleJoinCommunity.mutationOptions({
@@ -65,7 +59,10 @@ export default function CommunityHeaderDropdown({
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({
-          queryKey: [communityByNameQueryKey, joinedCommunitiesQueryKey],
+          queryKey: trpc.community.getCommunityByName.queryKey(communityName),
+        });
+        queryClient.invalidateQueries({
+          queryKey: joinedCommunitiesQueryKey,
         });
 
         if (data[0].joined) {
@@ -93,7 +90,10 @@ export default function CommunityHeaderDropdown({
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({
-          queryKey: [moderatedCommunitiesQueryKey, joinedCommunitiesQueryKey],
+          queryKey: trpc.community.getModeratedCommunities.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: joinedCommunitiesQueryKey,
         });
 
         if (data[0].favorited) {
@@ -121,7 +121,7 @@ export default function CommunityHeaderDropdown({
       },
       onSuccess: (data) => {
         queryClient.invalidateQueries({
-          queryKey: [mutedCommunitiesQueryKey],
+          queryKey: trpc.community.getMutedCommunities.queryKey(),
         });
 
         if (data[0].muted) {

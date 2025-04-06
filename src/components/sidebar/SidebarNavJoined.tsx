@@ -126,13 +126,11 @@ export default function SidebarNavJoined() {
                           },
                           {
                             onSuccess: () => {
-                              const userToCommunityQueryKey =
-                                trpc.community.getUserToCommunity.queryKey(
-                                  userToCommunity.community.name,
-                                );
-
                               queryClient.invalidateQueries({
-                                queryKey: userToCommunityQueryKey,
+                                queryKey:
+                                  trpc.community.getUserToCommunity.queryKey(
+                                    userToCommunity.community.name,
+                                  ),
                               });
                             },
                             onError: (error) => {
