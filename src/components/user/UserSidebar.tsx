@@ -74,16 +74,13 @@ function UserSidebarContent({ username }: { username: string }) {
     <>
       <div className="flex items-center gap-1.5">
         <Avatar>
-          <AvatarImage src={user.imageUrl} />
-          <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
+          <AvatarImage src={user.image ?? undefined} />
+          <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <div className="leading-tight font-bold break-words">
-            {user.firstName} {user.lastName}{" "}
-            {!user.firstName && !user.lastName && user.username}
-          </div>
+          <div className="leading-tight font-bold break-words">{user.name}</div>
           <div className="text-muted-foreground flex gap-1 text-xs break-words">
-            u/{user.username}
+            u/{username}
           </div>
         </div>
       </div>

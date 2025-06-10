@@ -1,12 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { UserSchema } from "@/db/schema/users";
 import { baseProcedure, createTRPCRouter } from "../init";
 
 export const userRouter = createTRPCRouter({
   getUserByName: baseProcedure
-    .input(UserSchema.shape.username)
+    .input(UserSchema.shape.username.unwrap())
     .query(async ({ input, ctx }) => {
       const user = await ctx.db.query.users.findFirst({
         where: (user, { eq }) => eq(user.username, input),
@@ -71,7 +71,7 @@ export const userRouter = createTRPCRouter({
   searchUsers: baseProcedure.input(z.string()).query(({ input, ctx }) => {
     return ctx.db.query.users.findMany({
       limit: 4,
-      columns: { username: true, imageUrl: true },
+      columns: { username: true, image: true },
       where: (user, { ilike }) => ilike(user.username, `%${input}%`),
       extras: (user, { sql }) => ({
         onionCount: sql<number>`

@@ -29,14 +29,14 @@ export default function UserHeader({ username }: { username: string }) {
       <div className="flex flex-row items-center justify-between gap-4 px-4 py-2.5">
         <div className="flex items-center gap-2 lg:max-h-10">
           <Avatar className="border-card bg-card size-12 lg:size-24 lg:self-end lg:border-4">
-            <AvatarImage src={user.imageUrl} />
-            <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
+            <AvatarImage src={user.image ?? undefined} />
+            <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
           </Avatar>
 
           <div>
             <div className="flex items-center gap-1">
               <h1 className="self-center text-lg font-extrabold break-all xl:text-3xl">
-                u/{user.username}
+                u/{username}
               </h1>
 
               <UserSidebar username={username} isDialog />
@@ -51,7 +51,7 @@ export default function UserHeader({ username }: { username: string }) {
           </div>
         </div>
 
-        <UserNavigation username={user.username} />
+        <UserNavigation username={username} />
       </div>
     </div>
   );

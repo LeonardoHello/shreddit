@@ -149,7 +149,7 @@ function CommunitySidebarContent({
           className="inline-flex w-full items-center gap-2"
         >
           <Avatar className="size-8">
-            <AvatarImage src={community.moderator.imageUrl} />
+            <AvatarImage src={community.moderator.image ?? undefined} />
             <AvatarFallback className="uppercase">
               {community.moderator.username?.slice(0, 2)}
             </AvatarFallback>

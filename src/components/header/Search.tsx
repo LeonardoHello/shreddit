@@ -169,7 +169,7 @@ const SearchDropdown = memo(
               >
                 <Link href={`/u/${user.username}`}>
                   <Image
-                    src={user.imageUrl}
+                    src={user.image ?? ""}
                     alt="community image"
                     height={28}
                     width={28}

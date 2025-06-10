@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { CommunitySchema } from "@/db/schema/communities";
 import { UserSchema } from "@/db/schema/users";
@@ -13,7 +13,7 @@ export const postFeedRouter = createTRPCRouter({
         // cursor input needed to expose useInfiniteQuery hook
         // value of the cursor is what's returned from getNextPageParam
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -42,7 +42,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
       }),
     )
     .query(async ({ input, ctx }) => {
@@ -71,7 +71,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         communityName: CommunitySchema.shape.name,
       }),
     )
@@ -102,7 +102,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
     )
@@ -133,7 +133,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
     )
@@ -164,7 +164,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
     )
@@ -195,7 +195,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
     )
@@ -226,7 +226,7 @@ export const postFeedRouter = createTRPCRouter({
     .input(
       z.object({
         cursor: z.number().nullish(),
-        sort: z.nativeEnum(PostSort),
+        sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
     )

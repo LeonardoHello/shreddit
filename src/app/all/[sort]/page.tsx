@@ -1,5 +1,5 @@
 import { auth as authPromise } from "@clerk/nextjs/server";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types/enums";
@@ -9,7 +9,7 @@ export default async function AllSortPage(props: {
 }) {
   const [params, auth] = await Promise.all([props.params, authPromise()]);
 
-  const sort = z.nativeEnum(PostSort).parse(params.sort);
+  const sort = z.enum(PostSort).parse(params.sort);
 
   return (
     <FeedPostInfiniteQuery

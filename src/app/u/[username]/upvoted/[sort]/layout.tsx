@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { getQueryClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types/enums";
@@ -12,7 +12,7 @@ export default async function UserUpvotedLayout(props: {
 }) {
   const params = await props.params;
 
-  const { data: sort, success } = z.nativeEnum(PostSort).safeParse(params.sort);
+  const { data: sort, success } = z.enum(PostSort).safeParse(params.sort);
 
   if (!success) notFound();
 

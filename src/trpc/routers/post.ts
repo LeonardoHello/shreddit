@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import {
   postFiles,
@@ -22,7 +22,7 @@ export const postRouter = createTRPCRouter({
         where: (post, { eq }) => eq(post.id, input),
         with: {
           community: { columns: { name: true, icon: true } },
-          author: { columns: { username: true, imageUrl: true } },
+          author: { columns: { username: true, image: true } },
           files: {
             columns: { id: true, name: true, url: true, thumbHash: true },
           },

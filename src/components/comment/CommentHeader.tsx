@@ -13,7 +13,7 @@ export default function CommentHeader() {
     <div className="flex items-center gap-2">
       <Link href={`/u/${state.author.username}`} className="rounded-full">
         <Image
-          src={state.author.imageUrl}
+          src={state.author.image ?? ""}
           alt="user background"
           priority
           width={28}

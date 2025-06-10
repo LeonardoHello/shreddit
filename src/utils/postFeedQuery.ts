@@ -26,7 +26,7 @@ export const postFeedQuery =
         offset: sql.placeholder("offset"),
         with: {
           community: { columns: { name: true, icon: true } },
-          author: { columns: { username: true, imageUrl: true } },
+          author: { columns: { username: true, image: true } },
           files: {
             columns: { id: true, name: true, url: true, thumbHash: true },
           },

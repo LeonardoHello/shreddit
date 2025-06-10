@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { User } from "@clerk/nextjs/server";
-
 import { usePostContext } from "@/context/PostContext";
+import { User, UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import CommunityImage from "../community/CommunityImage";
@@ -23,23 +22,27 @@ export default function PostHeader({
   const state = usePostContext();
   const hydrated = useHydration();
 
+  const username = UserSchema.shape.username
+    .unwrap()
+    .parse(state.author.username);
+
   return (
     <div className="flex items-center justify-between gap-2">
       {communityName ? (
         <div className="text-muted-foreground flex items-center gap-1 text-xs">
           <Link
-            href={`/u/${state.author.username}`}
+            href={`/u/${username}`}
             onClick={(e) => e.stopPropagation()}
             className="group text-foreground flex items-center gap-1.5"
           >
             <Avatar className="size-6">
-              <AvatarImage src={state.author.imageUrl} />
+              <AvatarImage src={state.author.image ?? undefined} />
               <AvatarFallback className="uppercase">
-                {state.author.username.slice(0, 2)}
+                {username.slice(0, 2)}
               </AvatarFallback>
             </Avatar>
             <span className="font-extrabold break-all group-hover:opacity-80">
-              u/{state.author.username}
+              u/{username}
             </span>
           </Link>
 

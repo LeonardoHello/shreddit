@@ -1,9 +1,11 @@
 import { text, timestamp } from "drizzle-orm/pg-core";
 
 export const timestamps = {
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp()
+    .$defaultFn(() => new Date())
+    .notNull(),
   updatedAt: timestamp()
-    .defaultNow()
+    .$defaultFn(() => new Date())
     .notNull()
     .$onUpdate(() => new Date()),
 };

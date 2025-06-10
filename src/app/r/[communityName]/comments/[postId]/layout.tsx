@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { getQueryClient, trpc } from "@/trpc/server";
 
