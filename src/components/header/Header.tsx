@@ -6,6 +6,7 @@ import { getSession } from "@/app/actions";
 import { Button } from "../ui/button";
 import ProfileButton from "./ProfileButton";
 import { Search } from "./Search";
+import SignInButton from "./SignInButton";
 
 export default async function Header({
   children,
@@ -37,16 +38,7 @@ export default async function Header({
         </div>
       )}
 
-      {!session && (
-        <div className="flex items-center gap-2">
-          <Button
-            className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90"
-            asChild
-          >
-            <Link href="/sign-in">Sign in</Link>
-          </Button>
-        </div>
-      )}
+      {!session && <SignInButton />}
     </header>
   );
 }

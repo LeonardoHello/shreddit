@@ -32,10 +32,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  Auth,
+  auth,
 }: {
   children: React.ReactNode;
-  Auth: React.ReactNode;
+  auth: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
@@ -64,7 +64,7 @@ export default function RootLayout({
               </SidebarInset>
             </SidebarProvider>
           </RecentCommunityContextProvider>
-          {Auth}
+          {auth}
         </TRPCReactProvider>
         <Toaster closeButton />
       </body>
