@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import logo from "@public/logo.svg";
-import logoText from "@public/logoText.svg";
+import shrek from "@public/shrek.svg";
+import shrekText from "@public/shrekText.svg";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -29,9 +29,9 @@ export default function SidebarLogo() {
           }}
         >
           <Link href="/">
-            <Image src={logo} alt="logo" priority className="h-full w-auto" />
+            <Image src={shrek} alt="logo" priority className="size-10" />
             <Image
-              src={logoText}
+              src={shrekText}
               alt="logo text"
               priority
               className="h-5/6 w-auto"

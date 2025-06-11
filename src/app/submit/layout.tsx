@@ -7,7 +7,7 @@ import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
 import { getQueryClient, trpc } from "@/trpc/server";
-import logo from "@public/logo.svg";
+import shrek from "@public/shrek.svg";
 
 export default async function SubmitLayout({
   children,
@@ -40,7 +40,7 @@ export default async function SubmitLayout({
       <div className="bg-card sticky top-[72px] hidden h-fit w-80 flex-col gap-2.5 rounded-lg border p-4 text-sm xl:flex">
         <div>
           <div className="mb-2 flex items-center gap-2">
-            <Image src={logo} alt="logo" className="size-8" />
+            <Image src={shrek} alt="logo" className="size-8" />
             <h2 className="text-base font-medium">Posting to Shreddit</h2>
           </div>
           <div>
