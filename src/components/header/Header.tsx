@@ -1,27 +1,26 @@
 import Link from "next/link";
 
-import {
-  ClerkLoaded,
-  ClerkLoading,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-} from "@clerk/nextjs";
 import { Plus } from "lucide-react";
 
+import { getSession } from "@/app/actions";
 import { Button } from "../ui/button";
-import { Skeleton } from "../ui/skeleton";
 import ProfileButton from "./ProfileButton";
 import { Search } from "./Search";
 
-export default function Header({ children }: { children: React.ReactNode }) {
+export default async function Header({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await getSession();
+
   return (
     <header className="bg-card sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4">
       {children}
 
       <Search />
 
-      <SignedIn>
+      {session && (
         <div className="flex items-center gap-2">
           <Button
             variant={"ghost"}
@@ -34,31 +33,20 @@ export default function Header({ children }: { children: React.ReactNode }) {
             </Link>
           </Button>
 
-          <ClerkLoading>
-            <Skeleton className="size-8 rounded-full" />
-          </ClerkLoading>
-          <ClerkLoaded>
-            <ProfileButton />
-          </ClerkLoaded>
+          <ProfileButton />
         </div>
-      </SignedIn>
+      )}
 
-      <SignedOut>
+      {!session && (
         <div className="flex items-center gap-2">
-          <ClerkLoading>
-            <Button className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90">
-              Sign in
-            </Button>
-          </ClerkLoading>
-          <ClerkLoaded>
-            <SignInButton mode="modal">
-              <Button className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90">
-                Sign in
-              </Button>
-            </SignInButton>
-          </ClerkLoaded>
+          <Button
+            className="text-foreground rounded-full bg-rose-600 hover:bg-rose-600/90"
+            asChild
+          >
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
         </div>
-      </SignedOut>
+      )}
     </header>
   );
 }

@@ -1,32 +1,32 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { getSessionCookie } from "better-auth/cookies";
 
 import { PostSort } from "./types/enums";
 
-const isProtectedRoute = createRouteMatcher(["/home(.*)", "/submit(.*)"]);
+export async function middleware(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request);
+  const { pathname } = request.nextUrl;
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId, redirectToSignIn } = await auth();
-
-  if (!userId && isProtectedRoute(req)) {
-    return redirectToSignIn();
+  if (!sessionCookie && ["/home", "/submit"].includes(pathname)) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
-  if (req.nextUrl.pathname === "/") {
-    if (userId) {
-      return NextResponse.rewrite(new URL(`/home/${PostSort.BEST}`, req.url));
+  if (request.nextUrl.pathname === "/") {
+    if (sessionCookie) {
+      return NextResponse.rewrite(
+        new URL(`/home/${PostSort.BEST}`, request.url),
+      );
     } else {
-      return NextResponse.rewrite(new URL(`/all/${PostSort.BEST}`, req.url));
+      return NextResponse.rewrite(
+        new URL(`/all/${PostSort.BEST}`, request.url),
+      );
     }
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/", "/dashboard"],
 };

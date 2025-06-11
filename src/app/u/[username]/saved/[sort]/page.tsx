@@ -1,19 +1,19 @@
-import { auth as authPromise } from "@clerk/nextjs/server";
 import { z } from "zod/v4";
 
+import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types/enums";
 
 export default async function UserPage(props: {
   params: Promise<{ username: string; sort: string }>;
 }) {
-  const [params, auth] = await Promise.all([props.params, authPromise()]);
+  const [params, session] = await Promise.all([props.params, getSession()]);
 
   const sort = z.enum(PostSort).parse(params.sort);
 
   return (
     <FeedPostInfiniteQuery
-      currentUserId={auth.userId}
+      currentUserId={session && session.session.userId}
       infiniteQueryOptions={{
         procedure: "getSavedPosts",
         input: {

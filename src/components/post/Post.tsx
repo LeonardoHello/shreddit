@@ -2,10 +2,10 @@
 
 import { notFound } from "next/navigation";
 
-import { User } from "@clerk/nextjs/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import PostContextProvider from "@/context/PostContext";
+import { User } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import PostBody from "./PostBody";
 import PostFooter from "./PostFooter";

@@ -1,18 +1,18 @@
 import { cache } from "react";
 
-import { auth } from "@clerk/nextjs/server";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { getSession } from "@/app/actions";
 import db from "@/db";
 
 export const createTRPCContext = cache(async () => {
   /**
    * @see: https://trpc.io/docs/server/context
    */
-  const { userId } = await auth();
-  return { db, userId };
+  const session = await getSession();
+  return { db, userId: session && session.session.userId };
 });
 
 // Avoid exporting the entire t-object

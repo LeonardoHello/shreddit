@@ -2,9 +2,8 @@
 
 import { Suspense, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
-import { useClerk } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
@@ -12,6 +11,7 @@ import {
   ReducerAction,
   useRecentCommunityDispatchContext,
 } from "@/context/RecentCommunityContext";
+import { User } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import { useTRPC } from "@/trpc/client";
 import communityBanner from "@public/communityBanner.jpg";
@@ -38,7 +38,6 @@ export default function CommunityHeader({
 
   const dispatch = useRecentCommunityDispatchContext();
 
-  const clerk = useClerk();
   const isHydrated = useHydration();
 
   useEffect(() => {
@@ -100,24 +99,15 @@ export default function CommunityHeader({
 
         {!currentUserId && (
           <div className="flex items-center gap-3">
-            <Button
-              variant={"outline"}
-              className="rounded-full"
-              onClick={() => {
-                clerk.openSignIn();
-              }}
-            >
-              <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
-              <span className="capitalize">create post</span>
+            <Button variant={"outline"} className="rounded-full" asChild>
+              <Link href={"/sign-in"}>
+                <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+                <span className="capitalize">create post</span>
+              </Link>
             </Button>
 
-            <Button
-              className="rounded-full font-bold capitalize"
-              onClick={() => {
-                clerk.openSignIn();
-              }}
-            >
-              join
+            <Button className="rounded-full font-bold capitalize" asChild>
+              <Link href={"/sign-in"}>join</Link>
             </Button>
           </div>
         )}

@@ -1,5 +1,5 @@
-import { useClerk } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
+import Link from "next/link";
+
 import { MessageCircle } from "lucide-react";
 
 import {
@@ -7,6 +7,7 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { User } from "@/db/schema/users";
 import { Button } from "../ui/button";
 import CommentDeleteDialog from "./CommentDeleteDialog";
 import CommentDropdown from "./CommentDropdown";
@@ -20,8 +21,6 @@ export default function CommentFooter({
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const clerk = useClerk();
-
   return (
     <div className="text-muted-foreground flex items-center">
       <CommentVote currentUserId={currentUserId} />
@@ -30,16 +29,18 @@ export default function CommentFooter({
         size="sm"
         variant={"ghost"}
         className="size-8 gap-1.5 rounded-full sm:w-auto"
+        disabled={!currentUserId}
         onClick={() => {
           if (currentUserId) {
             dispatch({ type: ReducerAction.TOGGLE_REPLY });
-          } else {
-            clerk.openSignIn();
           }
         }}
+        asChild
       >
-        <MessageCircle className="size-4" />
-        <span className="hidden sm:inline-block">Reply</span>
+        <Link href={"/sign-in"}>
+          <MessageCircle className="size-4" />
+          <span className="hidden sm:inline-block">Reply</span>
+        </Link>
       </Button>
 
       {currentUserId === state.authorId && (

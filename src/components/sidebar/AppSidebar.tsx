@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
-import { auth } from "@clerk/nextjs/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { getSession } from "@/app/actions";
 import {
   Sidebar,
   SidebarContent,
@@ -21,11 +21,11 @@ import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
 export async function AppSidebar() {
-  const { userId } = await auth();
+  const session = await getSession();
 
   const queryClient = getQueryClient();
 
-  if (userId) {
+  if (session) {
     void queryClient.prefetchQuery(
       trpc.community.getModeratedCommunities.queryOptions(),
     );
@@ -41,7 +41,7 @@ export async function AppSidebar() {
     <Sidebar className="z-20">
       <SidebarHeader>
         <SidebarLogo />
-        <SidebarMenuMain isSignedIn={!!userId} />
+        <SidebarMenuMain isSignedIn={!!session} />
       </SidebarHeader>
 
       <SidebarSeparator />
@@ -60,7 +60,7 @@ export async function AppSidebar() {
 
           <SidebarSeparator />
 
-          {userId && (
+          {session && (
             <HydrationBoundary state={dehydrate(queryClient)}>
               <Suspense
                 fallback={<SidebarNavSkeleton length={2} canFavorite />}

@@ -1,9 +1,9 @@
 "use client";
 
-import { User } from "@clerk/nextjs/server";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import CommentContextProvider from "@/context/CommentContext";
+import { User } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import Comment from "./Comment";
 import CommentSectionEmpty from "./CommentSectionEmpty";

@@ -1,8 +1,7 @@
 import { usePathname, useRouter } from "next/navigation";
 
-import { User } from "@clerk/nextjs/server";
-
 import { usePostContext } from "@/context/PostContext";
+import { User } from "@/db/schema/users";
 import PostBody from "../post/PostBody";
 import PostFooter from "../post/PostFooter";
 import PostHeader from "../post/PostHeader";

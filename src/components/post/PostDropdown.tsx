@@ -1,6 +1,5 @@
 "use client";
 
-import { User } from "@clerk/nextjs/server";
 import { useMutation } from "@tanstack/react-query";
 import {
   AlertTriangle,
@@ -30,6 +29,7 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
+import { User } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";

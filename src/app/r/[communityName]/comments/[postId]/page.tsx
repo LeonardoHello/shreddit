@@ -1,30 +1,48 @@
-import { auth as authPromise } from "@clerk/nextjs/server";
+import Link from "next/link";
 
+import { Plus } from "lucide-react";
+
+import { getSession } from "@/app/actions";
 import CommentSection from "@/components/comment/CommentSection";
 import Post from "@/components/post/Post";
 import RTEComment from "@/components/RTE/RTEComment";
-import RTECommentPlaceholder from "@/components/RTE/RTECommentPlaceholder";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default async function PostPage(props: {
   params: Promise<{ postId: string }>;
 }) {
-  const [params, auth] = await Promise.all([props.params, authPromise()]);
+  const [params, session] = await Promise.all([props.params, getSession()]);
 
   return (
     <div className="flex w-0 grow flex-col gap-2">
-      <Post currentUserId={auth.userId} postId={params.postId} />
+      <Post
+        currentUserId={session && session.session.userId}
+        postId={params.postId}
+      />
 
       <div className="bg-card flex flex-col gap-4 rounded-lg border p-4 pb-8">
-        {auth.userId ? (
+        {session ? (
           <RTEComment postId={params.postId} />
         ) : (
-          <RTECommentPlaceholder />
+          <Button
+            variant={"outline"}
+            className="self-start rounded-full"
+            asChild
+          >
+            <Link href={"/sign-in"}>
+              <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+              Add a comment
+            </Link>
+          </Button>
         )}
 
         <Separator />
 
-        <CommentSection currentUserId={auth.userId} postId={params.postId} />
+        <CommentSection
+          currentUserId={session && session.session.userId}
+          postId={params.postId}
+        />
       </div>
     </div>
   );

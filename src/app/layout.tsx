@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Reddit_Sans } from "next/font/google";
 
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { Analytics } from "@vercel/analytics/next";
 import { extractRouterConfig } from "uploadthing/server";
@@ -34,52 +32,42 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  Auth,
 }: {
   children: React.ReactNode;
+  Auth: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-        layout: {
-          termsPageUrl: "https://clerk.com/terms",
-          privacyPageUrl: "https://clerk.com/privacy",
-          logoPlacement: "none",
-        },
-        variables: { colorPrimary: "#f43f5e" },
-      }}
-    >
-      <html lang="en" suppressHydrationWarning className="dark">
-        <body className={`${reddit_sans.className} antialiased`}>
-          <TRPCReactProvider>
-            <NextSSRPlugin
-              /**
-               * The `extractRouterConfig` will extract **only** the route configs
-               * from the router to prevent additional information from being
-               * leaked to the client. The data passed to the client is the same
-               * as if you were to fetch `/api/uploadthing` directly.
-               */
-              routerConfig={extractRouterConfig(ourFileRouter)}
-            />
+    <html lang="en" suppressHydrationWarning className="dark">
+      <body className={`${reddit_sans.className} antialiased`}>
+        <TRPCReactProvider>
+          <NextSSRPlugin
+            /**
+             * The `extractRouterConfig` will extract **only** the route configs
+             * from the router to prevent additional information from being
+             * leaked to the client. The data passed to the client is the same
+             * as if you were to fetch `/api/uploadthing` directly.
+             */
+            routerConfig={extractRouterConfig(ourFileRouter)}
+          />
+          <RecentCommunityContextProvider>
+            <SidebarProvider>
+              <AppSidebar />
 
-            <RecentCommunityContextProvider>
-              <SidebarProvider>
-                <AppSidebar />
+              <SidebarInset>
+                <Header>
+                  <SidebarTrigger className="-ml-1 [&_svg]:stroke-[1.5]" />
+                </Header>
 
-                <SidebarInset>
-                  <Header>
-                    <SidebarTrigger className="-ml-1 [&_svg]:stroke-[1.5]" />
-                  </Header>
-
-                  {children}
-                  <Analytics />
-                </SidebarInset>
-              </SidebarProvider>
-            </RecentCommunityContextProvider>
-          </TRPCReactProvider>
-          <Toaster closeButton />
-        </body>
-      </html>
-    </ClerkProvider>
+                {children}
+                <Analytics />
+              </SidebarInset>
+            </SidebarProvider>
+          </RecentCommunityContextProvider>
+          {Auth}
+        </TRPCReactProvider>
+        <Toaster closeButton />
+      </body>
+    </html>
   );
 }

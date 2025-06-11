@@ -1,7 +1,7 @@
 "use client";
 
-import { useClerk } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
+import Link from "next/link";
+
 import { useMutation } from "@tanstack/react-query";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
+import { User } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
@@ -22,8 +23,6 @@ export default function PostVote({
 }) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
-
-  const clerk = useClerk();
 
   const trpc = useTRPC();
 
@@ -67,17 +66,18 @@ export default function PostVote({
               postId: state.id,
               voteStatus: isUpvoted ? "none" : "upvoted",
             });
-          } else {
-            clerk.openSignIn();
           }
         }}
+        asChild
       >
-        <ArrowBigUp
-          className={cn("stroke-[1.2]", {
-            "fill-foreground": isUpvoted,
-          })}
-        />
-        <span className="sr-only">Upvote</span>
+        <Link href={"/sign-in"}>
+          <ArrowBigUp
+            className={cn("stroke-[1.2]", {
+              "fill-foreground": isUpvoted,
+            })}
+          />
+          <span className="sr-only">Upvote</span>
+        </Link>
       </Button>
 
       <div className="text-xs font-bold">
@@ -100,17 +100,18 @@ export default function PostVote({
               postId: state.id,
               voteStatus: isDownvoted ? "none" : "downvoted",
             });
-          } else {
-            clerk.openSignIn();
           }
         }}
+        asChild
       >
-        <ArrowBigDown
-          className={cn("stroke-[1.2]", {
-            "fill-foreground": isDownvoted,
-          })}
-        />
-        <span className="sr-only">Downvote</span>
+        <Link href={"/sign-in"}>
+          <ArrowBigDown
+            className={cn("stroke-[1.2]", {
+              "fill-foreground": isDownvoted,
+            })}
+          />
+          <span className="sr-only">Downvote</span>
+        </Link>
       </Button>
     </div>
   );

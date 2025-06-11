@@ -1,7 +1,6 @@
-import { User } from "@clerk/nextjs/server";
-
 import CommentContextProvider from "@/context/CommentContext";
 import { Comment as CommentType } from "@/db/schema/comments";
+import { User } from "@/db/schema/users";
 import { RouterOutput } from "@/trpc/routers/_app";
 import Comment from "./Comment";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useClerk } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
+import Link from "next/link";
+
 import { useMutation } from "@tanstack/react-query";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { User } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
@@ -22,8 +23,6 @@ export default function CommentVote({
 }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
-
-  const clerk = useClerk();
 
   const trpc = useTRPC();
 
@@ -60,17 +59,19 @@ export default function CommentVote({
               commentId: state.id,
               voteStatus: isUpvoted ? "none" : "upvoted",
             });
-          } else {
-            clerk.openSignIn();
           }
         }}
+        disabled={!currentUserId}
+        asChild
       >
-        <ArrowBigUp
-          className={cn("stroke-[1.2]", {
-            "fill-rose-600 text-rose-600": isUpvoted,
-          })}
-        />
-        <span className="sr-only">Upvote</span>
+        <Link href="/sign-in">
+          <ArrowBigUp
+            className={cn("stroke-[1.2]", {
+              "fill-rose-600 text-rose-600": isUpvoted,
+            })}
+          />
+          <span className="sr-only">Upvote</span>
+        </Link>
       </Button>
 
       <div className="text-xs font-bold">
@@ -89,17 +90,19 @@ export default function CommentVote({
               commentId: state.id,
               voteStatus: isDownvoted ? "none" : "downvoted",
             });
-          } else {
-            clerk.openSignIn();
           }
         }}
+        disabled={!currentUserId}
+        asChild
       >
-        <ArrowBigDown
-          className={cn("stroke-[1.2]", {
-            "fill-indigo-500 text-indigo-500": isDownvoted,
-          })}
-        />
-        <span className="sr-only">Downvote</span>
+        <Link href="/sign-in">
+          <ArrowBigDown
+            className={cn("stroke-[1.2]", {
+              "fill-indigo-500 text-indigo-500": isDownvoted,
+            })}
+          />
+          <span className="sr-only">Downvote</span>
+        </Link>
       </Button>
     </div>
   );
