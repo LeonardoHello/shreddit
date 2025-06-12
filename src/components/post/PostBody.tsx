@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/cn";
 import RTEPostEdit from "../RTE/RTEPostEdit";
 import PostBodyImage from "./PostBodyImage";
 import PostBodyText from "./PostBodyText";

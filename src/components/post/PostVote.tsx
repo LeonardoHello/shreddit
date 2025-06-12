@@ -12,8 +12,8 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { User } from "@/db/schema/users";
+import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 
 export default function PostVote({

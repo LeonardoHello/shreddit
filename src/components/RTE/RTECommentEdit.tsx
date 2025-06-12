@@ -15,8 +15,8 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import RTECommentButtons from "./RTECommentButtons";

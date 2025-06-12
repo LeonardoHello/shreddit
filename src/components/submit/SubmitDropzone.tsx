@@ -8,7 +8,7 @@ import {
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
 import { PostFileSchema } from "@/db/schema/posts";
-import { UploadDropzone } from "@/utils/uploadthing";
+import { UploadDropzone } from "@/lib/uploadthing";
 
 const postFileSchema = PostFileSchema.pick({
   key: true,

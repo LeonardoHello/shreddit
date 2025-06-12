@@ -16,8 +16,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Post } from "@/db/schema/posts";
+import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import RTECommentButtons from "./RTECommentButtons";

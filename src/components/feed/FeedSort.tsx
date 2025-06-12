@@ -5,8 +5,8 @@ import { useParams, usePathname } from "next/navigation";
 
 import { ChevronDown } from "lucide-react";
 
+import { cn } from "@/lib/cn";
 import { PostSort } from "@/types/enums";
-import { cn } from "@/utils/cn";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,

@@ -18,10 +18,10 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
+import { cn } from "@/lib/cn";
+import { useUploadThing } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import { useUploadThing } from "@/utils/uploadthing";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 import { Toggle } from "../ui/toggle";

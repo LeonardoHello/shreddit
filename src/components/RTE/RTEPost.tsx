@@ -21,10 +21,10 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
+import { cn } from "@/lib/cn";
+import { useUploadThing } from "@/lib/uploadthing";
 import { PostType } from "@/types/enums";
-import { cn } from "@/utils/cn";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
-import { useUploadThing } from "@/utils/uploadthing";
 import { Progress } from "../ui/progress";
 import { Toggle } from "../ui/toggle";
 import RTEPostButtons from "./RTEPostButtons";

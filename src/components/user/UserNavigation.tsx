@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/cn";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,

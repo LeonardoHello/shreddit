@@ -20,8 +20,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
-import { cn } from "@/utils/cn";
 import CommunityImage from "../community/CommunityImage";
 import {
   AccordionContent,
