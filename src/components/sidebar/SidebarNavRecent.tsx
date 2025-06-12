@@ -51,6 +51,7 @@ export default function SidebarNavRecent() {
                         setOpenMobile(false);
                       }
                     }}
+                    className="[&>svg]:size-6"
                   >
                     <Link href={`/r/${community.name}`}>
                       <CommunityImage icon={community.icon} size={32} />

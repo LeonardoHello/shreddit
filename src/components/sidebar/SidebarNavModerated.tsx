@@ -90,8 +90,8 @@ export default function SidebarNavModerated() {
             <SidebarMenu>
               <SidebarDialog>
                 <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <Plus className="size-8 stroke-1" />
+                  <SidebarMenuButton className="[&>svg]:size-6">
+                    <Plus className="stroke-1" />
                     Create Community
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -115,6 +115,7 @@ export default function SidebarNavModerated() {
                             setOpenMobile(false);
                           }
                         }}
+                        className="[&>svg]:size-6"
                       >
                         <Link href={`/r/${userToCommunity.community.name}`}>
                           <CommunityImage

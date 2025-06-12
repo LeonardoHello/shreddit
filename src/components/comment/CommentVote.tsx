@@ -66,7 +66,7 @@ export default function CommentVote({
       >
         <Link href="/sign-in">
           <ArrowBigUp
-            className={cn("stroke-[1.2]", {
+            className={cn("size-6 stroke-[1.2]", {
               "fill-rose-600 text-rose-600": isUpvoted,
             })}
           />
@@ -97,7 +97,7 @@ export default function CommentVote({
       >
         <Link href="/sign-in">
           <ArrowBigDown
-            className={cn("stroke-[1.2]", {
+            className={cn("size-6 stroke-[1.2]", {
               "fill-indigo-500 text-indigo-500": isDownvoted,
             })}
           />

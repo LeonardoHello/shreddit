@@ -55,6 +55,7 @@ export default function SidebarNavMain({
                   setOpenMobile(false);
                 }
               }}
+              className="[&>svg]:size-5"
             >
               <Link href={item.href}>
                 <item.icon />

@@ -108,6 +108,7 @@ export default function SidebarNavJoined() {
                           setOpenMobile(false);
                         }
                       }}
+                      className="[&>svg]:size-6"
                     >
                       <Link href={`/r/${userToCommunity.community.name}`}>
                         <CommunityImage

@@ -72,7 +72,7 @@ export default function PostVote({
       >
         <Link href={"/sign-in"}>
           <ArrowBigUp
-            className={cn("stroke-[1.2]", {
+            className={cn("size-6 stroke-[1.2]", {
               "fill-foreground": isUpvoted,
             })}
           />
@@ -106,7 +106,7 @@ export default function PostVote({
       >
         <Link href={"/sign-in"}>
           <ArrowBigDown
-            className={cn("stroke-[1.2]", {
+            className={cn("size-6 stroke-[1.2]", {
               "fill-foreground": isDownvoted,
             })}
           />
