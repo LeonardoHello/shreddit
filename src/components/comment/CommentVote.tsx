@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useMutation } from "@tanstack/react-query";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
@@ -21,6 +21,8 @@ export default function CommentVote({
 }: {
   currentUserId: User["id"] | null;
 }) {
+  const router = useRouter();
+
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
@@ -59,19 +61,17 @@ export default function CommentVote({
               commentId: state.id,
               voteStatus: isUpvoted ? "none" : "upvoted",
             });
+          } else {
+            router.push("/sign-in");
           }
         }}
-        disabled={!currentUserId}
-        asChild
       >
-        <Link href="/sign-in">
-          <ArrowBigUp
-            className={cn("size-6 stroke-[1.2]", {
-              "fill-rose-600 text-rose-600": isUpvoted,
-            })}
-          />
-          <span className="sr-only">Upvote</span>
-        </Link>
+        <ArrowBigUp
+          className={cn("size-6 stroke-[1.2]", {
+            "fill-rose-600 text-rose-600": isUpvoted,
+          })}
+        />
+        <span className="sr-only">Upvote</span>
       </Button>
 
       <div className="text-xs font-bold">
@@ -90,19 +90,17 @@ export default function CommentVote({
               commentId: state.id,
               voteStatus: isDownvoted ? "none" : "downvoted",
             });
+          } else {
+            router.push("/sign-in");
           }
         }}
-        disabled={!currentUserId}
-        asChild
       >
-        <Link href="/sign-in">
-          <ArrowBigDown
-            className={cn("size-6 stroke-[1.2]", {
-              "fill-indigo-500 text-indigo-500": isDownvoted,
-            })}
-          />
-          <span className="sr-only">Downvote</span>
-        </Link>
+        <ArrowBigDown
+          className={cn("size-6 stroke-[1.2]", {
+            "fill-indigo-500 text-indigo-500": isDownvoted,
+          })}
+        />
+        <span className="sr-only">Downvote</span>
       </Button>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useMutation } from "@tanstack/react-query";
 import { ArrowBigDown, ArrowBigUp } from "lucide-react";
@@ -21,6 +21,8 @@ export default function PostVote({
 }: {
   currentUserId: User["id"] | null;
 }) {
+  const router = useRouter();
+
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
@@ -66,18 +68,17 @@ export default function PostVote({
               postId: state.id,
               voteStatus: isUpvoted ? "none" : "upvoted",
             });
+          } else {
+            router.push("/sign-in");
           }
         }}
-        asChild
       >
-        <Link href={"/sign-in"}>
-          <ArrowBigUp
-            className={cn("size-6 stroke-[1.2]", {
-              "fill-foreground": isUpvoted,
-            })}
-          />
-          <span className="sr-only">Upvote</span>
-        </Link>
+        <ArrowBigUp
+          className={cn("size-6 stroke-[1.2]", {
+            "fill-foreground": isUpvoted,
+          })}
+        />
+        <span className="sr-only">Upvote</span>
       </Button>
 
       <div className="text-xs font-bold">
@@ -100,18 +101,17 @@ export default function PostVote({
               postId: state.id,
               voteStatus: isDownvoted ? "none" : "downvoted",
             });
+          } else {
+            router.push("/sign-in");
           }
         }}
-        asChild
       >
-        <Link href={"/sign-in"}>
-          <ArrowBigDown
-            className={cn("size-6 stroke-[1.2]", {
-              "fill-foreground": isDownvoted,
-            })}
-          />
-          <span className="sr-only">Downvote</span>
-        </Link>
+        <ArrowBigDown
+          className={cn("size-6 stroke-[1.2]", {
+            "fill-foreground": isDownvoted,
+          })}
+        />
+        <span className="sr-only">Downvote</span>
       </Button>
     </div>
   );
