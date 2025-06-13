@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { MessageCircle } from "lucide-react";
 
@@ -18,6 +18,8 @@ export default function CommentFooter({
 }: {
   currentUserId: User["id"] | null;
 }) {
+  const router = useRouter();
+
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
@@ -33,14 +35,13 @@ export default function CommentFooter({
         onClick={() => {
           if (currentUserId) {
             dispatch({ type: ReducerAction.TOGGLE_REPLY });
+          } else {
+            router.push("/sign-in");
           }
         }}
-        asChild
       >
-        <Link href={"/sign-in"}>
-          <MessageCircle className="size-4" />
-          <span className="hidden sm:inline-block">Reply</span>
-        </Link>
+        <MessageCircle className="size-4" />
+        <span className="hidden sm:inline-block">Reply</span>
       </Button>
 
       {currentUserId === state.authorId && (
