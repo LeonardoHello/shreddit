@@ -50,11 +50,7 @@ export default function PostDeleteDialog({
   );
 
   return (
-    <AlertDialogContent
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
-    >
+    <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
         <AlertDialogDescription>
