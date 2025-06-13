@@ -22,10 +22,10 @@ export default async function Header({
       <Search />
 
       {session && (
-        <div className="flex items-center gap-2">
-          <Button variant={"ghost"} className="w-9 md:w-auto" asChild>
+        <div className="flex items-center gap-3">
+          <Button variant={"secondary"} className="w-9 md:w-auto" asChild>
             <Link href={"/submit"}>
-              <Plus className="size-4 stroke-1" viewBox="4 4 16 16" />
+              <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
               <span className="hidden md:inline-block">Create</span>
             </Link>
           </Button>

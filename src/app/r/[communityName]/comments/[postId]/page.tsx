@@ -31,7 +31,7 @@ export default async function PostPage(props: {
             asChild
           >
             <Link href={"/sign-in"}>
-              <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+              <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
               Add a comment
             </Link>
           </Button>

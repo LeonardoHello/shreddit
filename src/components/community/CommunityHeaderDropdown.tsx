@@ -144,14 +144,14 @@ export default function CommunityHeaderDropdown({
         asChild
       >
         <Link href={`/submit/r/${communityName}`}>
-          <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+          <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
           <span className="hidden capitalize sm:block">create post</span>
         </Link>
       </Button>
 
       <Button
         variant={userToCommunity.joined ? "outline" : "default"}
-        className="rounded-full font-bold"
+        className="rounded-full"
         onClick={() => {
           joinCommunity.mutate({
             communityId,

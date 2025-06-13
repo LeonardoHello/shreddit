@@ -101,12 +101,12 @@ export default function CommunityHeader({
           <div className="flex items-center gap-3">
             <Button variant={"outline"} className="rounded-full" asChild>
               <Link href={"/sign-in"}>
-                <Plus className="size-5 stroke-1" viewBox="4 4 16 16" />
+                <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
                 <span className="capitalize">create post</span>
               </Link>
             </Button>
 
-            <Button className="rounded-full font-bold capitalize" asChild>
+            <Button className="rounded-full capitalize" asChild>
               <Link href={"/sign-in"}>join</Link>
             </Button>
           </div>

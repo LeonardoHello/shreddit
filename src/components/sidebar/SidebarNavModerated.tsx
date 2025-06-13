@@ -91,7 +91,7 @@ export default function SidebarNavModerated() {
               <SidebarDialog>
                 <SidebarMenuItem>
                   <SidebarMenuButton className="[&>svg]:size-6">
-                    <Plus className="stroke-1" />
+                    <Plus className="stroke-[1.5]" />
                     Create Community
                   </SidebarMenuButton>
                 </SidebarMenuItem>
