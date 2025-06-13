@@ -26,11 +26,15 @@ export default function ParallelSignInPage() {
         }
       }}
     >
-      <DialogContent className="items-center">
-        <Image src={shrek} alt="shrek" className="size-10" />
+      <DialogContent className="justify-center">
+        <Image
+          src={shrek}
+          alt="shrek"
+          className="size-10 justify-self-center"
+        />
         <DialogHeader>
           <DialogTitle className="text-center">Welcome</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-center">
             Sign in with your favorite social provider
           </DialogDescription>
         </DialogHeader>
