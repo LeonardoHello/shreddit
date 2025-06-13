@@ -4,9 +4,8 @@ import { Plus } from "lucide-react";
 
 import { getSession } from "@/app/actions";
 import { Button } from "../ui/button";
-import ProfileButton from "./ProfileButton";
 import { Search } from "./Search";
-import SignInButton from "./SignInButton";
+import UserDropdownMenu from "./UserDropdownMenu";
 
 export default async function Header({
   children,
@@ -23,18 +22,26 @@ export default async function Header({
 
       {session && (
         <div className="flex items-center gap-3">
-          <Button variant={"secondary"} className="w-9 md:w-auto" asChild>
+          <Button variant={"outline"} className="w-9 md:w-auto" asChild>
             <Link href={"/submit"}>
               <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
               <span className="hidden md:inline-block">Create</span>
             </Link>
           </Button>
 
-          <ProfileButton />
+          <UserDropdownMenu
+            name={session.user.name}
+            username={session.user.username}
+            userImage={session.user.image}
+          />
         </div>
       )}
 
-      {!session && <SignInButton />}
+      {!session && (
+        <Button asChild>
+          <Link href="/sign-in">Sign in</Link>
+        </Button>
+      )}
     </header>
   );
 }
