@@ -1,9 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { useCommentContext } from "@/context/CommentContext";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
+import donkey from "@public/donkey.png";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export default function CommentHeader() {
   const hydrated = useHydration();
@@ -12,14 +13,12 @@ export default function CommentHeader() {
   return (
     <div className="flex items-center gap-2">
       <Link href={`/u/${state.author.username}`} className="rounded-full">
-        <Image
-          src={state.author.image ?? ""}
-          alt="user background"
-          priority
-          width={28}
-          height={28}
-          className="rounded-full"
-        />
+        <Avatar className="size-7">
+          <AvatarImage src={state.author.image ?? donkey.src} />
+          <AvatarFallback className="uppercase">
+            {state.author.username?.slice(0, 2)}
+          </AvatarFallback>
+        </Avatar>
       </Link>
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">

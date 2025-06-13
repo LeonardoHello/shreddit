@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +10,9 @@ import * as motion from "motion/react-client";
 
 import useDropdown from "@/hooks/useDropdown";
 import { useTRPC } from "@/trpc/client";
+import donkey from "@public/donkey.png";
 import CommunityImage from "../community/CommunityImage";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -168,13 +169,12 @@ const SearchDropdown = memo(
                 onClick={closeDropdown}
               >
                 <Link href={`/u/${user.username}`}>
-                  <Image
-                    src={user.image ?? ""}
-                    alt="community image"
-                    height={28}
-                    width={28}
-                    className="rounded-full"
-                  />
+                  <Avatar className="size-7">
+                    <AvatarImage src={user.image ?? donkey.src} />
+                    <AvatarFallback className="uppercase">
+                      {user.username?.slice(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="w-0 grow">
                     <div className="truncate text-sm font-medium">
                       u/{user.username}

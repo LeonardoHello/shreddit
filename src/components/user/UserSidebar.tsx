@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
+import donkey from "@public/donkey.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -74,7 +75,7 @@ function UserSidebarContent({ username }: { username: string }) {
     <>
       <div className="flex items-center gap-1.5">
         <Avatar>
-          <AvatarImage src={user.image ?? undefined} />
+          <AvatarImage src={user.image ?? donkey.src} />
           <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">

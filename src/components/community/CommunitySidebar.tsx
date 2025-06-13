@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { Community } from "@/db/schema/communities";
 import { useTRPC } from "@/trpc/client";
+import donkey from "@public/donkey.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
@@ -149,7 +150,7 @@ function CommunitySidebarContent({
           className="inline-flex w-full items-center gap-2"
         >
           <Avatar className="size-8">
-            <AvatarImage src={community.moderator.image ?? undefined} />
+            <AvatarImage src={community.moderator.image ?? donkey.src} />
             <AvatarFallback className="uppercase">
               {community.moderator.username?.slice(0, 2)}
             </AvatarFallback>

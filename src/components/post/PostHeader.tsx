@@ -7,6 +7,7 @@ import { usePostContext } from "@/context/PostContext";
 import { User, UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
+import donkey from "@public/donkey.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import PostDeleteDialog from "./PostDeleteDialog";
@@ -36,7 +37,7 @@ export default function PostHeader({
             className="group text-foreground flex items-center gap-1.5"
           >
             <Avatar className="size-6">
-              <AvatarImage src={state.author.image ?? undefined} />
+              <AvatarImage src={state.author.image ?? donkey.src} />
               <AvatarFallback className="uppercase">
                 {username.slice(0, 2)}
               </AvatarFallback>
