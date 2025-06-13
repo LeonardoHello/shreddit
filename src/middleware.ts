@@ -12,11 +12,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (
-    !sessionCookie &&
-    (pathname.startsWith("/home") || pathname.startsWith("/submit"))
-  ) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  if (!sessionCookie) {
+    if (pathname.startsWith("/home")) {
+      return NextResponse.redirect(new URL("/", request.url));
+    } else if (pathname.startsWith("/submit")) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
   }
 
   if (request.nextUrl.pathname === "/") {
