@@ -10,6 +10,7 @@ import * as postsSchema from "@/db/schema/posts";
 import * as usersSchema from "@/db/schema/users";
 
 export const auth = betterAuth({
+  advanced: { cookiePrefix: "shreddit" },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

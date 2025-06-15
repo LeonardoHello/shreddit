@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 import { PostSort } from "@/types/enums";
 
+const sessionCookieKey = "shreddit.session_token";
+
 const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
@@ -18,8 +20,87 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/sign-in",
+        has: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: `/home/${PostSort.BEST}`,
+        permanent: false,
+      },
+      {
+        source: "/home",
+        missing: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: `/all/${PostSort.BEST}`,
+        permanent: false,
+      },
+      {
+        source: "/home/:sort",
+        missing: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: `/all/${PostSort.BEST}`,
+        permanent: false,
+      },
+      {
+        source: "/submit",
+        missing: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: "/sign-in",
+        permanent: false,
+      },
+      {
+        source: "/submit/r/:communityName",
+        missing: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: "/sign-in",
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
+      {
+        source: "/",
+        missing: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: `/all/${PostSort.BEST}`,
+      },
+      {
+        source: "/",
+        has: [
+          {
+            type: "cookie",
+            key: sessionCookieKey,
+          },
+        ],
+        destination: `/home/${PostSort.BEST}`,
+      },
       {
         source: "/all",
         destination: `/all/${PostSort.BEST}`,
