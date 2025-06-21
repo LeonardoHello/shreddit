@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Community } from "@/db/schema/communities";
+import { UserSchema } from "@/db/schema/users";
 import { useTRPC } from "@/trpc/client";
 import donkey from "@public/donkey.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -70,6 +71,10 @@ function CommunitySidebarContent({
   const { data: community } = useSuspenseQuery(
     trpc.community.getCommunityByName.queryOptions(communityName),
   );
+
+  const { success, data: username } = UserSchema.shape.username
+    .unwrap()
+    .safeParse(community.moderator.username);
 
   return (
     <>
@@ -145,20 +150,32 @@ function CommunitySidebarContent({
 
       <div className="flex flex-col items-start gap-1">
         <div className="text-muted-foreground text-sm uppercase">Moderator</div>
-        <Link
-          href={`/u/${community.moderator.username}`}
-          className="inline-flex w-full items-center gap-2"
-        >
-          <Avatar className="size-8">
-            <AvatarImage src={community.moderator.image ?? donkey.src} />
-            <AvatarFallback className="uppercase">
-              {community.moderator.username?.slice(0, 2)}
-            </AvatarFallback>
-          </Avatar>
-          <span className="truncate text-sm">
-            u/{community.moderator.username}
-          </span>
-        </Link>
+        {success ? (
+          <Link
+            href={`/u/${username}`}
+            className="inline-flex w-full items-center gap-2"
+          >
+            <Avatar className="size-8">
+              <AvatarImage src={community.moderator.image ?? donkey.src} />
+              <AvatarFallback className="uppercase">
+                {username.slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="truncate text-sm">u/{username}</span>
+          </Link>
+        ) : (
+          <div className="inline-flex w-full items-center gap-2">
+            <Avatar className="size-8">
+              <AvatarImage src={community.moderator.image ?? donkey.src} />
+              <AvatarFallback className="uppercase">
+                {community.moderator.name.slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="truncate text-sm">
+              u/{community.moderatorId.slice(0, 9)}
+            </span>
+          </div>
+        )}
       </div>
     </>
   );

@@ -31,7 +31,9 @@ export default function UserHeader({ username }: { username: string }) {
         <div className="flex items-center gap-2 lg:max-h-10">
           <Avatar className="border-card bg-card size-12 lg:size-24 lg:self-end lg:border-4">
             <AvatarImage src={user.image ?? donkey.src} />
-            <AvatarFallback>{username.slice(0, 2)}</AvatarFallback>
+            <AvatarFallback className="uppercase">
+              {username.slice(0, 2)}
+            </AvatarFallback>
           </Avatar>
 
           <div>

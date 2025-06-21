@@ -23,29 +23,41 @@ export default function PostHeader({
   const state = usePostContext();
   const hydrated = useHydration();
 
-  const username = UserSchema.shape.username
+  const { success, data: username } = UserSchema.shape.username
     .unwrap()
-    .parse(state.author.username);
+    .safeParse(state.author.username);
 
   return (
     <div className="flex items-center justify-between gap-2">
       {communityName ? (
         <div className="text-muted-foreground flex items-center gap-1 text-xs">
-          <Link
-            href={`/u/${username}`}
-            onClick={(e) => e.stopPropagation()}
-            className="group text-foreground flex items-center gap-1.5"
-          >
-            <Avatar className="size-6">
-              <AvatarImage src={state.author.image ?? donkey.src} />
-              <AvatarFallback className="uppercase">
-                {username.slice(0, 2)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="font-extrabold break-all group-hover:opacity-80">
-              u/{username}
-            </span>
-          </Link>
+          {success ? (
+            <Link
+              href={`/u/${username}`}
+              onClick={(e) => e.stopPropagation()}
+              className="group text-foreground flex items-center gap-1.5"
+            >
+              <Avatar className="size-6">
+                <AvatarImage src={state.author.image ?? donkey.src} />
+                <AvatarFallback className="uppercase">
+                  {username.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="font-extrabold break-all group-hover:opacity-80">
+                u/{username}
+              </span>
+            </Link>
+          ) : (
+            <div className="group text-foreground flex items-center gap-1.5">
+              <Avatar className="size-6">
+                <AvatarImage src={state.author.image ?? donkey.src} />
+                <AvatarFallback className="uppercase">UN</AvatarFallback>
+              </Avatar>
+              <span className="font-extrabold break-all group-hover:opacity-80">
+                u/{state.authorId.slice(0, 9)}
+              </span>
+            </div>
+          )}
 
           <span>•</span>
           {hydrated ? (

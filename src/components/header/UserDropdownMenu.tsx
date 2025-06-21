@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { LogOut, User, UserCog } from "lucide-react";
-import { z } from "zod/v4";
 
 import {
   DropdownMenu,
@@ -31,10 +30,7 @@ export default function UserDropdownMenu({
 }) {
   const router = useRouter();
 
-  const parsedUsername = z.parse(
-    UserSchema.shape.username.unwrap().min(3).max(30),
-    username,
-  );
+  const parsedUsername = UserSchema.shape.username.unwrap().parse(username);
 
   return (
     <DropdownMenu>
@@ -48,7 +44,7 @@ export default function UserDropdownMenu({
           <Avatar className="size-8">
             <AvatarImage src={userImage ?? donkey.src} />
             <AvatarFallback className="uppercase">
-              {parsedUsername.slice(0, 2)}
+              {name.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
         </Button>

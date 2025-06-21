@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { useCommentContext } from "@/context/CommentContext";
+import { UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import donkey from "@public/donkey.png";
@@ -10,24 +11,43 @@ export default function CommentHeader() {
   const hydrated = useHydration();
   const state = useCommentContext();
 
+  const { success, data: username } = UserSchema.shape.username
+    .unwrap()
+    .safeParse(state.author.username);
+
   return (
     <div className="flex items-center gap-2">
-      <Link href={`/u/${state.author.username}`} className="rounded-full">
+      {success ? (
+        <Link href={`/u/${username}`} className="rounded-full">
+          <Avatar className="size-7">
+            <AvatarImage src={state.author.image ?? donkey.src} />
+            <AvatarFallback className="uppercase">
+              {username.slice(0, 2)}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
+      ) : (
         <Avatar className="size-7">
           <AvatarImage src={state.author.image ?? donkey.src} />
           <AvatarFallback className="uppercase">
-            {state.author.username?.slice(0, 2)}
+            {state.author.name.slice(0, 2)}
           </AvatarFallback>
         </Avatar>
-      </Link>
+      )}
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
-        <Link
-          href={`/u/${state.author.username}`}
-          className="font-extrabold break-all hover:underline"
-        >
-          {state.author.username}
-        </Link>
+        {success ? (
+          <Link
+            href={`/u/${username}`}
+            className="font-extrabold break-all hover:underline"
+          >
+            {username}
+          </Link>
+        ) : (
+          <div className="font-extrabold break-all hover:underline">
+            {state.authorId.slice(0, 9)}
+          </div>
+        )}
 
         {state.authorId === state.post.authorId && (
           <div className="font-bold text-blue-500 uppercase">op</div>
