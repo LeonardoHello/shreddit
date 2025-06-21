@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 import { PostSort } from "@/types/enums";
 
-const sessionCookieKey = "__Secure-shreddit.session_token";
+const sessionCookieKey = "__Secure-better-auth.session_token";
 
 const nextConfig: NextConfig = {
   experimental: {
