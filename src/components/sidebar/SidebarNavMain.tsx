@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -57,10 +57,10 @@ export default function SidebarNavMain({
               }}
               className="[&>svg]:size-5"
             >
-              <Link href={item.href}>
+              <HoverPrefetchLink href={item.href}>
                 <item.icon />
                 <span>{item.label}</span>
-              </Link>
+              </HoverPrefetchLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}

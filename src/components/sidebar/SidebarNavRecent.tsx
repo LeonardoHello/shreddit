@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -18,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
 export default function SidebarNavRecent() {
@@ -53,10 +52,10 @@ export default function SidebarNavRecent() {
                     }}
                     className="[&>svg]:size-6"
                   >
-                    <Link href={`/r/${community.name}`}>
+                    <HoverPrefetchLink href={`/r/${community.name}`}>
                       <CommunityImage icon={community.icon} size={32} />
                       <span>r/{community.name}</span>
-                    </Link>
+                    </HoverPrefetchLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

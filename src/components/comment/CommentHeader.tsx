@@ -1,11 +1,10 @@
-import Link from "next/link";
-
 import { useCommentContext } from "@/context/CommentContext";
 import { UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import donkey from "@public/donkey.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
 export default function CommentHeader() {
   const hydrated = useHydration();
@@ -18,14 +17,14 @@ export default function CommentHeader() {
   return (
     <div className="flex items-center gap-2">
       {success ? (
-        <Link href={`/u/${username}`} className="rounded-full">
+        <HoverPrefetchLink href={`/u/${username}`} className="rounded-full">
           <Avatar className="size-7">
             <AvatarImage src={state.author.image ?? donkey.src} />
             <AvatarFallback className="uppercase">
               {username.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
-        </Link>
+        </HoverPrefetchLink>
       ) : (
         <Avatar className="size-7">
           <AvatarImage src={state.author.image ?? donkey.src} />
@@ -37,12 +36,12 @@ export default function CommentHeader() {
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
         {success ? (
-          <Link
+          <HoverPrefetchLink
             href={`/u/${username}`}
             className="font-extrabold break-all hover:underline"
           >
             {username}
-          </Link>
+          </HoverPrefetchLink>
         ) : (
           <div className="font-extrabold break-all hover:underline">
             {state.authorId.slice(0, 9)}

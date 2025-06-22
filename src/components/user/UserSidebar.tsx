@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { onion } from "@lucide/lab";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Cake, Icon, Info } from "lucide-react";
@@ -19,6 +17,7 @@ import donkey from "@public/donkey.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Separator } from "../ui/separator";
 
 export default function UserSidebar({
@@ -136,12 +135,12 @@ function UserSidebarContent({ username }: { username: string }) {
                   <CommunityImage icon={community.icon} size={32} />
 
                   <div className="truncate text-xs tracking-wide">
-                    <Link
+                    <HoverPrefetchLink
                       href={`/r/${community.name}`}
                       className="max-w-[15rem] cursor-pointer font-medium lowercase hover:underline"
                     >
                       r/{community.name}
-                    </Link>
+                    </HoverPrefetchLink>
                     <div>
                       {new Intl.NumberFormat("en-US", {
                         notation: "compact",

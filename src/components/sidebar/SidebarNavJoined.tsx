@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import {
   useMutation,
   useQueryClient,
@@ -28,6 +26,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
 export default function SidebarNavJoined() {
   const queryClient = useQueryClient();
@@ -110,13 +109,15 @@ export default function SidebarNavJoined() {
                       }}
                       className="[&>svg]:size-6"
                     >
-                      <Link href={`/r/${userToCommunity.community.name}`}>
+                      <HoverPrefetchLink
+                        href={`/r/${userToCommunity.community.name}`}
+                      >
                         <CommunityImage
                           icon={userToCommunity.community.icon}
                           size={32}
                         />
                         <span>r/{userToCommunity.community.name}</span>
-                      </Link>
+                      </HoverPrefetchLink>
                     </SidebarMenuButton>
                     <SidebarMenuAction
                       onClick={() => {

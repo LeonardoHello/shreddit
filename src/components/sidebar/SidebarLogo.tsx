@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 
 import shrek from "@public/shrek.svg";
 import shrekText from "@public/shrekText.svg";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -28,7 +28,7 @@ export default function SidebarLogo() {
             }
           }}
         >
-          <Link href="/">
+          <HoverPrefetchLink href="/">
             <Image src={shrek} alt="logo" priority className="size-10" />
             <Image
               src={shrekText}
@@ -36,7 +36,7 @@ export default function SidebarLogo() {
               priority
               className="h-5/6 w-auto"
             />
-          </Link>
+          </HoverPrefetchLink>
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

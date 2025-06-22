@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useRef, useState } from "react";
-import Link from "next/link";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
@@ -14,6 +13,7 @@ import donkey from "@public/donkey.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import SearchSkeleton from "./SearchSkeleton";
@@ -137,7 +137,7 @@ const SearchDropdown = memo(
                 className="h-12 justify-start"
                 onClick={closeDropdown}
               >
-                <Link href={`/r/${community.name}`}>
+                <HoverPrefetchLink href={`/r/${community.name}`}>
                   <CommunityImage icon={community.icon} size={28} />
                   <div className="w-0 grow">
                     <div className="truncate text-sm font-medium">
@@ -151,7 +151,7 @@ const SearchDropdown = memo(
                       {community.memberCount === 1 ? "member" : "members"}
                     </div>
                   </div>
-                </Link>
+                </HoverPrefetchLink>
               </Button>
             ))}
           </div>
@@ -168,7 +168,7 @@ const SearchDropdown = memo(
                 className="h-12 justify-start"
                 onClick={closeDropdown}
               >
-                <Link href={`/u/${user.username}`}>
+                <HoverPrefetchLink href={`/u/${user.username}`}>
                   <Avatar className="size-7">
                     <AvatarImage src={user.image ?? donkey.src} />
                     <AvatarFallback className="uppercase">
@@ -187,7 +187,7 @@ const SearchDropdown = memo(
                       {user.onionCount === 1 ? "onion" : "onions"}
                     </div>
                   </div>
-                </Link>
+                </HoverPrefetchLink>
               </Button>
             ))}
           </div>

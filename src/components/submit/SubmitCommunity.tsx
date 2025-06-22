@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useState } from "react";
-import Link from "next/link";
 
 import {
   useQuery,
@@ -19,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useTRPC } from "@/trpc/client";
 import CommunityImage from "../community/CommunityImage";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
 
@@ -93,7 +93,7 @@ export default function SubmitCommunity({
             </DropdownMenuLabel>
             {myCommunities.map((community) => (
               <DropdownMenuItem key={community.id} className="h-11" asChild>
-                <Link href={`/submit/r/${community.name}`}>
+                <HoverPrefetchLink href={`/submit/r/${community.name}`}>
                   <CommunityImage
                     size={32}
                     className={"min-h-8 min-w-8"}
@@ -107,7 +107,7 @@ export default function SubmitCommunity({
                       {community.memberCount} members
                     </div>
                   </div>
-                </Link>
+                </HoverPrefetchLink>
               </DropdownMenuItem>
             ))}
           </>
@@ -146,7 +146,7 @@ const SubmitCommunityDropdown = memo(
         {!isLoading &&
           searchedCommunities?.map((community) => (
             <DropdownMenuItem key={community.id} className="h-11" asChild>
-              <Link href={`/submit/r/${community.name}`}>
+              <HoverPrefetchLink href={`/submit/r/${community.name}`}>
                 <CommunityImage
                   size={32}
                   className={"min-h-8 min-w-8"}
@@ -160,7 +160,7 @@ const SubmitCommunityDropdown = memo(
                     {community.memberCount} members
                   </div>
                 </div>
-              </Link>
+              </HoverPrefetchLink>
             </DropdownMenuItem>
           ))}
       </>

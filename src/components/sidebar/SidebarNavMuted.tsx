@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import {
@@ -20,6 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../ui/accordion";
+import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
 export default function SidebarNavMuted() {
   const { isMobile, setOpenMobile } = useSidebar();
@@ -60,13 +59,15 @@ export default function SidebarNavMuted() {
                       }}
                       className="[&>svg]:size-6"
                     >
-                      <Link href={`/r/${userToCommunity.community.name}`}>
+                      <HoverPrefetchLink
+                        href={`/r/${userToCommunity.community.name}`}
+                      >
                         <CommunityImage
                           icon={userToCommunity.community.icon}
                           size={32}
                         />
                         <span>r/{userToCommunity.community.name}</span>
-                      </Link>
+                      </HoverPrefetchLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
