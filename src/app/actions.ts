@@ -1,14 +1,15 @@
 "use server";
 
+import { cache } from "react";
 import { cookies, headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 
-export const getSession = async () => {
-  return auth.api.getSession({
+export const getSession = cache(async () =>
+  auth.api.getSession({
     headers: await headers(),
-  });
-};
+  }),
+);
 
 export const setCookie = async (data: {
   SIDEBAR_COOKIE_NAME: "sidebar_state";
