@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
+import { RouteHas } from "next/dist/lib/load-custom-routes";
 
 import { PostSort } from "@/types/enums";
 
-const sessionCookieKey = "__Secure-better-auth.session_token";
+const routeHasAuthCookie: RouteHas = {
+  type: "cookie",
+  key: "__Secure-better-auth.session_token",
+};
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -24,56 +28,31 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/sign-in",
-        has: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
-        destination: `/home/${PostSort.BEST}`,
+        has: [routeHasAuthCookie],
+        destination: "/",
         permanent: false,
       },
       {
         source: "/home",
-        missing: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
-        destination: `/all/${PostSort.BEST}`,
+        missing: [routeHasAuthCookie],
+        destination: "/",
         permanent: false,
       },
       {
         source: "/home/:sort",
-        missing: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
-        destination: `/all/${PostSort.BEST}`,
+        missing: [routeHasAuthCookie],
+        destination: "/",
         permanent: false,
       },
       {
         source: "/submit",
-        missing: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
+        missing: [routeHasAuthCookie],
         destination: "/sign-in",
         permanent: false,
       },
       {
         source: "/submit/r/:communityName",
-        missing: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
+        missing: [routeHasAuthCookie],
         destination: "/sign-in",
         permanent: false,
       },
@@ -83,22 +62,12 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        missing: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
+        missing: [routeHasAuthCookie],
         destination: `/all/${PostSort.BEST}`,
       },
       {
         source: "/",
-        has: [
-          {
-            type: "cookie",
-            key: sessionCookieKey,
-          },
-        ],
+        has: [routeHasAuthCookie],
         destination: `/home/${PostSort.BEST}`,
       },
       {
