@@ -54,9 +54,6 @@ function PostImage({
     Buffer.from(file.thumbHash, "base64"),
   );
 
-  const imageSizes =
-    "(max-width: 640px) 90vw, (max-width: 768px) 570px, (max-width: 1024px) 698px, (max-width: 1280px) 618px, (max-width: 1536px) 586px, 674px";
-
   return (
     <div className="relative overflow-hidden rounded-md">
       <div className="relative flex h-96 flex-col justify-center rounded-md border border-white/15">
@@ -64,15 +61,16 @@ function PostImage({
           src={placeholderURL}
           alt={file.name + " - background image"}
           fill
-          sizes={imageSizes}
           className="scale-105 rounded-md object-cover object-center opacity-30"
         />
         {!isUnsafe && (
           <Image
             src={file.url}
             alt={file.name}
+            priority
+            quality={50}
             fill
-            sizes={imageSizes}
+            sizes="(max-width: 640px) 90vw, (max-width: 768px) 570px, (max-width: 1024px) 698px, (max-width: 1280px) 618px, (max-width: 1536px) 586px, 674px"
             placeholder="blur"
             blurDataURL={placeholderURL}
             className="object-contain"
