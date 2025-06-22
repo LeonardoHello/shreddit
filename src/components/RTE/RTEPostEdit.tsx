@@ -148,7 +148,7 @@ function ImageButton({ editor }: { editor: Editor }) {
         .focus()
         .forEach(res, (file, { commands }) => {
           return commands.setImage({
-            src: file.appUrl,
+            src: file.ufsUrl,
             alt: file.name,
           });
         })
