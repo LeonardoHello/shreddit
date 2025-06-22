@@ -1,22 +1,19 @@
 import Link from "next/link";
 
-import { Plus } from "lucide-react";
+import { LogIn, Plus } from "lucide-react";
 
 import { getSession } from "@/app/actions";
 import { Button } from "../ui/button";
+import { SidebarTrigger } from "../ui/sidebar";
 import { Search } from "./Search";
 import UserDropdownMenu from "./UserDropdownMenu";
 
-export default async function Header({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function Header() {
   const session = await getSession();
 
   return (
     <header className="bg-card sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b px-4">
-      {children}
+      <SidebarTrigger className="-ml-1 [&_svg]:stroke-[1.5]" />
 
       <Search />
 
@@ -39,7 +36,10 @@ export default async function Header({
 
       {!session && (
         <Button asChild>
-          <Link href="/sign-in">Sign in</Link>
+          <Link href="/sign-in">
+            <LogIn />
+            <span>Sign in</span>
+          </Link>
         </Button>
       )}
     </header>

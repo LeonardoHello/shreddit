@@ -22,10 +22,12 @@ export const auth = betterAuth({
   }),
   socialProviders: {
     google: {
+      prompt: "select_account",
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
     github: {
+      prompt: "select_account",
       clientId: process.env.GITHUB_CLIENT_ID as string,
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
     },
@@ -34,5 +36,10 @@ export const auth = betterAuth({
       clientSecret: process.env.DISCORD_CLIENT_SECRET as string,
     },
   },
-  plugins: [username(), nextCookies()],
+  plugins: [
+    username({
+      maxUsernameLength: 21,
+    }),
+    nextCookies(),
+  ],
 });

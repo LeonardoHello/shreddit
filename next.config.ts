@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: "/choose-username",
+        missing: [routeHasAuthCookie],
+        destination: "/",
+        permanent: false,
+      },
+      {
         source: "/home",
         missing: [routeHasAuthCookie],
         destination: "/",
