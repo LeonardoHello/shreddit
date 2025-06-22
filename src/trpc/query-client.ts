@@ -7,6 +7,7 @@ import superjson from "superjson";
 export function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
+      queries: { refetchOnWindowFocus: false },
       dehydrate: {
         serializeData: superjson.serialize,
         shouldDehydrateQuery: (query) =>
