@@ -10,6 +10,12 @@ import * as postsSchema from "@/db/schema/posts";
 import * as usersSchema from "@/db/schema/users";
 
 export const auth = betterAuth({
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
+  },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

@@ -17,7 +17,6 @@ export default async function FeedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // deduped with cache function
   const session = await getSession();
 
   if (session && !session.user.username) {
