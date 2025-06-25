@@ -71,9 +71,11 @@ export default function UserDropdownMenu({
             <span>User Profile</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <UserCog />
-          <span>Manage Account</span>
+        <DropdownMenuItem asChild>
+          <Link href={"/manage-account"}>
+            <UserCog />
+            <span>Manage Account</span>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
