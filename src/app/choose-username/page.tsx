@@ -1,4 +1,4 @@
-import UsernameForm from "@/components/UsernameForm";
+import UsernameForm from "@/components/username-form";
 import { getSession } from "../actions";
 
 export default async function ChooseUsernamePage() {
