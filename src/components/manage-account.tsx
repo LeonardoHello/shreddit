@@ -95,7 +95,7 @@ export default function AccountPage({
                   <AvatarImage
                     className="object-cover"
                     src={profileImage}
-                    alt="Profile picture "
+                    alt="Profile picture"
                   />
                   <AvatarFallback className="text-lg uppercase">
                     {username.slice(0, 2)}
@@ -138,17 +138,19 @@ export default function AccountPage({
                   id="username"
                   value={username}
                   placeholder="Enter username"
+                  readOnly
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
                   Email Address
-                  <Lock className="text-muted-foreground h-3 w-3" />
+                  <Lock className="text-muted-foreground size-3" />
                 </Label>
                 <Input
                   id="email"
                   value={email}
                   disabled
+                  readOnly
                   className="bg-muted/50 text-muted-foreground cursor-not-allowed"
                 />
               </div>
