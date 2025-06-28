@@ -227,11 +227,8 @@ export default function AccountPage({
     });
 
     authClient.updateUser({
-      username:
-        values.username === username ||
-        !form.getFieldState("username").isTouched
-          ? undefined
-          : values.username,
+      username: values.username === username ? undefined : values.username,
+      image: state.uploadedImage ?? undefined,
       fetchOptions: {
         onSuccess: () => {
           startTransition(() => {
