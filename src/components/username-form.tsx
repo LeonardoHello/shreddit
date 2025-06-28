@@ -54,6 +54,9 @@ const formSchema = z.object({
     }),
 });
 
+const description =
+  "Username must be 3-21 characters long and contain only alphanumeric characters, underscores, and dots.";
+
 export default function UsernameForm({
   userName,
   userImage,
@@ -101,9 +104,6 @@ export default function UsernameForm({
   }
 
   const isMutating = isPending || isLoading || form.formState.isSubmitting;
-
-  const description =
-    "Username must be 3-21 characters long and contain only alphanumeric characters, underscores, and dots.";
 
   return (
     <div className="flex min-h-screen flex-col">

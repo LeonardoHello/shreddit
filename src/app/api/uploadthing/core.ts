@@ -35,6 +35,22 @@ export const ourFileRouter = {
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { ...file };
     }),
+  userImageUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async () => {
+      const session = await getSession();
+
+      if (!session) throw new UploadThingError("Unauthorized");
+
+      return { userId: session.session.userId };
+    })
+    .onUploadComplete(async ({ file }) => {
+      return { ufsUrl: file.ufsUrl };
+    }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

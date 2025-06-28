@@ -117,6 +117,7 @@ function ImageButton({ editor }: { editor: Editor }) {
     onUploadError: (e) => {
       dispatch({ type: ReducerAction.ENABLE_SUBMIT });
 
+      toast.dismiss(toastId);
       toast.error(e.message);
     },
   });
