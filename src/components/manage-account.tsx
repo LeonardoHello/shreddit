@@ -217,37 +217,47 @@ export default function AccountPage({
     disabled: isPending || state.isLoading,
   });
 
+  const isDisabled =
+    form.getValues("username") === username &&
+    (image === state.uploadedImage || !state.uploadedImage);
+
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    dispatch({
-      type: ReducerAction.START_LOADING,
-    });
-
-    authClient.updateUser({
-      username: values.username === username ? undefined : values.username,
-      image: state.uploadedImage ?? undefined,
-      fetchOptions: {
-        onSuccess: () => {
-          startTransition(() => {
-            router.refresh();
-          });
+    if (!isDisabled && !isMutating) {
+      authClient.updateUser({
+        username: values.username === username ? undefined : values.username,
+        image:
+          !state.uploadedImage || image === state.uploadedImage
+            ? undefined
+            : state.uploadedImage,
+        fetchOptions: {
+          onRequest: () => {
+            dispatch({
+              type: ReducerAction.START_LOADING,
+            });
+          },
+          onSuccess: () => {
+            startTransition(() => {
+              router.refresh();
+            });
+          },
+          onError: (error) => {
+            dispatch({
+              type: ReducerAction.SET_ERROR_MESSAGE,
+              errorMessage: error.error.message,
+            });
+          },
+          onResponse: () => {
+            dispatch({
+              type: ReducerAction.STOP_LOADING,
+            });
+          },
         },
-        onError: (error) => {
-          dispatch({
-            type: ReducerAction.SET_ERROR_MESSAGE,
-            errorMessage: error.error.message,
-          });
-        },
-        onResponse: () => {
-          dispatch({
-            type: ReducerAction.STOP_LOADING,
-          });
-        },
-      },
-    });
+      });
+    }
   }
 
   const { startUpload, routeConfig, isUploading } = useUploadThing(
@@ -298,9 +308,6 @@ export default function AccountPage({
 
   const isMutating =
     isPending || state.isLoading || form.formState.isSubmitting || isUploading;
-
-  const isDisabled =
-    form.getValues("username") === username && !state.uploadedImage;
 
   const handleDeleteAccount = () => {
     // Handle account deletion logic here
