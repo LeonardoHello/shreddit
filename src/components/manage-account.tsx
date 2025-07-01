@@ -179,7 +179,8 @@ export default function AccountPage({
   provider: "github" | "discord" | "google" | undefined;
 }) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isFormPending, startFormTransition] = useTransition();
+  const [isDeletionPending, startDeletionTransition] = useTransition();
 
   const [state, dispatch] = useReducer(reducer, {
     errorMessage: null,
@@ -214,7 +215,7 @@ export default function AccountPage({
     defaultValues: {
       username,
     },
-    disabled: isPending || state.isLoading,
+    disabled: isFormPending || state.isLoading,
   });
 
   const isDisabled =
@@ -240,7 +241,7 @@ export default function AccountPage({
             });
           },
           onSuccess: () => {
-            startTransition(() => {
+            startFormTransition(() => {
               router.refresh();
             });
           },
@@ -307,11 +308,23 @@ export default function AccountPage({
   });
 
   const isMutating =
-    isPending || state.isLoading || form.formState.isSubmitting || isUploading;
+    isFormPending ||
+    state.isLoading ||
+    form.formState.isSubmitting ||
+    isUploading;
 
   const handleDeleteAccount = () => {
-    // Handle account deletion logic here
-    console.log("Deleting account...");
+    startDeletionTransition(async () => {
+      const deleteAccount = await authClient.deleteUser();
+      if (deleteAccount.error) {
+        toast.error(
+          deleteAccount.error.message ??
+            "Failed to send delete verification email.",
+        );
+      } else {
+        toast.success(deleteAccount.data.message);
+      }
+    });
   };
 
   return (
@@ -508,9 +521,17 @@ export default function AccountPage({
               </div>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="mr-2 size-4" />
-                    Delete Account
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={isDeletionPending}
+                  >
+                    {isDeletionPending ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="mr-2 size-4" />
+                    )}
+                    {isDeletionPending ? "Deleting..." : "Delete Account"}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
