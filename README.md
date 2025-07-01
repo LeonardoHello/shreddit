@@ -15,13 +15,13 @@ Shreddit is a full-stack social media platform inspired by Reddit, designed to p
 7. **Drizzle ORM**: A type-safe SQL query builder and ORM.
 8. **UploadThing**: A file upload service for handling image uploads.
 9. **TipTap**: A rich text editor implementation.
-10. **Clerk**: Manages authentication and user management.
+10. **Better-Auth**: Manages authentication and user management.
 
 ## Features
 
 - **Reddit Clone Functionality**: Shreddit mirrors Reddit's core features, allowing users to create posts, upvote/downvote, comment, and engage in discussions.
 - **Type Safety**: Extensive use of TypeScript throughout the project ensures type safety, reducing bugs and enhancing code quality.
-- **Secure Authentication**: Clerk provides robust user management and authentication, ensuring a secure environment for handling sensitive user data.
+- **Secure Authentication**: Better-Auth provides robust user management and authentication, ensuring a secure environment for handling sensitive user data.
 - **Optimized Data Fetching**: Utilizes React Query's `useInfiniteQuery` for infinite scrolling, providing a smooth user experience when browsing posts.
 - **Optimistic Updates**: Incorporates optimistic updates to provide immediate feedback to users, enhancing the user experience by reducing perceived latency.
 - **Thumbhash for Image Handling**: Uses the Thumbhash library to generate lightweight image placeholders, improving page load times and user experience.
@@ -37,22 +37,20 @@ Shreddit is a full-stack social media platform inspired by Reddit, designed to p
 **To run Shreddit locally:**
 
 1. Clone the repository: `git clone https://github.com/LeonardoHello/shreddit.git`
-2. Install dependencies: `npm install`
+2. Install dependencies: `pnpm i`
 3. Add environment variables inside the `.env.local` file:
    ```plaintext
    DATABASE_URL=
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-   CLERK_SECRET_KEY=
-   CLERK_WEBHOOK_SECRET=
-   SIGNING_SECRET=
-   NEXT_PUBLIC_CLERK_SIGN_IN_URL=
-   NEXT_PUBLIC_CLERK_SIGN_UP_URL=
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=
-   NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=
    UPLOADTHING_TOKEN=
+   BETTER_AUTH_SECRET=
+   BETTER_AUTH_URL=
+   GOOGLE_CLIENT_ID=
+   GOOGLE_CLIENT_SECRET=
+   GITHUB_CLIENT_ID=
+   GITHUB_CLIENT_SECRET=
+   DISCORD_CLIENT_ID=
+   DISCORD_CLIENT_SECRET=
+   RESEND_API_KEY=
    ```
-4. Run the development server: `npm run dev`
-
-## Conclusion
-
-Shreddit is a comprehensive social media platform that showcases modern web development practices and technologies. It is designed to be scalable, secure, and user-friendly, making it an excellent addition to any developer's portfolio.
+4. Run drizzle schema migration: `pnpm push` [source](https://orm.drizzle.team/docs/migrations)
+5. Run the development server: `pnpm dev`

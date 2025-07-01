@@ -14,6 +14,7 @@ import {
 } from "uploadthing/client";
 import { z } from "zod/v3";
 
+import { deleteAccount } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -309,9 +310,16 @@ export default function AccountPage({
   const isMutating =
     isPending || state.isLoading || form.formState.isSubmitting || isUploading;
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     // Handle account deletion logic here
-    console.log("Deleting account...");
+    const response = await deleteAccount();
+
+    if (response.error) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+      router.refresh();
+    }
   };
 
   return (
