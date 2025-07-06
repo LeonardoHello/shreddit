@@ -8,11 +8,23 @@ export const runtime = "edge";
 // TODO: Add cron job to delete files from uploadthing that are not in the database
 export async function GET() {
   const utapi = new UTApi();
-  const files = await db.query.postFiles.findMany({
-    columns: { key: true },
-  });
+  const [files, posts, users] = await Promise.all([
+    db.query.postFiles.findMany({
+      columns: { key: true },
+    }),
+    db.query.posts.findMany({
+      where: (posts, { isNotNull }) => isNotNull(posts.text),
+      columns: { text: true },
+    }),
+    db.query.users.findMany({
+      columns: { image: true },
+    }),
+  ]);
 
   const destructuredFiles = files.map(({ key }) => key);
+  const destructuredPosts = posts.map(({ text }) => text);
+  const destructuredUsers = users.map(({ image }) => image);
+
   // default opts.limit 500
   // default opts.offset 0
   const uploadthingFiles = await utapi.listFiles();
@@ -20,7 +32,20 @@ export async function GET() {
   const filesToDelete = [];
 
   for (const file of uploadthingFiles.files) {
-    if (!destructuredFiles.includes(file.key)) {
+    if (
+      // Check if the file is not in the files table
+      !destructuredFiles.includes(file.key) &&
+      // Check if the file is not referenced in any post text
+      !destructuredPosts.some((text) =>
+        text?.includes(
+          `<img src="https://8t3elu199k.ufs.sh/f/${file.key}" alt="${file.name}">`,
+        ),
+      ) &&
+      // Check if the file is not a user image
+      !destructuredUsers.some(
+        (image) => image === `https://8t3elu199k.ufs.sh/f/${file.key}`,
+      )
+    ) {
       filesToDelete.push(file.key);
     }
   }
