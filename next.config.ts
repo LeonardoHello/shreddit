@@ -15,13 +15,8 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "img.clerk.com", port: "" },
-      {
-        protocol: "https",
-        hostname: "utfs.io",
-        pathname: "/a/8t3elu199k/**",
-        port: "",
-      },
+      new URL("https://img.clerk.com"),
+      new URL("https://8t3elu199k.ufs.sh/f/*"),
     ],
   },
   async redirects() {
