@@ -69,13 +69,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/",
-        missing: [routeHasAuthCookie],
         destination: `/all/${PostSort.BEST}`,
-      },
-      {
-        source: "/",
-        has: [routeHasAuthCookie],
-        destination: `/home/${PostSort.BEST}`,
       },
       {
         source: "/all",

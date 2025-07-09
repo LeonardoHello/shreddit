@@ -17,19 +17,12 @@ export default function SidebarNavMain({
 }) {
   const pathname = usePathname();
 
-  const isHome =
-    pathname.startsWith("/home") || (isSignedIn && pathname === "/");
-  const isAll =
-    pathname.startsWith("/all") || (!isSignedIn && pathname === "/");
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const isAll = pathname.startsWith("/all") || pathname === "/";
+  const isHome = pathname.startsWith("/home");
 
   const items = [
-    {
-      label: "Home",
-      href: "/home",
-      isActive: isHome,
-      icon: isHome ? ActiveHomeIcon : InactiveHomeIcon,
-      authRequired: true,
-    },
     {
       label: "All",
       href: "/all",
@@ -37,13 +30,19 @@ export default function SidebarNavMain({
       icon: isAll ? ActiveAllIcon : InactiveAllIcon,
       authRequired: false,
     },
+    {
+      label: "Home",
+      href: "/home",
+      isActive: isHome,
+      icon: isHome ? ActiveHomeIcon : InactiveHomeIcon,
+      authRequired: true,
+    },
   ];
-
-  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <SidebarMenu>
       {items
+        // Filter items based on authentication status
         .filter((item) => isSignedIn || !item.authRequired)
         .map((item) => (
           <SidebarMenuItem key={item.href}>
