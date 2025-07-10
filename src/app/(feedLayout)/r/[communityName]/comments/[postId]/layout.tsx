@@ -11,7 +11,7 @@ export default async function PostLayout(props: {
 }) {
   const params = await props.params;
 
-  const { success } = z.string().uuid().safeParse(params.postId);
+  const { success } = z.uuid().safeParse(params.postId);
 
   if (!success) notFound();
 
