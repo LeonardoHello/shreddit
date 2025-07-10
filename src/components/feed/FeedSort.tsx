@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { ChevronDown } from "lucide-react";
 
@@ -17,67 +17,48 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 
-export default function FeedSort({
-  isAuthenticated,
-}: {
-  isAuthenticated: boolean;
-}) {
+export default function FeedSort({ sort }: { sort: PostSort }) {
   const pathname = usePathname();
-  const {
-    sort = PostSort.BEST,
-    username = "",
-    communityName = "",
-  } = useParams();
 
   function getHref() {
-    if (pathname.startsWith("/home")) {
-      return "/home";
-    } else if (pathname.startsWith("/all")) {
-      return "/all";
-    } else if (pathname.startsWith("/r")) {
-      return `/r/${communityName}`;
-    } else if (
-      pathname.startsWith(`/u/${username}`) &&
-      !pathname.startsWith(`/u/${username}/saved`) &&
-      !pathname.startsWith(`/u/${username}/hidden`) &&
-      !pathname.startsWith(`/u/${username}/upvoted`) &&
-      !pathname.startsWith(`/u/${username}/downvoted`)
-    ) {
-      return `/u/${username}`;
-    } else if (pathname.startsWith(`/u/${username}/saved`)) {
-      return `/u/${username}/saved`;
-    } else if (pathname.startsWith(`/u/${username}/hidden`)) {
-      return `/u/${username}/hidden`;
-    } else if (pathname.startsWith(`/u/${username}/upvoted`)) {
-      return `/u/${username}/upvoted`;
-    } else if (pathname.startsWith(`/u/${username}/downvoted`)) {
-      return `/u/${username}/downvoted`;
-    } else {
-      // in case of root path
-      return isAuthenticated ? "/home" : "/all";
-    }
+    // Prioritize most specific routes first
+    if (/^\/home/.test(pathname)) return "/home";
+    if (/^\/all/.test(pathname)) return "/all";
+
+    // Match /r/:communityName
+    const rMatch = pathname.match(/^\/r\/[^/]+/);
+    if (rMatch) return rMatch[0];
+
+    // Match /u/:username routes
+    const uMatch = pathname.match(
+      /^\/u\/[^/]+(?:\/(saved|hidden|upvoted|downvoted))?/,
+    );
+    if (uMatch) return uMatch[0];
+
+    return "/all"; // Fallback
   }
+
+  const baseHref = getHref();
 
   const tabs = [
     {
       label: "Best",
-      href: `${getHref()}/${PostSort.BEST}`,
+      href: `${baseHref}/${PostSort.BEST}`,
       isActive: sort === PostSort.BEST,
     },
     {
       label: "Hot",
-      href: `${getHref()}/${PostSort.HOT}`,
+      href: `${baseHref}/${PostSort.HOT}`,
       isActive: sort === PostSort.HOT,
     },
     {
       label: "New",
-      href: `${getHref()}/${PostSort.NEW}`,
+      href: `${baseHref}/${PostSort.NEW}`,
       isActive: sort === PostSort.NEW,
     },
-
     {
       label: "Controversial",
-      href: `${getHref()}/${PostSort.CONTROVERSIAL}`,
+      href: `${baseHref}/${PostSort.CONTROVERSIAL}`,
       isActive: sort === PostSort.CONTROVERSIAL,
     },
   ];
