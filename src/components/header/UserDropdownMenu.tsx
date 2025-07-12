@@ -44,7 +44,7 @@ export default function UserDropdownMenu({
           <Avatar className="size-8">
             <AvatarImage src={userImage ?? donkey.src} />
             <AvatarFallback className="uppercase">
-              {name.slice(0, 2)}
+              {parsedUsername.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
         </Button>
