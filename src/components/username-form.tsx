@@ -38,6 +38,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { User } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
 import donkey from "@public/donkey.png";
 import shrek from "@public/shrek.svg";
@@ -61,8 +62,8 @@ export default function UsernameForm({
   userName,
   userImage,
 }: {
-  userName: string;
-  userImage: string | null | undefined;
+  userName: User["name"];
+  userImage: User["image"] | undefined;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

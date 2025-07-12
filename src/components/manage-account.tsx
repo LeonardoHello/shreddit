@@ -60,7 +60,7 @@ import {
 import { User } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
 import { useUploadThing } from "@/lib/uploadthing";
-import donkes from "@public/donkey.png";
+import donkey from "@public/donkey.png";
 import { DiscordIcon, GithubIcon, GoogleIcon } from "./social-icons";
 import { Progress } from "./ui/progress";
 
@@ -74,19 +74,19 @@ const formSchema = z.object({
       message:
         "Username can only contain alphanumeric characters, underscores, and dots",
     }),
-  selectedFile: z.instanceof(File).optional(),
 });
 
 type ReducerState = {
   errorMessage?: string;
   isLoading: boolean;
   displayImage: string;
+  selectedFile?: File;
 };
 
 enum ReducerAction {
   SET_ERROR_MESSAGE,
   REMOVE_ERROR_MESSAGE,
-  SET_DISPLAY_IMAGE,
+  SET_IMAGE,
   START_LOADING,
   STOP_LOADING,
 }
@@ -100,8 +100,9 @@ type ReducerActionType =
       type: typeof ReducerAction.REMOVE_ERROR_MESSAGE;
     }
   | {
-      type: typeof ReducerAction.SET_DISPLAY_IMAGE;
+      type: typeof ReducerAction.SET_IMAGE;
       displayImage: ReducerState["displayImage"];
+      selectedFile: ReducerState["selectedFile"];
     }
   | {
       type: typeof ReducerAction.START_LOADING;
@@ -124,10 +125,11 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
         errorMessage: undefined,
       };
     }
-    case ReducerAction.SET_DISPLAY_IMAGE: {
+    case ReducerAction.SET_IMAGE: {
       return {
         ...state,
         displayImage: action.displayImage,
+        selectedFile: action.selectedFile,
       };
     }
     case ReducerAction.START_LOADING: {
@@ -168,14 +170,14 @@ export default function AccountPage({
   image: User["image"] | undefined;
   provider: "github" | "discord" | "google" | undefined;
 }) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [state, dispatch] = useReducer(reducer, {
     isLoading: false,
-    displayImage: image ?? donkes.src,
+    displayImage: image ?? donkey.src,
   });
+
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -192,15 +194,19 @@ export default function AccountPage({
       onUploadProgress: (p) => {
         toast.info(<Progress value={p} />, {
           id: toastId,
-          duration: 1000 * 99,
+          // in milliseconds
+          duration: 99 * 1000,
         });
       },
       onClientUploadComplete: (res) => {
-        form.setValue("selectedFile", undefined);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
 
         dispatch({
-          type: ReducerAction.SET_DISPLAY_IMAGE,
+          type: ReducerAction.SET_IMAGE,
           displayImage: res[0].ufsUrl,
+          selectedFile: undefined,
         });
 
         toast.dismiss(toastId);
@@ -210,11 +216,10 @@ export default function AccountPage({
           fileInputRef.current.value = "";
         }
 
-        form.setValue("selectedFile", undefined);
-
         dispatch({
-          type: ReducerAction.SET_DISPLAY_IMAGE,
-          displayImage: image ?? donkes.src,
+          type: ReducerAction.SET_IMAGE,
+          displayImage: image ?? donkey.src,
+          selectedFile: undefined,
         });
 
         toast.dismiss(toastId);
@@ -225,7 +230,7 @@ export default function AccountPage({
 
   const isDisabled =
     form.getValues("username") === username &&
-    (!form.getValues("selectedFile") || state.displayImage === image);
+    (!state.selectedFile || state.displayImage === image);
 
   const isMutating =
     isPending || isUploading || state.isLoading || form.formState.isSubmitting;
@@ -241,8 +246,8 @@ export default function AccountPage({
       });
 
       const uploadedFile =
-        values.selectedFile && state.displayImage !== image
-          ? await startUpload([values.selectedFile])
+        state.selectedFile && state.displayImage !== image
+          ? await startUpload([state.selectedFile])
           : undefined;
 
       authClient.updateUser({
@@ -274,13 +279,12 @@ export default function AccountPage({
     const file = event.target.files?.[0];
 
     if (file) {
-      form.setValue("selectedFile", file);
-
       const reader = new FileReader();
       reader.onload = (e) => {
         dispatch({
-          type: ReducerAction.SET_DISPLAY_IMAGE,
+          type: ReducerAction.SET_IMAGE,
           displayImage: e.target?.result as string,
+          selectedFile: file,
         });
       };
       reader.onerror = () => {
@@ -340,8 +344,8 @@ export default function AccountPage({
                   htmlFor="profile-upload"
                   className="absolute -right-2 -bottom-2 cursor-pointer"
                 >
-                  <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-8 w-8 items-center justify-center rounded-full">
-                    <Camera className="h-4 w-4" />
+                  <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-8 items-center justify-center rounded-full">
+                    <Camera className="size-4" />
                   </div>
                   <input
                     ref={fileInputRef}
