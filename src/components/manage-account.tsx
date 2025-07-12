@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, useReducer, useTransition } from "react";
+import { createElement, useReducer, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -170,6 +170,7 @@ export default function AccountPage({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [state, dispatch] = useReducer(reducer, {
     isLoading: false,
@@ -205,6 +206,12 @@ export default function AccountPage({
         toast.dismiss(toastId);
       },
       onUploadError: (e) => {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+
+        form.setValue("selectedFile", undefined);
+
         dispatch({
           type: ReducerAction.SET_DISPLAY_IMAGE,
           displayImage: image ?? donkes.src,
@@ -276,6 +283,9 @@ export default function AccountPage({
           displayImage: e.target?.result as string,
         });
       };
+      reader.onerror = () => {
+        toast.error("Failed to read the file");
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -334,6 +344,7 @@ export default function AccountPage({
                     <Camera className="h-4 w-4" />
                   </div>
                   <input
+                    ref={fileInputRef}
                     id="profile-upload"
                     type="file"
                     accept={generateMimeTypes(
