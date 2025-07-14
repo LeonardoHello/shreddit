@@ -6,7 +6,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";
-import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   generateClientDropzoneAccept,
@@ -96,7 +96,16 @@ function ActionButtons({ editor }: { editor: Editor }) {
     }),
   );
 
-  const isDisabled = editPost.isPending || state.isDisabled;
+  const isMutating = state.isUploading || editPost.isPending;
+
+  const handleSubmit = () => {
+    if (isMutating) return;
+
+    editPost.mutate({
+      id: state.id,
+      text: prettifyHTML(editor.getHTML()),
+    });
+  };
 
   return (
     <div className="flex justify-end gap-2 p-2">
@@ -106,6 +115,8 @@ function ActionButtons({ editor }: { editor: Editor }) {
         onClick={() => {
           editor.commands.setContent(state.text);
           dispatch({ type: ReducerAction.CANCEL_EDIT });
+
+          toast.dismiss(toastId);
         }}
         className="rounded-full"
       >
@@ -114,33 +125,40 @@ function ActionButtons({ editor }: { editor: Editor }) {
 
       <Button
         size="sm"
-        disabled={isDisabled}
-        onClick={() => {
-          if (!isDisabled) {
-            editPost.mutate({
-              id: state.id,
-              text: prettifyHTML(editor.getHTML()),
-            });
-          }
-        }}
+        disabled={isMutating}
+        onClick={handleSubmit}
         className="rounded-full"
       >
-        Edit
+        {state.isUploading ? (
+          <>
+            <Loader2 className="size-4 animate-spin" />
+            Uploading...
+          </>
+        ) : (
+          "Edit"
+        )}
       </Button>
     </div>
   );
 }
 
 function ImageButton({ editor }: { editor: Editor }) {
+  const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      dispatch({ type: ReducerAction.DISABLE_EDIT });
+      dispatch({ type: ReducerAction.START_UPLOAD });
+
       return files;
     },
     onUploadProgress: (p) => {
-      toast(<Progress value={p} />, { id: toastId, duration: 1000 * 99 });
+      if (state.isEditing) {
+        toast.info(<Progress value={p} />, {
+          id: toastId,
+          duration: 1000 * 99,
+        });
+      }
     },
     onClientUploadComplete: (res) => {
       editor
@@ -154,12 +172,12 @@ function ImageButton({ editor }: { editor: Editor }) {
         })
         .run();
 
-      dispatch({ type: ReducerAction.ENABLE_EDIT });
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
 
       toast.dismiss(toastId);
     },
     onUploadError: (e) => {
-      dispatch({ type: ReducerAction.ENABLE_EDIT });
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
 
       toast.dismiss(toastId);
       toast.error(e.message);

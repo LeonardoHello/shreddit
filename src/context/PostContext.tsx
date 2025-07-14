@@ -9,8 +9,8 @@ type Post = NonNullable<RouterOutput["post"]["getPost"]>;
 
 type ReducerState = Post & {
   isEditing: boolean;
-  isDisabled: boolean;
   isDeleted: boolean;
+  isUploading: boolean;
 };
 
 export enum ReducerAction {
@@ -24,8 +24,8 @@ export enum ReducerAction {
   DELETE,
   TOGGLE_EDIT,
   CANCEL_EDIT,
-  ENABLE_EDIT,
-  DISABLE_EDIT,
+  START_UPLOAD,
+  STOP_UPLOAD,
 }
 
 type ReducerActionType =
@@ -60,8 +60,8 @@ type ReducerActionType =
   | { type: typeof ReducerAction.DELETE }
   | { type: typeof ReducerAction.TOGGLE_EDIT }
   | { type: typeof ReducerAction.CANCEL_EDIT }
-  | { type: typeof ReducerAction.ENABLE_EDIT }
-  | { type: typeof ReducerAction.DISABLE_EDIT };
+  | { type: typeof ReducerAction.START_UPLOAD }
+  | { type: typeof ReducerAction.STOP_UPLOAD };
 
 function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
   switch (action.type) {
@@ -103,11 +103,11 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
     case ReducerAction.CANCEL_EDIT:
       return { ...state, isEditing: false };
 
-    case ReducerAction.ENABLE_EDIT:
-      return { ...state, isDisabled: false };
+    case ReducerAction.START_UPLOAD:
+      return { ...state, isUploading: true };
 
-    case ReducerAction.DISABLE_EDIT:
-      return { ...state, isDisabled: true };
+    case ReducerAction.STOP_UPLOAD:
+      return { ...state, isUploading: false };
 
     default:
       throw Error("Unknown action");
@@ -129,8 +129,8 @@ export default function PostContextProvider({
   const [state, dispatch] = useReducer(reducer, {
     ...post,
     isEditing: false,
-    isDisabled: false,
     isDeleted: false,
+    isUploading: false,
   });
 
   return (
