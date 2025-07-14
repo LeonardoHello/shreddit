@@ -2,13 +2,15 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import type { Post, PostFile } from "@/db/schema/posts";
+import type { Post } from "@/db/schema/posts";
 import { PostType } from "@/types/enums";
 
-type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
+export type ReducerState = Pick<Post, "title" | "text" | "spoiler" | "nsfw"> & {
   postType: PostType;
-  files: Pick<PostFile, "key" | "url" | "name" | "thumbHash">[];
-  isDisabled: boolean;
+  selectedFiles: { file: File; url: string }[];
+  isLoading: boolean;
+  // isUploading is used for RTEPost to show the upload progress
+  isUploading: boolean;
 };
 
 export enum ReducerAction {
@@ -16,10 +18,14 @@ export enum ReducerAction {
   SET_TITLE,
   SET_TEXT,
   SET_FILES,
+  ADD_FILES,
+  REMOVE_FILE,
   TOGGLE_SPOILER,
   TOGGLE_NSFW,
-  DISABLE_SUBMIT,
-  ENABLE_SUBMIT,
+  START_LOADING,
+  STOP_LOADING,
+  START_UPLOAD,
+  STOP_UPLOAD,
 }
 
 type ReducerActionType =
@@ -34,12 +40,22 @@ type ReducerActionType =
     }
   | {
       type: typeof ReducerAction.SET_FILES;
-      nextFiles: ReducerState["files"];
+      selectedFiles: ReducerState["selectedFiles"];
+    }
+  | {
+      type: typeof ReducerAction.ADD_FILES;
+      selectedFiles: ReducerState["selectedFiles"];
+    }
+  | {
+      type: typeof ReducerAction.REMOVE_FILE;
+      fileUrl: ReducerState["selectedFiles"][number]["url"];
     }
   | { type: typeof ReducerAction.TOGGLE_SPOILER }
   | { type: typeof ReducerAction.TOGGLE_NSFW }
-  | { type: typeof ReducerAction.DISABLE_SUBMIT }
-  | { type: typeof ReducerAction.ENABLE_SUBMIT };
+  | { type: typeof ReducerAction.START_LOADING }
+  | { type: typeof ReducerAction.STOP_LOADING }
+  | { type: typeof ReducerAction.START_UPLOAD }
+  | { type: typeof ReducerAction.STOP_UPLOAD };
 
 const reducer = (
   state: ReducerState,
@@ -56,7 +72,24 @@ const reducer = (
       return { ...state, text: action.text };
 
     case ReducerAction.SET_FILES:
-      return { ...state, files: action.nextFiles };
+      return {
+        ...state,
+        selectedFiles: action.selectedFiles,
+      };
+
+    case ReducerAction.ADD_FILES:
+      return {
+        ...state,
+        selectedFiles: state.selectedFiles.concat(action.selectedFiles),
+      };
+
+    case ReducerAction.REMOVE_FILE:
+      return {
+        ...state,
+        selectedFiles: state.selectedFiles.filter(
+          (file) => file.url !== action.fileUrl,
+        ),
+      };
 
     case ReducerAction.TOGGLE_SPOILER:
       return { ...state, spoiler: !state.spoiler };
@@ -64,11 +97,17 @@ const reducer = (
     case ReducerAction.TOGGLE_NSFW:
       return { ...state, nsfw: !state.nsfw };
 
-    case ReducerAction.DISABLE_SUBMIT:
-      return { ...state, isDisabled: true };
+    case ReducerAction.START_LOADING:
+      return { ...state, isLoading: true };
 
-    case ReducerAction.ENABLE_SUBMIT:
-      return { ...state, isDisabled: false };
+    case ReducerAction.STOP_LOADING:
+      return { ...state, isLoading: false };
+
+    case ReducerAction.START_UPLOAD:
+      return { ...state, isUploading: true };
+
+    case ReducerAction.STOP_UPLOAD:
+      return { ...state, isUploading: false };
 
     default:
       throw Error("Unknown action");
@@ -89,10 +128,11 @@ export default function SubmitContextProvider({
     postType: PostType.TEXT,
     title: "",
     text: null,
-    files: [],
+    selectedFiles: [],
     nsfw: false,
     spoiler: false,
-    isDisabled: false,
+    isLoading: false,
+    isUploading: false,
   });
 
   return (

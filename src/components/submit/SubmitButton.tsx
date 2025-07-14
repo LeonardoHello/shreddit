@@ -12,9 +12,21 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
+import { PostFileSchema } from "@/db/schema/posts";
+import { useUploadThing } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
 import { PostType } from "@/types/enums";
 import { Button } from "../ui/button";
+import { Progress } from "../ui/progress";
+
+const postFileSchema = PostFileSchema.pick({
+  key: true,
+  url: true,
+  name: true,
+  thumbHash: true,
+}).array();
+
+const toastId = "loading_toast";
 
 export default function SubmitButton({
   communityName,
@@ -33,10 +45,36 @@ export default function SubmitButton({
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
+  const { startUpload } = useUploadThing("imageUploader", {
+    onBeforeUploadBegin: (files) => {
+      dispatch({ type: ReducerAction.START_UPLOAD });
+
+      return files;
+    },
+    onUploadProgress: (p) => {
+      toast.info(<Progress value={p} />, {
+        id: toastId,
+        // in milliseconds
+        duration: 99 * 1000,
+      });
+    },
+    onClientUploadComplete: () => {
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
+
+      toast.dismiss(toastId);
+    },
+    onUploadError: (e) => {
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
+
+      toast.dismiss(toastId);
+      toast.error(e.message);
+    },
+  });
+
   const createPostText = useMutation(
     trpc.post.createTextPost.mutationOptions({
       onMutate: () => {
-        dispatch({ type: ReducerAction.DISABLE_SUBMIT });
+        dispatch({ type: ReducerAction.START_LOADING });
       },
       onSuccess: (data) => {
         const post = data[0];
@@ -49,7 +87,7 @@ export default function SubmitButton({
         toast.error(error.message);
       },
       onSettled: () => {
-        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+        dispatch({ type: ReducerAction.STOP_LOADING });
       },
     }),
   );
@@ -57,7 +95,7 @@ export default function SubmitButton({
   const createPostImage = useMutation(
     trpc.post.createImagePost.mutationOptions({
       onMutate: () => {
-        dispatch({ type: ReducerAction.DISABLE_SUBMIT });
+        dispatch({ type: ReducerAction.START_LOADING });
       },
       onSuccess: (data) => {
         const post = data[0][0];
@@ -70,47 +108,91 @@ export default function SubmitButton({
         toast.error(error.message);
       },
       onSettled: () => {
-        dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+        dispatch({ type: ReducerAction.STOP_LOADING });
       },
     }),
   );
 
   const isMutating =
-    isPending || createPostText.isPending || createPostImage.isPending;
+    isPending ||
+    state.isUploading ||
+    state.isLoading ||
+    createPostText.isPending ||
+    createPostImage.isPending;
 
   const isDisabled =
-    isMutating ||
-    state.isDisabled ||
     state.title.length === 0 ||
-    (state.postType === PostType.IMAGE && state.files.length === 0);
+    (state.postType === PostType.IMAGE && state.selectedFiles.length === 0);
+
+  const handleSubmit = async () => {
+    if (isDisabled) return;
+
+    const { selectedFiles, ...post } = state;
+
+    if (state.postType === PostType.TEXT) {
+      createPostText.mutate({
+        ...post,
+        communityId: selectedCommunity.id,
+      });
+    } else {
+      if (state.selectedFiles.length > 12) {
+        toast.error("You can only upload up to 12 files.");
+        return;
+      }
+
+      const uploadedFiles = await startUpload(
+        selectedFiles.map((file) => file.file),
+      );
+
+      if (!uploadedFiles) {
+        return;
+      }
+
+      const files = uploadedFiles.map((file) => ({
+        name: file.name,
+        key: file.key,
+        url: file.ufsUrl,
+      }));
+
+      const response = await fetch("/api/thumbHash", {
+        method: "POST",
+        body: JSON.stringify(files),
+      });
+
+      const data = await response.json();
+
+      const { data: parsedFiles, error } = postFileSchema.safeParse(data);
+
+      if (error) {
+        toast.error(error.message);
+        dispatch({ type: ReducerAction.STOP_LOADING });
+        return;
+      }
+
+      // text is set to null
+      createPostImage.mutate({
+        ...post,
+        communityId: selectedCommunity.id,
+        files: parsedFiles,
+      });
+    }
+  };
 
   return (
     <Button
       className="order-2 self-end rounded-full"
-      disabled={isDisabled}
-      aria-disabled={isDisabled}
-      onClick={() => {
-        if (isDisabled) return;
-
-        const { files, ...post } = state;
-
-        if (state.postType === PostType.TEXT) {
-          createPostText.mutate({
-            ...post,
-            communityId: selectedCommunity.id,
-          });
-        } else if (state.postType === PostType.IMAGE) {
-          // text is set to null
-          createPostImage.mutate({
-            ...post,
-            communityId: selectedCommunity.id,
-            files,
-          });
-        }
-      }}
+      disabled={isDisabled || isMutating}
+      aria-disabled={isDisabled || isMutating}
+      onClick={handleSubmit}
     >
-      {isMutating && <Loader2 className="size-4 animate-spin" />}
-      {!isMutating && "Post"}
+      {isMutating ? (
+        <>
+          <Loader2 className="size-4 animate-spin" />
+          {state.isUploading ? "Uploading..." : "Posting..."}
+        </>
+      ) : (
+        "Post"
+      )}
     </Button>
   );
 }

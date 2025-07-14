@@ -88,7 +88,8 @@ function ImageButton({ editor }: { editor: Editor }) {
 
   const { startUpload, routeConfig } = useUploadThing("imageUploader", {
     onBeforeUploadBegin: (files) => {
-      dispatch({ type: ReducerAction.DISABLE_SUBMIT });
+      dispatch({ type: ReducerAction.START_UPLOAD });
+
       return files;
     },
     onUploadProgress: (p) => {
@@ -109,13 +110,13 @@ function ImageButton({ editor }: { editor: Editor }) {
         })
         .run();
 
-      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
 
       toast.dismiss(toastId);
     },
 
     onUploadError: (e) => {
-      dispatch({ type: ReducerAction.ENABLE_SUBMIT });
+      dispatch({ type: ReducerAction.STOP_UPLOAD });
 
       toast.dismiss(toastId);
       toast.error(e.message);

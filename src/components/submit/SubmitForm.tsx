@@ -54,9 +54,9 @@ export default function SubmitForm() {
               key={tab}
               value={tab}
               className="grow gap-1.5"
-              disabled={state.isDisabled}
+              disabled={state.isLoading || state.isUploading}
               onClick={() => {
-                if (state.isDisabled) return;
+                if (state.isLoading || state.isUploading) return;
 
                 dispatch({
                   type: ReducerAction.SET_POST_TYPE,
