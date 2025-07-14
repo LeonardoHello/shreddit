@@ -24,7 +24,7 @@ export default function RTECommentButtons({ editor }: { editor: Editor }) {
 
       <div className="hidden items-center gap-2 p-1 sm:flex">
         <RTEMarks editor={editor} />
-        <Separator orientation="vertical" className="h-5" />
+        <Separator orientation="vertical" />
         <RTENodes editor={editor} />
       </div>
     </>
