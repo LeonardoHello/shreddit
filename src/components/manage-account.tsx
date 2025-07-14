@@ -79,14 +79,13 @@ const formSchema = z.object({
 type ReducerState = {
   errorMessage?: string;
   isLoading: boolean;
-  displayImage: string;
-  selectedFile?: File;
+  selectedFile: { file?: File; url: string };
 };
 
 enum ReducerAction {
   SET_ERROR_MESSAGE,
   REMOVE_ERROR_MESSAGE,
-  SET_IMAGE,
+  SELECT_FILE,
   START_LOADING,
   STOP_LOADING,
 }
@@ -100,8 +99,7 @@ type ReducerActionType =
       type: typeof ReducerAction.REMOVE_ERROR_MESSAGE;
     }
   | {
-      type: typeof ReducerAction.SET_IMAGE;
-      displayImage: ReducerState["displayImage"];
+      type: typeof ReducerAction.SELECT_FILE;
       selectedFile: ReducerState["selectedFile"];
     }
   | {
@@ -125,10 +123,9 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
         errorMessage: undefined,
       };
     }
-    case ReducerAction.SET_IMAGE: {
+    case ReducerAction.SELECT_FILE: {
       return {
         ...state,
-        displayImage: action.displayImage,
         selectedFile: action.selectedFile,
       };
     }
@@ -155,6 +152,10 @@ const toastId = "loading_toast";
 const description =
   "Username must be 3-21 characters long and contain only alphanumeric characters, underscores, and dots.";
 
+// file size limit in MB
+const maxFileSize = 4;
+const maxFileSizeInBytes = maxFileSize * 1024 * 1024; // convert to bytes
+
 export default function AccountPage({
   name,
   createdAt,
@@ -173,7 +174,7 @@ export default function AccountPage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [state, dispatch] = useReducer(reducer, {
     isLoading: false,
-    displayImage: image ?? donkey.src,
+    selectedFile: { file: undefined, url: image ?? donkey.src },
   });
 
   const router = useRouter();
@@ -204,9 +205,8 @@ export default function AccountPage({
         }
 
         dispatch({
-          type: ReducerAction.SET_IMAGE,
-          displayImage: res[0].ufsUrl,
-          selectedFile: undefined,
+          type: ReducerAction.SELECT_FILE,
+          selectedFile: { file: undefined, url: res[0].ufsUrl },
         });
 
         toast.dismiss(toastId);
@@ -217,9 +217,8 @@ export default function AccountPage({
         }
 
         dispatch({
-          type: ReducerAction.SET_IMAGE,
-          displayImage: image ?? donkey.src,
-          selectedFile: undefined,
+          type: ReducerAction.SELECT_FILE,
+          selectedFile: { file: undefined, url: image ?? donkey.src },
         });
 
         toast.dismiss(toastId);
@@ -230,7 +229,7 @@ export default function AccountPage({
 
   const isDisabled =
     form.getValues("username") === username &&
-    (!state.selectedFile || state.displayImage === image);
+    (!state.selectedFile.file || state.selectedFile.url === image);
 
   const isMutating =
     isPending || isUploading || state.isLoading || form.formState.isSubmitting;
@@ -246,8 +245,8 @@ export default function AccountPage({
       });
 
       const uploadedFile =
-        state.selectedFile && state.displayImage !== image
-          ? await startUpload([state.selectedFile])
+        state.selectedFile.file && state.selectedFile.url !== image
+          ? await startUpload([state.selectedFile.file])
           : undefined;
 
       authClient.updateUser({
@@ -277,21 +276,17 @@ export default function AccountPage({
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    if (!file) return;
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        dispatch({
-          type: ReducerAction.SET_IMAGE,
-          displayImage: e.target?.result as string,
-          selectedFile: file,
-        });
-      };
-      reader.onerror = () => {
-        toast.error("Failed to read the file");
-      };
-      reader.readAsDataURL(file);
+    if (file.size > maxFileSizeInBytes) {
+      toast.error(`File size exceeds the maximum limit of ${maxFileSize}MB`);
+      return;
     }
+
+    dispatch({
+      type: ReducerAction.SELECT_FILE,
+      selectedFile: { file, url: URL.createObjectURL(file) },
+    });
   };
 
   const handleDeleteAccount = async () => {
@@ -333,7 +328,7 @@ export default function AccountPage({
                 <Avatar className="size-24">
                   <AvatarImage
                     className="object-cover"
-                    src={state.displayImage}
+                    src={state.selectedFile.url}
                     alt="Profile picture"
                   />
                   <AvatarFallback className="text-lg uppercase">
@@ -487,6 +482,7 @@ export default function AccountPage({
                   type="submit"
                   className="w-min self-end"
                   disabled={isMutating || isDisabled}
+                  aria-disabled={isMutating || isDisabled}
                 >
                   {isMutating ? (
                     <>
