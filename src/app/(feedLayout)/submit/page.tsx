@@ -1,5 +1,6 @@
 import { ChevronDown, CircleDashed } from "lucide-react";
 
+import SubmitButtonFake from "@/components/submit/SubmitButtonFake";
 import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import { Button } from "@/components/ui/button";
 
@@ -14,9 +15,7 @@ export default function SubmitPage() {
         </Button>
       </SubmitCommunity>
 
-      <Button className="order-2 self-end rounded-full" disabled>
-        Post
-      </Button>
+      <SubmitButtonFake />
     </>
   );
 }
