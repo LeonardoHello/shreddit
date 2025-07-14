@@ -2,6 +2,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
 import { User } from "@/db/schema/users";
+import { cn } from "@/lib/cn";
 import PostBody from "../post/PostBody";
 import PostFooter from "../post/PostFooter";
 import PostHeader from "../post/PostHeader";
@@ -32,7 +33,12 @@ export default function FeedPost({
 
   return (
     <div
-      className="bg-card hover:border-ring/50 flex cursor-pointer flex-col gap-2 rounded-lg border px-4 py-2"
+      className={cn(
+        "bg-card hover:border-ring/50 flex flex-col gap-2 rounded-lg border px-4 py-2",
+        {
+          "cursor-pointer": !state.isEditing,
+        },
+      )}
       onTouchStart={() => {
         router.prefetch(`/r/${state.community.name}/comments/${state.id}`);
       }}
