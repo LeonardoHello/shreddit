@@ -140,11 +140,15 @@ export default function SubmitButton({
         return;
       }
 
+      dispatch({ type: ReducerAction.START_LOADING });
+
       const uploadedFiles = await startUpload(
         selectedFiles.map((file) => file.file),
       );
 
       if (!uploadedFiles) {
+        dispatch({ type: ReducerAction.STOP_LOADING });
+
         return;
       }
 
@@ -166,6 +170,7 @@ export default function SubmitButton({
       if (error) {
         toast.error(error.message);
         dispatch({ type: ReducerAction.STOP_LOADING });
+
         return;
       }
 
