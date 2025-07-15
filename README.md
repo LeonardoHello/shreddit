@@ -6,31 +6,40 @@ Shreddit is a full-stack social media platform inspired by Reddit, designed to p
 
 ## Technologies Used
 
-1. **Next.js (v15)**: A React framework for server-side rendering, routing, and API routes.
-2. **React (v19)**: A JavaScript library for building user interfaces.
-3. **TypeScript**: Enhances JavaScript with static typing for improved code quality.
-4. **Tailwind CSS**: A utility-first CSS framework for styling.
-5. **shadcn/ui**: Provides beautifully designed, accessible, and customizable components.
-6. **tRPC**: A type-safe API layer for client-server communication.
-7. **Drizzle ORM**: A type-safe SQL query builder and ORM.
-8. **UploadThing**: A file upload service for handling image uploads.
-9. **TipTap**: A rich text editor implementation.
-10. **Better-Auth**: Manages authentication and user management.
+- **Frontend:**  
+  - Developed with **React 19** and **Next.js 15**, utilizing server-side rendering, dynamic routing, and client/server components for optimal performance and SEO.
+  - Implemented responsive, accessible UIs using **Tailwind CSS** and **shadcn/ui** components, ensuring seamless experiences across devices.
+  - Built advanced navigation features, including a collapsible, mobile-friendly sidebar and real-time search with instant feedback.
+  - Integrated **TipTap** rich text editor for posts and comments, supporting image uploads and custom formatting.
+  - Used **motion/react** for smooth UI animations and transitions.
 
-## Features
+- **Type Safety & Code Quality:**  
+  - Enforced strict type safety with **TypeScript** and **Zod** schemas for runtime validation.
+  - Maintained code quality with **ESLint** configurations and consistent formatting via **Prettier**.
 
-- **Reddit Clone Functionality**: Shreddit mirrors Reddit's core features, allowing users to create posts, upvote/downvote, comment, and engage in discussions.
-- **Type Safety**: Extensive use of TypeScript throughout the project ensures type safety, reducing bugs and enhancing code quality.
-- **Secure Authentication**: Better-Auth provides robust user management and authentication, ensuring a secure environment for handling sensitive user data.
-- **Optimized Data Fetching**: Utilizes React Query's `useInfiniteQuery` for infinite scrolling, providing a smooth user experience when browsing posts.
-- **Optimistic Updates**: Incorporates optimistic updates to provide immediate feedback to users, enhancing the user experience by reducing perceived latency.
-- **Thumbhash for Image Handling**: Uses the Thumbhash library to generate lightweight image placeholders, improving page load times and user experience.
-- **Cron Job for Filesystem Management**: Implements a scheduled cron job to manage and clean up unused files, ensuring efficient use of storage resources.
-- **Responsive Design**: The platform is designed to be fully responsive, adapting to various screen sizes and devices.
-- **Real-time Search**: Implements a real-time search feature, allowing users to quickly find content and communities.
-- **Advanced Sidebar Navigation**: Features a collapsible and mobile-friendly sidebar for easy navigation.
-- **Error Handling**: Provides user-friendly error messages and recovery options in case of server issues.
-- **Adherence to Best Practices**: Leverages ESLint configurations from React Query, React Compiler, and Drizzle, ensuring consistent code quality.
+- **State Management & Context:**  
+  - Designed robust context providers for post submission, recent communities, and sidebar state, using React Context with useReducer and custom hooks.
+  - Leveraged **React Query** for data fetching, caching, and optimistic UI updates, including infinite scrolling and skeleton loading states.
+
+- **Backend & API Layer:**  
+  - Architected a type-safe API using **tRPC**, enabling seamless client-server communication.
+  - Modeled data with **Drizzle ORM**, writing complex SQL queries for feeds, user actions, and community management.
+  - Implemented authentication and user management with **Better-Auth**, supporting OAuth providers (Google, GitHub, Discord) and secure session handling.
+
+- **File Uploads & Media:**  
+  - Integrated **UploadThing** for image uploads, including client-side dropzones and progress feedback.
+  - Utilized **Thumbhash** for lightweight image placeholders, improving perceived performance.
+
+- **UX & Error Handling:**  
+  - Provided user-friendly error messages and recovery options.
+  - Used **Sonner** for toast notifications and feedback.
+  - Designed loading skeletons for all major flows.
+
+- **Other Features:**  
+  - Scheduled cron jobs for filesystem cleanup.
+  - Implemented community moderation, favoriting, muting, and joining features.
+  - Supported infinite feeds for posts, upvoted, saved, and hidden content.
+  - Adhered to best practices for accessibility, performance, and maintainability.
 
 # Usage
 
@@ -50,7 +59,6 @@ Shreddit is a full-stack social media platform inspired by Reddit, designed to p
    GITHUB_CLIENT_SECRET=
    DISCORD_CLIENT_ID=
    DISCORD_CLIENT_SECRET=
-   RESEND_API_KEY=
    ```
 4. Run drizzle schema migration: `pnpm push` [source](https://orm.drizzle.team/docs/migrations)
 5. Run the development server: `pnpm dev`
