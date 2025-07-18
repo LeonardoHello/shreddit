@@ -45,9 +45,7 @@ export default function CommunityDeleteDialog({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to delete your community. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to delete your community. Please try again later.");
       },
     }),
   );

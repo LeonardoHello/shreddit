@@ -31,9 +31,7 @@ export default function FeedPostHidden() {
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to hide the post. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to hide the post. Please try again later.");
       },
     }),
   );

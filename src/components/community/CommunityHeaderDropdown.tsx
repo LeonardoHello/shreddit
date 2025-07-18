@@ -73,9 +73,7 @@ export default function CommunityHeaderDropdown({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to join the community. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to join the community. Please try again later.");
       },
     }),
   );
@@ -108,7 +106,7 @@ export default function CommunityHeaderDropdown({
       onError: (error) => {
         console.error(error);
         toast.error(
-          "Failed to favorite the community. Please try refreshing the page or try again later.",
+          "Failed to favorite the community. Please try again later.",
         );
       },
     }),
@@ -138,9 +136,7 @@ export default function CommunityHeaderDropdown({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to mute the community. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to mute the community. Please try again later.");
       },
     }),
   );

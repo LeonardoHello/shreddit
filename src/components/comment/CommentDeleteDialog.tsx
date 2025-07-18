@@ -32,9 +32,7 @@ export default function CommentDeleteDialog() {
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to delete your comment. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to delete your comment. Please try again later.");
       },
     }),
   );

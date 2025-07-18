@@ -38,9 +38,7 @@ export default function PostVote({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to update your vote. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to update your vote. Please try again later.");
       },
     }),
   );

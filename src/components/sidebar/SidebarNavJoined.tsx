@@ -146,7 +146,7 @@ export default function SidebarNavJoined() {
                             onError: (error) => {
                               console.error(error);
                               toast.error(
-                                "Failed to favorite the community. Please try refreshing the page or try again later.",
+                                "Failed to favorite the community. Please try again later.",
                               );
                             },
                           },

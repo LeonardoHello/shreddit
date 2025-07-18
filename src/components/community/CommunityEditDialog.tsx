@@ -71,9 +71,7 @@ export default function CommunityEditDialog({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to edit your community. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to edit your community. Please try again later.");
       },
     }),
   );

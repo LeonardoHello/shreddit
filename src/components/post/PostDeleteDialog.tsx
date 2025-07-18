@@ -45,9 +45,7 @@ export default function PostDeleteDialog({
       },
       onError: (error) => {
         console.error(error);
-        toast.error(
-          "Failed to delete your post. Please try refreshing the page or try again later.",
-        );
+        toast.error("Failed to delete your post. Please try again later.");
       },
     }),
   );
