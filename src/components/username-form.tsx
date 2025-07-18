@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/tooltip";
 import { User } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import shrek from "@public/shrek.svg";
 
 const formSchema = z.object({
@@ -133,7 +133,7 @@ export default function UsernameForm({
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <Avatar className="mx-auto mb-4 size-12">
-              <AvatarImage src={userImage ?? donkey.src} />
+              <AvatarImage src={userImage ?? defaultUserImage.src} />
               <AvatarFallback className="uppercase">
                 {userName.slice(0, 2)}
               </AvatarFallback>

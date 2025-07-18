@@ -2,7 +2,7 @@ import { useCommentContext } from "@/context/CommentContext";
 import { UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
@@ -19,7 +19,7 @@ export default function CommentHeader() {
       {success ? (
         <HoverPrefetchLink href={`/u/${username}`} className="rounded-full">
           <Avatar className="size-7">
-            <AvatarImage src={state.author.image ?? donkey.src} />
+            <AvatarImage src={state.author.image ?? defaultUserImage.src} />
             <AvatarFallback className="uppercase">
               {username.slice(0, 2)}
             </AvatarFallback>
@@ -27,7 +27,7 @@ export default function CommentHeader() {
         </HoverPrefetchLink>
       ) : (
         <Avatar className="size-7">
-          <AvatarImage src={state.author.image ?? donkey.src} />
+          <AvatarImage src={state.author.image ?? defaultUserImage.src} />
           <AvatarFallback className="uppercase">
             {state.author.name.slice(0, 2)}
           </AvatarFallback>

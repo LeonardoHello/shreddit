@@ -6,7 +6,7 @@ import { usePostContext } from "@/context/PostContext";
 import { User, UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
@@ -38,7 +38,7 @@ export default function PostHeader({
               className="group text-foreground flex items-center gap-1.5"
             >
               <Avatar className="size-6">
-                <AvatarImage src={state.author.image ?? donkey.src} />
+                <AvatarImage src={state.author.image ?? defaultUserImage.src} />
                 <AvatarFallback className="uppercase">
                   {username.slice(0, 2)}
                 </AvatarFallback>
@@ -50,7 +50,7 @@ export default function PostHeader({
           ) : (
             <div className="group text-foreground flex items-center gap-1.5">
               <Avatar className="size-6">
-                <AvatarImage src={state.author.image ?? donkey.src} />
+                <AvatarImage src={state.author.image ?? defaultUserImage.src} />
                 <AvatarFallback className="uppercase">UN</AvatarFallback>
               </Avatar>
               <span className="font-extrabold break-all group-hover:opacity-80">

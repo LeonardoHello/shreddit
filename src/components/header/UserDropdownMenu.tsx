@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserSchema } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 
@@ -42,7 +42,7 @@ export default function UserDropdownMenu({
           asChild
         >
           <Avatar className="size-8">
-            <AvatarImage src={userImage ?? donkey.src} />
+            <AvatarImage src={userImage ?? defaultUserImage.src} />
             <AvatarFallback className="uppercase">
               {parsedUsername.slice(0, 2)}
             </AvatarFallback>
@@ -52,7 +52,7 @@ export default function UserDropdownMenu({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel className="flex items-center gap-2">
           <Avatar className="size-8">
-            <AvatarImage src={userImage ?? donkey.src} />
+            <AvatarImage src={userImage ?? defaultUserImage.src} />
             <AvatarFallback className="uppercase">
               {parsedUsername.slice(0, 2)}
             </AvatarFallback>

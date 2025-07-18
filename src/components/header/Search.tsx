@@ -9,7 +9,7 @@ import * as motion from "motion/react-client";
 
 import useDropdown from "@/hooks/useDropdown";
 import { useTRPC } from "@/trpc/client";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -170,7 +170,7 @@ const SearchDropdown = memo(
               >
                 <HoverPrefetchLink href={`/u/${user.username}`}>
                   <Avatar className="size-7">
-                    <AvatarImage src={user.image ?? donkey.src} />
+                    <AvatarImage src={user.image ?? defaultUserImage.src} />
                     <AvatarFallback className="uppercase">
                       {user.username?.slice(0, 2)}
                     </AvatarFallback>

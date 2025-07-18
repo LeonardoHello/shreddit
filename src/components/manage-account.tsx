@@ -60,7 +60,7 @@ import {
 import { User } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
 import { useUploadThing } from "@/lib/uploadthing";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import { DiscordIcon, GithubIcon, GoogleIcon } from "./social-icons";
 import { Progress } from "./ui/progress";
 
@@ -174,7 +174,7 @@ export default function AccountPage({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [state, dispatch] = useReducer(reducer, {
     isLoading: false,
-    selectedFile: { file: undefined, url: image ?? donkey.src },
+    selectedFile: { file: undefined, url: image ?? defaultUserImage.src },
   });
 
   const router = useRouter();
@@ -218,7 +218,7 @@ export default function AccountPage({
 
         dispatch({
           type: ReducerAction.SELECT_FILE,
-          selectedFile: { file: undefined, url: image ?? donkey.src },
+          selectedFile: { file: undefined, url: image ?? defaultUserImage.src },
         });
 
         toast.dismiss(toastId);

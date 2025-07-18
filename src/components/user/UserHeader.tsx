@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { useTRPC } from "@/trpc/client";
-import donkey from "@public/donkey.png";
+import defaultUserImage from "@public/defaultUserImage.png";
 import userBanner from "@public/userBanner.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import UserNavigation from "./UserNavigation";
@@ -30,7 +30,7 @@ export default function UserHeader({ username }: { username: string }) {
       <div className="flex flex-row items-center justify-between gap-4 px-4 py-2.5">
         <div className="flex items-center gap-2 lg:max-h-10">
           <Avatar className="border-card bg-card size-12 lg:size-24 lg:self-end lg:border-4">
-            <AvatarImage src={user.image ?? donkey.src} />
+            <AvatarImage src={user.image ?? defaultUserImage.src} />
             <AvatarFallback className="uppercase">
               {username.slice(0, 2)}
             </AvatarFallback>
