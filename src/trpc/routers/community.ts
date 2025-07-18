@@ -54,7 +54,7 @@ export const communityRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const data = await ctx.db.query.communities.findFirst({
         where: (community, { eq }) => eq(community.name, input),
-        columns: { id: true, name: true, icon: true },
+        columns: { id: true, name: true, icon: true, iconPlaceholder: true },
       });
 
       if (!data)
@@ -78,7 +78,7 @@ export const communityRouter = createTRPCRouter({
         limit: input.limit,
         where: (community, { ilike }) =>
           ilike(community.name, `%${input.search}%`),
-        columns: { id: true, name: true, icon: true },
+        columns: { id: true, name: true, icon: true, iconPlaceholder: true },
         extras: (community, { sql }) => ({
           memberCount: sql<number>`
               (
@@ -100,7 +100,7 @@ export const communityRouter = createTRPCRouter({
             eq(userToCommunity.userId, ctx.userId),
             exists(
               ctx.db
-                .select()
+                .select({ id: communities.id })
                 .from(communities)
                 .where(
                   and(
@@ -144,7 +144,7 @@ export const communityRouter = createTRPCRouter({
               ),
             ),
         ),
-      columns: { id: true, name: true, icon: true },
+      columns: { id: true, name: true, icon: true, iconPlaceholder: true },
       extras: (community, { sql }) => ({
         memberCount: sql<number>`
           (
@@ -162,7 +162,7 @@ export const communityRouter = createTRPCRouter({
       where: (userToCommunity, { and, eq, exists }) =>
         exists(
           ctx.db
-            .select()
+            .select({ id: communities.id })
             .from(communities)
             .where(
               and(
@@ -173,7 +173,11 @@ export const communityRouter = createTRPCRouter({
             ),
         ),
       columns: { favorited: true },
-      with: { community: { columns: { id: true, name: true, icon: true } } },
+      with: {
+        community: {
+          columns: { id: true, name: true, icon: true, iconPlaceholder: true },
+        },
+      },
     });
   }),
   getJoinedCommunities: protectedProcedure.query(({ ctx }) => {
@@ -184,7 +188,11 @@ export const communityRouter = createTRPCRouter({
           eq(userToCommunity.joined, true),
         ),
       columns: { favorited: true },
-      with: { community: { columns: { id: true, name: true, icon: true } } },
+      with: {
+        community: {
+          columns: { id: true, name: true, icon: true, iconPlaceholder: true },
+        },
+      },
     });
   }),
   getMutedCommunities: protectedProcedure.query(({ ctx }) => {
@@ -195,7 +203,11 @@ export const communityRouter = createTRPCRouter({
           eq(userToCommunity.muted, true),
         ),
       columns: { favorited: true },
-      with: { community: { columns: { id: true, name: true, icon: true } } },
+      with: {
+        community: {
+          columns: { id: true, name: true, icon: true, iconPlaceholder: true },
+        },
+      },
     });
   }),
   editCommunity: protectedProcedure
@@ -287,7 +299,9 @@ export const communityRouter = createTRPCRouter({
         name: true,
         description: true,
         icon: true,
+        iconPlaceholder: true,
         banner: true,
+        bannerPlaceholder: true,
       }),
     )
     .mutation(({ input, ctx }) => {

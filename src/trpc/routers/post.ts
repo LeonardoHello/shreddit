@@ -21,7 +21,9 @@ export const postRouter = createTRPCRouter({
       const post = await ctx.db.query.posts.findFirst({
         where: (post, { eq }) => eq(post.id, input),
         with: {
-          community: { columns: { name: true, icon: true } },
+          community: {
+            columns: { name: true, icon: true, iconPlaceholder: true },
+          },
           author: { columns: { username: true, image: true } },
           files: {
             columns: { id: true, name: true, url: true, thumbHash: true },

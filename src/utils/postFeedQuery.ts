@@ -25,7 +25,9 @@ export const postFeedQuery =
         limit: 10,
         offset: sql.placeholder("offset"),
         with: {
-          community: { columns: { name: true, icon: true } },
+          community: {
+            columns: { name: true, icon: true, iconPlaceholder: true },
+          },
           author: { columns: { username: true, image: true } },
           files: {
             columns: { id: true, name: true, url: true, thumbHash: true },
@@ -106,7 +108,7 @@ export const postFeedQuery =
                 hideHiddenPosts,
                 exists(
                   db
-                    .select()
+                    .select({ id: communities.id })
                     .from(communities)
                     .where(
                       and(

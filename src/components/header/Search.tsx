@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useRef, useState } from "react";
-import Image from "next/image";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
@@ -10,8 +9,8 @@ import * as motion from "motion/react-client";
 
 import useDropdown from "@/hooks/useDropdown";
 import { useTRPC } from "@/trpc/client";
-import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import defaultUserImage from "@public/defaultUserImage.png";
+import CommunityIcon from "../community/CommunityIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
@@ -139,11 +138,11 @@ const SearchDropdown = memo(
                 onClick={closeDropdown}
               >
                 <HoverPrefetchLink href={`/r/${community.name}`}>
-                  <Image
-                    src={community.icon ?? defaultCommunityIcon}
-                    alt={`${community.name} community icon`}
-                    width={28}
-                    height={28}
+                  <CommunityIcon
+                    icon={community.icon}
+                    iconPlaceholder={community.iconPlaceholder}
+                    communtiyName={community.name}
+                    size={28}
                     className="rounded-full object-contain select-none"
                   />
 

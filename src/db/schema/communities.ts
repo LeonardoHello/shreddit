@@ -20,7 +20,9 @@ export const communities = pgTable("communities", {
   description: text().notNull().default(""),
   memberNickname: text().notNull().default(""),
   icon: text(),
+  iconPlaceholder: text(),
   banner: text(),
+  bannerPlaceholder: text(),
   moderatorId: text()
     .references(() => users.id, {
       onDelete: "cascade",

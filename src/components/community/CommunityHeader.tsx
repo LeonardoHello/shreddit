@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import * as thumbhash from "thumbhash";
 
 import {
   ReducerAction,
@@ -15,12 +16,12 @@ import { User } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import { useTRPC } from "@/trpc/client";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
-import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import CommunityDeleteDialog from "./CommunityDeleteDialog";
 import CommunityEditDialog from "./CommunityEditDialog";
 import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
+import CommunityIcon from "./CommunityIcon";
 import CommunitySidebar from "./CommunitySidebar";
 
 export default function CommunityHeader({
@@ -49,9 +50,23 @@ export default function CommunityHeader({
         id: community.id,
         name: community.name,
         icon: community.icon,
+        iconPlaceholder: community.iconPlaceholder,
       },
     });
-  }, [dispatch, community.icon, community.id, community.name, isHydrated]);
+  }, [
+    dispatch,
+    community.id,
+    community.name,
+    community.icon,
+    community.iconPlaceholder,
+    isHydrated,
+  ]);
+
+  const placeholderURL =
+    community.bannerPlaceholder &&
+    thumbhash.thumbHashToDataURL(
+      Buffer.from(community.bannerPlaceholder, "base64"),
+    );
 
   return (
     <div className="bg-card flex flex-col rounded-lg border">
@@ -59,19 +74,23 @@ export default function CommunityHeader({
         <Image
           src={community.banner ?? defaultCommunityBanner}
           alt={`${community.name} community icon`}
-          className="w-auto rounded-t-lg object-cover"
           fill
+          placeholder="blur"
+          blurDataURL={
+            community.banner && placeholderURL ? placeholderURL : undefined
+          }
+          className="w-auto rounded-t-lg object-cover"
         />
       </div>
 
       <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center">
         <div className="flex items-center gap-2 lg:max-h-10">
-          <Image
-            src={community.icon ?? defaultCommunityIcon}
-            alt={`${community.name} community icon`}
+          <CommunityIcon
+            icon={community.icon}
+            iconPlaceholder={community.iconPlaceholder}
+            communtiyName={community.name}
+            size={48}
             className="border-card bg-card z-10 rounded-full border-2 object-contain select-none lg:size-24 lg:self-end lg:border-4"
-            width={48}
-            height={48}
           />
           <div>
             <div className="flex items-center gap-1">

@@ -33,6 +33,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { PostFileSchema } from "@/db/schema/posts";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
@@ -46,6 +47,13 @@ import { Textarea } from "../ui/textarea";
 const minNameLength = 3;
 const maxNameLength = 21;
 const maxDescriptionLength = 500;
+
+const fileSchema = PostFileSchema.pick({
+  key: true,
+  url: true,
+  name: true,
+  thumbHash: true,
+}).array();
 
 const formSchema = z.object({
   name: z
@@ -70,6 +78,7 @@ type ReducerState = {
   isOpen: boolean;
   communityIcon: { file: File | undefined; url: string | StaticImport };
   communityBanner: { file: File | undefined; url: string | StaticImport };
+  isLoading: boolean;
 };
 
 enum ReducerAction {
@@ -78,6 +87,8 @@ enum ReducerAction {
   SET_IS_OPEN,
   SELECT_ICON,
   SELECT_BANNER,
+  START_LOADING,
+  STOP_LOADING,
 }
 
 type ReducerActionType =
@@ -99,6 +110,12 @@ type ReducerActionType =
   | {
       type: typeof ReducerAction.SELECT_BANNER;
       communityBanner: ReducerState["communityBanner"];
+    }
+  | {
+      type: typeof ReducerAction.START_LOADING;
+    }
+  | {
+      type: typeof ReducerAction.STOP_LOADING;
     };
 
 function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
@@ -133,6 +150,21 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
         communityBanner: action.communityBanner,
       };
     }
+    case ReducerAction.START_LOADING: {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    }
+    case ReducerAction.STOP_LOADING: {
+      return {
+        ...state,
+        isLoading: false,
+      };
+    }
+    default: {
+      throw Error("Unknown action.");
+    }
   }
 }
 
@@ -154,6 +186,7 @@ export default function SidebarDialog({
     isOpen: false,
     communityIcon: { file: undefined, url: defaultCommunityIcon },
     communityBanner: { file: undefined, url: defaultCommunityBanner },
+    isLoading: false,
   });
 
   const router = useRouter();
@@ -213,6 +246,9 @@ export default function SidebarDialog({
 
   const createCommunity = useMutation(
     trpc.community.createCommunity.mutationOptions({
+      onMutate: () => {
+        dispatch({ type: ReducerAction.START_LOADING });
+      },
       onSuccess: (data) => {
         queryClient.invalidateQueries({
           queryKey: trpc.community.getModeratedCommunities.queryKey(),
@@ -245,6 +281,9 @@ export default function SidebarDialog({
           toast.error("Failed to create a community. Please try again later.");
         }
       },
+      onSettled: () => {
+        dispatch({ type: ReducerAction.STOP_LOADING });
+      },
     }),
   );
 
@@ -266,6 +305,7 @@ export default function SidebarDialog({
 
       return;
     }
+    dispatch({ type: ReducerAction.START_LOADING });
 
     if (state.communityIcon.file || state.communityBanner.file) {
       const filesToUpload = [];
@@ -278,31 +318,69 @@ export default function SidebarDialog({
 
       const uploadedFiles = await startUpload(filesToUpload);
 
-      if (uploadedFiles) {
-        let iconUrl: string | null = null;
-        let bannerUrl: string | null = null;
+      if (!uploadedFiles) {
+        dispatch({ type: ReducerAction.STOP_LOADING });
 
-        if (state.communityIcon.file && state.communityBanner.file) {
-          // Both files uploaded, order preserved
-          iconUrl = uploadedFiles[0].ufsUrl;
-          bannerUrl = uploadedFiles[1].ufsUrl;
-        } else if (state.communityIcon.file) {
-          iconUrl = uploadedFiles[0].ufsUrl;
-        } else if (state.communityBanner.file) {
-          bannerUrl = uploadedFiles[0].ufsUrl;
-        }
-
-        createCommunity.mutate({
-          ...values,
-          icon: iconUrl,
-          banner: bannerUrl,
-        });
+        return;
       }
+
+      const files = uploadedFiles.map((file) => ({
+        name: file.name,
+        key: file.key,
+        url: file.ufsUrl,
+      }));
+
+      const response = await fetch("/api/thumbHash", {
+        method: "POST",
+        body: JSON.stringify(files),
+      });
+
+      const data = await response.json();
+
+      const { data: parsedFiles, error } = fileSchema.safeParse(data);
+
+      if (error) {
+        toast.error(error.message);
+        dispatch({ type: ReducerAction.STOP_LOADING });
+
+        return;
+      }
+
+      let icon: string | null = null;
+      let iconPlaceholder: string | null = null;
+
+      let banner: string | null = null;
+      let bannerPlaceholder: string | null = null;
+
+      if (state.communityIcon.file && state.communityBanner.file) {
+        // Both files uploaded, order preserved
+        icon = parsedFiles[0].url;
+        iconPlaceholder = parsedFiles[0].thumbHash;
+
+        banner = parsedFiles[1].url;
+        bannerPlaceholder = parsedFiles[1].thumbHash;
+      } else if (state.communityIcon.file) {
+        icon = parsedFiles[0].url;
+        iconPlaceholder = parsedFiles[0].thumbHash;
+      } else if (state.communityBanner.file) {
+        banner = parsedFiles[0].url;
+        bannerPlaceholder = parsedFiles[0].thumbHash;
+      }
+
+      createCommunity.mutate({
+        ...values,
+        icon: icon,
+        iconPlaceholder,
+        banner,
+        bannerPlaceholder,
+      });
     } else {
       createCommunity.mutate({
         ...values,
         icon: null,
+        iconPlaceholder: null,
         banner: null,
+        bannerPlaceholder: null,
       });
     }
   }

@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useState } from "react";
-import Image from "next/image";
 
 import {
   useQuery,
@@ -18,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTRPC } from "@/trpc/client";
-import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
+import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
@@ -95,11 +94,11 @@ export default function SubmitCommunity({
             {myCommunities.map((community) => (
               <DropdownMenuItem key={community.id} className="h-11" asChild>
                 <HoverPrefetchLink href={`/submit/r/${community.name}`}>
-                  <Image
-                    src={community.icon ?? defaultCommunityIcon}
-                    alt={`${community.name} community icon`}
-                    width={32}
-                    height={32}
+                  <CommunityIcon
+                    icon={community.icon}
+                    iconPlaceholder={community.iconPlaceholder}
+                    communtiyName={community.name}
+                    size={32}
                     className="rounded-full object-contain select-none"
                   />
                   <div className="flex flex-col">
@@ -150,11 +149,11 @@ const SubmitCommunityDropdown = memo(
           searchedCommunities?.map((community) => (
             <DropdownMenuItem key={community.id} className="h-11" asChild>
               <HoverPrefetchLink href={`/submit/r/${community.name}`}>
-                <Image
-                  src={community.icon ?? defaultCommunityIcon}
-                  alt={`${community.name} community icon`}
-                  width={32}
-                  height={32}
+                <CommunityIcon
+                  icon={community.icon}
+                  iconPlaceholder={community.iconPlaceholder}
+                  communtiyName={community.name}
+                  size={32}
                   className="rounded-full object-contain select-none"
                 />
                 <div className="flex flex-col">

@@ -12,7 +12,12 @@ export const userRouter = createTRPCRouter({
         where: (user, { eq }) => eq(user.username, input),
         with: {
           communities: {
-            columns: { id: true, icon: true, name: true },
+            columns: {
+              id: true,
+              icon: true,
+              name: true,
+              iconPlaceholder: true,
+            },
             extras: (community, { sql }) => ({
               memberCount: sql<number>`
                 (

@@ -4,7 +4,10 @@ import { createContext, useContext, useEffect, useReducer } from "react";
 
 import { Community, CommunitySchema } from "@/db/schema/communities";
 
-type RecentCommunity = Pick<Community, "id" | "name" | "icon">;
+type RecentCommunity = Pick<
+  Community,
+  "id" | "name" | "icon" | "iconPlaceholder"
+>;
 type ReducerState = {
   communities: RecentCommunity[];
   isLoading: boolean;
@@ -46,6 +49,7 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
           id: true,
           name: true,
           icon: true,
+          iconPlaceholder: true,
         })
           .array()
           .safeParse(parsed);

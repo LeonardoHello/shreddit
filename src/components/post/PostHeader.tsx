@@ -1,14 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
 import { User, UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
-import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import defaultUserImage from "@public/defaultUserImage.png";
+import CommunityIcon from "../community/CommunityIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import PostDeleteDialog from "./PostDeleteDialog";
@@ -79,11 +78,11 @@ export default function PostHeader({
             className="group text-foreground flex items-center gap-1.5 text-xs"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={state.community.icon ?? defaultCommunityIcon}
-              alt={`${state.community.name} community icon`}
-              width={24}
-              height={24}
+            <CommunityIcon
+              icon={state.community.icon}
+              iconPlaceholder={state.community.iconPlaceholder}
+              communtiyName={state.community.name}
+              size={24}
               className="rounded-full object-contain select-none"
             />
             <span className="font-extrabold break-all group-hover:opacity-80">

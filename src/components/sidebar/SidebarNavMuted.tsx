@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import {
@@ -14,7 +12,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTRPC } from "@/trpc/client";
-import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
+import CommunityIcon from "../community/CommunityIcon";
 import {
   AccordionContent,
   AccordionItem,
@@ -64,14 +62,13 @@ export default function SidebarNavMuted() {
                       <HoverPrefetchLink
                         href={`/r/${userToCommunity.community.name}`}
                       >
-                        <Image
-                          src={
-                            userToCommunity.community.icon ??
-                            defaultCommunityIcon
+                        <CommunityIcon
+                          icon={userToCommunity.community.icon}
+                          iconPlaceholder={
+                            userToCommunity.community.iconPlaceholder
                           }
-                          alt={`${userToCommunity.community.name} community icon`}
-                          width={32}
-                          height={32}
+                          communtiyName={userToCommunity.community.name}
+                          size={32}
                           className="rounded-full object-contain select-none"
                         />
                         <span>r/{userToCommunity.community.name}</span>
