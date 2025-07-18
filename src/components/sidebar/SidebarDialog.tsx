@@ -66,18 +66,28 @@ const formSchema = z.object({
 });
 
 type ReducerState = {
+  errorMessage?: string;
   isOpen: boolean;
   communityIcon: { file: File | undefined; url: string | StaticImport };
   communityBanner: { file: File | undefined; url: string | StaticImport };
 };
 
 enum ReducerAction {
+  SET_ERROR_MESSAGE,
+  REMOVE_ERROR_MESSAGE,
   SET_IS_OPEN,
   SELECT_ICON,
   SELECT_BANNER,
 }
 
 type ReducerActionType =
+  | {
+      type: typeof ReducerAction.SET_ERROR_MESSAGE;
+      errorMessage: NonNullable<ReducerState["errorMessage"]>;
+    }
+  | {
+      type: typeof ReducerAction.REMOVE_ERROR_MESSAGE;
+    }
   | {
       type: typeof ReducerAction.SET_IS_OPEN;
       isOpen: ReducerState["isOpen"];
@@ -93,6 +103,18 @@ type ReducerActionType =
 
 function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
   switch (action.type) {
+    case ReducerAction.SET_ERROR_MESSAGE: {
+      return {
+        ...state,
+        errorMessage: action.errorMessage,
+      };
+    }
+    case ReducerAction.REMOVE_ERROR_MESSAGE: {
+      return {
+        ...state,
+        errorMessage: undefined,
+      };
+    }
     case ReducerAction.SET_IS_OPEN: {
       return {
         ...state,
@@ -214,10 +236,13 @@ export default function SidebarDialog({
           error.message ===
           'duplicate key value violates unique constraint "communities_name_unique"'
         ) {
-          const name = form.getValues("name");
-          toast.error(`"r/${name}" is already taken`);
+          dispatch({
+            type: ReducerAction.SET_ERROR_MESSAGE,
+            errorMessage:
+              "Communtiy name is already taken. please try another.",
+          });
         } else {
-          toast.error(error.message);
+          toast.error("Failed to create a community. Please try again later.");
         }
       },
     }),
@@ -406,6 +431,13 @@ export default function SidebarDialog({
             <FormField
               control={form.control}
               name="name"
+              rules={{
+                onChange: () => {
+                  dispatch({
+                    type: ReducerAction.REMOVE_ERROR_MESSAGE,
+                  });
+                },
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
@@ -415,7 +447,7 @@ export default function SidebarDialog({
                     <Input {...field} />
                   </FormControl>
                   <div className="inline-flex w-full justify-between px-1">
-                    <FormMessage />
+                    <FormMessage>{state.errorMessage}</FormMessage>
                     <div className="text-muted-foreground ml-auto text-xs">
                       {maxNameLength - field.value.length}
                     </div>

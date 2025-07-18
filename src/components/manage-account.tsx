@@ -79,7 +79,7 @@ const formSchema = z.object({
 type ReducerState = {
   errorMessage?: string;
   isLoading: boolean;
-  selectedFile: { file?: File; url: string };
+  selectedFile: { file: File | undefined; url: string };
 };
 
 enum ReducerAction {
