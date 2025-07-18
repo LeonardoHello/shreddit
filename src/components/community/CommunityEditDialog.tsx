@@ -70,7 +70,10 @@ export default function CommunityEditDialog({
         toast.success("Community successfully edited");
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to edit your community. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );

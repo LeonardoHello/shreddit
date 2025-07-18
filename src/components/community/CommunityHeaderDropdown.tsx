@@ -72,7 +72,10 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to join the community. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
@@ -103,7 +106,10 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to favorite the community. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
@@ -131,7 +137,10 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to mute the community. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );

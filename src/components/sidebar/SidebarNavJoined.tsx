@@ -144,7 +144,10 @@ export default function SidebarNavJoined() {
                               });
                             },
                             onError: (error) => {
-                              toast.error(error.message);
+                              console.error(error);
+                              toast.error(
+                                "Failed to favorite the community. Please try refreshing the page or try again later.",
+                              );
                             },
                           },
                         );

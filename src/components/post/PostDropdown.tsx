@@ -62,7 +62,10 @@ export default function PostDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to save the post. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
@@ -83,7 +86,10 @@ export default function PostDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to hide the post. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
@@ -104,7 +110,10 @@ export default function PostDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to toggle spoiler tag for the post. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
@@ -125,7 +134,10 @@ export default function PostDropdown({
         }
       },
       onError: (error) => {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "Failed to toggle NSFW tag for the post. Please try refreshing the page or try again later.",
+        );
       },
     }),
   );
