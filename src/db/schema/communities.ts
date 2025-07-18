@@ -5,7 +5,6 @@ import {
   primaryKey,
   text,
   timestamp,
-  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
@@ -14,25 +13,21 @@ import { timestamps } from "../helpers";
 import { posts } from "./posts";
 import { users } from "./users";
 
-export const communities = pgTable(
-  "communities",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    name: text().unique().notNull(),
-    displayName: text().notNull().default(""),
-    description: text().notNull().default(""),
-    memberNickname: text().notNull().default(""),
-    icon: text(),
-    banner: text(),
-    moderatorId: text()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      })
-      .notNull(),
-    ...timestamps,
-  },
-  (t) => [uniqueIndex().on(t.id), uniqueIndex().on(t.name)],
-);
+export const communities = pgTable("communities", {
+  id: uuid().primaryKey().defaultRandom(),
+  name: text().unique().notNull(),
+  displayName: text().notNull().default(""),
+  description: text().notNull().default(""),
+  memberNickname: text().notNull().default(""),
+  icon: text(),
+  banner: text(),
+  moderatorId: text()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  ...timestamps,
+});
 
 export const communitiesRelations = relations(communities, ({ one, many }) => ({
   moderator: one(users, {
@@ -57,10 +52,7 @@ export const usersToCommunities = pgTable(
     joined: boolean().notNull().default(true),
     joinedAt: timestamp().notNull().defaultNow(),
   },
-  (t) => [
-    primaryKey({ columns: [t.userId, t.communityId] }),
-    uniqueIndex().on(t.userId, t.communityId),
-  ],
+  (t) => [primaryKey({ columns: [t.userId, t.communityId] })],
 );
 
 export const usersToCommunitiesRelations = relations(

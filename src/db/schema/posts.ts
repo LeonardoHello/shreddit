@@ -1,12 +1,5 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
-import {
-  boolean,
-  pgTable,
-  primaryKey,
-  text,
-  uniqueIndex,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { boolean, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
 import { timestamps, uploadthingFile } from "../helpers";
@@ -15,27 +8,22 @@ import { communities } from "./communities";
 import { voteStatusEnum } from "./enums";
 import { users } from "./users";
 
-export const posts = pgTable(
-  "posts",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    ...timestamps,
-    title: text().notNull(),
-    text: text(),
-    nsfw: boolean().notNull().default(false),
-    spoiler: boolean().notNull().default(false),
-    authorId: text()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      })
-      .notNull(),
-    communityId: uuid()
-      .references(() => communities.id, { onDelete: "cascade" })
-      .notNull(),
-  },
-
-  (t) => [uniqueIndex().on(t.id)],
-);
+export const posts = pgTable("posts", {
+  id: uuid().primaryKey().defaultRandom(),
+  ...timestamps,
+  title: text().notNull(),
+  text: text(),
+  nsfw: boolean().notNull().default(false),
+  spoiler: boolean().notNull().default(false),
+  authorId: text()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
+  communityId: uuid()
+    .references(() => communities.id, { onDelete: "cascade" })
+    .notNull(),
+});
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
   author: one(users, {
@@ -65,10 +53,7 @@ export const usersToPosts = pgTable(
     saved: boolean().notNull().default(false),
     hidden: boolean().notNull().default(false),
   },
-  (t) => [
-    primaryKey({ columns: [t.userId, t.postId] }),
-    uniqueIndex().on(t.userId, t.postId),
-  ],
+  (t) => [primaryKey({ columns: [t.userId, t.postId] })],
 );
 
 export const usersToPostsRelations = relations(usersToPosts, ({ one }) => ({

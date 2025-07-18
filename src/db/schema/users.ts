@@ -1,39 +1,28 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
-import {
-  boolean,
-  index,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
 import { comments, usersToComments } from "./comments";
 import { communities, usersToCommunities } from "./communities";
 import { posts, usersToPosts } from "./posts";
 
-export const users = pgTable(
-  "users",
-  {
-    id: text().primaryKey(),
-    name: text().notNull(),
-    email: text().notNull().unique(),
-    emailVerified: boolean()
-      .$defaultFn(() => false)
-      .notNull(),
-    image: text(),
-    createdAt: timestamp()
-      .$defaultFn(() => /* @__PURE__ */ new Date())
-      .notNull(),
-    updatedAt: timestamp()
-      .$defaultFn(() => /* @__PURE__ */ new Date())
-      .notNull(),
-    username: text().unique(),
-    displayUsername: text(),
-  },
-  (t) => [uniqueIndex().on(t.email)],
-);
+export const users = pgTable("users", {
+  id: text().primaryKey(),
+  name: text().notNull(),
+  email: text().notNull().unique(),
+  emailVerified: boolean()
+    .$defaultFn(() => false)
+    .notNull(),
+  image: text(),
+  createdAt: timestamp()
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp()
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  username: text().unique(),
+  displayUsername: text(),
+});
 
 export const sessions = pgTable(
   "sessions",
@@ -49,7 +38,7 @@ export const sessions = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
   },
-  (t) => [index().on(t.userId), uniqueIndex().on(t.token)],
+  (t) => [index().on(t.userId)],
 );
 
 export const accounts = pgTable(

@@ -3,7 +3,6 @@ import {
   pgTable,
   primaryKey,
   text,
-  uniqueIndex,
   uuid,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
@@ -14,26 +13,22 @@ import { voteStatusEnum } from "./enums";
 import { posts } from "./posts";
 import { users } from "./users";
 
-export const comments = pgTable(
-  "comments",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    text: text().notNull(),
-    parentCommentId: uuid().references((): AnyPgColumn => comments.id, {
+export const comments = pgTable("comments", {
+  id: uuid().primaryKey().defaultRandom(),
+  text: text().notNull(),
+  parentCommentId: uuid().references((): AnyPgColumn => comments.id, {
+    onDelete: "cascade",
+  }),
+  authorId: text()
+    .references(() => users.id, {
       onDelete: "cascade",
-    }),
-    authorId: text()
-      .references(() => users.id, {
-        onDelete: "cascade",
-      })
-      .notNull(),
-    postId: uuid()
-      .references(() => posts.id, { onDelete: "cascade" })
-      .notNull(),
-    ...timestamps,
-  },
-  (t) => [uniqueIndex().on(t.id)],
-);
+    })
+    .notNull(),
+  postId: uuid()
+    .references(() => posts.id, { onDelete: "cascade" })
+    .notNull(),
+  ...timestamps,
+});
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
   post: one(posts, {
@@ -62,10 +57,7 @@ export const usersToComments = pgTable(
       .notNull(),
     voteStatus: voteStatusEnum().notNull().default("none"),
   },
-  (t) => [
-    primaryKey({ columns: [t.userId, t.commentId] }),
-    uniqueIndex().on(t.userId, t.commentId),
-  ],
+  (t) => [primaryKey({ columns: [t.userId, t.commentId] })],
 );
 
 export const usersToCommentsRelations = relations(
