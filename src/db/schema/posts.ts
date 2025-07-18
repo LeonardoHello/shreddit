@@ -102,6 +102,7 @@ export const postFilesRelations = relations(postFiles, ({ one }) => ({
 export type Post = InferSelectModel<typeof posts>;
 export type UserToPost = InferSelectModel<typeof usersToPosts>;
 export type PostFile = InferSelectModel<typeof postFiles>;
+
 export const PostSchema = createSelectSchema(posts);
 export const UserToPostSchema = createSelectSchema(usersToPosts);
 export const PostFileSchema = createSelectSchema(postFiles);
