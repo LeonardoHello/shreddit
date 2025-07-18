@@ -79,5 +79,6 @@ export const usersToCommunitiesRelations = relations(
 
 export type Community = InferSelectModel<typeof communities>;
 export type UserToCommunity = InferSelectModel<typeof usersToCommunities>;
+
 export const CommunitySchema = createSelectSchema(communities);
 export const UserToCommunitySchema = createSelectSchema(usersToCommunities);

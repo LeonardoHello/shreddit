@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 
 import { useTRPC } from "@/trpc/client";
-import CommunityImage from "../community/CommunityImage";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 
 export default function SubmitCommunitySelected({
   communityName,
@@ -22,10 +24,12 @@ export default function SubmitCommunitySelected({
 
   return (
     <>
-      <CommunityImage
-        size={24}
-        icon={selectedCommunity.icon}
-        className="size-6"
+      <Image
+        src={selectedCommunity.icon ?? defaultCommunityIcon}
+        alt={`${selectedCommunity.name} community icon`}
+        width={24}
+        height={24}
+        className="rounded-full object-contain select-none"
       />
 
       <span className="truncate">r/{selectedCommunity.name}</span>

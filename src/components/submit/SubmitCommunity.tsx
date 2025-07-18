@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState } from "react";
+import Image from "next/image";
 
 import {
   useQuery,
@@ -17,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTRPC } from "@/trpc/client";
-import CommunityImage from "../community/CommunityImage";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
@@ -94,10 +95,12 @@ export default function SubmitCommunity({
             {myCommunities.map((community) => (
               <DropdownMenuItem key={community.id} className="h-11" asChild>
                 <HoverPrefetchLink href={`/submit/r/${community.name}`}>
-                  <CommunityImage
-                    size={32}
-                    className={"min-h-8 min-w-8"}
-                    icon={community.icon}
+                  <Image
+                    src={community.icon ?? defaultCommunityIcon}
+                    alt={`${community.name} community icon`}
+                    width={32}
+                    height={32}
+                    className="rounded-full object-contain select-none"
                   />
                   <div className="flex flex-col">
                     <div className="max-w-40 truncate text-sm sm:max-w-52">
@@ -147,10 +150,12 @@ const SubmitCommunityDropdown = memo(
           searchedCommunities?.map((community) => (
             <DropdownMenuItem key={community.id} className="h-11" asChild>
               <HoverPrefetchLink href={`/submit/r/${community.name}`}>
-                <CommunityImage
-                  size={32}
-                  className={"min-h-8 min-w-8"}
-                  icon={community.icon}
+                <Image
+                  src={community.icon ?? defaultCommunityIcon}
+                  alt={`${community.name} community icon`}
+                  width={32}
+                  height={32}
+                  className="rounded-full object-contain select-none"
                 />
                 <div className="flex flex-col">
                   <div className="max-w-40 truncate text-sm sm:max-w-52">

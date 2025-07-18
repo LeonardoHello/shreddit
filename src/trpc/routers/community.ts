@@ -282,7 +282,14 @@ export const communityRouter = createTRPCRouter({
         .returning({ muted: usersToCommunities.muted });
     }),
   createCommunity: protectedProcedure
-    .input(CommunitySchema.pick({ name: true, description: true }))
+    .input(
+      CommunitySchema.pick({
+        name: true,
+        description: true,
+        icon: true,
+        banner: true,
+      }),
+    )
     .mutation(({ input, ctx }) => {
       const communityId = uuidv4();
 

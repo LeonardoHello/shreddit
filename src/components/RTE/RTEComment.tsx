@@ -97,8 +97,6 @@ function ActionButtons({
     }),
   );
 
-  const isMutating = isPending || createComment.isPending;
-
   const editorState = useEditorState({
     editor,
     // This function will be called every time the editor state changes
@@ -108,6 +106,7 @@ function ActionButtons({
     }),
   });
 
+  const isMutating = isPending || createComment.isPending;
   const isDisabled = editorState.isEmpty || isMutating;
 
   return (

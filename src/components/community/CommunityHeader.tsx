@@ -14,13 +14,13 @@ import {
 import { User } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import { useTRPC } from "@/trpc/client";
-import communityBanner from "@public/communityBanner.jpg";
+import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import CommunityDeleteDialog from "./CommunityDeleteDialog";
 import CommunityEditDialog from "./CommunityEditDialog";
 import CommunityHeaderDropdown from "./CommunityHeaderDropdown";
-import CommunityImage from "./CommunityImage";
 import CommunitySidebar from "./CommunitySidebar";
 
 export default function CommunityHeader({
@@ -55,19 +55,23 @@ export default function CommunityHeader({
 
   return (
     <div className="bg-card flex flex-col rounded-lg border">
-      <Image
-        src={communityBanner}
-        alt="shrek themed community banner"
-        className="h-20 w-full rounded-t-lg object-cover lg:h-32"
-        placeholder="blur"
-      />
+      <div className="relative aspect-8/1">
+        <Image
+          src={community.banner ?? defaultCommunityBanner}
+          alt={`${community.name} community icon`}
+          className="w-auto rounded-t-lg object-cover"
+          fill
+        />
+      </div>
 
       <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center">
         <div className="flex items-center gap-2 lg:max-h-10">
-          <CommunityImage
-            icon={community.icon}
-            size={56}
-            className="border-card bg-card size-12 lg:size-24 lg:self-end lg:border-4"
+          <Image
+            src={community.icon ?? defaultCommunityIcon}
+            alt={`${community.name} community icon`}
+            className="border-card bg-card z-10 rounded-full border-2 object-contain select-none lg:size-24 lg:self-end lg:border-4"
+            width={48}
+            height={48}
           />
           <div>
             <div className="flex items-center gap-1">

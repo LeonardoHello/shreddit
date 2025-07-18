@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,7 +12,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useRecentCommunityContext } from "@/context/RecentCommunityContext";
-import CommunityImage from "../community/CommunityImage";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import {
   AccordionContent,
   AccordionItem,
@@ -53,7 +55,13 @@ export default function SidebarNavRecent() {
                     className="[&>svg]:size-6"
                   >
                     <HoverPrefetchLink href={`/r/${community.name}`}>
-                      <CommunityImage icon={community.icon} size={32} />
+                      <Image
+                        src={community.icon ?? defaultCommunityIcon}
+                        alt={`${community.name} community icon`}
+                        width={32}
+                        height={32}
+                        className="rounded-full object-contain select-none"
+                      />
                       <span>r/{community.name}</span>
                     </HoverPrefetchLink>
                   </SidebarMenuButton>

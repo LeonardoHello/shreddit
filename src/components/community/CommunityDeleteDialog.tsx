@@ -40,6 +40,7 @@ export default function CommunityDeleteDialog({
           queryKey: trpc.community.getMutedCommunities.queryKey(),
         });
 
+        router.refresh();
         toast.success("Community deleted successfully.");
       },
       onError: (error) => {

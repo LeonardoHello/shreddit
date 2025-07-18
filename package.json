@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push",
     "studio": "npx drizzle-kit studio"
   },

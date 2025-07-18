@@ -121,11 +121,18 @@ export default function SubmitButton({
     createPostImage.isPending;
 
   const isDisabled =
+    isMutating ||
     state.title.length === 0 ||
     (state.postType === PostType.IMAGE && state.selectedFiles.length === 0);
 
   const handleSubmit = async () => {
-    if (isDisabled) return;
+    if (isDisabled) {
+      toast.error(
+        "Cannot submit the form. Please check all required fields and try again.",
+      );
+
+      return;
+    }
 
     const { selectedFiles, ...post } = state;
 
@@ -186,8 +193,8 @@ export default function SubmitButton({
   return (
     <Button
       className="order-2 self-end rounded-full"
-      disabled={isDisabled || isMutating}
-      aria-disabled={isDisabled || isMutating}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
       onClick={handleSubmit}
     >
       {isMutating ? (

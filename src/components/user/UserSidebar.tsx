@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { onion } from "@lucide/lab";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Cake, Icon, Info } from "lucide-react";
@@ -13,8 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTRPC } from "@/trpc/client";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import defaultUserImage from "@public/defaultUserImage.png";
-import CommunityImage from "../community/CommunityImage";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
@@ -132,7 +134,13 @@ function UserSidebarContent({ username }: { username: string }) {
             >
               {user.communities.map((community) => (
                 <div key={community.id} className="flex items-center gap-1.5">
-                  <CommunityImage icon={community.icon} size={32} />
+                  <Image
+                    src={community.icon ?? defaultCommunityIcon}
+                    alt={`${community.name} community icon`}
+                    width={32}
+                    height={32}
+                    className="rounded-full object-contain select-none"
+                  />
 
                   <div className="truncate text-xs tracking-wide">
                     <HoverPrefetchLink

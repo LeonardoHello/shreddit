@@ -5,6 +5,8 @@ import db from "@/db";
 export const preferredRegion = ["fra1"];
 export const runtime = "edge";
 
+const urlOrigin = "https://8t3elu199k.ufs.sh/f";
+
 export async function GET() {
   const utapi = new UTApi();
   const [files, posts, users] = await Promise.all([
@@ -37,13 +39,11 @@ export async function GET() {
       // Check if the file is not referenced in any post text
       !destructuredPosts.some((text) =>
         text?.includes(
-          `<img src="https://8t3elu199k.ufs.sh/f/${file.key}" alt="${file.name}">`,
+          `<img src="${urlOrigin}/${file.key}" alt="${file.name}">`,
         ),
       ) &&
       // Check if the file is not a user image
-      !destructuredUsers.some(
-        (image) => image === `https://8t3elu199k.ufs.sh/f/${file.key}`,
-      )
+      !destructuredUsers.some((image) => image === `${urlOrigin}/${file.key}`)
     ) {
       filesToDelete.push(file.key);
     }

@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import {
   useMutation,
   useQueryClient,
@@ -20,7 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
-import CommunityImage from "../community/CommunityImage";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import {
   AccordionContent,
   AccordionItem,
@@ -112,9 +114,15 @@ export default function SidebarNavJoined() {
                       <HoverPrefetchLink
                         href={`/r/${userToCommunity.community.name}`}
                       >
-                        <CommunityImage
-                          icon={userToCommunity.community.icon}
-                          size={32}
+                        <Image
+                          src={
+                            userToCommunity.community.icon ??
+                            defaultCommunityIcon
+                          }
+                          alt={`${userToCommunity.community.name} community icon`}
+                          width={32}
+                          height={32}
+                          className="rounded-full object-contain select-none"
                         />
                         <span>r/{userToCommunity.community.name}</span>
                       </HoverPrefetchLink>
