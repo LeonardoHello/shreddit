@@ -1,5 +1,7 @@
 "use client";
 
+import { notFound } from "next/navigation";
+
 import { onion } from "@lucide/lab";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Cake, Icon, Info } from "lucide-react";
@@ -69,6 +71,10 @@ function UserSidebarContent({ username }: { username: string }) {
   const { data: user } = useSuspenseQuery(
     trpc.user.getUserByName.queryOptions(username),
   );
+
+  if (!user) {
+    notFound();
+  }
 
   return (
     <>

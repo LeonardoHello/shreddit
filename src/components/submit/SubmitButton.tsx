@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -38,6 +38,10 @@ export default function SubmitButton({
   const { data: selectedCommunity } = useSuspenseQuery(
     trpc.community.getSelectedCommunity.queryOptions(communityName),
   );
+
+  if (!selectedCommunity) {
+    notFound();
+  }
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

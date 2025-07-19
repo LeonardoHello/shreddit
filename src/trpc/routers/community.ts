@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
@@ -40,14 +39,7 @@ export const communityRouter = createTRPCRouter({
         }),
       });
 
-      if (!data)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message:
-            "The community you are looking for doesn't exist or has been deleted by the moderator.",
-        });
-
-      return data;
+      return data ?? null;
     }),
   getSelectedCommunity: protectedProcedure
     .input(CommunitySchema.shape.name)
@@ -57,14 +49,7 @@ export const communityRouter = createTRPCRouter({
         columns: { id: true, name: true, icon: true, iconPlaceholder: true },
       });
 
-      if (!data)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message:
-            "The community you are looking for doesn't exist or has been deleted by the moderator.",
-        });
-
-      return data;
+      return data ?? null;
     }),
   searchCommunities: baseProcedure
     .input(

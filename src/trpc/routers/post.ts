@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
@@ -85,14 +84,7 @@ export const postRouter = createTRPCRouter({
         }),
       });
 
-      if (!post)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message:
-            "The post you are looking for doesn't exist or has been deleted by the author.",
-        });
-
-      return post;
+      return post ?? null;
     }),
   createTextPost: protectedProcedure
     .input(

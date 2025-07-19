@@ -3,6 +3,7 @@
 import { Suspense, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -36,6 +37,10 @@ export default function CommunityHeader({
   const { data: community } = useSuspenseQuery(
     trpc.community.getCommunityByName.queryOptions(communityName),
   );
+
+  if (!community) {
+    notFound();
+  }
 
   const dispatch = useRecentCommunityDispatchContext();
 

@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { z } from "zod/v4";
 
 import { UserSchema } from "@/db/schema/users";
@@ -64,14 +63,7 @@ export const userRouter = createTRPCRouter({
         }),
       });
 
-      if (!user)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message:
-            "The user you are looking for doesn't exist or has deleted their account.",
-        });
-
-      return user;
+      return user ?? null;
     }),
   searchUsers: baseProcedure.input(z.string()).query(({ input, ctx }) => {
     return ctx.db.query.users.findMany({

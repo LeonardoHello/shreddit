@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
@@ -17,6 +18,10 @@ export default function UserHeader({ username }: { username: string }) {
   const { data: user } = useSuspenseQuery(
     trpc.user.getUserByName.queryOptions(username),
   );
+
+  if (!user) {
+    notFound();
+  }
 
   return (
     <div className="bg-card flex flex-col rounded-lg border">

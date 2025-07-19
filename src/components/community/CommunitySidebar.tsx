@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CakeSlice, Globe, Info } from "lucide-react";
@@ -71,6 +72,10 @@ function CommunitySidebarContent({
   const { data: community } = useSuspenseQuery(
     trpc.community.getCommunityByName.queryOptions(communityName),
   );
+
+  if (!community) {
+    notFound();
+  }
 
   const { success, data: username } = UserSchema.shape.username
     .unwrap()
