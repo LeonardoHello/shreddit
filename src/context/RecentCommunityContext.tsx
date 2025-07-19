@@ -37,7 +37,7 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
       }
 
       try {
-        const saved = localStorage.getItem(key);
+        const saved = sessionStorage.getItem(key);
 
         if (!saved) {
           return { ...state, isLoading: false };
@@ -45,7 +45,7 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
 
         const parsed = JSON.parse(saved);
 
-        const validated = CommunitySchema.pick({
+        const { data, error } = CommunitySchema.pick({
           id: true,
           name: true,
           icon: true,
@@ -54,11 +54,11 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
           .array()
           .safeParse(parsed);
 
-        if (!validated.success) {
+        if (error) {
           return { ...state, isLoading: false };
         }
 
-        return { communities: validated.data, isLoading: false };
+        return { communities: data, isLoading: false };
       } catch (error) {
         console.error("Failed to get recent communities:", error);
         return { ...state, isLoading: false };
@@ -78,7 +78,7 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
 
       if (typeof window !== "undefined") {
         try {
-          localStorage.setItem(key, JSON.stringify(updatedState.communities));
+          sessionStorage.setItem(key, JSON.stringify(updatedState.communities));
         } catch (error) {
           console.error("Failed to update for recent communities:", error);
         }
