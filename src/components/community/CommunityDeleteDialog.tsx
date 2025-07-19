@@ -12,12 +12,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Community } from "@/db/schema/communities";
 import { useTRPC } from "@/trpc/client";
 
 export default function CommunityDeleteDialog({
   communityId,
 }: {
-  communityId: string;
+  communityId: Community["id"];
 }) {
   const router = useRouter();
 
@@ -40,7 +41,6 @@ export default function CommunityDeleteDialog({
           queryKey: trpc.community.getMutedCommunities.queryKey(),
         });
 
-        router.refresh();
         toast.success("Community deleted successfully.");
       },
       onError: (error) => {
