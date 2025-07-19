@@ -99,7 +99,7 @@ export default function SubmitCommunity({
                     iconPlaceholder={community.iconPlaceholder}
                     communtiyName={community.name}
                     size={32}
-                    className="rounded-full object-contain select-none"
+                    className="aspect-square rounded-full object-cover select-none"
                   />
                   <div className="flex flex-col">
                     <div className="max-w-40 truncate text-sm sm:max-w-52">
@@ -154,7 +154,7 @@ const SubmitCommunityDropdown = memo(
                   iconPlaceholder={community.iconPlaceholder}
                   communtiyName={community.name}
                   size={32}
-                  className="rounded-full object-contain select-none"
+                  className="aspect-square rounded-full object-cover select-none"
                 />
                 <div className="flex flex-col">
                   <div className="max-w-40 truncate text-sm sm:max-w-52">

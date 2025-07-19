@@ -90,7 +90,7 @@ export default function CommunityHeader({
             iconPlaceholder={community.iconPlaceholder}
             communtiyName={community.name}
             size={48}
-            className="border-card bg-card z-10 rounded-full border-2 object-contain select-none lg:size-24 lg:self-end lg:border-4"
+            className="border-card bg-card z-10 aspect-square rounded-full border-2 object-cover select-none lg:size-24 lg:self-end lg:border-4"
           />
           <div>
             <div className="flex items-center gap-1">

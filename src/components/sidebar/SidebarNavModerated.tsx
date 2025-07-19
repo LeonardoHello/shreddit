@@ -126,7 +126,7 @@ export default function SidebarNavModerated() {
                             }
                             communtiyName={userToCommunity.community.name}
                             size={32}
-                            className="rounded-full object-contain select-none"
+                            className="aspect-square rounded-full object-cover select-none"
                           />
                           <span>r/{userToCommunity.community.name}</span>
                         </HoverPrefetchLink>

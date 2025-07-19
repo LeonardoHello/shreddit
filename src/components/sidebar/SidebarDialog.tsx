@@ -478,7 +478,7 @@ export default function SidebarDialog({
                 alt="communtiy icon"
                 width={60}
                 height={60}
-                className="bg-card border-card aspect-square rounded-full border-2 object-contain"
+                className="bg-card border-card aspect-square rounded-full border-2 object-cover"
               />
               <label
                 htmlFor="icon-upload"

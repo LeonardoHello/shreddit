@@ -27,7 +27,7 @@ export default function SubmitCommunitySelected({
         iconPlaceholder={selectedCommunity.iconPlaceholder}
         communtiyName={selectedCommunity.name}
         size={24}
-        className="rounded-full object-contain select-none"
+        className="aspect-square rounded-full object-cover select-none"
       />
 
       <span className="truncate">r/{selectedCommunity.name}</span>

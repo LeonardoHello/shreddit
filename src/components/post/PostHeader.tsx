@@ -83,7 +83,7 @@ export default function PostHeader({
               iconPlaceholder={state.community.iconPlaceholder}
               communtiyName={state.community.name}
               size={24}
-              className="rounded-full object-contain select-none"
+              className="aspect-square rounded-full object-cover select-none"
             />
             <span className="font-extrabold break-all group-hover:opacity-80">
               r/{state.community.name}

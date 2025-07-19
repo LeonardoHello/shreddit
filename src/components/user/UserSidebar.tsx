@@ -137,7 +137,7 @@ function UserSidebarContent({ username }: { username: string }) {
                     iconPlaceholder={community.iconPlaceholder}
                     communtiyName={community.name}
                     size={32}
-                    className="rounded-full object-contain select-none"
+                    className="aspect-square rounded-full object-cover select-none"
                   />
 
                   <div className="truncate text-xs tracking-wide">

@@ -143,7 +143,7 @@ const SearchDropdown = memo(
                     iconPlaceholder={community.iconPlaceholder}
                     communtiyName={community.name}
                     size={28}
-                    className="rounded-full object-contain select-none"
+                    className="aspect-square rounded-full object-cover select-none"
                   />
 
                   <div className="w-0 grow">
