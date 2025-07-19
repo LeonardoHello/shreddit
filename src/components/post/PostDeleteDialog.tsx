@@ -44,6 +44,8 @@ export default function PostDeleteDialog({
         toast.success("Post deleted successfully.");
       },
       onError: (error) => {
+        dispatch({ type: ReducerAction.RESTORE });
+
         console.error(error);
         toast.error("Failed to delete your post. Please try again later.");
       },

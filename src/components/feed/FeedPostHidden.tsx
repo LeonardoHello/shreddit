@@ -17,10 +17,14 @@ export default function FeedPostHidden() {
   const hidePost = useMutation(
     trpc.post.hidePost.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = state.isHidden;
+
         dispatch({
           type: ReducerAction.SET_HIDE,
           hide: variables.hidden,
         });
+
+        return { previousValue };
       },
       onSuccess: (data) => {
         if (data[0].hidden) {
@@ -29,7 +33,12 @@ export default function FeedPostHidden() {
           toast.success("Post unhidden successfully.");
         }
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_HIDE,
+          hide: context?.previousValue ?? false,
+        });
+
         console.error(error);
         toast.error("Failed to hide the post. Please try again later.");
       },

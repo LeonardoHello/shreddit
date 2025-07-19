@@ -31,12 +31,21 @@ export default function PostVote({
   const votePost = useMutation(
     trpc.post.votePost.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = state.voteStatus;
+
         dispatch({
           type: ReducerAction.SET_VOTE,
           vote: variables.voteStatus,
         });
+
+        return { previousValue };
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_VOTE,
+          vote: context?.previousValue ?? "none",
+        });
+
         console.error(error);
         toast.error("Failed to update your vote. Please try again later.");
       },

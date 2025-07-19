@@ -69,8 +69,8 @@ function ActionButtons({
 }) {
   const [isPending, startTransition] = useTransition();
 
-  const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   const createComment = useMutation(
     trpc.comment.createComment.mutationOptions({

@@ -49,10 +49,14 @@ export default function PostDropdown({
   const savePost = useMutation(
     trpc.post.savePost.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = post.isSaved;
+
         dispatch({
           type: ReducerAction.SET_SAVE,
           save: variables.saved,
         });
+
+        return { previousValue };
       },
       onSuccess: (data) => {
         if (data[0].saved) {
@@ -61,7 +65,12 @@ export default function PostDropdown({
           toast.success("Post unsaved successfully.");
         }
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_SAVE,
+          save: context?.previousValue ?? false,
+        });
+
         console.error(error);
         toast.error("Failed to save the post. Please try again later.");
       },
@@ -71,10 +80,14 @@ export default function PostDropdown({
   const hidePost = useMutation(
     trpc.post.hidePost.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = post.isHidden;
+
         dispatch({
           type: ReducerAction.SET_HIDE,
           hide: variables.hidden,
         });
+
+        return { previousValue };
       },
       onSuccess: (data) => {
         if (data[0].hidden) {
@@ -83,7 +96,12 @@ export default function PostDropdown({
           toast.success("Post unhidden successfully.");
         }
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_HIDE,
+          hide: context?.previousValue ?? false,
+        });
+
         console.error(error);
         toast.error("Failed to hide the post. Please try again later.");
       },
@@ -93,10 +111,14 @@ export default function PostDropdown({
   const setSpoiler = useMutation(
     trpc.post.setPostSpoiler.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = post.spoiler;
+
         dispatch({
           type: ReducerAction.SET_SPOILER,
           spoiler: variables.spoiler,
         });
+
+        return { previousValue };
       },
       onSuccess: (data) => {
         if (data[0].spoiler) {
@@ -105,7 +127,12 @@ export default function PostDropdown({
           toast.success("Post has been un-marked as a spoiler");
         }
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_SPOILER,
+          spoiler: context?.previousValue ?? false,
+        });
+
         console.error(error);
         toast.error(
           "Failed to toggle spoiler tag for the post. Please try again later.",
@@ -117,10 +144,14 @@ export default function PostDropdown({
   const setNSFW = useMutation(
     trpc.post.setPostNSFW.mutationOptions({
       onMutate: (variables) => {
+        const previousValue = post.nsfw;
+
         dispatch({
           type: ReducerAction.SET_NSFW,
           nsfw: variables.nsfw,
         });
+
+        return { previousValue };
       },
       onSuccess: (data) => {
         if (data[0].nsfw) {
@@ -129,7 +160,12 @@ export default function PostDropdown({
           toast.success("Post has been un-marked as a spoiler");
         }
       },
-      onError: (error) => {
+      onError: (error, _variables, context) => {
+        dispatch({
+          type: ReducerAction.SET_NSFW,
+          nsfw: context?.previousValue ?? false,
+        });
+
         console.error(error);
         toast.error(
           "Failed to toggle NSFW tag for the post. Please try again later.",

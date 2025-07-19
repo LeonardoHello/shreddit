@@ -81,6 +81,10 @@ export default function CommunityEditDialog({
         toast.success("Community successfully edited");
       },
       onError: (error) => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.community.getCommunityByName.queryKey(community.name),
+        });
+
         console.error(error);
         toast.error("Failed to edit your community. Please try again later.");
       },

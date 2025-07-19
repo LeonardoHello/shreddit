@@ -73,6 +73,17 @@ export default function SidebarNavModerated() {
           });
         });
       },
+      onError: (error) => {
+        queryClient.invalidateQueries({
+          queryKey: moderatedCommunitiesQueryKey,
+        });
+        queryClient.invalidateQueries({ queryKey: joinedCommunitiesQueryKey });
+
+        console.error(error);
+        toast.error(
+          "Failed to toggle favorite community. Please try again later.",
+        );
+      },
     }),
   );
 

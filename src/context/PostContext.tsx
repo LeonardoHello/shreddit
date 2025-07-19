@@ -22,6 +22,7 @@ export enum ReducerAction {
   SET_HIDE,
   SET_SAVE,
   DELETE,
+  RESTORE,
   TOGGLE_EDIT,
   CANCEL_EDIT,
   START_UPLOAD,
@@ -58,6 +59,7 @@ type ReducerActionType =
       nsfw: ReducerState["nsfw"];
     }
   | { type: typeof ReducerAction.DELETE }
+  | { type: typeof ReducerAction.RESTORE }
   | { type: typeof ReducerAction.TOGGLE_EDIT }
   | { type: typeof ReducerAction.CANCEL_EDIT }
   | { type: typeof ReducerAction.START_UPLOAD }
@@ -96,6 +98,9 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
 
     case ReducerAction.DELETE:
       return { ...state, isDeleted: true };
+
+    case ReducerAction.RESTORE:
+      return { ...state, isDeleted: false };
 
     case ReducerAction.TOGGLE_EDIT:
       return { ...state, isEditing: !state.isEditing };

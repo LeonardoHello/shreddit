@@ -72,6 +72,8 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
+        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
+
         console.error(error);
         toast.error("Failed to join the community. Please try again later.");
       },
@@ -104,6 +106,8 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
+        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
+
         console.error(error);
         toast.error(
           "Failed to favorite the community. Please try again later.",
@@ -135,6 +139,8 @@ export default function CommunityHeaderDropdown({
         }
       },
       onError: (error) => {
+        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
+
         console.error(error);
         toast.error("Failed to mute the community. Please try again later.");
       },
