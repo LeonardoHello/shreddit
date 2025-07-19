@@ -48,23 +48,34 @@ export default function CommunityEditDialog({
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
-  const communityQueryKey = trpc.community.getCommunityByName.queryKey();
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      displayName: community.displayName ?? "",
+      description: community.description ?? "",
+      memberNickname: community.memberNickname ?? "",
+    },
+  });
 
   const editCommunity = useMutation(
     trpc.community.editCommunity.mutationOptions({
       onMutate: (variables) => {
-        queryClient.setQueryData(communityQueryKey, (updater) => {
-          if (!updater) {
-            return community;
-          }
+        queryClient.setQueryData(
+          trpc.community.getCommunityByName.queryKey(community.name),
+          (updater) => {
+            if (!updater) {
+              return community;
+            }
 
-          return {
-            ...updater,
-            displayName: variables.displayName,
-            memberNickname: variables.memberNickname,
-            description: variables.description,
-          };
-        });
+            return {
+              ...updater,
+              displayName: variables.displayName,
+              memberNickname: variables.memberNickname,
+              description: variables.description,
+            };
+          },
+        );
       },
       onSuccess: () => {
         toast.success("Community successfully edited");
@@ -75,16 +86,6 @@ export default function CommunityEditDialog({
       },
     }),
   );
-
-  // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      displayName: community.displayName ?? "",
-      description: community.description ?? "",
-      memberNickname: community.memberNickname ?? "",
-    },
-  });
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
