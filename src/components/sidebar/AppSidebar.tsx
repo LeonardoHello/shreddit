@@ -78,9 +78,7 @@ export async function AppSidebar() {
 
               <SidebarSeparator />
 
-              <Suspense
-                fallback={<SidebarNavSkeleton length={3} canFavorite />}
-              >
+              <Suspense fallback={<SidebarNavSkeleton length={3} />}>
                 <SidebarNavMuted />
               </Suspense>
 

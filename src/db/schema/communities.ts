@@ -51,6 +51,7 @@ export const usersToCommunities = pgTable(
       .notNull(),
     muted: boolean().notNull().default(false),
     favorited: boolean().notNull().default(false),
+    favoritedAt: timestamp().notNull().defaultNow(),
     joined: boolean().notNull().default(true),
     joinedAt: timestamp().notNull().defaultNow(),
   },

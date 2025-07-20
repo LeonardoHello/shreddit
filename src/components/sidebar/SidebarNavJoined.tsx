@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
+import sortSidebarCommunities from "@/utils/sortSidebarCommunities";
 import CommunityIcon from "../community/CommunityIcon";
 import {
   AccordionContent,
@@ -55,7 +56,7 @@ export default function SidebarNavJoined() {
             if (communityId !== _userToCommunity.community.id)
               return _userToCommunity;
 
-            return { ..._userToCommunity, favorited };
+            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
           });
         });
 
@@ -68,7 +69,7 @@ export default function SidebarNavJoined() {
             if (communityId !== _userToCommunity.community.id)
               return _userToCommunity;
 
-            return { ..._userToCommunity, favorited };
+            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
           });
         });
       },
@@ -92,6 +93,8 @@ export default function SidebarNavJoined() {
     return null;
   }
 
+  const sortedSidebarCommunities = sortSidebarCommunities(joinedCommunities);
+
   return (
     <SidebarGroup>
       <AccordionItem value="joined">
@@ -101,75 +104,67 @@ export default function SidebarNavJoined() {
         <AccordionContent>
           <SidebarGroupContent>
             <SidebarMenu>
-              {joinedCommunities
-                .sort((a, b) => {
-                  if (a.favorited && !b.favorited) return -1;
-                  if (!a.favorited && b.favorited) return 1;
-                  if (a.community.name < b.community.name) return -1;
-                  if (a.community.name > b.community.name) return 1;
-                  return 0;
-                })
-                .map((userToCommunity) => (
-                  <SidebarMenuItem key={userToCommunity.community.id}>
-                    <SidebarMenuButton
-                      asChild
-                      onClick={() => {
-                        if (isMobile) {
-                          setOpenMobile(false);
+              {sortedSidebarCommunities.map((userToCommunity) => (
+                <SidebarMenuItem key={userToCommunity.community.id}>
+                  <SidebarMenuButton
+                    asChild
+                    onClick={() => {
+                      if (isMobile) {
+                        setOpenMobile(false);
+                      }
+                    }}
+                    className="[&>svg]:size-6"
+                  >
+                    <HoverPrefetchLink
+                      href={`/r/${userToCommunity.community.name}`}
+                    >
+                      <CommunityIcon
+                        icon={userToCommunity.community.icon}
+                        iconPlaceholder={
+                          userToCommunity.community.iconPlaceholder
                         }
-                      }}
-                      className="[&>svg]:size-6"
-                    >
-                      <HoverPrefetchLink
-                        href={`/r/${userToCommunity.community.name}`}
-                      >
-                        <CommunityIcon
-                          icon={userToCommunity.community.icon}
-                          iconPlaceholder={
-                            userToCommunity.community.iconPlaceholder
-                          }
-                          communtiyName={userToCommunity.community.name}
-                          size={32}
-                          className="aspect-square rounded-full object-cover select-none"
-                        />
-                        <span>r/{userToCommunity.community.name}</span>
-                      </HoverPrefetchLink>
-                    </SidebarMenuButton>
-                    <SidebarMenuAction
-                      onClick={() => {
-                        toggleFavorite.mutate(
-                          {
-                            communityId: userToCommunity.community.id,
-                            favorited: !userToCommunity.favorited,
-                          },
-                          {
-                            onSuccess: () => {
-                              queryClient.invalidateQueries({
-                                queryKey:
-                                  trpc.community.getUserToCommunity.queryKey(
-                                    userToCommunity.community.name,
-                                  ),
-                              });
-                            },
-                            onError: (error) => {
-                              console.error(error);
-                              toast.error(
-                                "Failed to favorite the community. Please try again later.",
-                              );
-                            },
-                          },
-                        );
-                      }}
-                    >
-                      <Star
-                        className={cn("stroke-1", {
-                          "fill-foreground text-foreground":
-                            userToCommunity.favorited,
-                        })}
+                        communtiyName={userToCommunity.community.name}
+                        size={32}
+                        className="aspect-square rounded-full object-cover select-none"
                       />
-                    </SidebarMenuAction>
-                  </SidebarMenuItem>
-                ))}
+                      <span>r/{userToCommunity.community.name}</span>
+                    </HoverPrefetchLink>
+                  </SidebarMenuButton>
+                  <SidebarMenuAction
+                    onClick={() => {
+                      toggleFavorite.mutate(
+                        {
+                          communityId: userToCommunity.community.id,
+                          favorited: !userToCommunity.favorited,
+                        },
+                        {
+                          onSuccess: () => {
+                            queryClient.invalidateQueries({
+                              queryKey:
+                                trpc.community.getUserToCommunity.queryKey(
+                                  userToCommunity.community.name,
+                                ),
+                            });
+                          },
+                          onError: (error) => {
+                            console.error(error);
+                            toast.error(
+                              "Failed to favorite the community. Please try again later.",
+                            );
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    <Star
+                      className={cn("stroke-1", {
+                        "fill-foreground text-foreground":
+                          userToCommunity.favorited,
+                      })}
+                    />
+                  </SidebarMenuAction>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </AccordionContent>

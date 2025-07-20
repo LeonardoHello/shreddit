@@ -157,7 +157,7 @@ export const communityRouter = createTRPCRouter({
               ),
             ),
         ),
-      columns: { favorited: true },
+      columns: { favorited: true, favoritedAt: true },
       with: {
         community: {
           columns: { id: true, name: true, icon: true, iconPlaceholder: true },
@@ -172,7 +172,7 @@ export const communityRouter = createTRPCRouter({
           eq(userToCommunity.userId, ctx.userId),
           eq(userToCommunity.joined, true),
         ),
-      columns: { favorited: true },
+      columns: { favorited: true, favoritedAt: true },
       with: {
         community: {
           columns: { id: true, name: true, icon: true, iconPlaceholder: true },
@@ -187,7 +187,7 @@ export const communityRouter = createTRPCRouter({
           eq(userToCommunity.userId, ctx.userId),
           eq(userToCommunity.muted, true),
         ),
-      columns: { favorited: true },
+      columns: { favorited: true, favoritedAt: true },
       with: {
         community: {
           columns: { id: true, name: true, icon: true, iconPlaceholder: true },
@@ -230,10 +230,11 @@ export const communityRouter = createTRPCRouter({
         .values({
           ...input,
           userId: ctx.userId,
+          favoritedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { favorited: input.favorited },
+          set: { favorited: input.favorited, favoritedAt: new Date() },
         })
         .returning({ favorited: usersToCommunities.favorited });
     }),
