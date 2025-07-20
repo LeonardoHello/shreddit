@@ -63,7 +63,7 @@ export function Search() {
         <Input
           id="search"
           placeholder="Search Shreddit"
-          className="bg-input h-10 rounded-full pl-11"
+          className="bg-input h-10 rounded-lg pl-11"
           autoComplete="off"
           value={searchedValue}
           onChange={onInputChange}
@@ -122,7 +122,7 @@ const SearchDropdown = memo(
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/.4) transparent",
         }}
-        className="bg-card absolute top-[60px] left-2 flex max-h-[min(calc(100vh-4rem),24rem)] w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto rounded-xl border p-2 sm:top-12 sm:left-0 sm:w-full"
+        className="bg-card absolute top-[60px] left-2 flex max-h-[min(calc(100vh-4rem),24rem)] w-[calc(100vw-1rem)] flex-col gap-4 overflow-y-auto rounded-lg border p-2 sm:top-12 sm:left-0 sm:w-full"
       >
         {isLoading && <SearchSkeleton />}
 

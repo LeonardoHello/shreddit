@@ -149,14 +149,10 @@ export default function CommunityHeaderDropdown({
 
   return (
     <div className="flex items-center gap-3">
-      <Button
-        variant={"outline"}
-        className="w-9 rounded-full sm:w-auto"
-        asChild
-      >
+      <Button variant={"outline"} className="rounded-full" asChild>
         <Link href={`/submit/r/${communityName}`}>
           <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
-          <span className="hidden capitalize sm:block">create post</span>
+          <span className="capitalize">create post</span>
         </Link>
       </Button>
 

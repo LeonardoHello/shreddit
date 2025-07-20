@@ -75,7 +75,7 @@ export default function CommunityHeader({
 
   return (
     <div className="bg-card flex flex-col rounded-lg border">
-      <div className="relative aspect-8/1">
+      <div className="relative aspect-5/1 sm:aspect-6/1 lg:aspect-8/1">
         <Image
           src={community.banner ?? defaultCommunityBanner}
           alt={`${community.name} community icon`}
@@ -88,7 +88,7 @@ export default function CommunityHeader({
         />
       </div>
 
-      <div className="flex flex-col justify-between gap-4 px-4 py-2.5 md:flex-row md:items-center">
+      <div className="flex flex-col justify-between gap-4 px-4 py-2.5 lg:flex-row lg:items-center">
         <div className="flex items-center gap-2 lg:max-h-10">
           <CommunityIcon
             icon={community.icon}
