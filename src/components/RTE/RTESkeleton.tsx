@@ -73,7 +73,10 @@ function RTEButtons() {
         </ToggleGroupItem>
       </ToggleGroup>
 
-      <Separator orientation="vertical" />
+      <Separator
+        orientation="vertical"
+        className="data-[orientation=vertical]:h-4"
+      />
 
       <ToggleGroup type="multiple" disabled>
         <ToggleGroupItem value="heading1" aria-label="Toggle heading 1">

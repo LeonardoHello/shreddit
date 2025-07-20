@@ -28,15 +28,24 @@ export default function RTEPostButtons({
         tippyOptions={{ maxWidth: 200 }}
       >
         <RTENodeButtons editor={editor} />
-        <Separator orientation="vertical" />
+        <Separator
+          orientation="vertical"
+          className="data-[orientation=vertical]:h-4"
+        />
         {children}
       </FloatingMenu>
 
       <div className="hidden items-center gap-2 p-1 sm:flex">
         <RTEMarkButtons editor={editor} />
-        <Separator orientation="vertical" />
+        <Separator
+          orientation="vertical"
+          className="data-[orientation=vertical]:h-4"
+        />
         <RTENodeButtons editor={editor} />
-        <Separator orientation="vertical" />
+        <Separator
+          orientation="vertical"
+          className="data-[orientation=vertical]:h-4"
+        />
         {children}
       </div>
     </>
