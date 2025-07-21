@@ -5,7 +5,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { ChevronRight, Plus, Star } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -28,7 +28,6 @@ import { useTRPC } from "@/trpc/client";
 import sortSidebarCommunities from "@/utils/sortSidebarCommunities";
 import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
-import SidebarDialog from "./SidebarDialog";
 
 export default function SidebarNavModerated() {
   const trpc = useTRPC();
@@ -127,15 +126,6 @@ export default function SidebarNavModerated() {
         <CollapsibleContent className="CollapsibleContent">
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarDialog>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="[&>svg]:size-7">
-                    <Plus className="stroke-[1.25]" />
-                    Create Community
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarDialog>
-
               {sortedSidebarCommunities.map((item) => (
                 <SidebarMenuItem key={item.community.id}>
                   <SidebarMenuButton

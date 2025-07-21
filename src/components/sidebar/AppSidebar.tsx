@@ -1,16 +1,23 @@
 import { Suspense } from "react";
+import Link from "next/link";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
 
 import { getSession } from "@/app/actions";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { getQueryClient, trpc } from "@/trpc/server";
+import SidebarDialog from "./SidebarDialog";
 import SidebarLogo from "./SidebarLogo";
 import SidebarNavJoined from "./SidebarNavJoined";
 import SidebarMenuMain from "./SidebarNavMain";
@@ -71,6 +78,32 @@ export async function AppSidebar() {
           </HydrationBoundary>
         )}
       </SidebarContent>
+
+      <SidebarSeparator />
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            {session && (
+              <SidebarDialog>
+                <SidebarMenuButton className="[&>svg]:size-7">
+                  <Plus className="stroke-[1.25]" />
+                  Create Community
+                </SidebarMenuButton>
+              </SidebarDialog>
+            )}
+            {!session && (
+              <Link href={"/sign-in"}>
+                <SidebarMenuButton className="[&>svg]:size-7">
+                  <Plus className="stroke-[1.25]" />
+                  Create Community
+                </SidebarMenuButton>
+              </Link>
+            )}
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
