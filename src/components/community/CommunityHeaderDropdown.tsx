@@ -149,7 +149,7 @@ export default function CommunityHeaderDropdown({
 
   return (
     <div className="flex items-center gap-3">
-      <Button variant={"outline"} className="rounded-full" asChild>
+      <Button variant={"outline"} asChild>
         <Link href={`/submit/r/${communityName}`}>
           <Plus className="stroke-[1.5]" viewBox="4 4 16 16" />
           <span className="capitalize">create post</span>
@@ -158,7 +158,6 @@ export default function CommunityHeaderDropdown({
 
       <Button
         variant={userToCommunity.joined ? "outline" : "default"}
-        className="rounded-full"
         onClick={() => {
           joinCommunity.mutate({
             communityId,
@@ -173,7 +172,7 @@ export default function CommunityHeaderDropdown({
         <AlertDialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full">
+              <Button variant={"outline"} size="icon">
                 <Ellipsis className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
