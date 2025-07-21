@@ -11,7 +11,6 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { getQueryClient, trpc } from "@/trpc/server";
-import { Accordion } from "../ui/accordion";
 import SidebarLogo from "./SidebarLogo";
 import SidebarNavJoined from "./SidebarNavJoined";
 import SidebarMenuMain from "./SidebarNavMain";
@@ -45,47 +44,32 @@ export async function AppSidebar() {
       </SidebarHeader>
 
       <SidebarSeparator />
+
       <SidebarContent
         style={{
           scrollbarWidth: "thin",
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/0.4) transparent",
         }}
+        className="gap-0"
       >
-        <Accordion
-          type="multiple"
-          defaultValue={["recent", "moderated", "joined"]}
-        >
-          <SidebarNavRecent />
+        <SidebarNavRecent />
 
-          <SidebarSeparator />
+        {session && (
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <Suspense fallback={<SidebarNavSkeleton itemCount={1} />}>
+              <SidebarNavModerated />
+            </Suspense>
 
-          {session && (
-            <HydrationBoundary state={dehydrate(queryClient)}>
-              <Suspense
-                fallback={<SidebarNavSkeleton length={2} canFavorite />}
-              >
-                <SidebarNavModerated />
-              </Suspense>
+            <Suspense fallback={<SidebarNavSkeleton itemCount={4} />}>
+              <SidebarNavJoined />
+            </Suspense>
 
-              <SidebarSeparator />
-
-              <Suspense
-                fallback={<SidebarNavSkeleton length={4} canFavorite />}
-              >
-                <SidebarNavJoined />
-              </Suspense>
-
-              <SidebarSeparator />
-
-              <Suspense fallback={<SidebarNavSkeleton length={3} />}>
-                <SidebarNavMuted />
-              </Suspense>
-
-              <SidebarSeparator />
-            </HydrationBoundary>
-          )}
-        </Accordion>
+            <Suspense fallback={<SidebarNavSkeleton itemCount={2} />}>
+              <SidebarNavMuted />
+            </Suspense>
+          </HydrationBoundary>
+        )}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

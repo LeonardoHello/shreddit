@@ -34,7 +34,7 @@ export default function SidebarLogo() {
               src={shrekText}
               alt="logo text"
               priority
-              className="h-5/6 w-auto"
+              className="h-full w-auto"
             />
           </HoverPrefetchLink>
         </SidebarMenuButton>

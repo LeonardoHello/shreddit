@@ -5,9 +5,14 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { Star } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -22,16 +27,11 @@ import { cn } from "@/lib/cn";
 import { useTRPC } from "@/trpc/client";
 import sortSidebarCommunities from "@/utils/sortSidebarCommunities";
 import CommunityIcon from "../community/CommunityIcon";
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
 export default function SidebarNavJoined() {
-  const queryClient = useQueryClient();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   const { data: joinedCommunities } = useSuspenseQuery(
     trpc.community.getJoinedCommunities.queryOptions(),
@@ -41,6 +41,8 @@ export default function SidebarNavJoined() {
     trpc.community.getModeratedCommunities.queryKey();
   const joinedCommunitiesQueryKey =
     trpc.community.getJoinedCommunities.queryKey();
+  const mutedCommunitiesQueryKey =
+    trpc.community.getMutedCommunities.queryKey();
 
   const toggleFavorite = useMutation(
     trpc.community.toggleFavoriteCommunity.mutationOptions({
@@ -72,12 +74,26 @@ export default function SidebarNavJoined() {
             return { ..._userToCommunity, favorited, favoritedAt: new Date() };
           });
         });
+
+        queryClient.setQueryData(mutedCommunitiesQueryKey, (updater) => {
+          if (!updater) {
+            return [];
+          }
+
+          return updater.map((_userToCommunity) => {
+            if (communityId !== _userToCommunity.community.id)
+              return _userToCommunity;
+
+            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
+          });
+        });
       },
       onError: (error) => {
         queryClient.invalidateQueries({
           queryKey: moderatedCommunitiesQueryKey,
         });
         queryClient.invalidateQueries({ queryKey: joinedCommunitiesQueryKey });
+        queryClient.invalidateQueries({ queryKey: mutedCommunitiesQueryKey });
 
         console.error(error);
         toast.error(
@@ -96,53 +112,58 @@ export default function SidebarNavJoined() {
   const sortedSidebarCommunities = sortSidebarCommunities(joinedCommunities);
 
   return (
-    <SidebarGroup>
-      <AccordionItem value="joined">
-        <SidebarGroupLabel asChild className="group/label">
-          <AccordionTrigger>JOINED</AccordionTrigger>
+    <Collapsible
+      title="Communities you joined"
+      defaultOpen
+      className="group/collapsible"
+    >
+      <SidebarGroup>
+        <SidebarGroupLabel
+          asChild
+          className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
+        >
+          <CollapsibleTrigger>
+            Joined{" "}
+            <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+          </CollapsibleTrigger>
         </SidebarGroupLabel>
-        <AccordionContent>
+        <CollapsibleContent className="CollapsibleContent">
           <SidebarGroupContent>
             <SidebarMenu>
-              {sortedSidebarCommunities.map((userToCommunity) => (
-                <SidebarMenuItem key={userToCommunity.community.id}>
+              {sortedSidebarCommunities.map((item) => (
+                <SidebarMenuItem key={item.community.id}>
                   <SidebarMenuButton
-                    asChild
                     onClick={() => {
                       if (isMobile) {
                         setOpenMobile(false);
                       }
                     }}
-                    className="[&>svg]:size-6"
+                    asChild
                   >
-                    <HoverPrefetchLink
-                      href={`/r/${userToCommunity.community.name}`}
-                    >
+                    <HoverPrefetchLink href={`/r/${item.community.name}`}>
                       <CommunityIcon
-                        icon={userToCommunity.community.icon}
-                        iconPlaceholder={
-                          userToCommunity.community.iconPlaceholder
-                        }
-                        communtiyName={userToCommunity.community.name}
-                        size={32}
+                        icon={item.community.icon}
+                        iconPlaceholder={item.community.iconPlaceholder}
+                        communtiyName={item.community.name}
+                        size={28}
                         className="aspect-square rounded-full object-cover select-none"
                       />
-                      <span>r/{userToCommunity.community.name}</span>
+                      <span>r/{item.community.name}</span>
                     </HoverPrefetchLink>
                   </SidebarMenuButton>
                   <SidebarMenuAction
                     onClick={() => {
                       toggleFavorite.mutate(
                         {
-                          communityId: userToCommunity.community.id,
-                          favorited: !userToCommunity.favorited,
+                          communityId: item.community.id,
+                          favorited: !item.favorited,
                         },
                         {
                           onSuccess: () => {
                             queryClient.invalidateQueries({
                               queryKey:
                                 trpc.community.getUserToCommunity.queryKey(
-                                  userToCommunity.community.name,
+                                  item.community.name,
                                 ),
                             });
                           },
@@ -157,9 +178,8 @@ export default function SidebarNavJoined() {
                     }}
                   >
                     <Star
-                      className={cn("stroke-1", {
-                        "fill-foreground text-foreground":
-                          userToCommunity.favorited,
+                      className={cn({
+                        "fill-foreground text-foreground": item.favorited,
                       })}
                     />
                   </SidebarMenuAction>
@@ -167,8 +187,8 @@ export default function SidebarNavJoined() {
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
-        </AccordionContent>
-      </AccordionItem>
-    </SidebarGroup>
+        </CollapsibleContent>
+      </SidebarGroup>
+    </Collapsible>
   );
 }
