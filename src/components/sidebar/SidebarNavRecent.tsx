@@ -43,7 +43,7 @@ export default function SidebarNavRecent() {
       <SidebarGroup>
         <SidebarGroupLabel
           asChild
-          className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
+          className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm font-light uppercase"
         >
           <CollapsibleTrigger>
             Recent{" "}
