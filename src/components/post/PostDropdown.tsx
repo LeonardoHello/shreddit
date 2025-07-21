@@ -174,6 +174,9 @@ export default function PostDropdown({
     }),
   );
 
+  const isAuthor = currentUserId === post.authorId;
+  const isModerator = currentUserId === post.community.moderatorId;
+
   return (
     <AlertDialog>
       <DropdownMenu>
@@ -226,7 +229,7 @@ export default function PostDropdown({
               </>
             )}
           </DropdownMenuItem>
-          {currentUserId === post.authorId && (
+          {(isAuthor || isModerator) && (
             <>
               {post.files.length === 0 && (
                 <DropdownMenuItem

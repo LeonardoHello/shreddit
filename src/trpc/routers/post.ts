@@ -1,7 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
 
+import { communities } from "@/db/schema/communities";
 import {
   postFiles,
   PostFileSchema,
@@ -21,7 +22,12 @@ export const postRouter = createTRPCRouter({
         where: (post, { eq }) => eq(post.id, input),
         with: {
           community: {
-            columns: { name: true, icon: true, iconPlaceholder: true },
+            columns: {
+              name: true,
+              icon: true,
+              iconPlaceholder: true,
+              moderatorId: true,
+            },
           },
           author: { columns: { username: true, image: true } },
           files: {
@@ -145,16 +151,42 @@ export const postRouter = createTRPCRouter({
       return ctx.db
         .update(posts)
         .set({ ...input })
-        .where(eq(posts.id, input.id))
-        .returning();
+        .where(
+          and(
+            eq(posts.id, input.id),
+            or(
+              eq(posts.authorId, ctx.userId),
+              eq(
+                ctx.db
+                  .select({ moderatorId: communities.moderatorId })
+                  .from(communities)
+                  .where(eq(communities.id, posts.communityId)),
+                ctx.userId,
+              ),
+            ),
+          ),
+        );
     }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {
       return ctx.db
         .delete(posts)
-        .where(eq(posts.id, input))
-        .returning({ id: posts.id });
+        .where(
+          and(
+            eq(posts.id, input),
+            or(
+              eq(posts.authorId, ctx.userId),
+              eq(
+                ctx.db
+                  .select({ moderatorId: communities.moderatorId })
+                  .from(communities)
+                  .where(eq(communities.id, posts.communityId)),
+                ctx.userId,
+              ),
+            ),
+          ),
+        );
     }),
   savePost: protectedProcedure
     .input(
@@ -213,7 +245,21 @@ export const postRouter = createTRPCRouter({
       return ctx.db
         .update(posts)
         .set({ spoiler: input.spoiler, updatedAt: new Date() })
-        .where(and(eq(posts.authorId, ctx.userId), eq(posts.id, input.id)))
+        .where(
+          and(
+            eq(posts.id, input.id),
+            or(
+              eq(posts.authorId, ctx.userId),
+              eq(
+                ctx.db
+                  .select({ moderatorId: communities.moderatorId })
+                  .from(communities)
+                  .where(eq(communities.id, posts.communityId)),
+                ctx.userId,
+              ),
+            ),
+          ),
+        )
         .returning({ spoiler: posts.spoiler });
     }),
   setPostNSFW: protectedProcedure
@@ -227,7 +273,21 @@ export const postRouter = createTRPCRouter({
       return ctx.db
         .update(posts)
         .set({ nsfw: input.nsfw, updatedAt: new Date() })
-        .where(and(eq(posts.authorId, ctx.userId), eq(posts.id, input.id)))
+        .where(
+          and(
+            eq(posts.id, input.id),
+            or(
+              eq(posts.authorId, ctx.userId),
+              eq(
+                ctx.db
+                  .select({ moderatorId: communities.moderatorId })
+                  .from(communities)
+                  .where(eq(communities.id, posts.communityId)),
+                ctx.userId,
+              ),
+            ),
+          ),
+        )
         .returning({ nsfw: posts.nsfw });
     }),
 });

@@ -91,7 +91,6 @@ function ActionButtons({ editor }: { editor: Editor }) {
         toast.success("Post successfully edited.");
       },
       onError: (error) => {
-        // TODO: set edit to true
         toast.error(error.message);
       },
     }),
