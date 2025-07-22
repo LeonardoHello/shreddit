@@ -1,4 +1,5 @@
-import { eq } from "drizzle-orm";
+import { and, eq, exists, or } from "drizzle-orm";
+import z from "zod/v4";
 
 import {
   comments,
@@ -7,6 +8,7 @@ import {
   UserToComment,
   UserToCommentSchema,
 } from "@/db/schema/comments";
+import { communities, CommunitySchema } from "@/db/schema/communities";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const commentRouter = createTRPCRouter({
@@ -17,7 +19,10 @@ export const commentRouter = createTRPCRouter({
         where: (comment, { eq }) => eq(comment.postId, input),
         with: {
           author: true,
-          post: { columns: { authorId: true } },
+          post: {
+            columns: { authorId: true, communityId: true },
+            with: { community: { columns: { moderatorId: true } } },
+          },
         },
         extras: (comment, { sql }) => ({
           voteCount: sql<number>`
@@ -62,15 +67,6 @@ export const commentRouter = createTRPCRouter({
         })
         .returning();
     }),
-  editComment: protectedProcedure
-    .input(CommentSchema.pick({ id: true, text: true }))
-    .mutation(({ input, ctx }) => {
-      return ctx.db
-        .update(comments)
-        .set({ text: input.text, updatedAt: new Date() })
-        .where(eq(comments.id, input.id))
-        .returning();
-    }),
   voteComment: protectedProcedure
     .input(UserToCommentSchema.pick({ commentId: true, voteStatus: true }))
     .mutation(({ input, ctx }) => {
@@ -82,12 +78,46 @@ export const commentRouter = createTRPCRouter({
           set: { voteStatus: input.voteStatus },
         });
     }),
+  editComment: protectedProcedure
+    .input(CommentSchema.pick({ id: true, text: true }))
+    .mutation(({ input, ctx }) => {
+      return ctx.db
+        .update(comments)
+        .set({ text: input.text, updatedAt: new Date() })
+        .where(
+          and(eq(comments.id, input.id), eq(comments.authorId, ctx.userId)),
+        )
+        .returning();
+    }),
   deleteComment: protectedProcedure
-    .input(CommentSchema.shape.id)
+    .input(
+      z.object({
+        commentId: CommentSchema.shape.id,
+        communityId: CommunitySchema.shape.id,
+      }),
+    )
     .mutation(({ input, ctx }) => {
       return ctx.db
         .delete(comments)
-        .where(eq(comments.id, input))
+        .where(
+          and(
+            eq(comments.id, input.commentId),
+            or(
+              eq(comments.authorId, ctx.userId),
+              exists(
+                ctx.db
+                  .select({ id: communities.id })
+                  .from(communities)
+                  .where(
+                    and(
+                      eq(communities.id, input.communityId),
+                      eq(communities.moderatorId, ctx.userId),
+                    ),
+                  ),
+              ),
+            ),
+          ),
+        )
         .returning({ id: comments.id });
     }),
 });

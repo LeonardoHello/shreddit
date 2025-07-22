@@ -50,7 +50,10 @@ export default function CommentDeleteDialog() {
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction
           onClick={() => {
-            deleteComment.mutate(state.id);
+            deleteComment.mutate({
+              commentId: state.id,
+              communityId: state.post.communityId,
+            });
           }}
         >
           Delete

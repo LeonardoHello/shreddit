@@ -19,8 +19,10 @@ import { Button } from "../ui/button";
 
 export default function CommentDropdown({
   children,
+  isAuthor,
 }: {
   children: React.ReactNode;
+  isAuthor: boolean;
 }) {
   const dispatch = useCommentDispatchContext();
 
@@ -40,14 +42,18 @@ export default function CommentDropdown({
         >
           <DropdownMenuLabel>Comment options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => {
-              dispatch({ type: ReducerAction.TOGGLE_EDIT });
-            }}
-          >
-            <Pencil className="size-4" />
-            <span>Edit comment</span>
-          </DropdownMenuItem>
+
+          {isAuthor && (
+            <DropdownMenuItem
+              onClick={() => {
+                dispatch({ type: ReducerAction.TOGGLE_EDIT });
+              }}
+            >
+              <Pencil className="size-4" />
+              <span>Edit comment</span>
+            </DropdownMenuItem>
+          )}
+
           <AlertDialogTrigger asChild>
             <DropdownMenuItem>
               <Trash />

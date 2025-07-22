@@ -23,6 +23,10 @@ export default function CommentFooter({
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
+  const isAuthor = state.authorId === currentUserId;
+  const isCommunityModerator =
+    state.post.community.moderatorId === currentUserId;
+
   return (
     <div className="text-muted-foreground flex items-center">
       <CommentVote currentUserId={currentUserId} />
@@ -44,8 +48,8 @@ export default function CommentFooter({
         <span className="hidden sm:inline-block">Reply</span>
       </Button>
 
-      {currentUserId === state.authorId && (
-        <CommentDropdown>
+      {(isAuthor || isCommunityModerator) && (
+        <CommentDropdown isAuthor={isAuthor}>
           <CommentDeleteDialog />
         </CommentDropdown>
       )}
