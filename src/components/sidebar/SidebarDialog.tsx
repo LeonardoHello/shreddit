@@ -1,13 +1,12 @@
 "use client";
 
 import { useReducer, useRef, useTransition } from "react";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -33,6 +32,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Community } from "@/db/schema/communities";
 import { PostFileSchema } from "@/db/schema/posts";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
@@ -44,9 +44,9 @@ import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
 import { Textarea } from "../ui/textarea";
 
-const minNameLength = 3;
-const maxNameLength = 21;
-const maxDescriptionLength = 500;
+const nameMinLength = 3;
+const nameMaxLength = 21;
+const descriptionMaxLength = 500;
 
 const fileSchema = PostFileSchema.pick({
   key: true,
@@ -59,16 +59,16 @@ const formSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(minNameLength, {
+    .min(nameMinLength, {
       message: "Please lengthen this text to 3 characters or more",
     })
-    .max(maxNameLength, {
+    .max(nameMaxLength, {
       message: "Please shorten this text to 21 characters or less",
     })
     .regex(/^[a-zA-Z0-9_]+$/, {
       message: "Only letters, numbers and underscore are allowed",
     }),
-  description: z.string().trim().max(maxDescriptionLength, {
+  description: z.string().trim().max(descriptionMaxLength, {
     message: "Description is too long, shorten it to 300 characters or less",
   }),
 });
@@ -76,8 +76,8 @@ const formSchema = z.object({
 type ReducerState = {
   errorMessage?: string;
   isOpen: boolean;
-  communityIcon: { file: File | undefined; url: string | StaticImport };
-  communityBanner: { file: File | undefined; url: string | StaticImport };
+  communityIcon: { file: File | null; url: string | null };
+  communityBanner: { file: File | null; url: string | null };
   isLoading: boolean;
 };
 
@@ -184,31 +184,16 @@ export default function SidebarDialog({
 
   const [state, dispatch] = useReducer(reducer, {
     isOpen: false,
-    communityIcon: { file: undefined, url: defaultCommunityIcon },
-    communityBanner: { file: undefined, url: defaultCommunityBanner },
+    communityIcon: { file: null, url: null },
+    communityBanner: { file: null, url: null },
     isLoading: false,
   });
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const fileSelectedReset = () => {
-    if (iconInputRef.current) {
-      iconInputRef.current.value = "";
-    }
-    dispatch({
-      type: ReducerAction.SELECT_ICON,
-      communityIcon: { file: undefined, url: defaultCommunityIcon },
-    });
-
-    if (bannerInputRef.current) {
-      bannerInputRef.current.value = "";
-    }
-    dispatch({
-      type: ReducerAction.SELECT_BANNER,
-      communityBanner: { file: undefined, url: defaultCommunityBanner },
-    });
-  };
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -219,8 +204,32 @@ export default function SidebarDialog({
     },
   });
 
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
+  const handleBannerReset = () => {
+    if (bannerInputRef.current) {
+      bannerInputRef.current.value = "";
+    }
+    dispatch({
+      type: ReducerAction.SELECT_BANNER,
+      communityBanner: {
+        file: null,
+        url: null,
+      },
+    });
+  };
+
+  const handleIconReset = () => {
+    if (iconInputRef.current) {
+      iconInputRef.current.value = "";
+    }
+
+    dispatch({
+      type: ReducerAction.SELECT_ICON,
+      communityIcon: {
+        file: null,
+        url: null,
+      },
+    });
+  };
 
   const { startUpload, routeConfig, isUploading } = useUploadThing(
     "imageUploader",
@@ -236,7 +245,8 @@ export default function SidebarDialog({
         toast.dismiss(toastId);
       },
       onUploadError: (e) => {
-        fileSelectedReset();
+        handleIconReset();
+        handleBannerReset();
 
         toast.dismiss(toastId);
         toast.error(e.message);
@@ -291,7 +301,8 @@ export default function SidebarDialog({
     isPending ||
     isUploading ||
     createCommunity.isPending ||
-    form.formState.isSubmitting;
+    form.formState.isSubmitting ||
+    state.isLoading;
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -346,11 +357,11 @@ export default function SidebarDialog({
         return;
       }
 
-      let icon: string | null = null;
-      let iconPlaceholder: string | null = null;
+      let icon: Community["icon"] = null;
+      let iconPlaceholder: Community["iconPlaceholder"] = null;
 
-      let banner: string | null = null;
-      let bannerPlaceholder: string | null = null;
+      let banner: Community["banner"] = null;
+      let bannerPlaceholder: Community["bannerPlaceholder"] = null;
 
       if (state.communityIcon.file && state.communityBanner.file) {
         // Both files uploaded, order preserved
@@ -416,7 +427,8 @@ export default function SidebarDialog({
   };
 
   const handleFormReset = () => {
-    fileSelectedReset();
+    handleIconReset();
+    handleBannerReset();
 
     form.reset();
   };
@@ -449,14 +461,20 @@ export default function SidebarDialog({
           <div className="flex flex-col items-start">
             <div className="relative aspect-8/1 w-full">
               <Image
-                src={state.communityBanner.url}
+                src={state.communityBanner.url ?? defaultCommunityBanner}
                 alt="community banner"
                 className="rounded-md object-cover"
                 fill
               />
+              <Button
+                className="absolute -top-4 -right-4 size-8 rounded-full"
+                onClick={handleBannerReset}
+              >
+                <X className="size-4" />
+              </Button>
               <label
                 htmlFor="banner-upload"
-                className="absolute -right-2 -bottom-2 cursor-pointer"
+                className="absolute -right-4 -bottom-4 cursor-pointer"
               >
                 <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-8 items-center justify-center rounded-full">
                   <Camera className="size-4" />
@@ -472,20 +490,26 @@ export default function SidebarDialog({
                 />
               </label>
             </div>
-            <div className="relative -mt-6 px-4">
+            <div className="relative -mt-6 ml-4">
               <Image
-                src={state.communityIcon.url}
+                src={state.communityIcon.url ?? defaultCommunityIcon}
                 alt="communtiy icon"
                 width={60}
                 height={60}
                 className="bg-card border-card aspect-square rounded-full border-2 object-cover"
               />
+              <Button
+                className="absolute -top-1 -right-2 size-6 rounded-full"
+                onClick={handleIconReset}
+              >
+                <X className="size-3" />
+              </Button>
               <label
                 htmlFor="icon-upload"
-                className="absolute right-1 -bottom-1 cursor-pointer"
+                className="absolute -right-2 -bottom-1 cursor-pointer"
               >
-                <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-7 items-center justify-center rounded-full">
-                  <Camera className="size-3.5" />
+                <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-6 items-center justify-center rounded-full">
+                  <Camera className="size-3" />
                 </div>
                 <input
                   ref={iconInputRef}
@@ -527,7 +551,7 @@ export default function SidebarDialog({
                   <div className="inline-flex w-full justify-between px-1">
                     <FormMessage>{state.errorMessage}</FormMessage>
                     <div className="text-muted-foreground ml-auto text-xs">
-                      {maxNameLength - field.value.length}
+                      {nameMaxLength - field.value.length}
                     </div>
                   </div>
                 </FormItem>
@@ -552,7 +576,7 @@ export default function SidebarDialog({
                   <div className="inline-flex w-full px-1">
                     <FormMessage />
                     <div className="text-muted-foreground ml-auto text-xs">
-                      {maxDescriptionLength - field.value.length}
+                      {descriptionMaxLength - field.value.length}
                     </div>
                   </div>
                 </FormItem>
