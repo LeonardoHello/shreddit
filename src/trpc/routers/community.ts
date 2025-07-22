@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
 
@@ -197,11 +197,11 @@ export const communityRouter = createTRPCRouter({
   }),
   editCommunity: protectedProcedure
     .input(
-      CommunitySchema.pick({
-        id: true,
-        displayName: true,
-        description: true,
-        memberNickname: true,
+      CommunitySchema.omit({
+        updatedAt: true,
+        createdAt: true,
+        name: true,
+        moderatorId: true,
       }),
     )
     .mutation(({ input, ctx }) => {
@@ -210,12 +210,21 @@ export const communityRouter = createTRPCRouter({
       return ctx.db
         .update(communities)
         .set({ ...rest })
-        .where(eq(communities.id, id));
+        .where(
+          and(eq(communities.moderatorId, ctx.userId), eq(communities.id, id)),
+        );
     }),
   deleteCommunity: protectedProcedure
     .input(CommunitySchema.shape.id)
     .mutation(({ input, ctx }) => {
-      return ctx.db.delete(communities).where(eq(communities.id, input));
+      return ctx.db
+        .delete(communities)
+        .where(
+          and(
+            eq(communities.moderatorId, ctx.userId),
+            eq(communities.id, input),
+          ),
+        );
     }),
   toggleFavoriteCommunity: protectedProcedure
     .input(

@@ -1,9 +1,17 @@
 "use client";
 
+import { useReducer, useRef } from "react";
+import Image from "next/image";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Camera, Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import {
+  generateMimeTypes,
+  generatePermittedFileTypes,
+} from "uploadthing/client";
 import { z } from "zod/v3";
 
 import { Button } from "@/components/ui/button";
@@ -24,15 +32,96 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Community } from "@/db/schema/communities";
+import { PostFileSchema } from "@/db/schema/posts";
+import { useUploadThing } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
 import { RouterOutput } from "@/trpc/routers/_app";
+import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
+import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
+import { Label } from "../ui/label";
+import { Progress } from "../ui/progress";
 import { Textarea } from "../ui/textarea";
 
-type Community = NonNullable<RouterOutput["community"]["getCommunityByName"]>;
+type ReducerState = {
+  communityIcon: {
+    file: File | null;
+    url: string | null;
+    placeholder: string | null;
+  };
+  communityBanner: {
+    file: File | null;
+    url: string | null;
+    placeholder: string | null;
+  };
+  isLoading: boolean;
+};
+
+enum ReducerAction {
+  SELECT_ICON,
+  SELECT_BANNER,
+  START_LOADING,
+  STOP_LOADING,
+}
+
+type ReducerActionType =
+  | {
+      type: typeof ReducerAction.SELECT_ICON;
+      communityIcon: ReducerState["communityIcon"];
+    }
+  | {
+      type: typeof ReducerAction.SELECT_BANNER;
+      communityBanner: ReducerState["communityBanner"];
+    }
+  | {
+      type: typeof ReducerAction.START_LOADING;
+    }
+  | {
+      type: typeof ReducerAction.STOP_LOADING;
+    };
+
+function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
+  switch (action.type) {
+    case ReducerAction.SELECT_ICON: {
+      return {
+        ...state,
+        communityIcon: action.communityIcon,
+      };
+    }
+    case ReducerAction.SELECT_BANNER: {
+      return {
+        ...state,
+        communityBanner: action.communityBanner,
+      };
+    }
+    case ReducerAction.START_LOADING: {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    }
+    case ReducerAction.STOP_LOADING: {
+      return {
+        ...state,
+        isLoading: false,
+      };
+    }
+    default: {
+      throw Error("Unknown action.");
+    }
+  }
+}
 
 const displayNameMaxLength = 100;
 const memberNicknameMaxLength = 21;
 const descriptionMaxLength = 500;
+
+const fileSchema = PostFileSchema.pick({
+  key: true,
+  url: true,
+  name: true,
+  thumbHash: true,
+}).array();
 
 const formSchema = z.object({
   displayName: z.string().trim().max(displayNameMaxLength),
@@ -40,11 +129,34 @@ const formSchema = z.object({
   description: z.string().trim().max(descriptionMaxLength),
 });
 
+// file size limit in MB
+const maxFileSize = 4;
+const maxFileSizeInBytes = maxFileSize * 1024 * 1024; // convert to bytes
+
+const toastId = "loading_toast";
+
 export default function CommunityEditDialog({
   community,
 }: {
-  community: Community;
+  community: NonNullable<RouterOutput["community"]["getCommunityByName"]>;
 }) {
+  const iconInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  const [state, dispatch] = useReducer(reducer, {
+    communityIcon: {
+      file: null,
+      url: community.icon,
+      placeholder: community.iconPlaceholder,
+    },
+    communityBanner: {
+      file: null,
+      url: community.banner,
+      placeholder: community.bannerPlaceholder,
+    },
+    isLoading: false,
+  });
+
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -58,6 +170,58 @@ export default function CommunityEditDialog({
     },
   });
 
+  const handleBannerReset = () => {
+    if (bannerInputRef.current) {
+      bannerInputRef.current.value = "";
+    }
+    dispatch({
+      type: ReducerAction.SELECT_BANNER,
+      communityBanner: {
+        file: null,
+        url: community.banner,
+        placeholder: community.bannerPlaceholder,
+      },
+    });
+  };
+
+  const handleIconReset = () => {
+    if (iconInputRef.current) {
+      iconInputRef.current.value = "";
+    }
+
+    dispatch({
+      type: ReducerAction.SELECT_ICON,
+      communityIcon: {
+        file: null,
+        url: community.icon,
+        placeholder: community.iconPlaceholder,
+      },
+    });
+  };
+
+  const { startUpload, routeConfig, isUploading } = useUploadThing(
+    "imageUploader",
+    {
+      onUploadProgress: (p) => {
+        toast.info(<Progress value={p} />, {
+          id: toastId,
+          // in milliseconds
+          duration: 99 * 1000,
+        });
+      },
+      onClientUploadComplete: () => {
+        toast.dismiss(toastId);
+      },
+      onUploadError: (e) => {
+        handleIconReset();
+        handleBannerReset();
+
+        toast.dismiss(toastId);
+        toast.error(e.message);
+      },
+    },
+  );
+
   const editCommunity = useMutation(
     trpc.community.editCommunity.mutationOptions({
       onMutate: (variables) => {
@@ -70,6 +234,10 @@ export default function CommunityEditDialog({
 
             return {
               ...updater,
+              icon: state.communityIcon.url,
+              iconPlaceholder: state.communityIcon.placeholder,
+              banner: state.communityBanner.url,
+              bannerPlaceholder: state.communityBanner.placeholder,
               displayName: variables.displayName,
               memberNickname: variables.memberNickname,
               description: variables.description,
@@ -91,15 +259,154 @@ export default function CommunityEditDialog({
     }),
   );
 
+  const isMutating = isUploading || state.isLoading;
+
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    editCommunity.mutate({
-      id: community.id,
-      ...values,
-    });
+    if (isMutating) {
+      toast.error(
+        "Cannot submit the form. Please check all required fields and try again.",
+      );
+
+      return;
+    }
+    dispatch({ type: ReducerAction.START_LOADING });
+
+    if (state.communityIcon.file || state.communityBanner.file) {
+      const filesToUpload = [];
+      if (state.communityIcon.file) {
+        filesToUpload.push(state.communityIcon.file);
+      }
+      if (state.communityBanner.file) {
+        filesToUpload.push(state.communityBanner.file);
+      }
+
+      const uploadedFiles = await startUpload(filesToUpload);
+
+      if (!uploadedFiles) {
+        dispatch({ type: ReducerAction.STOP_LOADING });
+
+        return;
+      }
+
+      const files = uploadedFiles.map((file) => ({
+        name: file.name,
+        key: file.key,
+        url: file.ufsUrl,
+      }));
+
+      const response = await fetch("/api/thumbHash", {
+        method: "POST",
+        body: JSON.stringify(files),
+      });
+
+      const data = await response.json();
+
+      const { data: parsedFiles, error } = fileSchema.safeParse(data);
+
+      if (error) {
+        toast.error(error.message);
+        dispatch({ type: ReducerAction.STOP_LOADING });
+
+        return;
+      }
+
+      let icon: Community["icon"] = community.icon;
+      let iconPlaceholder: Community["iconPlaceholder"] =
+        community.iconPlaceholder;
+
+      let banner: Community["banner"] = community.banner;
+      let bannerPlaceholder: Community["bannerPlaceholder"] =
+        community.bannerPlaceholder;
+
+      if (state.communityIcon.file && state.communityBanner.file) {
+        // Both files uploaded, order preserved
+        icon = parsedFiles[0].url;
+        iconPlaceholder = parsedFiles[0].thumbHash;
+
+        banner = parsedFiles[1].url;
+        bannerPlaceholder = parsedFiles[1].thumbHash;
+      } else if (state.communityIcon.file) {
+        icon = parsedFiles[0].url;
+        iconPlaceholder = parsedFiles[0].thumbHash;
+      } else if (state.communityBanner.file) {
+        banner = parsedFiles[0].url;
+        bannerPlaceholder = parsedFiles[0].thumbHash;
+      }
+
+      dispatch({ type: ReducerAction.STOP_LOADING });
+
+      editCommunity.mutate({
+        id: community.id,
+        icon,
+        iconPlaceholder,
+        banner,
+        bannerPlaceholder,
+        ...values,
+      });
+    } else {
+      dispatch({ type: ReducerAction.STOP_LOADING });
+
+      editCommunity.mutate({
+        id: community.id,
+        icon: community.icon,
+        iconPlaceholder: community.iconPlaceholder,
+        banner: community.banner,
+        bannerPlaceholder: community.bannerPlaceholder,
+        ...values,
+      });
+    }
   }
+
+  const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > maxFileSizeInBytes) {
+      toast.error(`File size exceeds the maximum limit of ${maxFileSize}MB`);
+      return;
+    }
+
+    dispatch({
+      type: ReducerAction.SELECT_ICON,
+      communityIcon: {
+        file,
+        url: URL.createObjectURL(file),
+        placeholder: URL.createObjectURL(file),
+      },
+    });
+  };
+
+  const handleBannerUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > maxFileSizeInBytes) {
+      toast.error(`File size exceeds the maximum limit of ${maxFileSize}MB`);
+      return;
+    }
+
+    dispatch({
+      type: ReducerAction.SELECT_BANNER,
+      communityBanner: {
+        file,
+        url: URL.createObjectURL(file),
+        placeholder: URL.createObjectURL(file),
+      },
+    });
+  };
+
+  const handleFormReset = () => {
+    handleIconReset();
+    handleBannerReset();
+
+    form.reset();
+  };
+
+  const permittedFileTypes = generatePermittedFileTypes(routeConfig);
+  const mimeTypes = generateMimeTypes(permittedFileTypes.fileTypes);
 
   return (
     <DialogContent className="bg-card max-h-screen overflow-y-auto">
@@ -110,6 +417,79 @@ export default function CommunityEditDialog({
           top of the sidebar.
         </DialogDescription>
       </DialogHeader>
+
+      <div className="flex flex-col gap-1.5">
+        <Label>Icon & Banner</Label>
+        <div className="flex flex-col items-start">
+          <div className="relative aspect-8/1 w-full">
+            <Image
+              src={state.communityBanner.url ?? defaultCommunityBanner}
+              alt="community banner"
+              placeholder={state.communityBanner.placeholder ? "blur" : "empty"}
+              blurDataURL={state.communityBanner.placeholder ?? undefined}
+              fill
+              className="rounded-md object-cover"
+            />
+            <Button
+              className="absolute -top-4 -right-4 size-8 rounded-full"
+              onClick={handleBannerReset}
+            >
+              <X className="size-4" />
+            </Button>
+            <label
+              htmlFor="banner-upload"
+              className="absolute -right-4 -bottom-4 cursor-pointer"
+            >
+              <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-8 items-center justify-center rounded-full">
+                <Camera className="size-4" />
+              </div>
+              <input
+                ref={bannerInputRef}
+                id="banner-upload"
+                type="file"
+                accept={mimeTypes.join(", ")}
+                multiple={false}
+                className="hidden"
+                onChange={handleBannerUpload}
+              />
+            </label>
+          </div>
+          <div className="relative -mt-6 ml-4">
+            <Image
+              src={state.communityIcon.url ?? defaultCommunityIcon}
+              alt="communtiy icon"
+              width={60}
+              height={60}
+              placeholder={state.communityIcon.placeholder ? "blur" : "empty"}
+              blurDataURL={state.communityIcon.placeholder ?? undefined}
+              className="bg-card border-card aspect-square rounded-full border-2 object-cover"
+            />
+            <Button
+              className="absolute -top-1 -right-2 size-6 rounded-full"
+              onClick={handleIconReset}
+            >
+              <X className="size-3" />
+            </Button>
+            <label
+              htmlFor="icon-upload"
+              className="absolute -right-2 -bottom-1 cursor-pointer"
+            >
+              <div className="bg-primary text-primary-foreground hover:bg-primary/90 flex size-6 items-center justify-center rounded-full">
+                <Camera className="size-3" />
+              </div>
+              <input
+                ref={iconInputRef}
+                id="icon-upload"
+                type="file"
+                accept={mimeTypes.join(", ")}
+                multiple={false}
+                className="hidden"
+                onChange={handleIconUpload}
+              />
+            </label>
+          </div>
+        </div>
+      </div>
 
       <Form {...form}>
         <form
@@ -182,12 +562,24 @@ export default function CommunityEditDialog({
                 type="button"
                 variant={"secondary"}
                 className="rounded-full"
+                onClick={handleFormReset}
               >
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" className="rounded-full">
-              Save
+            <Button
+              type="submit"
+              className="rounded-full"
+              disabled={isMutating}
+            >
+              {isMutating ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  {isUploading ? "Uploading..." : "Saving..."}
+                </>
+              ) : (
+                "Save"
+              )}
             </Button>
           </div>
         </form>
