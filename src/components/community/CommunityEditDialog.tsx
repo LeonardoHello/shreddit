@@ -225,6 +225,8 @@ export default function CommunityEditDialog({
   const editCommunity = useMutation(
     trpc.community.editCommunity.mutationOptions({
       onMutate: (variables) => {
+        const { id, ...rest } = variables;
+
         queryClient.setQueryData(
           trpc.community.getCommunityByName.queryKey(community.name),
           (updater) => {
@@ -232,18 +234,26 @@ export default function CommunityEditDialog({
               return community;
             }
 
-            return {
-              ...updater,
-              icon: state.communityIcon.url,
-              iconPlaceholder: state.communityIcon.placeholder,
-              banner: state.communityBanner.url,
-              bannerPlaceholder: state.communityBanner.placeholder,
-              displayName: variables.displayName,
-              memberNickname: variables.memberNickname,
-              description: variables.description,
-            };
+            return { ...updater, ...rest };
           },
         );
+
+        dispatch({
+          type: ReducerAction.SELECT_ICON,
+          communityIcon: {
+            file: null,
+            url: rest.icon,
+            placeholder: rest.iconPlaceholder,
+          },
+        });
+        dispatch({
+          type: ReducerAction.SELECT_BANNER,
+          communityBanner: {
+            file: null,
+            url: rest.banner,
+            placeholder: rest.bannerPlaceholder,
+          },
+        });
       },
       onSuccess: () => {
         toast.success("Community successfully edited");
@@ -252,6 +262,9 @@ export default function CommunityEditDialog({
         queryClient.invalidateQueries({
           queryKey: trpc.community.getCommunityByName.queryKey(community.name),
         });
+
+        handleIconReset();
+        handleBannerReset();
 
         console.error(error);
         toast.error("Failed to edit your community. Please try again later.");
@@ -425,7 +438,7 @@ export default function CommunityEditDialog({
             <Image
               src={state.communityBanner.url ?? defaultCommunityBanner}
               alt="community banner"
-              placeholder={state.communityBanner.placeholder ? "blur" : "empty"}
+              placeholder="blur"
               blurDataURL={state.communityBanner.placeholder ?? undefined}
               fill
               className="rounded-md object-cover"
@@ -460,7 +473,7 @@ export default function CommunityEditDialog({
               alt="communtiy icon"
               width={60}
               height={60}
-              placeholder={state.communityIcon.placeholder ? "blur" : "empty"}
+              placeholder="blur"
               blurDataURL={state.communityIcon.placeholder ?? undefined}
               className="bg-card border-card aspect-square rounded-full border-2 object-cover"
             />
