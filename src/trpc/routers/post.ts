@@ -1,4 +1,4 @@
-import { and, eq, or } from "drizzle-orm";
+import { and, eq, exists, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod/v4";
 
@@ -156,23 +156,25 @@ export const postRouter = createTRPCRouter({
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
     .mutation(({ input, ctx }) => {
-      return ctx.db
-        .delete(posts)
-        .where(
-          and(
-            eq(posts.id, input),
-            or(
-              eq(posts.authorId, ctx.userId),
-              eq(
-                ctx.db
-                  .select({ moderatorId: communities.moderatorId })
-                  .from(communities)
-                  .where(eq(communities.id, posts.communityId)),
-                ctx.userId,
-              ),
+      return ctx.db.delete(posts).where(
+        and(
+          eq(posts.id, input),
+          or(
+            eq(posts.authorId, ctx.userId),
+            exists(
+              ctx.db
+                .select({ moderatorId: communities.moderatorId })
+                .from(communities)
+                .where(
+                  and(
+                    eq(communities.id, posts.communityId),
+                    eq(communities.moderatorId, ctx.userId),
+                  ),
+                ),
             ),
           ),
-        );
+        ),
+      );
     }),
   savePost: protectedProcedure
     .input(
@@ -236,12 +238,16 @@ export const postRouter = createTRPCRouter({
             eq(posts.id, input.id),
             or(
               eq(posts.authorId, ctx.userId),
-              eq(
+              exists(
                 ctx.db
                   .select({ moderatorId: communities.moderatorId })
                   .from(communities)
-                  .where(eq(communities.id, posts.communityId)),
-                ctx.userId,
+                  .where(
+                    and(
+                      eq(communities.id, posts.communityId),
+                      eq(communities.moderatorId, ctx.userId),
+                    ),
+                  ),
               ),
             ),
           ),
@@ -264,12 +270,16 @@ export const postRouter = createTRPCRouter({
             eq(posts.id, input.id),
             or(
               eq(posts.authorId, ctx.userId),
-              eq(
+              exists(
                 ctx.db
                   .select({ moderatorId: communities.moderatorId })
                   .from(communities)
-                  .where(eq(communities.id, posts.communityId)),
-                ctx.userId,
+                  .where(
+                    and(
+                      eq(communities.id, posts.communityId),
+                      eq(communities.moderatorId, ctx.userId),
+                    ),
+                  ),
               ),
             ),
           ),
