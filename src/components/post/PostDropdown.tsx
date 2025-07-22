@@ -229,18 +229,20 @@ export default function PostDropdown({
               </>
             )}
           </DropdownMenuItem>
+
+          {isAuthor && post.files.length === 0 && (
+            <DropdownMenuItem
+              onClick={() => {
+                dispatch({ type: ReducerAction.TOGGLE_EDIT });
+              }}
+            >
+              <Pencil />
+              <span>Edit post</span>
+            </DropdownMenuItem>
+          )}
+
           {(isAuthor || isModerator) && (
             <>
-              {post.files.length === 0 && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    dispatch({ type: ReducerAction.TOGGLE_EDIT });
-                  }}
-                >
-                  <Pencil />
-                  <span>Edit post</span>
-                </DropdownMenuItem>
-              )}
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem>
                   <Trash />

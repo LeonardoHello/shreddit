@@ -151,21 +151,7 @@ export const postRouter = createTRPCRouter({
       return ctx.db
         .update(posts)
         .set({ ...input })
-        .where(
-          and(
-            eq(posts.id, input.id),
-            or(
-              eq(posts.authorId, ctx.userId),
-              eq(
-                ctx.db
-                  .select({ moderatorId: communities.moderatorId })
-                  .from(communities)
-                  .where(eq(communities.id, posts.communityId)),
-                ctx.userId,
-              ),
-            ),
-          ),
-        );
+        .where(and(eq(posts.id, input.id), eq(posts.authorId, ctx.userId)));
     }),
   deletePost: protectedProcedure
     .input(PostSchema.shape.id)
