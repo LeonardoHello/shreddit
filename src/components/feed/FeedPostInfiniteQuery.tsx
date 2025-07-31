@@ -101,7 +101,7 @@ export default function FeedPostInfiniteQuery({
           </PostContextProvider>
         )),
       )}
-      {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton />}
+      {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton withoutButton />}
 
       <div ref={ref} className="sr-only bottom-0 h-[550px]" />
     </div>
