@@ -3,9 +3,9 @@ import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import SubmitCommunitySelected from "@/components/submit/SubmitCommunitySelected";
 import { Button } from "@/components/ui/button";
 
-export default async function CommunitySubmitPage(props: {
-  params: Promise<{ communityName: string }>;
-}) {
+export default async function CommunitySubmitPage(
+  props: PageProps<"/submit/r/[communityName]">,
+) {
   const params = await props.params;
 
   return (

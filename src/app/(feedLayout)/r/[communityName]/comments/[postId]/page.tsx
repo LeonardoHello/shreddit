@@ -9,9 +9,9 @@ import RTEComment from "@/components/RTE/RTEComment";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
-export default async function PostPage(props: {
-  params: Promise<{ postId: string }>;
-}) {
+export default async function PostPage(
+  props: PageProps<"/r/[communityName]/comments/[postId]">,
+) {
   const [params, session] = await Promise.all([props.params, getSession()]);
 
   return (

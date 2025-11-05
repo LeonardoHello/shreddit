@@ -5,10 +5,9 @@ import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
 import { getQueryClient, trpc } from "@/trpc/server";
 
-export default async function CommunityLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ communityName: string; sort: string }>;
-}) {
+export default async function CommunityLayout(
+  props: LayoutProps<"/r/[communityName]">,
+) {
   const [params, session] = await Promise.all([props.params, getSession()]);
 
   const queryClient = getQueryClient();

@@ -4,9 +4,9 @@ import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types/enums";
 
-export default async function UserPage(props: {
-  params: Promise<{ username: string; sort: string }>;
-}) {
+export default async function UserPage(
+  props: PageProps<"/u/[username]/upvoted/[sort]">,
+) {
   const [params, session] = await Promise.all([props.params, getSession()]);
 
   const sort = z.enum(PostSort).parse(params.sort);

@@ -4,9 +4,7 @@ import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types/enums";
 
-export default async function AllSortPage(props: {
-  params: Promise<{ sort: string }>;
-}) {
+export default async function AllSortPage(props: PageProps<"/all/[sort]">) {
   const [params, session] = await Promise.all([props.params, getSession()]);
 
   const sort = z.enum(PostSort).parse(params.sort);

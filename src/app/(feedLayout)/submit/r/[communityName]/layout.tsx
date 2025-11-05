@@ -4,10 +4,9 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getQueryClient, trpc } from "@/trpc/server";
 
-export default async function CommunitySubmitLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ communityName: string }>;
-}) {
+export default async function CommunitySubmitLayout(
+  props: LayoutProps<"/submit/r/[communityName]">,
+) {
   const params = await props.params;
 
   const queryClient = getQueryClient();

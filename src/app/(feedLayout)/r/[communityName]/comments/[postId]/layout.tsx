@@ -5,10 +5,9 @@ import { z } from "zod/v4";
 
 import { getQueryClient, trpc } from "@/trpc/server";
 
-export default async function PostLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ communityName: string; postId: string }>;
-}) {
+export default async function PostLayout(
+  props: LayoutProps<"/r/[communityName]/comments/[postId]">,
+) {
   const params = await props.params;
 
   const { success } = z.uuid().safeParse(params.postId);

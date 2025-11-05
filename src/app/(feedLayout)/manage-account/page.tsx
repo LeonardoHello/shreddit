@@ -25,7 +25,7 @@ export default async function ManageAccountPage() {
 
   const { data: provider } = z.safeParse(
     z.enum(["google", "github", "discord"]),
-    account.provider,
+    account.providerId,
   );
 
   return (

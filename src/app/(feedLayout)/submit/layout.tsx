@@ -9,11 +9,7 @@ import SubmitContextProvider from "@/context/SubmitContext";
 import { getQueryClient, trpc } from "@/trpc/server";
 import shrek from "@public/shrek.svg";
 
-export default async function SubmitLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function SubmitLayout(props: LayoutProps<"/submit">) {
   const queryClient = getQueryClient();
 
   void queryClient.prefetchQuery(
@@ -28,7 +24,7 @@ export default async function SubmitLayout({
         <div className="flex flex-col gap-2">
           <SubmitContextProvider>
             <HydrationBoundary state={dehydrate(queryClient)}>
-              {children}
+              {props.children}
             </HydrationBoundary>
             <SubmitForm />
           </SubmitContextProvider>

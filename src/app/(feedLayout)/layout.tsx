@@ -12,11 +12,7 @@ import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 import { TRPCReactProvider } from "@/trpc/client";
 import { getSession } from "../actions";
 
-export default async function FeedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function FeedLayout(props: LayoutProps<"/">) {
   const session = await getSession();
 
   if (session && !session.user.username) {
@@ -42,7 +38,7 @@ export default async function FeedLayout({
 
             <SidebarInset>
               <Header />
-              {children}
+              {props.children}
             </SidebarInset>
           </SidebarProvider>
         </RecentCommunityContextProvider>

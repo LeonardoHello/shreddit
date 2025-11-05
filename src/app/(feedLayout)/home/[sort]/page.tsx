@@ -4,9 +4,7 @@ import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
 import { PostSort } from "@/types/enums";
 
-export default async function HomeSortPage(props: {
-  params: Promise<{ sort: string }>;
-}) {
+export default async function HomeSortPage(props: PageProps<"/home/[sort]">) {
   const [params, session] = await Promise.all([props.params, getSession()]);
 
   if (!session) throw new Error("Could not load home page information.");

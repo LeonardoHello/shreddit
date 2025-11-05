@@ -29,7 +29,7 @@ export default function CommunityIcon({
       className={className}
       width={size}
       height={size}
-      placeholder="blur"
+      placeholder={Number(size) >= 40 ? "blur" : "empty"}
       blurDataURL={icon && placeholderURL ? placeholderURL : undefined}
     />
   );

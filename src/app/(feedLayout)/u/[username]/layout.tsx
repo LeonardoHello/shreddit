@@ -4,10 +4,7 @@ import UserHeader from "@/components/user/UserHeader";
 import UserSidebar from "@/components/user/UserSidebar";
 import { getQueryClient, trpc } from "@/trpc/server";
 
-export default async function UserLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ username: string; sort: string }>;
-}) {
+export default async function UserLayout(props: LayoutProps<"/u/[username]">) {
   const params = await props.params;
 
   const queryClient = getQueryClient();

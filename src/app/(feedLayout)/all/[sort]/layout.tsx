@@ -6,10 +6,7 @@ import { z } from "zod/v4";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { PostSort } from "@/types/enums";
 
-export default async function AllSortLayout(props: {
-  children: React.ReactNode;
-  params: Promise<{ sort: string }>;
-}) {
+export default async function AllSortLayout(props: LayoutProps<"/all/[sort]">) {
   const params = await props.params;
 
   const { data: sort, success } = z.enum(PostSort).safeParse(params.sort);
