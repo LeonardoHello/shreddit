@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import { CommunitySchema } from "@/db/schema/communities";
 import { UserSchema } from "@/db/schema/users";
@@ -12,7 +12,7 @@ export const postFeedRouter = createTRPCRouter({
       z.object({
         // cursor input needed to expose useInfiniteQuery hook
         // value of the cursor is what's returned from getNextPageParam
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
       }),
     )
@@ -41,7 +41,7 @@ export const postFeedRouter = createTRPCRouter({
   getHomePosts: protectedProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
       }),
     )
@@ -70,7 +70,7 @@ export const postFeedRouter = createTRPCRouter({
   getCommunityPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         communityName: CommunitySchema.shape.name,
       }),
@@ -101,7 +101,7 @@ export const postFeedRouter = createTRPCRouter({
   getUserPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
@@ -132,7 +132,7 @@ export const postFeedRouter = createTRPCRouter({
   getUpvotedPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
@@ -163,7 +163,7 @@ export const postFeedRouter = createTRPCRouter({
   getDownvotedPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
@@ -194,7 +194,7 @@ export const postFeedRouter = createTRPCRouter({
   getSavedPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),
@@ -225,7 +225,7 @@ export const postFeedRouter = createTRPCRouter({
   getHiddenPosts: baseProcedure
     .input(
       z.object({
-        cursor: z.number().nullish(),
+        cursor: z.nullish(z.number()),
         sort: z.enum(PostSort),
         username: UserSchema.shape.username,
       }),

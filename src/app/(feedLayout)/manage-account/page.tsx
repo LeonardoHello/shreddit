@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import { getSession } from "@/app/actions";
 import AccountPage from "@/components/manage-account";

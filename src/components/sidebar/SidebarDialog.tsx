@@ -13,7 +13,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import { z } from "zod/v3";
+import * as z from "zod/mini";
 
 import {
   Dialog,
@@ -56,21 +56,24 @@ const fileSchema = PostFileSchema.pick({
 }).array();
 
 const formSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(nameMinLength, {
+  name: z.string().check(
+    z.minLength(nameMinLength, {
       message: "Please lengthen this text to 3 characters or more",
-    })
-    .max(nameMaxLength, {
+    }),
+    z.maxLength(nameMaxLength, {
       message: "Please shorten this text to 21 characters or less",
-    })
-    .regex(/^[a-zA-Z0-9_]+$/, {
+    }),
+    z.regex(/^[a-zA-Z0-9_]+$/, {
       message: "Only letters, numbers and underscore are allowed",
     }),
-  description: z.string().trim().max(descriptionMaxLength, {
-    message: "Description is too long, shorten it to 300 characters or less",
-  }),
+    z.trim(),
+  ),
+  description: z.string().check(
+    z.maxLength(descriptionMaxLength, {
+      message: "Description is too long, shorten it to 300 characters or less",
+    }),
+    z.trim(),
+  ),
 });
 
 type ReducerState = {

@@ -1,6 +1,6 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import { communities } from "@/db/schema/communities";
 import {

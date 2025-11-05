@@ -1,5 +1,5 @@
 import { and, eq, exists, or } from "drizzle-orm";
-import z from "zod/v4";
+import * as z from "zod/mini";
 
 import {
   comments,

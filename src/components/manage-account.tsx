@@ -11,7 +11,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import { z } from "zod/v3";
+import * as z from "zod/mini";
 
 import { deleteAccount } from "@/app/actions";
 import {
@@ -65,15 +65,15 @@ import { DiscordIcon, GithubIcon, GoogleIcon } from "./social-icons";
 import { Progress } from "./ui/progress";
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, { message: "Username must be at least 3 characters long" })
-    .max(21, { message: "Username must be at most 21 characters long" })
-    .regex(/^[a-zA-Z0-9_.]+$/, {
+  username: z.string().check(
+    z.minLength(3, { message: "Username must be at least 3 characters long" }),
+    z.maxLength(21, { message: "Username must be at most 21 characters long" }),
+    z.regex(/^[a-zA-Z0-9_.]+$/, {
       message:
         "Username can only contain alphanumeric characters, underscores, and dots",
     }),
+    z.trim(),
+  ),
 });
 
 type ReducerState = {

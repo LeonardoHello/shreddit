@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";

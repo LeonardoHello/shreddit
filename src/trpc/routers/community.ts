@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import {
   communities,
@@ -55,7 +55,7 @@ export const communityRouter = createTRPCRouter({
     .input(
       z.object({
         search: z.string(),
-        limit: z.number().positive().optional(),
+        limit: z.optional(z.number().check(z.positive())),
       }),
     )
     .query(({ input, ctx }) => {

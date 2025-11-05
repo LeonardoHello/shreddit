@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +12,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import { z } from "zod/v3";
+import * as z from "zod/mini";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -124,9 +124,11 @@ const fileSchema = PostFileSchema.pick({
 }).array();
 
 const formSchema = z.object({
-  displayName: z.string().trim().max(displayNameMaxLength),
-  memberNickname: z.string().trim().max(memberNicknameMaxLength),
-  description: z.string().trim().max(descriptionMaxLength),
+  displayName: z.string().check(z.maxLength(displayNameMaxLength), z.trim()),
+  memberNickname: z
+    .string()
+    .check(z.maxLength(memberNicknameMaxLength), z.trim()),
+  description: z.string().check(z.maxLength(descriptionMaxLength), z.trim()),
 });
 
 // file size limit in MB
@@ -157,6 +159,16 @@ export default function CommunityEditDialog({
     isLoading: false,
   });
 
+  useEffect(() => {
+    if (iconInputRef.current && state.communityIcon.file === null) {
+      iconInputRef.current.value = "";
+    }
+
+    if (bannerInputRef.current && state.communityBanner.file === null) {
+      bannerInputRef.current.value = "";
+    }
+  }, [state.communityIcon.file, state.communityBanner.file]);
+
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
@@ -171,9 +183,6 @@ export default function CommunityEditDialog({
   });
 
   const handleBannerReset = () => {
-    if (bannerInputRef.current) {
-      bannerInputRef.current.value = "";
-    }
     dispatch({
       type: ReducerAction.SELECT_BANNER,
       communityBanner: {
@@ -185,10 +194,6 @@ export default function CommunityEditDialog({
   };
 
   const handleIconReset = () => {
-    if (iconInputRef.current) {
-      iconInputRef.current.value = "";
-    }
-
     dispatch({
       type: ReducerAction.SELECT_ICON,
       communityIcon: {

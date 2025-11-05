@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info, Loader2, LogOut } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod/v3";
+import * as z from "zod/mini";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -44,15 +44,15 @@ import defaultUserImage from "@public/defaultUserImage.png";
 import shrek from "@public/shrek.svg";
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .trim()
-    .min(3, { message: "Username must be at least 3 characters long" })
-    .max(21, { message: "Username must be at most 21 characters long" })
-    .regex(/^[a-zA-Z0-9_.]+$/, {
+  username: z.string().check(
+    z.minLength(3, { message: "Username must be at least 3 characters long" }),
+    z.maxLength(21, { message: "Username must be at most 21 characters long" }),
+    z.regex(/^[a-zA-Z0-9_.]+$/, {
       message:
         "Username can only contain alphanumeric characters, underscores, and dots",
     }),
+    z.trim(),
+  ),
 });
 
 const description =

@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import * as z from "zod/mini";
 
 import { UserSchema } from "@/db/schema/users";
 import { baseProcedure, createTRPCRouter } from "../init";
