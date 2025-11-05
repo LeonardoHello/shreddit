@@ -2,9 +2,8 @@
 
 import { notFound } from "next/navigation";
 
-import { onion } from "@lucide/lab";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Cake, Icon, Info } from "lucide-react";
+import { Cake, Info } from "lucide-react";
 
 import {
   Dialog,
@@ -86,8 +85,10 @@ function UserSidebarContent({ username }: { username: string }) {
           </AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
-          <div className="leading-tight font-bold break-words">{user.name}</div>
-          <div className="text-muted-foreground flex gap-1 text-xs break-words">
+          <div className="leading-tight font-bold wrap-break-word">
+            {user.name}
+          </div>
+          <div className="text-muted-foreground flex gap-1 text-xs wrap-break-word">
             u/{username}
           </div>
         </div>
@@ -97,7 +98,7 @@ function UserSidebarContent({ username }: { username: string }) {
         <div className="space-y-1">
           <div className="text-muted-foreground text-xs">Onions</div>
           <div className="flex items-center gap-1">
-            <Icon iconNode={onion} className="size-4" />
+            <OnionIcon className="size-4" />
             <div className="text-xs text-zinc-500">
               {new Intl.NumberFormat("en-US", {
                 notation: "compact",
@@ -149,7 +150,7 @@ function UserSidebarContent({ username }: { username: string }) {
                   <div className="truncate text-xs tracking-wide">
                     <HoverPrefetchLink
                       href={`/r/${community.name}`}
-                      className="max-w-[15rem] cursor-pointer font-medium lowercase hover:underline"
+                      className="max-w-60 cursor-pointer font-medium lowercase hover:underline"
                     >
                       r/{community.name}
                     </HoverPrefetchLink>
@@ -170,3 +171,25 @@ function UserSidebarContent({ username }: { username: string }) {
     </>
   );
 }
+
+const OnionIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="12" cy="12" r="6" />
+    <path d="M2.8 8.1a10 10 0 1 0 5.3-5.3C5 4 3 2 3 2L2 3s2 2 .8 5.1" />
+    <path d="M18 20v2" />
+    <path d="m21 21-1.9-1.9" />
+    <path d="M22 18h-2" />
+  </svg>
+);
