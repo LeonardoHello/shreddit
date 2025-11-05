@@ -12,6 +12,9 @@ import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 import { TRPCReactProvider } from "@/trpc/client";
 import { getSession } from "../actions";
 
+export const runtime = "edge";
+export const preferredRegion = "fra1";
+
 export default async function FeedLayout(props: LayoutProps<"/">) {
   const session = await getSession();
 

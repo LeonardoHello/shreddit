@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "../actions";
 
+export const runtime = "edge";
+export const preferredRegion = "fra1";
+
 export default async function ChooseUsernamelayout({
   children,
 }: {
