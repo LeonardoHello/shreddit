@@ -4,7 +4,8 @@ export default function useHydration() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setHydrated(true);
+    const id = setTimeout(() => setHydrated(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   return hydrated;
