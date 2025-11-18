@@ -1,11 +1,51 @@
 import { SQL, sql } from "drizzle-orm";
+import * as z from "zod/mini";
 
 import db from "@/db";
 import { communities, usersToCommunities } from "@/db/schema/communities";
-import { usersToPosts, UserToPost } from "@/db/schema/posts";
+import { PostSchema, usersToPosts, UserToPost } from "@/db/schema/posts";
 import { users } from "@/db/schema/users";
+import type { UserId } from "@/lib/auth";
 import { PostSort } from "@/types/enums";
 import { monthAgo } from "./getLastMonthDate";
+
+type InputConfig = NonNullable<
+  Parameters<(typeof db)["query"]["posts"]["findMany"]>[0]
+>;
+
+export const PostCursorSchema = z.discriminatedUnion("sort", [
+  z.object({
+    sort: z.literal(PostSort.BEST),
+    cursor: z.optional(
+      z.object({
+        id: PostSchema.shape.id,
+        voteCount: z.number().check(z.nonnegative()),
+      }),
+    ),
+  }),
+  z.object({
+    sort: z.literal(PostSort.HOT),
+    cursor: z.optional(
+      z.object({
+        id: PostSchema.shape.id,
+        voteCount: z.number().check(z.nonnegative()),
+      }),
+    ),
+  }),
+  z.object({
+    sort: z.literal(PostSort.NEW),
+    cursor: z.optional(PostSchema.pick({ id: true, createdAt: true })),
+  }),
+  z.object({
+    sort: z.literal(PostSort.CONTROVERSIAL),
+    cursor: z.optional(
+      z.object({
+        id: PostSchema.shape.id,
+        commentCount: z.number().check(z.nonnegative()),
+      }),
+    ),
+  }),
+]);
 
 export const postFeedQuery =
   (
@@ -296,3 +336,99 @@ export const postFeedQuery =
         },
       })
       .prepare("post_feed");
+
+export const postFeedQueryx = ({
+  currentUserId,
+  postSort,
+}: {
+  currentUserId: UserId;
+  postSort: PostSort;
+}) =>
+  ({
+    limit: 10,
+    with: {
+      community: {
+        columns: {
+          name: true,
+          icon: true,
+          iconPlaceholder: true,
+          moderatorId: true,
+        },
+      },
+      author: { columns: { username: true, image: true } },
+      files: {
+        columns: { id: true, name: true, url: true, thumbHash: true },
+      },
+    },
+    extras: (post) => ({
+      voteCount: sql<number>`
+          (
+            SELECT COALESCE(SUM(
+              CASE 
+                WHEN vote_status = 'upvoted' THEN 1
+                WHEN vote_status = 'downvoted' THEN -1
+                ELSE 0
+              END
+            ), 0)
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+          )
+        `.as("vote_count"),
+      commentCount: sql<number>`
+          (
+            SELECT COUNT(*)
+            FROM comments
+            WHERE comments.post_id = ${post.id}
+          )
+        `.as("comment_count"),
+      ...(currentUserId
+        ? {
+            isSaved: sql<UserToPost["saved"] | null>`
+                (
+                  SELECT saved
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                    AND users_to_posts.user_id = ${currentUserId}
+                )
+              `.as("is_saved"),
+            isHidden: sql<UserToPost["hidden"] | null>`
+                (
+                  SELECT hidden
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                    AND users_to_posts.user_id = ${currentUserId}
+                )
+              `.as("is_hidden"),
+            voteStatus: sql<UserToPost["voteStatus"] | null>`
+                (
+                  SELECT vote_status
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                    AND users_to_posts.user_id = ${currentUserId}
+                )
+                `.as("vote_status"),
+            userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
+                (
+                  SELECT updated_at
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                    AND users_to_posts.user_id = ${currentUserId}
+                )
+              `.as("user_to_post_updated_at"),
+          }
+        : undefined),
+    }),
+    orderBy: (post, { desc, asc }) => {
+      const orderBy = {
+        [PostSort.BEST]: [desc(sql`vote_count`), asc(post.createdAt)],
+        [PostSort.HOT]: [desc(sql`vote_count`), asc(post.createdAt)],
+        [PostSort.NEW]: [desc(post.createdAt)],
+        [PostSort.CONTROVERSIAL]: [
+          desc(sql`comment_count`),
+          asc(post.createdAt),
+        ],
+      }[postSort];
+
+      return orderBy;
+    },
+  }) satisfies InputConfig;

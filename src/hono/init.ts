@@ -1,14 +1,12 @@
 import { createFactory, createMiddleware } from "hono/factory";
 
 import db from "@/db";
-import { auth } from "@/lib/auth";
-
-type UserId = typeof auth.$Infer.Session.session.userId;
+import { auth, type UserId } from "@/lib/auth";
 
 type Env = {
   Variables: {
     db: typeof db;
-    userId: UserId | null;
+    currentUserId: UserId;
   };
 };
 
@@ -18,11 +16,11 @@ export const factory = createFactory<Env>({
       c.set("db", db);
       const session = await auth.api.getSession({ headers: c.req.raw.headers });
       if (!session) {
-        c.set("userId", null);
+        c.set("currentUserId", null);
         await next();
         return;
       }
-      c.set("userId", session.session.userId);
+      c.set("currentUserId", session.session.userId);
       await next();
     });
   },
@@ -30,15 +28,17 @@ export const factory = createFactory<Env>({
 
 type MiddlewareEnv = {
   Variables: {
-    userId: UserId;
+    currentUserId: NonNullable<UserId>;
   };
 };
 
 // Ensures the user is authenticated
-export const mw = createMiddleware<MiddlewareEnv>(async (c, next) => {
-  const userId = c.get("userId");
+export const mwAuthenticated = createMiddleware<MiddlewareEnv>(
+  async (c, next) => {
+    const currentUserId = c.get("currentUserId");
 
-  if (!userId) return c.text("unauthorized", 401);
+    if (!currentUserId) return c.text("unauthorized", 401);
 
-  await next();
-});
+    await next();
+  },
+);

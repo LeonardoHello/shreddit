@@ -10,10 +10,6 @@ const routeHasAuthCookie: RouteHas = {
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  experimental: {
-    optimizePackageImports: ["@lucide/lab"],
-  },
-
   images: {
     remotePatterns: [
       new URL("https://img.clerk.com"),

@@ -16,3 +16,14 @@ export enum PostType {
   TEXT = "text",
   IMAGE = "image",
 }
+
+export enum PostFeed {
+  ALL = "all",
+  HOME = "home",
+  USER = "user",
+  COMMUNITY = "community",
+  UPVOTED = "upvoted",
+  DOWNVOTED = "downvoted",
+  SAVED = "saved",
+  HIDDEN = "hidden",
+}
