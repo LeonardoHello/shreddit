@@ -5,7 +5,7 @@ import {
   usersToCommunities,
   UserToCommunitySchema,
 } from "@/db/schema/communities";
-import { reg } from "@/utils/honoPathRegex";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
 
 export const userToCommunity = factory

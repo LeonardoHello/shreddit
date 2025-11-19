@@ -11,7 +11,7 @@ import {
   PostSchema,
   UserToPost,
 } from "@/db/schema/posts";
-import { reg } from "@/utils/honoPathRegex";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
 
 // eslint-disable-next-line drizzle/enforce-delete-with-where

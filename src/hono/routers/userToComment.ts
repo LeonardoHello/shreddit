@@ -1,7 +1,7 @@
 import { validator } from "hono/validator";
 
 import { usersToComments, UserToCommentSchema } from "@/db/schema/comments";
-import { reg } from "@/utils/honoPathRegex";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
 
 export const userToComment = factory.createApp().patch(

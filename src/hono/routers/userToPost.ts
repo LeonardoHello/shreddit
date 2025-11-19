@@ -8,7 +8,7 @@ import {
   usersToPosts,
   UserToPostSchema,
 } from "@/db/schema/posts";
-import { reg } from "@/utils/honoPathRegex";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
 
 export const userToPost = factory

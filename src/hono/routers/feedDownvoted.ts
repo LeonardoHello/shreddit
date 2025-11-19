@@ -9,7 +9,7 @@ import { PostCursorSchema, postFeedQueryx } from "@/utils/postFeedQuery";
 import { factory } from "../init";
 
 export const feedDownvoted = factory.createApp().get(
-  "/users/:username/downvoted",
+  "/:username/downvoted",
   validator("query", (value, c) => {
     const parsed = PostCursorSchema.safeParse(value);
 

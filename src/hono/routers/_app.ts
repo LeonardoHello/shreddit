@@ -27,11 +27,11 @@ export const app = new Hono()
   .route("/communities", userToCommunity)
   .route("/posts", feedAll)
   .route("/posts", feedHome)
-  .route("/posts", feedCommunity)
-  .route("/posts", feedUser)
-  .route("/posts", feedUpvoted)
-  .route("/posts", feedDownvoted)
-  .route("/posts", feedSaved)
-  .route("/posts", feedHidden);
+  .route("/posts/communities", feedCommunity)
+  .route("/posts/users", feedUser)
+  .route("/posts/users", feedUpvoted)
+  .route("/posts/users", feedDownvoted)
+  .route("/posts/users", feedSaved)
+  .route("/posts/users", feedHidden);
 
 export type AppType = typeof app;
