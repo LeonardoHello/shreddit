@@ -381,42 +381,51 @@ export const postFeedQueryx = ({
             WHERE comments.post_id = ${post.id}
           )
         `.as("comment_count"),
-      ...(currentUserId
-        ? {
-            isSaved: sql<UserToPost["saved"] | null>`
-                (
-                  SELECT saved
-                  FROM users_to_posts
-                  WHERE users_to_posts.post_id = ${post.id}
-                    AND users_to_posts.user_id = ${currentUserId}
-                )
-              `.as("is_saved"),
-            isHidden: sql<UserToPost["hidden"] | null>`
-                (
-                  SELECT hidden
-                  FROM users_to_posts
-                  WHERE users_to_posts.post_id = ${post.id}
-                    AND users_to_posts.user_id = ${currentUserId}
-                )
-              `.as("is_hidden"),
-            voteStatus: sql<UserToPost["voteStatus"] | null>`
-                (
-                  SELECT vote_status
-                  FROM users_to_posts
-                  WHERE users_to_posts.post_id = ${post.id}
-                    AND users_to_posts.user_id = ${currentUserId}
-                )
-                `.as("vote_status"),
-            userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
-                (
-                  SELECT updated_at
-                  FROM users_to_posts
-                  WHERE users_to_posts.post_id = ${post.id}
-                    AND users_to_posts.user_id = ${currentUserId}
-                )
-              `.as("user_to_post_updated_at"),
-          }
-        : undefined),
+
+      isSaved: sql<UserToPost["saved"] | null>`
+          CASE
+            WHEN ${currentUserId} IS NULL THEN NULL
+            ELSE (
+              SELECT saved
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${currentUserId}
+            )
+          END
+        `.as("is_saved"),
+      isHidden: sql<UserToPost["hidden"] | null>`
+          CASE
+            WHEN ${currentUserId} IS NULL THEN NULL
+            ELSE (
+              SELECT hidden
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${currentUserId}
+            )
+          END
+        `.as("is_hidden"),
+      voteStatus: sql<UserToPost["voteStatus"] | null>`
+          CASE
+            WHEN ${currentUserId} IS NULL THEN NULL
+            ELSE (
+              SELECT vote_status
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${currentUserId}
+            )
+          END
+        `.as("vote_status"),
+      userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
+          CASE
+            WHEN ${currentUserId} IS NULL THEN NULL
+            ELSE (
+              SELECT updated_at
+              FROM users_to_posts
+              WHERE users_to_posts.post_id = ${post.id}
+                AND users_to_posts.user_id = ${currentUserId}
+            )
+          END
+        `.as("user_to_post_updated_at"),
     }),
     orderBy: (post, { desc, asc }) => {
       const orderBy = {
