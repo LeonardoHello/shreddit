@@ -4,7 +4,7 @@ import { validator } from "hono/validator";
 import { usersToCommunities } from "@/db/schema/communities";
 import { usersToPosts } from "@/db/schema/posts";
 import { PostSort } from "@/types/enums";
-import { monthAgo } from "@/utils/getLastMonthDate";
+import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
 import { PostCursorSchema, postFeedQueryx } from "@/utils/postFeedQuery";
 import { factory } from "../init";
 
@@ -64,7 +64,7 @@ export const feedAll = factory.createApp().get(
         }
 
         if (query.sort === PostSort.HOT) {
-          filters.push(gt(post.createdAt, monthAgo));
+          filters.push(gt(post.createdAt, getOneMonthAgo()));
         }
 
         if (query.cursor) {

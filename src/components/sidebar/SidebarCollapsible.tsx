@@ -54,6 +54,8 @@ export default function SidebarCollapsible({
   const mutedCommunitiesQueryKey =
     trpc.community.getMutedCommunities.queryKey();
 
+  const newDate = new Date().toISOString();
+
   const toggleFavorite = useMutation(
     trpc.community.toggleFavoriteCommunity.mutationOptions({
       onMutate: (variables) => {
@@ -68,7 +70,7 @@ export default function SidebarCollapsible({
             if (communityId !== _userToCommunity.community.id)
               return _userToCommunity;
 
-            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
+            return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
         });
 
@@ -81,7 +83,7 @@ export default function SidebarCollapsible({
             if (communityId !== _userToCommunity.community.id)
               return _userToCommunity;
 
-            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
+            return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
         });
 
@@ -94,7 +96,7 @@ export default function SidebarCollapsible({
             if (communityId !== _userToCommunity.community.id)
               return _userToCommunity;
 
-            return { ..._userToCommunity, favorited, favoritedAt: new Date() };
+            return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
         });
       },

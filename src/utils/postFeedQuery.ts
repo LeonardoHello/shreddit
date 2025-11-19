@@ -7,7 +7,7 @@ import { PostSchema, usersToPosts, UserToPost } from "@/db/schema/posts";
 import { users } from "@/db/schema/users";
 import type { UserId } from "@/lib/auth";
 import { PostSort } from "@/types/enums";
-import { monthAgo } from "./getLastMonthDate";
+import { getOneMonthAgo } from "./getOneMonthAgo";
 
 type InputConfig = NonNullable<
   Parameters<(typeof db)["query"]["posts"]["findMany"]>[0]
@@ -263,7 +263,7 @@ export const postFeedQuery =
           }
 
           if (postSort === PostSort.HOT)
-            filters.push(gt(post.createdAt, monthAgo));
+            filters.push(gt(post.createdAt, getOneMonthAgo()));
 
           return and(...filters);
         },

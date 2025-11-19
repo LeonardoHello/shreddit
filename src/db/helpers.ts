@@ -1,13 +1,14 @@
+import { sql } from "drizzle-orm";
 import { text, timestamp } from "drizzle-orm/pg-core";
 
 export const timestamps = {
-  createdAt: timestamp()
-    .$defaultFn(() => new Date())
+  createdAt: timestamp({ mode: "string" })
+    .default(sql`NOW()`)
     .notNull(),
-  updatedAt: timestamp()
-    .$defaultFn(() => new Date())
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updatedAt: timestamp({ mode: "string" })
+    .default(sql`NOW()`)
+    .$onUpdate(() => sql`NOW()`)
+    .notNull(),
 };
 
 export const uploadthingFile = {

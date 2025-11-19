@@ -103,7 +103,7 @@ function CommunitySidebarContent({
           <CakeSlice className="size-4" />
           <p>
             Created{" "}
-            {community.createdAt.toLocaleDateString("en-US", {
+            {new Date(community.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
               day: "2-digit",

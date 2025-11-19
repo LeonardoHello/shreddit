@@ -8,7 +8,7 @@ import {
   usersToCommunities,
   UserToCommunitySchema,
 } from "@/db/schema/communities";
-import { monthAgo } from "@/utils/getLastMonthDate";
+import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
 import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const communityRouter = createTRPCRouter({
@@ -33,7 +33,7 @@ export const communityRouter = createTRPCRouter({
               FROM users_to_communities 
               WHERE users_to_communities.community_id = ${community.id} 
                 AND users_to_communities.joined = true 
-                AND users_to_communities.joined_at > ${monthAgo}
+                AND users_to_communities.joined_at > ${getOneMonthAgo()}
             )
           `.as("new_member_count"),
         }),
@@ -239,11 +239,14 @@ export const communityRouter = createTRPCRouter({
         .values({
           ...input,
           userId: ctx.userId,
-          favoritedAt: new Date(),
+          favoritedAt: new Date().toISOString(),
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { favorited: input.favorited, favoritedAt: new Date() },
+          set: {
+            favorited: input.favorited,
+            favoritedAt: new Date().toISOString(),
+          },
         })
         .returning({ favorited: usersToCommunities.favorited });
     }),
@@ -259,12 +262,12 @@ export const communityRouter = createTRPCRouter({
         .insert(usersToCommunities)
         .values({
           userId: ctx.userId,
-          joinedAt: new Date(),
+          joinedAt: new Date().toISOString(),
           ...input,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { joined: input.joined, joinedAt: new Date() },
+          set: { joined: input.joined, joinedAt: new Date().toISOString() },
         })
         .returning({ joined: usersToCommunities.joined });
     }),

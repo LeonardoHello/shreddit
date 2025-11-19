@@ -30,7 +30,7 @@ export default async function ManageAccountPage() {
 
   return (
     <AccountPage
-      createdAt={session.user.createdAt}
+      createdAt={session.user.createdAt.toISOString()}
       name={session.user.name}
       image={session.user.image}
       username={username}

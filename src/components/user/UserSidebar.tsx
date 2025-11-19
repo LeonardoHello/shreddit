@@ -112,7 +112,7 @@ function UserSidebarContent({ username }: { username: string }) {
           <div className="flex items-center gap-1">
             <Cake className="size-4" />
             <div className="text-xs text-zinc-500">
-              {user.createdAt.toLocaleDateString("en-US", {
+              {new Date(user.createdAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "2-digit",

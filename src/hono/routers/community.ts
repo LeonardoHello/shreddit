@@ -8,7 +8,7 @@ import {
   CommunitySchema,
   usersToCommunities,
 } from "@/db/schema/communities";
-import { monthAgo } from "@/utils/getLastMonthDate";
+import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
 
@@ -36,7 +36,7 @@ export const community = factory
               FROM users_to_communities 
               WHERE users_to_communities.community_id = ${community.id} 
                 AND users_to_communities.joined = true 
-                AND users_to_communities.joined_at > ${monthAgo}
+                AND users_to_communities.joined_at > ${getOneMonthAgo()}
             )
           `.as("new_member_count"),
       }),

@@ -91,7 +91,7 @@ export const comment = factory
         })
         .onConflictDoUpdate({
           target: [comments.id],
-          set: { text: json.text, updatedAt: new Date() },
+          set: { text: json.text, updatedAt: new Date().toISOString() },
         })
         .returning();
 
@@ -115,7 +115,7 @@ export const comment = factory
 
       const data = await c.var.db
         .update(comments)
-        .set({ text: query.text, updatedAt: new Date() })
+        .set({ text: query.text, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(comments.id, commentId),

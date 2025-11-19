@@ -232,7 +232,7 @@ export const postRouter = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(posts)
-        .set({ spoiler: input.spoiler, updatedAt: new Date() })
+        .set({ spoiler: input.spoiler, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, input.id),
@@ -264,7 +264,7 @@ export const postRouter = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(posts)
-        .set({ nsfw: input.nsfw, updatedAt: new Date() })
+        .set({ nsfw: input.nsfw, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, input.id),

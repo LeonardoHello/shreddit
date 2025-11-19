@@ -119,7 +119,7 @@ export const userToPost = factory
 
       const data = await c.var.db
         .update(posts)
-        .set({ spoiler: json.spoiler, updatedAt: new Date() })
+        .set({ spoiler: json.spoiler, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, postId),
@@ -161,7 +161,7 @@ export const userToPost = factory
 
       const data = await c.var.db
         .update(posts)
-        .set({ nsfw: json.nsfw, updatedAt: new Date() })
+        .set({ nsfw: json.nsfw, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, postId),

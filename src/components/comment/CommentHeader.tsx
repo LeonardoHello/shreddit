@@ -14,6 +14,9 @@ export default function CommentHeader() {
     .unwrap()
     .safeParse(state.author.username);
 
+  const createdAtDate = new Date(state.createdAt);
+  const updatedAtDate = new Date(state.updatedAt);
+
   return (
     <div className="flex items-center gap-2">
       {success ? (
@@ -57,20 +60,20 @@ export default function CommentHeader() {
         {hydrated ? (
           <>
             <time
-              dateTime={state.createdAt.toISOString()}
-              title={state.createdAt.toLocaleDateString("hr-HR")}
+              dateTime={state.createdAt}
+              title={createdAtDate.toLocaleDateString("hr-HR")}
             >
-              {getRelativeTimeString(state.createdAt)}
+              {getRelativeTimeString(createdAtDate)}
             </time>
             {state.updatedAt > state.createdAt && (
               <>
                 <span>•</span>
                 <time
-                  dateTime={state.updatedAt.toISOString()}
-                  title={state.updatedAt.toLocaleDateString("hr-HR")}
+                  dateTime={state.updatedAt}
+                  title={updatedAtDate.toLocaleDateString("hr-HR")}
                   className="italic"
                 >
-                  edited {getRelativeTimeString(state.updatedAt)}
+                  edited {getRelativeTimeString(updatedAtDate)}
                 </time>
               </>
             )}

@@ -359,7 +359,7 @@ export default function AccountPage({
                 <h3 className="text-lg font-medium">{name}</h3>
                 <p className="text-muted-foreground text-sm">
                   Member since{" "}
-                  {createdAt.toLocaleDateString("en-HR", {
+                  {new Date(createdAt).toLocaleDateString("en-HR", {
                     dateStyle: "long",
                   })}
                 </p>

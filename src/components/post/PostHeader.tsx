@@ -27,6 +27,9 @@ export default function PostHeader({
     .unwrap()
     .safeParse(state.author.username);
 
+  const createdAtDate = new Date(state.createdAt);
+  const updatedAtDate = new Date(state.updatedAt);
+
   return (
     <div className="flex items-center justify-between gap-2">
       {communityName ? (
@@ -62,10 +65,10 @@ export default function PostHeader({
           <span>•</span>
           {hydrated ? (
             <time
-              dateTime={state.createdAt.toISOString()}
-              title={state.createdAt.toLocaleDateString("hr-HR")}
+              dateTime={state.createdAt}
+              title={createdAtDate.toLocaleDateString("hr-HR")}
             >
-              {getRelativeTimeString(state.createdAt)}
+              {getRelativeTimeString(createdAtDate)}
             </time>
           ) : (
             <span>Calculating...</span>
@@ -92,10 +95,10 @@ export default function PostHeader({
           <span>•</span>
           {hydrated ? (
             <time
-              dateTime={state.createdAt.toISOString()}
-              title={state.createdAt.toLocaleDateString("hr-HR")}
+              dateTime={state.createdAt}
+              title={updatedAtDate.toLocaleDateString("hr-HR")}
             >
-              {getRelativeTimeString(state.createdAt)}
+              {getRelativeTimeString(updatedAtDate)}
             </time>
           ) : (
             <span>Calculating...</span>

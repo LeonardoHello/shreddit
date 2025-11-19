@@ -63,7 +63,7 @@ export const commentRouter = createTRPCRouter({
         })
         .onConflictDoUpdate({
           target: [comments.id],
-          set: { text: input.text, updatedAt: new Date() },
+          set: { text: input.text, updatedAt: new Date().toISOString() },
         })
         .returning();
     }),
@@ -83,7 +83,7 @@ export const commentRouter = createTRPCRouter({
     .mutation(({ input, ctx }) => {
       return ctx.db
         .update(comments)
-        .set({ text: input.text, updatedAt: new Date() })
+        .set({ text: input.text, updatedAt: new Date().toISOString() })
         .where(
           and(eq(comments.id, input.id), eq(comments.authorId, ctx.userId)),
         )

@@ -143,16 +143,18 @@ export const userToCommunity = factory
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
 
+      const newDate = new Date().toISOString();
+
       const data = await c.var.db
         .insert(usersToCommunities)
         .values({
           communityId,
           userId: c.var.currentUserId,
-          favoritedAt: new Date(),
+          favoritedAt: newDate,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { favorited: json.favorited, favoritedAt: new Date() },
+          set: { favorited: json.favorited, favoritedAt: newDate },
         })
         .returning({ favorited: usersToCommunities.favorited });
 
@@ -179,16 +181,18 @@ export const userToCommunity = factory
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
 
+      const newDate = new Date().toISOString();
+
       const data = await c.var.db
         .insert(usersToCommunities)
         .values({
           communityId,
           userId: c.var.currentUserId,
-          joinedAt: new Date(),
+          joinedAt: newDate,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],
-          set: { joined: json.joined, joinedAt: new Date() },
+          set: { joined: json.joined, joinedAt: newDate },
         })
         .returning({ joined: usersToCommunities.joined });
 
