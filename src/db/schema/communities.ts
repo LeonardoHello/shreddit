@@ -1,4 +1,4 @@
-import { relations, sql, type InferSelectModel } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   pgTable,
@@ -51,12 +51,12 @@ export const usersToCommunities = pgTable(
       .notNull(),
     muted: boolean().notNull().default(false),
     favorited: boolean().notNull().default(false),
-    favoritedAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
+    favoritedAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
       .notNull(),
     joined: boolean().notNull().default(true),
-    joinedAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
+    joinedAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
       .notNull(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.communityId] })],

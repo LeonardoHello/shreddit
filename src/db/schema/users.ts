@@ -1,4 +1,4 @@
-import { relations, sql, type InferSelectModel } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-zod";
 
@@ -14,12 +14,12 @@ export const users = pgTable("users", {
     .$defaultFn(() => false)
     .notNull(),
   image: text(),
-  createdAt: timestamp({ mode: "string" })
-    .default(sql`NOW()`)
+  createdAt: timestamp({ mode: "string", withTimezone: true })
+    .defaultNow()
     .notNull(),
-  updatedAt: timestamp({ mode: "string" })
-    .default(sql`NOW()`)
-    .$onUpdate(() => sql`NOW()`)
+  updatedAt: timestamp({ mode: "string", withTimezone: true })
+    .defaultNow()
+    .$onUpdate(() => new Date().toISOString())
     .notNull(),
   username: text().unique(),
   displayUsername: text(),
@@ -29,13 +29,13 @@ export const sessions = pgTable(
   "sessions",
   {
     id: text().primaryKey(),
-    expiresAt: timestamp({ mode: "string" }).notNull(),
+    expiresAt: timestamp({ mode: "string", withTimezone: true }).notNull(),
     token: text().notNull().unique(),
-    createdAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
+    createdAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
       .notNull(),
-    updatedAt: timestamp({ mode: "string" })
-      .$onUpdate(() => sql`NOW()`)
+    updatedAt: timestamp({ mode: "string", withTimezone: true })
+      .$onUpdate(() => new Date().toISOString())
       .notNull(),
     ipAddress: text(),
     userAgent: text(),
@@ -58,15 +58,15 @@ export const accounts = pgTable(
     accessToken: text(),
     refreshToken: text(),
     idToken: text(),
-    accessTokenExpiresAt: timestamp({ mode: "string" }),
-    refreshTokenExpiresAt: timestamp({ mode: "string" }),
+    accessTokenExpiresAt: timestamp({ mode: "string", withTimezone: true }),
+    refreshTokenExpiresAt: timestamp({ mode: "string", withTimezone: true }),
     scope: text(),
     password: text(),
-    createdAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
+    createdAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
       .notNull(),
-    updatedAt: timestamp({ mode: "string" })
-      .$onUpdate(() => sql`NOW()`)
+    updatedAt: timestamp({ mode: "string", withTimezone: true })
+      .$onUpdate(() => new Date().toISOString())
       .notNull(),
   },
   (t) => [index().on(t.userId)],
@@ -78,13 +78,13 @@ export const verifications = pgTable(
     id: text().primaryKey(),
     identifier: text().notNull(),
     value: text().notNull(),
-    expiresAt: timestamp({ mode: "string" }).notNull(),
-    createdAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
+    expiresAt: timestamp({ mode: "string", withTimezone: true }).notNull(),
+    createdAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
       .notNull(),
-    updatedAt: timestamp({ mode: "string" })
-      .default(sql`NOW()`)
-      .$onUpdate(() => sql`NOW()`)
+    updatedAt: timestamp({ mode: "string", withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date().toISOString())
       .notNull(),
   },
   (t) => [index().on(t.identifier)],
