@@ -1,17 +1,24 @@
 import { SQL } from "drizzle-orm";
 import { validator } from "hono/validator";
+import z from "zod";
 
 import { usersToCommunities } from "@/db/schema/communities";
 import { usersToPosts } from "@/db/schema/posts";
 import { PostSort } from "@/types/enums";
 import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
+import { decodeCursor, encodeCursor } from "@/utils/hono";
 import { PostCursorSchema, postFeedQueryx } from "@/utils/postFeedQuery";
 import { factory } from "../init";
 
 export const feedAll = factory.createApp().get(
   "/all",
   validator("query", (value, c) => {
-    const parsed = PostCursorSchema.safeParse(value);
+    const parsed = z
+      .object({
+        sort: z.enum(PostSort),
+        cursor: z.nullish(z.string()),
+      })
+      .safeParse(value);
 
     if (!parsed.success) {
       return c.text(
@@ -19,7 +26,29 @@ export const feedAll = factory.createApp().get(
         400,
       );
     }
-    return parsed.data;
+
+    const cursor = parsed.data.cursor;
+
+    if (cursor === null || cursor === undefined) {
+      return { sort: parsed.data.sort, cursor };
+    }
+
+    const decodedCursor = decodeCursor(cursor);
+
+    if (decodedCursor === null) {
+      return c.text("400 Invalid pagination cursor format", 400);
+    }
+
+    const transformed = PostCursorSchema.safeParse({
+      sort: parsed.data.sort,
+      cursor: decodedCursor,
+    });
+
+    if (!transformed.success) {
+      return c.text("400 Invalid query parameter for cursor", 400);
+    }
+
+    return transformed.data;
   }),
   async (c) => {
     const query = c.req.valid("query");
@@ -30,8 +59,7 @@ export const feedAll = factory.createApp().get(
     });
 
     const data = await c.var.db.query.posts.findMany({
-      ...queryConfig,
-      where: (post, { and, gt, or, eq, sql, notExists }) => {
+      where: (post, { and, gt, lt, or, eq, sql, notExists }) => {
         const filters: (SQL | undefined)[] = [];
 
         if (c.var.currentUserId) {
@@ -69,49 +97,61 @@ export const feedAll = factory.createApp().get(
 
         if (query.cursor) {
           switch (query.sort) {
-            case PostSort.HOT:
-              filters.push(
-                or(
-                  gt(sql`vote_count`, query.cursor.voteCount),
-                  and(
-                    eq(sql`vote_count`, query.cursor.voteCount),
-                    gt(post.id, query.cursor.id),
-                  ),
-                ),
-              );
-              break;
-
             case PostSort.NEW:
               filters.push(
                 or(
-                  gt(post.createdAt, query.cursor.createdAt),
+                  lt(post.createdAt, query.cursor.createdAt),
                   and(
                     eq(post.createdAt, query.cursor.createdAt),
-                    gt(post.id, query.cursor.id),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
               break;
 
             case PostSort.CONTROVERSIAL:
+              const commentCountSql = sql<number>`
+                (
+                  SELECT COUNT(*)::int
+                  FROM comments
+                  WHERE comments.post_id = ${post.id}
+                )
+              `;
+
               filters.push(
                 or(
-                  gt(sql`comment_count`, query.cursor.commentCount),
+                  lt(commentCountSql, query.cursor.commentCount),
                   and(
-                    eq(sql`comment_count`, query.cursor.commentCount),
-                    gt(post.id, query.cursor.id),
+                    eq(commentCountSql, query.cursor.commentCount),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
               break;
 
             default:
+              const voteCountSql = sql<number>`
+                (
+                  SELECT (
+                      COALESCE(SUM(
+                          CASE 
+                              WHEN vote_status = 'upvoted' THEN 1
+                              WHEN vote_status = 'downvoted' THEN -1
+                              ELSE 0
+                          END
+                      ), 0)
+                  )::int
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                )
+              `;
+
               filters.push(
                 or(
-                  gt(sql`vote_count`, query.cursor.voteCount),
+                  lt(voteCountSql, query.cursor.voteCount),
                   and(
-                    eq(sql`vote_count`, query.cursor.voteCount),
-                    gt(post.id, query.cursor.id),
+                    eq(voteCountSql, query.cursor.voteCount),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
@@ -121,8 +161,31 @@ export const feedAll = factory.createApp().get(
 
         return and(...filters);
       },
+      ...queryConfig,
     });
 
-    return c.json(data, 200);
+    let nextCursor = null;
+
+    if (data.length !== 10) {
+      return c.json({ posts: data, nextCursor }, 200);
+    }
+
+    const { id, createdAt, commentCount, voteCount } = data[data.length - 1];
+
+    switch (query.sort) {
+      case PostSort.NEW:
+        nextCursor = encodeCursor({ id, createdAt });
+        break;
+
+      case PostSort.CONTROVERSIAL:
+        nextCursor = encodeCursor({ id, commentCount });
+        break;
+
+      default:
+        nextCursor = encodeCursor({ id, voteCount });
+        break;
+    }
+
+    return c.json({ posts: data, nextCursor }, 200);
   },
 );

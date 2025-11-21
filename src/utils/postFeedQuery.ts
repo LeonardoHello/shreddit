@@ -19,7 +19,7 @@ export const PostCursorSchema = z.discriminatedUnion("sort", [
     cursor: z.optional(
       z.object({
         id: PostSchema.shape.id,
-        voteCount: z.number().check(z.nonnegative()),
+        voteCount: z.number(),
       }),
     ),
   }),
@@ -28,7 +28,7 @@ export const PostCursorSchema = z.discriminatedUnion("sort", [
     cursor: z.optional(
       z.object({
         id: PostSchema.shape.id,
-        voteCount: z.number().check(z.nonnegative()),
+        voteCount: z.number(),
       }),
     ),
   }),
@@ -41,7 +41,7 @@ export const PostCursorSchema = z.discriminatedUnion("sort", [
     cursor: z.optional(
       z.object({
         id: PostSchema.shape.id,
-        commentCount: z.number().check(z.nonnegative()),
+        commentCount: z.number(),
       }),
     ),
   }),
@@ -363,28 +363,29 @@ export const postFeedQueryx = ({
     extras: (post) => ({
       voteCount: sql<number>`
           (
-            SELECT COALESCE(SUM(
-              CASE 
-                WHEN vote_status = 'upvoted' THEN 1
-                WHEN vote_status = 'downvoted' THEN -1
-                ELSE 0
-              END
-            ), 0)
+            SELECT (
+              COALESCE(SUM(
+                CASE 
+                  WHEN vote_status = 'upvoted' THEN 1
+                  WHEN vote_status = 'downvoted' THEN -1
+                  ELSE 0
+                END
+              ), 0)
+            )::int
             FROM users_to_posts
             WHERE users_to_posts.post_id = ${post.id}
           )
         `.as("vote_count"),
       commentCount: sql<number>`
           (
-            SELECT COUNT(*)
+            SELECT COUNT(*)::int
             FROM comments
             WHERE comments.post_id = ${post.id}
           )
         `.as("comment_count"),
-
       isSaved: sql<UserToPost["saved"] | null>`
           CASE
-            WHEN ${currentUserId} IS NULL THEN NULL
+            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
             ELSE (
               SELECT saved
               FROM users_to_posts
@@ -395,7 +396,7 @@ export const postFeedQueryx = ({
         `.as("is_saved"),
       isHidden: sql<UserToPost["hidden"] | null>`
           CASE
-            WHEN ${currentUserId} IS NULL THEN NULL
+            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
             ELSE (
               SELECT hidden
               FROM users_to_posts
@@ -406,7 +407,7 @@ export const postFeedQueryx = ({
         `.as("is_hidden"),
       voteStatus: sql<UserToPost["voteStatus"] | null>`
           CASE
-            WHEN ${currentUserId} IS NULL THEN NULL
+            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
             ELSE (
               SELECT vote_status
               FROM users_to_posts
@@ -417,7 +418,7 @@ export const postFeedQueryx = ({
         `.as("vote_status"),
       userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
           CASE
-            WHEN ${currentUserId} IS NULL THEN NULL
+            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
             ELSE (
               SELECT updated_at
               FROM users_to_posts
@@ -427,17 +428,12 @@ export const postFeedQueryx = ({
           END
         `.as("user_to_post_updated_at"),
     }),
-    orderBy: (post, { desc, asc }) => {
-      const orderBy = {
-        [PostSort.BEST]: [desc(sql`vote_count`), asc(post.createdAt)],
-        [PostSort.HOT]: [desc(sql`vote_count`), asc(post.createdAt)],
-        [PostSort.NEW]: [desc(post.createdAt)],
-        [PostSort.CONTROVERSIAL]: [
-          desc(sql`comment_count`),
-          asc(post.createdAt),
-        ],
+    orderBy: (post, { desc }) => {
+      return {
+        [PostSort.BEST]: [desc(sql`vote_count`), desc(post.id)],
+        [PostSort.HOT]: [desc(sql`vote_count`), desc(post.id)],
+        [PostSort.NEW]: [desc(post.createdAt), desc(post.id)],
+        [PostSort.CONTROVERSIAL]: [desc(sql`comment_count`), desc(post.id)],
       }[postSort];
-
-      return orderBy;
     },
   }) satisfies InputConfig;

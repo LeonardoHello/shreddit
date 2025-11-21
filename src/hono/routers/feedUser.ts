@@ -5,6 +5,7 @@ import { usersToPosts } from "@/db/schema/posts";
 import { users } from "@/db/schema/users";
 import { PostSort } from "@/types/enums";
 import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
+import { encodeCursor } from "@/utils/hono";
 import { PostCursorSchema, postFeedQueryx } from "@/utils/postFeedQuery";
 import { factory } from "../init";
 
@@ -32,7 +33,7 @@ export const feedUser = factory.createApp().get(
 
     const data = await c.var.db.query.posts.findMany({
       ...queryConfig,
-      where: (post, { and, gt, or, eq, sql, notExists, exists }) => {
+      where: (post, { and, gt, or, eq, sql, notExists, exists, lt }) => {
         const filters: (SQL | undefined)[] = [
           exists(
             c.var.db
@@ -67,49 +68,61 @@ export const feedUser = factory.createApp().get(
 
         if (query.cursor) {
           switch (query.sort) {
-            case PostSort.HOT:
-              filters.push(
-                or(
-                  gt(sql`vote_count`, query.cursor.voteCount),
-                  and(
-                    eq(sql`vote_count`, query.cursor.voteCount),
-                    gt(post.id, query.cursor.id),
-                  ),
-                ),
-              );
-              break;
-
             case PostSort.NEW:
               filters.push(
                 or(
-                  gt(post.createdAt, query.cursor.createdAt),
+                  lt(post.createdAt, query.cursor.createdAt),
                   and(
                     eq(post.createdAt, query.cursor.createdAt),
-                    gt(post.id, query.cursor.id),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
               break;
 
             case PostSort.CONTROVERSIAL:
+              const commentCountSql = sql<number>`
+                (
+                  SELECT COUNT(*)::int
+                  FROM comments
+                  WHERE comments.post_id = ${post.id}
+                )
+              `;
+
               filters.push(
                 or(
-                  gt(sql`comment_count`, query.cursor.commentCount),
+                  lt(commentCountSql, query.cursor.commentCount),
                   and(
-                    eq(sql`comment_count`, query.cursor.commentCount),
-                    gt(post.id, query.cursor.id),
+                    eq(commentCountSql, query.cursor.commentCount),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
               break;
 
             default:
+              const voteCountSql = sql<number>`
+                (
+                  SELECT (
+                      COALESCE(SUM(
+                          CASE 
+                              WHEN vote_status = 'upvoted' THEN 1
+                              WHEN vote_status = 'downvoted' THEN -1
+                              ELSE 0
+                          END
+                      ), 0)
+                  )::int
+                  FROM users_to_posts
+                  WHERE users_to_posts.post_id = ${post.id}
+                )
+              `;
+
               filters.push(
                 or(
-                  gt(sql`vote_count`, query.cursor.voteCount),
+                  lt(voteCountSql, query.cursor.voteCount),
                   and(
-                    eq(sql`vote_count`, query.cursor.voteCount),
-                    gt(post.id, query.cursor.id),
+                    eq(voteCountSql, query.cursor.voteCount),
+                    lt(post.id, query.cursor.id),
                   ),
                 ),
               );
@@ -119,8 +132,31 @@ export const feedUser = factory.createApp().get(
 
         return and(...filters);
       },
+      ...queryConfig,
     });
 
-    return c.json(data, 200);
+    let nextCursor = null;
+
+    if (data.length !== 10) {
+      return c.json({ posts: data, nextCursor }, 200);
+    }
+
+    const { id, createdAt, commentCount, voteCount } = data[data.length - 1];
+
+    switch (query.sort) {
+      case PostSort.NEW:
+        nextCursor = encodeCursor({ id, createdAt });
+        break;
+
+      case PostSort.CONTROVERSIAL:
+        nextCursor = encodeCursor({ id, commentCount });
+        break;
+
+      default:
+        nextCursor = encodeCursor({ id, voteCount });
+        break;
+    }
+
+    return c.json({ posts: data, nextCursor }, 200);
   },
 );

@@ -38,57 +38,59 @@ export const post = factory
       },
       extras: (post, { sql }) => ({
         voteCount: sql<number>`
-               (
-                 SELECT COALESCE(SUM(
-                   CASE 
-                     WHEN vote_status = 'upvoted' THEN 1
-                     WHEN vote_status = 'downvoted' THEN -1
-                     ELSE 0
-                   END
-                 ), 0)
-                 FROM users_to_posts
-                 WHERE users_to_posts.post_id = ${post.id}
-               )
-             `.as("vote_count"),
+          (
+            SELECT (
+              COALESCE(SUM(
+                CASE 
+                  WHEN vote_status = 'upvoted' THEN 1
+                  WHEN vote_status = 'downvoted' THEN -1
+                  ELSE 0
+                END
+              ), 0)
+            )::int
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+          )
+        `.as("vote_count"),
         commentCount: sql<number>`
-               (
-                 SELECT COUNT(*)
-                 FROM comments
-                 WHERE comments.post_id = ${post.id}
-               )
-             `.as("comment_count"),
+          (
+            SELECT COUNT(*)::int
+            FROM comments
+            WHERE comments.post_id = ${post.id}
+          )
+        `.as("comment_count"),
         isSaved: sql<UserToPost["saved"] | null>`
-               (
-                 SELECT saved
-                 FROM users_to_posts
-                 WHERE users_to_posts.post_id = ${post.id}
-                   AND users_to_posts.user_id = ${c.var.currentUserId}
-               )
-             `.as("is_saved"),
+          (
+            SELECT saved
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${c.var.currentUserId}
+          )
+        `.as("is_saved"),
         isHidden: sql<UserToPost["hidden"] | null>`
-               (
-                 SELECT hidden
-                 FROM users_to_posts
-                 WHERE users_to_posts.post_id = ${post.id}
-                   AND users_to_posts.user_id = ${c.var.currentUserId}
-               )
-             `.as("is_hidden"),
+          (
+            SELECT hidden
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${c.var.currentUserId}
+          )
+        `.as("is_hidden"),
         voteStatus: sql<UserToPost["voteStatus"] | null>`
-               (
-                 SELECT vote_status
-                 FROM users_to_posts
-                 WHERE users_to_posts.post_id = ${post.id}
-                   AND users_to_posts.user_id = ${c.var.currentUserId}
-               )
-             `.as("vote_status"),
+          (
+            SELECT vote_status
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${c.var.currentUserId}
+          )
+        `.as("vote_status"),
         userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
-               (
-                 SELECT updated_at
-                 FROM users_to_posts
-                 WHERE users_to_posts.post_id = ${post.id}
-                   AND users_to_posts.user_id = ${c.var.currentUserId}
-               )
-             `.as("user_to_post_updated_at"),
+          (
+            SELECT updated_at
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${c.var.currentUserId}
+          )
+        `.as("user_to_post_updated_at"),
       }),
     });
 
