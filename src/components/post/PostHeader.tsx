@@ -3,7 +3,8 @@
 import { useParams } from "next/navigation";
 
 import { usePostContext } from "@/context/PostContext";
-import { User, UserSchema } from "@/db/schema/users";
+import type { Post } from "@/db/schema/posts";
+import { UserSchema, type User } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
 import defaultUserImage from "@public/defaultUserImage.png";
@@ -26,9 +27,6 @@ export default function PostHeader({
   const { success, data: username } = UserSchema.shape.username
     .unwrap()
     .safeParse(state.author.username);
-
-  const createdAtDate = new Date(state.createdAt);
-  const updatedAtDate = new Date(state.updatedAt);
 
   return (
     <div className="flex items-center justify-between gap-2">
@@ -61,15 +59,12 @@ export default function PostHeader({
               </span>
             </div>
           )}
-
           <span>•</span>
           {hydrated ? (
-            <time
-              dateTime={state.createdAt}
-              title={createdAtDate.toLocaleDateString("hr-HR")}
-            >
-              {getRelativeTimeString(createdAtDate)}
-            </time>
+            <PostHeaderDate
+              createdAt={state.createdAt}
+              updatedAt={state.updatedAt}
+            />
           ) : (
             <span>Calculating...</span>
           )}
@@ -94,12 +89,10 @@ export default function PostHeader({
           </HoverPrefetchLink>
           <span>•</span>
           {hydrated ? (
-            <time
-              dateTime={state.createdAt}
-              title={updatedAtDate.toLocaleDateString("hr-HR")}
-            >
-              {getRelativeTimeString(updatedAtDate)}
-            </time>
+            <PostHeaderDate
+              createdAt={state.createdAt}
+              updatedAt={state.updatedAt}
+            />
           ) : (
             <span>Calculating...</span>
           )}
@@ -112,5 +105,52 @@ export default function PostHeader({
         </PostDropdown>
       )}
     </div>
+  );
+}
+
+function PostHeaderDate({
+  createdAt,
+  updatedAt,
+}: Pick<Post, "createdAt" | "updatedAt">) {
+  const createdAtDate = new Date(createdAt);
+  const updatedAtDate = new Date(updatedAt);
+
+  if (createdAt === updatedAt) {
+    return (
+      <time
+        dateTime={createdAt}
+        title={createdAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+      >
+        {getRelativeTimeString(createdAtDate)}
+      </time>
+    );
+  }
+
+  return (
+    <>
+      <time
+        dateTime={createdAt}
+        title={createdAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+      >
+        {getRelativeTimeString(createdAtDate)}
+      </time>
+      <span>•</span>
+      <time
+        dateTime={createdAt}
+        title={updatedAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+        className="italic"
+      >
+        {getRelativeTimeString(updatedAtDate)}
+      </time>
+    </>
   );
 }

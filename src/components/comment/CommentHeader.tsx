@@ -1,4 +1,5 @@
 import { useCommentContext } from "@/context/CommentContext";
+import type { Comment } from "@/db/schema/comments";
 import { UserSchema } from "@/db/schema/users";
 import useHydration from "@/hooks/useHydration";
 import getRelativeTimeString from "@/utils/getRelativeTimeString";
@@ -13,9 +14,6 @@ export default function CommentHeader() {
   const { success, data: username } = UserSchema.shape.username
     .unwrap()
     .safeParse(state.author.username);
-
-  const createdAtDate = new Date(state.createdAt);
-  const updatedAtDate = new Date(state.updatedAt);
 
   return (
     <div className="flex items-center gap-2">
@@ -58,30 +56,61 @@ export default function CommentHeader() {
         <span>•</span>
 
         {hydrated ? (
-          <>
-            <time
-              dateTime={state.createdAt}
-              title={createdAtDate.toLocaleDateString("hr-HR")}
-            >
-              {getRelativeTimeString(createdAtDate)}
-            </time>
-            {state.updatedAt > state.createdAt && (
-              <>
-                <span>•</span>
-                <time
-                  dateTime={state.updatedAt}
-                  title={updatedAtDate.toLocaleDateString("hr-HR")}
-                  className="italic"
-                >
-                  edited {getRelativeTimeString(updatedAtDate)}
-                </time>
-              </>
-            )}
-          </>
+          <CommentHeaderDate
+            createdAt={state.createdAt}
+            updatedAt={state.updatedAt}
+          />
         ) : (
           <span>Calculating...</span>
         )}
       </div>
     </div>
+  );
+}
+
+function CommentHeaderDate({
+  createdAt,
+  updatedAt,
+}: Pick<Comment, "createdAt" | "updatedAt">) {
+  const createdAtDate = new Date(createdAt);
+  const updatedAtDate = new Date(updatedAt);
+
+  if (createdAt === updatedAt) {
+    return (
+      <time
+        dateTime={createdAt}
+        title={createdAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+      >
+        {getRelativeTimeString(createdAtDate)}
+      </time>
+    );
+  }
+
+  return (
+    <>
+      <time
+        dateTime={createdAt}
+        title={createdAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+      >
+        {getRelativeTimeString(createdAtDate)}
+      </time>
+      <span>•</span>
+      <time
+        dateTime={createdAt}
+        title={updatedAtDate.toLocaleString("hr-HR", {
+          dateStyle: "full",
+          timeStyle: "long",
+        })}
+        className="italic"
+      >
+        {getRelativeTimeString(updatedAtDate)}
+      </time>
+    </>
   );
 }
