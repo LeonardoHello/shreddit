@@ -79,7 +79,7 @@ function CommentHeaderDate({
     return (
       <time
         dateTime={createdAt}
-        title={createdAtDate.toLocaleString("hr-HR", {
+        title={createdAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}
@@ -93,7 +93,7 @@ function CommentHeaderDate({
     <>
       <time
         dateTime={createdAt}
-        title={createdAtDate.toLocaleString("hr-HR", {
+        title={createdAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}
@@ -103,7 +103,7 @@ function CommentHeaderDate({
       <span>•</span>
       <time
         dateTime={createdAt}
-        title={updatedAtDate.toLocaleString("hr-HR", {
+        title={updatedAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}

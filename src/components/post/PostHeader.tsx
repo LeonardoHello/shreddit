@@ -119,7 +119,7 @@ function PostHeaderDate({
     return (
       <time
         dateTime={createdAt}
-        title={createdAtDate.toLocaleString("hr-HR", {
+        title={createdAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}
@@ -133,7 +133,7 @@ function PostHeaderDate({
     <>
       <time
         dateTime={createdAt}
-        title={createdAtDate.toLocaleString("hr-HR", {
+        title={createdAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}
@@ -143,7 +143,7 @@ function PostHeaderDate({
       <span>•</span>
       <time
         dateTime={createdAt}
-        title={updatedAtDate.toLocaleString("hr-HR", {
+        title={updatedAtDate.toLocaleString("en-DE", {
           dateStyle: "full",
           timeStyle: "long",
         })}
