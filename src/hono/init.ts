@@ -3,7 +3,7 @@ import { createFactory, createMiddleware } from "hono/factory";
 import db from "@/db";
 import { auth, type UserId } from "@/lib/auth";
 
-type Env = {
+export type Env = {
   Variables: {
     db: typeof db;
     currentUserId: UserId;
@@ -28,6 +28,7 @@ export const factory = createFactory<Env>({
 
 type MiddlewareEnv = {
   Variables: {
+    db: typeof db;
     currentUserId: NonNullable<UserId>;
   };
 };
