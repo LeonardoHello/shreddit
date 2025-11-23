@@ -1,6 +1,4 @@
-import React from "react";
-
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -13,29 +11,38 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCommentContext } from "@/context/CommentContext";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default function CommentDeleteDialog() {
   const state = useCommentContext();
 
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
-  const deleteComment = useMutation(
-    trpc.comment.deleteComment.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.comment.getComments.queryKey(state.postId),
-        });
+  const deleteComment = useMutation({
+    mutationFn: async () => {
+      const deleteComment = await client.comments[`:commentId{${reg}}`].$delete(
+        {
+          param: { commentId: state.id },
+          query: { communityId: state.post.communityId },
+        },
+      );
+      return deleteComment.json();
+    },
+    onSuccess: () => {
+      // TODO: check the right queryKey for getComments query
+      queryClient.invalidateQueries({
+        queryKey: ["posts", state.postId, "comments"],
+      });
 
-        toast.success("Comment deleted successfully.");
-      },
-      onError: (error) => {
-        console.error(error);
-        toast.error("Failed to delete your comment. Please try again later.");
-      },
-    }),
-  );
+      toast.success("Comment deleted successfully.");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to delete your comment. Please try again later.");
+    },
+  });
 
   return (
     <AlertDialogContent>
@@ -50,10 +57,7 @@ export default function CommentDeleteDialog() {
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction
           onClick={() => {
-            deleteComment.mutate({
-              commentId: state.id,
-              communityId: state.post.communityId,
-            });
+            deleteComment.mutate();
           }}
         >
           Delete

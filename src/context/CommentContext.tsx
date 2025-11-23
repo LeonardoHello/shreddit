@@ -2,11 +2,18 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import { RouterOutput } from "@/trpc/routers/_app";
+import type { InferResponseType } from "hono/client";
+
+import type { client } from "@/hono/client";
 import { ArrElement } from "@/types/helpers";
 import { calculateVotes } from "@/utils/calculateVotes";
 
-type Comment = ArrElement<RouterOutput["comment"]["getComments"]>;
+type Comment = ArrElement<
+  InferResponseType<
+    (typeof client.posts)[":postId{[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}"]["comments"]["$get"],
+    200
+  >
+>;
 
 type ReducerState = Comment & {
   isEditing: boolean;

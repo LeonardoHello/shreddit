@@ -18,9 +18,9 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
 import { useUploadThing } from "@/lib/uploadthing";
-import { useTRPC } from "@/trpc/client";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
@@ -76,35 +76,36 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const trpc = useTRPC();
-
-  const editPost = useMutation(
-    trpc.post.editPost.mutationOptions({
-      onMutate: () => {
-        dispatch({
-          type: ReducerAction.SET_TEXT,
-          text: prettifyHTML(editor.getHTML()),
-        });
-        dispatch({ type: ReducerAction.CANCEL_EDIT });
-      },
-      onSuccess: () => {
-        toast.success("Post successfully edited.");
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    }),
-  );
+  const editPost = useMutation({
+    mutationFn: async () => {
+      await client.posts[
+        ":postId{[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}"
+      ].$patch({
+        param: { postId: state.id },
+        json: { text: prettifyHTML(editor.getHTML()) },
+      });
+    },
+    onMutate: () => {
+      dispatch({
+        type: ReducerAction.SET_TEXT,
+        text: prettifyHTML(editor.getHTML()),
+      });
+      dispatch({ type: ReducerAction.CANCEL_EDIT });
+    },
+    onSuccess: () => {
+      toast.success("Post successfully edited.");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const isMutating = state.isUploading || editPost.isPending;
 
   const handleSubmit = () => {
     if (isMutating) return;
 
-    editPost.mutate({
-      id: state.id,
-      text: prettifyHTML(editor.getHTML()),
-    });
+    editPost.mutate();
   };
 
   return (

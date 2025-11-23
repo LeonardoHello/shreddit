@@ -29,7 +29,7 @@ export default function SidebarNavSkeleton({
           {Array.from({ length: itemCount }).map((_, index) => (
             <SidebarMenuItem key={index}>
               <div className="flex h-8 w-full items-center gap-2 rounded-md p-2">
-                <Skeleton className="size-7 flex-shrink-0 rounded-full" />
+                <Skeleton className="size-7 shrink-0 rounded-full" />
                 <div className="flex w-full min-w-0 items-center justify-between">
                   <Skeleton
                     style={{ width: `${80 + ((index * 30) % 40)}px` }}

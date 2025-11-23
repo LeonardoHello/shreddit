@@ -6,44 +6,49 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default function FeedPostHidden() {
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const trpc = useTRPC();
+  const hidePost = useMutation({
+    mutationFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].hide.$patch({
+        param: { postId: state.id },
+        json: { hidden: false },
+      });
 
-  const hidePost = useMutation(
-    trpc.post.hidePost.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = state.isHidden;
+      return res.json();
+    },
+    onMutate: () => {
+      const previousValue = state.isHidden;
 
-        dispatch({
-          type: ReducerAction.SET_HIDE,
-          hide: variables.hidden,
-        });
+      dispatch({
+        type: ReducerAction.SET_HIDE,
+        hide: false,
+      });
 
-        return { previousValue };
-      },
-      onSuccess: (data) => {
-        if (data[0].hidden) {
-          toast.success("Post hidden successfully.");
-        } else {
-          toast.success("Post unhidden successfully.");
-        }
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_HIDE,
-          hide: context?.previousValue ?? false,
-        });
+      return { previousValue };
+    },
+    onSuccess: (data) => {
+      if (data[0].hidden) {
+        toast.success("Post hidden successfully.");
+      } else {
+        toast.success("Post unhidden successfully.");
+      }
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_HIDE,
+        hide: context?.previousValue ?? false,
+      });
 
-        console.error(error);
-        toast.error("Failed to hide the post. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to hide the post. Please try again later.");
+    },
+  });
 
   return (
     <div className="bg-card hover:border-ring/50 flex h-20 items-center justify-between gap-3 rounded border p-4">
@@ -51,7 +56,7 @@ export default function FeedPostHidden() {
       <button
         className="rounded-full bg-zinc-800 px-4 py-2"
         onClick={() => {
-          hidePost.mutate({ postId: state.id, hidden: false });
+          hidePost.mutate();
         }}
       >
         Undo

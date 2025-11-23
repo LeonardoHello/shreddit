@@ -1,8 +1,15 @@
+import type { InferResponseType } from "hono";
+
 import CommentContextProvider from "@/context/CommentContext";
 import { Comment as CommentType } from "@/db/schema/comments";
 import { User } from "@/db/schema/users";
-import { RouterOutput } from "@/trpc/routers/_app";
+import type { client } from "@/hono/client";
 import Comment from "./Comment";
+
+type Replies = InferResponseType<
+  (typeof client.posts)[":postId{[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}"]["comments"]["$get"],
+  200
+>;
 
 export default function CommentThread({
   currentUserId,
@@ -11,7 +18,7 @@ export default function CommentThread({
 }: {
   currentUserId: User["id"] | null;
   commentId: CommentType["id"];
-  replies: RouterOutput["comment"]["getComments"];
+  replies: Replies;
 }) {
   const currentReplies = replies.filter(
     (reply) => reply.parentCommentId === commentId,

@@ -5,9 +5,10 @@ import { PostSort } from "@/types/enums";
 
 const routeHasAuthCookie: RouteHas = {
   type: "cookie",
-  key: "__Secure-better-auth.session_token",
+  key: "better-auth.session_token",
 };
 
+// TODO: create proxy file for rewriting u/:username and r/:communityName dynamic routes to display IDs
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {

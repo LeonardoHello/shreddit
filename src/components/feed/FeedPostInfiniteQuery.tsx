@@ -5,55 +5,123 @@ import { useEffect, useRef } from "react";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 
 import PostContextProvider from "@/context/PostContext";
+import type { Community } from "@/db/schema/communities";
 import type { User } from "@/db/schema/users";
-import { useTRPC } from "@/trpc/client";
-import { AppRouter, RouterInput } from "@/trpc/routers/_app";
+import { client } from "@/hono/client";
+import { PostFeed, PostSort } from "@/types/enums";
 import FeedEmpty from "./FeedEmpty";
 import FeedPost from "./FeedPost";
 import FeedPostInfiniteQuerySkeleton from "./FeedPostInfiniteQuerySkeleton";
 import FeedSort from "./FeedSort";
 
-type PostFeedProcedures = keyof AppRouter["postFeed"];
+type InfiniteQueryParams<T extends PostFeed> = {
+  [P in T]: P extends PostFeed.ALL
+    ? { feed: P; queryKey: ["posts", P, PostSort] }
+    : P extends PostFeed.HOME
+      ? { feed: P; queryKey: ["posts", P, PostSort] }
+      : P extends PostFeed.COMMUNITY
+        ? {
+            feed: P;
+            queryKey: ["posts", P, Community["name"], PostSort];
+            communityName: Community["name"];
+          }
+        : {
+            feed: P;
+            queryKey: ["posts", P, NonNullable<User["username"]>, PostSort];
+            username: NonNullable<User["username"]>;
+          };
+}[T];
 
-type InfiniteQueryOptions = {
-  [P in PostFeedProcedures]: {
-    procedure: P;
-    input: RouterInput["postFeed"][P];
-  };
-}[PostFeedProcedures];
-
-export default function FeedPostInfiniteQuery({
+export default function FeedPostInfiniteQuery<T extends PostFeed>({
   currentUserId,
-  infiniteQueryOptions,
+  params,
+  sort,
+  cursor,
 }: {
   currentUserId: User["id"] | null;
-  infiniteQueryOptions: InfiniteQueryOptions;
+  params: InfiniteQueryParams<T>;
+  sort: PostSort;
+  cursor?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { procedure, input } = infiniteQueryOptions;
+  const { queryKey } = params;
 
-  const trpc = useTRPC();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useSuspenseInfiniteQuery({
+      queryKey,
+      queryFn: async ({ pageParam }) => {
+        switch (params.feed) {
+          case PostFeed.HOME:
+            const homePosts = await client.posts.home.$get({
+              query: { sort, cursor: pageParam },
+            });
+            return homePosts.json();
 
-  // not all procedures are using the same QueryOptions
-  const {
-    data: { pages },
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useSuspenseInfiniteQuery(
-    procedure === "getAllPosts" || procedure === "getHomePosts"
-      ? trpc.postFeed[procedure].infiniteQueryOptions(input, {
-          getNextPageParam: (lastPage) => lastPage.nextCursor,
-        })
-      : procedure === "getCommunityPosts"
-        ? trpc.postFeed[procedure].infiniteQueryOptions(input, {
-            getNextPageParam: (lastPage) => lastPage.nextCursor,
-          })
-        : trpc.postFeed[procedure].infiniteQueryOptions(input, {
-            getNextPageParam: (lastPage) => lastPage.nextCursor,
-          }),
-  );
+          case PostFeed.COMMUNITY:
+            const communityPosts = await client.posts.communities[
+              ":communityName"
+            ].$get({
+              param: { communityName: params.communityName },
+              query: { sort, cursor: pageParam },
+            });
+            return communityPosts.json();
+
+          case PostFeed.USER:
+            const userPosts = await client.posts.users[":username"].$get({
+              param: { username: params.username },
+              query: { sort, cursor: pageParam },
+            });
+            return userPosts.json();
+
+          case PostFeed.SAVED:
+            const savedPosts = await client.posts.users[":username"].saved.$get(
+              {
+                param: { username: params.username },
+                query: { sort, cursor: pageParam },
+              },
+            );
+            return savedPosts.json();
+
+          case PostFeed.HIDDEN:
+            const hiddenPosts = await client.posts.users[
+              ":username"
+            ].hidden.$get({
+              param: { username: params.username },
+              query: { sort, cursor: pageParam },
+            });
+            return hiddenPosts.json();
+
+          case PostFeed.UPVOTED:
+            const upvotedPosts = await client.posts.users[
+              ":username"
+            ].upvoted.$get({
+              param: { username: params.username },
+              query: { sort, cursor: pageParam },
+            });
+            return upvotedPosts.json();
+
+          case PostFeed.DOWNVOTED:
+            const downvotedPosts = await client.posts.users[
+              ":username"
+            ].downvoted.$get({
+              param: { username: params.username },
+              query: { sort, cursor: pageParam },
+            });
+            return downvotedPosts.json();
+
+          default:
+          case PostFeed.ALL:
+            const allPosts = await client.posts.all.$get({
+              query: { sort, cursor: pageParam },
+            });
+            return allPosts.json();
+        }
+      },
+      // determens the type of queryFn's pageParam
+      initialPageParam: cursor,
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
+    });
 
   useEffect(() => {
     if (!ref.current || !hasNextPage || isFetchingNextPage) return;
@@ -73,10 +141,10 @@ export default function FeedPostInfiniteQuery({
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (pages[0].posts.length === 0) {
+  if (data.pages[0].posts.length === 0) {
     return (
       <div className="flex grow flex-col gap-2">
-        <FeedSort sort={infiniteQueryOptions.input.sort} />
+        <FeedSort sort={sort} />
         <FeedEmpty />
       </div>
     );
@@ -84,9 +152,9 @@ export default function FeedPostInfiniteQuery({
 
   return (
     <div className="relative flex w-0 grow flex-col gap-2">
-      <FeedSort sort={infiniteQueryOptions.input.sort} />
+      <FeedSort sort={sort} />
 
-      {pages.map((page) =>
+      {data.pages.map((page) =>
         page.posts.map((post) => (
           <PostContextProvider
             key={[

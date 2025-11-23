@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${reddit_sans.className} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${reddit_sans.className} dark antialiased`}>
         {props.children}
         {props.auth}
         <Analytics />

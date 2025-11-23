@@ -12,9 +12,9 @@ import {
   useSubmitContext,
   useSubmitDispatchContext,
 } from "@/context/SubmitContext";
-import { PostFileSchema } from "@/db/schema/posts";
+import { PostFile, PostFileSchema } from "@/db/schema/posts";
+import { client } from "@/hono/client";
 import { useUploadThing } from "@/lib/uploadthing";
-import { useTRPC } from "@/trpc/client";
 import { PostType } from "@/types/enums";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
@@ -33,11 +33,15 @@ export default function SubmitButton({
 }: {
   communityName: string;
 }) {
-  const trpc = useTRPC();
-
-  const { data: selectedCommunity } = useSuspenseQuery(
-    trpc.community.getSelectedCommunity.queryOptions(communityName),
-  );
+  const { data: selectedCommunity } = useSuspenseQuery({
+    queryKey: ["communities", communityName, "submit"],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].submit.$get({
+        param: { communityName },
+      });
+      return res.json();
+    },
+  });
 
   if (!selectedCommunity) {
     notFound();
@@ -75,54 +79,40 @@ export default function SubmitButton({
     },
   });
 
-  const createPostText = useMutation(
-    trpc.post.createTextPost.mutationOptions({
-      onMutate: () => {
-        dispatch({ type: ReducerAction.START_LOADING });
-      },
-      onSuccess: (data) => {
-        const post = data[0];
+  const createPost = useMutation({
+    mutationFn: async (
+      selectedFiles?: Pick<PostFile, "key" | "name" | "url" | "thumbHash">[],
+    ) => {
+      const res = await client.posts.$post({
+        json: {
+          ...state,
+          files: selectedFiles,
+          communityId: selectedCommunity.id,
+        },
+      });
 
-        startTransition(() => {
-          router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
-        });
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-      onSettled: () => {
-        dispatch({ type: ReducerAction.STOP_LOADING });
-      },
-    }),
-  );
+      return res.json();
+    },
+    onMutate: () => {
+      dispatch({ type: ReducerAction.START_LOADING });
+    },
+    onSuccess: (data) => {
+      const post = data[0];
 
-  const createPostImage = useMutation(
-    trpc.post.createImagePost.mutationOptions({
-      onMutate: () => {
-        dispatch({ type: ReducerAction.START_LOADING });
-      },
-      onSuccess: (data) => {
-        const post = data[0][0];
-
-        startTransition(() => {
-          router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
-        });
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-      onSettled: () => {
-        dispatch({ type: ReducerAction.STOP_LOADING });
-      },
-    }),
-  );
+      startTransition(() => {
+        router.push(`/r/${selectedCommunity.name}/comments/${post.id}`);
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      dispatch({ type: ReducerAction.STOP_LOADING });
+    },
+  });
 
   const isMutating =
-    isPending ||
-    state.isUploading ||
-    state.isLoading ||
-    createPostText.isPending ||
-    createPostImage.isPending;
+    isPending || state.isUploading || state.isLoading || createPost.isPending;
 
   const isDisabled =
     isMutating ||
@@ -138,13 +128,8 @@ export default function SubmitButton({
       return;
     }
 
-    const { selectedFiles, ...post } = state;
-
     if (state.postType === PostType.TEXT) {
-      createPostText.mutate({
-        ...post,
-        communityId: selectedCommunity.id,
-      });
+      createPost.mutate(undefined);
     } else {
       if (state.selectedFiles.length > 12) {
         toast.error("You can only upload up to 12 files.");
@@ -154,7 +139,7 @@ export default function SubmitButton({
       dispatch({ type: ReducerAction.START_LOADING });
 
       const uploadedFiles = await startUpload(
-        selectedFiles.map((file) => file.file),
+        state.selectedFiles.map((file) => file.file),
       );
 
       if (!uploadedFiles) {
@@ -176,21 +161,17 @@ export default function SubmitButton({
 
       const data = await response.json();
 
-      const { data: parsedFiles, error } = postFileSchema.safeParse(data);
+      const parsedFiles = postFileSchema.safeParse(data);
 
-      if (error) {
-        toast.error(error.message);
+      if (parsedFiles.error) {
+        toast.error(parsedFiles.error.message);
         dispatch({ type: ReducerAction.STOP_LOADING });
 
         return;
       }
 
       // text is set to null
-      createPostImage.mutate({
-        ...post,
-        communityId: selectedCommunity.id,
-        files: parsedFiles,
-      });
+      createPost.mutate(parsedFiles.data);
     }
   };
 

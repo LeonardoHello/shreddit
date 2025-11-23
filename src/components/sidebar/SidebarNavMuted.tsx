@@ -3,15 +3,18 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { VolumeX } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavMuted() {
-  const trpc = useTRPC();
+  const { data: mutedCommunities } = useSuspenseQuery({
+    queryKey: ["communities", "muted"],
+    queryFn: async () => {
+      const res = await client.communities.muted.$get();
 
-  const { data: mutedCommunities } = useSuspenseQuery(
-    trpc.community.getMutedCommunities.queryOptions(),
-  );
+      return res.json();
+    },
+  });
 
   return (
     <SidebarCollapsible

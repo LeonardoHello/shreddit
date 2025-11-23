@@ -1,5 +1,3 @@
-import React from "react";
-
 import { BubbleMenu, Editor, FloatingMenu } from "@tiptap/react";
 
 import { Separator } from "../ui/separator";

@@ -10,7 +10,7 @@ export default function CommentBody() {
 
   return (
     <div
-      className="prose prose-sm prose-zinc prose-invert max-w-none break-words"
+      className="prose prose-sm prose-zinc prose-invert max-w-none wrap-break-word"
       dangerouslySetInnerHTML={{ __html: state.text }}
     />
   );

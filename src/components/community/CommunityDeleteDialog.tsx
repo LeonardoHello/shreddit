@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -13,7 +13,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Community } from "@/db/schema/communities";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default function CommunityDeleteDialog({
   communityId,
@@ -22,33 +24,35 @@ export default function CommunityDeleteDialog({
 }) {
   const router = useRouter();
 
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
-  const deleteCommunity = useMutation(
-    trpc.community.deleteCommunity.mutationOptions({
-      onMutate: () => {
-        router.replace("/");
-      },
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getJoinedCommunities.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getModeratedCommunities.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getMutedCommunities.queryKey(),
-        });
+  const deleteCommunity = useMutation({
+    mutationFn: async () => {
+      await client.communities[`:communityId{${reg}}`].$delete({
+        param: { communityId },
+      });
+    },
+    onMutate: () => {
+      router.replace("/");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "moderated"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "joined"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "muted"],
+      });
 
-        toast.success("Community deleted successfully.");
-      },
-      onError: (error) => {
-        console.error(error);
-        toast.error("Failed to delete your community. Please try again later.");
-      },
-    }),
-  );
+      toast.success("Community deleted successfully.");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to delete your community. Please try again later.");
+    },
+  });
 
   return (
     <AlertDialogContent>
@@ -63,7 +67,7 @@ export default function CommunityDeleteDialog({
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction
           onClick={() => {
-            deleteCommunity.mutate(communityId);
+            deleteCommunity.mutate();
           }}
         >
           Delete

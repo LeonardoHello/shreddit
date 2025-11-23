@@ -10,26 +10,19 @@ import { factory, mwAuthenticated } from "../init";
 
 export const userToCommunity = factory
   .createApp()
-  .get("/:communityName/user", mwAuthenticated, async (c) => {
-    const communityName = c.req.param("communityName");
-
-    const data = await c.var.db.query.usersToCommunities.findFirst({
-      where: (userToCommunity, { and, eq, exists }) =>
+  .get("/joined", mwAuthenticated, async (c) => {
+    const data = await c.var.db.query.usersToCommunities.findMany({
+      where: (userToCommunity, { and, eq }) =>
         and(
           eq(userToCommunity.userId, c.var.currentUserId),
-          exists(
-            c.var.db
-              .select({ id: communities.id })
-              .from(communities)
-              .where(
-                and(
-                  eq(communities.id, userToCommunity.communityId),
-                  eq(communities.name, communityName),
-                ),
-              ),
-          ),
+          eq(userToCommunity.joined, true),
         ),
-      columns: { favorited: true, muted: true, joined: true },
+      columns: { favorited: true, favoritedAt: true },
+      with: {
+        community: {
+          columns: { id: true, name: true, icon: true, iconPlaceholder: true },
+        },
+      },
     });
 
     return c.json(data, 200);
@@ -60,23 +53,6 @@ export const userToCommunity = factory
           )
         `.as("member_count"),
       }),
-    });
-
-    return c.json(data, 200);
-  })
-  .get("/joined", mwAuthenticated, async (c) => {
-    const data = await c.var.db.query.usersToCommunities.findMany({
-      where: (userToCommunity, { and, eq }) =>
-        and(
-          eq(userToCommunity.userId, c.var.currentUserId),
-          eq(userToCommunity.joined, true),
-        ),
-      columns: { favorited: true, favoritedAt: true },
-      with: {
-        community: {
-          columns: { id: true, name: true, icon: true, iconPlaceholder: true },
-        },
-      },
     });
 
     return c.json(data, 200);
@@ -123,6 +99,30 @@ export const userToCommunity = factory
 
     return c.json(data, 200);
   })
+  .get("/:communityName/user", mwAuthenticated, async (c) => {
+    const communityName = c.req.param("communityName");
+
+    const data = await c.var.db.query.usersToCommunities.findFirst({
+      where: (userToCommunity, { and, eq, exists }) =>
+        and(
+          eq(userToCommunity.userId, c.var.currentUserId),
+          exists(
+            c.var.db
+              .select({ id: communities.id })
+              .from(communities)
+              .where(
+                and(
+                  eq(communities.id, userToCommunity.communityId),
+                  eq(communities.name, communityName),
+                ),
+              ),
+          ),
+        ),
+      columns: { favorited: true, muted: true, joined: true },
+    });
+
+    return c.json(data, 200);
+  })
   .patch(
     `/:communityId{${reg}}/favorite`,
     validator("json", (value, c) => {
@@ -131,8 +131,9 @@ export const userToCommunity = factory
       }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -169,8 +170,9 @@ export const userToCommunity = factory
       }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -207,8 +209,9 @@ export const userToCommunity = factory
       }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }

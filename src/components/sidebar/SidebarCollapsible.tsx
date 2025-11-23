@@ -1,8 +1,8 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, Star } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import type { InferResponseType } from "hono/client";
+import { ChevronRight, Star, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -20,12 +20,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Community } from "@/db/schema/communities";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
-import { RouterOutput } from "@/trpc/routers/_app";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import sortSidebarCommunities from "@/utils/sortSidebarCommunities";
 import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
+
+type ModeratedCommunitiesType = InferResponseType<
+  typeof client.communities.moderated.$get
+>;
+type JoinedCommunitiesType = InferResponseType<
+  typeof client.communities.joined.$get
+>;
+type MutedCommunitiesType = InferResponseType<
+  typeof client.communities.muted.$get
+>;
 
 export default function SidebarCollapsible({
   communities,
@@ -34,7 +46,10 @@ export default function SidebarCollapsible({
   label,
   empty,
 }: {
-  communities: RouterOutput["community"]["getModeratedCommunities"];
+  communities:
+    | ModeratedCommunitiesType
+    | JoinedCommunitiesType
+    | MutedCommunitiesType;
   defaultOpen?: boolean | undefined;
   title: string;
   label: string;
@@ -44,24 +59,33 @@ export default function SidebarCollapsible({
     description: string;
   };
 }) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
-  const moderatedCommunitiesQueryKey =
-    trpc.community.getModeratedCommunities.queryKey();
-  const joinedCommunitiesQueryKey =
-    trpc.community.getJoinedCommunities.queryKey();
-  const mutedCommunitiesQueryKey =
-    trpc.community.getMutedCommunities.queryKey();
+  const queryClient = getQueryClient();
 
   const newDate = new Date().toISOString();
 
-  const toggleFavorite = useMutation(
-    trpc.community.toggleFavoriteCommunity.mutationOptions({
-      onMutate: (variables) => {
-        const { communityId, favorited } = variables;
+  const toggleFavorite = useMutation({
+    mutationFn: async ({
+      communityId,
+      favorited,
+    }: {
+      communityId: Community["id"];
+      favorited: boolean;
+    }) => {
+      const res = await client.communities[
+        `:communityId{${reg}}`
+      ].favorite.$patch({
+        param: { communityId },
+        json: { favorited },
+      });
 
-        queryClient.setQueryData(moderatedCommunitiesQueryKey, (updater) => {
+      return res.json();
+    },
+    onMutate: (variables) => {
+      const { communityId, favorited } = variables;
+
+      queryClient.setQueryData<ModeratedCommunitiesType>(
+        ["communities", "moderated"],
+        (updater) => {
           if (!updater) {
             return [];
           }
@@ -72,9 +96,12 @@ export default function SidebarCollapsible({
 
             return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
-        });
+        },
+      );
 
-        queryClient.setQueryData(joinedCommunitiesQueryKey, (updater) => {
+      queryClient.setQueryData<JoinedCommunitiesType>(
+        ["communities", "joined"],
+        (updater) => {
           if (!updater) {
             return [];
           }
@@ -85,9 +112,12 @@ export default function SidebarCollapsible({
 
             return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
-        });
+        },
+      );
 
-        queryClient.setQueryData(mutedCommunitiesQueryKey, (updater) => {
+      queryClient.setQueryData<MutedCommunitiesType>(
+        ["communities", "muted"],
+        (updater) => {
           if (!updater) {
             return [];
           }
@@ -98,22 +128,22 @@ export default function SidebarCollapsible({
 
             return { ..._userToCommunity, favorited, favoritedAt: newDate };
           });
-        });
-      },
-      onError: (error) => {
-        queryClient.invalidateQueries({
-          queryKey: moderatedCommunitiesQueryKey,
-        });
-        queryClient.invalidateQueries({ queryKey: joinedCommunitiesQueryKey });
-        queryClient.invalidateQueries({ queryKey: mutedCommunitiesQueryKey });
+        },
+      );
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "moderated"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["communities", "joined"] });
+      queryClient.invalidateQueries({ queryKey: ["communities", "muted"] });
 
-        console.error(error);
-        toast.error(
-          "Failed to toggle favorite community. Please try again later.",
-        );
-      },
-    }),
-  );
+      console.error(error);
+      toast.error(
+        "Failed to toggle favorite community. Please try again later.",
+      );
+    },
+  });
 
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -186,10 +216,11 @@ export default function SidebarCollapsible({
                         {
                           onSuccess: () => {
                             queryClient.invalidateQueries({
-                              queryKey:
-                                trpc.community.getUserToCommunity.queryKey(
-                                  item.community.name,
-                                ),
+                              queryKey: [
+                                "communities",
+                                item.community.name,
+                                "user",
+                              ],
                             });
                           },
                           onError: (error) => {

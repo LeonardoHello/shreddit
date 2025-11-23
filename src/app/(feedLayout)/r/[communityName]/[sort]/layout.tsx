@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
-import { getQueryClient, trpc } from "@/trpc/server";
-import { PostSort } from "@/types/enums";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { PostFeed, PostSort } from "@/types/enums";
 
 export default async function CommunityLayout(
   props: LayoutProps<"/r/[communityName]/[sort]">,
@@ -17,12 +18,17 @@ export default async function CommunityLayout(
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchInfiniteQuery(
-    trpc.postFeed.getCommunityPosts.infiniteQueryOptions({
-      sort,
-      communityName: params.communityName,
-    }),
-  );
+  queryClient.prefetchInfiniteQuery({
+    queryKey: ["posts", PostFeed.COMMUNITY, params.communityName, sort],
+    queryFn: async ({ pageParam }) => {
+      const res = await client.posts.communities[":communityName"].$get({
+        param: { communityName: params.communityName },
+        query: { sort, cursor: pageParam },
+      });
+      return res.json();
+    },
+    initialPageParam: undefined,
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

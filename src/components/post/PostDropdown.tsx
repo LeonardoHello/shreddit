@@ -30,7 +30,8 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { User } from "@/db/schema/users";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 
@@ -41,141 +42,163 @@ export default function PostDropdown({
   children: React.ReactNode;
   currentUserId: User["id"];
 }) {
-  const post = usePostContext();
+  const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const trpc = useTRPC();
+  const savePost = useMutation({
+    mutationFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].save.$patch({
+        param: { postId: state.id },
+        json: { saved: !state.isSaved },
+      });
 
-  const savePost = useMutation(
-    trpc.post.savePost.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = post.isSaved;
+      return res.json();
+    },
+    onMutate: () => {
+      const previousValue = state.isSaved;
 
-        dispatch({
-          type: ReducerAction.SET_SAVE,
-          save: variables.saved,
-        });
+      dispatch({
+        type: ReducerAction.SET_SAVE,
+        save: !state.isSaved,
+      });
 
-        return { previousValue };
-      },
-      onSuccess: (data) => {
-        if (data[0].saved) {
-          toast.success("Post saved successfully.");
-        } else {
-          toast.success("Post unsaved successfully.");
-        }
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_SAVE,
-          save: context?.previousValue ?? false,
-        });
+      return { previousValue };
+    },
+    onSuccess: (data) => {
+      if (data[0].saved) {
+        toast.success("Post saved successfully.");
+      } else {
+        toast.success("Post unsaved successfully.");
+      }
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_SAVE,
+        save: context?.previousValue ?? false,
+      });
 
-        console.error(error);
-        toast.error("Failed to save the post. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to save the post. Please try again later.");
+    },
+  });
 
-  const hidePost = useMutation(
-    trpc.post.hidePost.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = post.isHidden;
+  const hidePost = useMutation({
+    mutationFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].hide.$patch({
+        param: { postId: state.id },
+        json: { hidden: !state.isHidden },
+      });
 
-        dispatch({
-          type: ReducerAction.SET_HIDE,
-          hide: variables.hidden,
-        });
+      return res.json();
+    },
+    onMutate: () => {
+      const previousValue = state.isHidden;
 
-        return { previousValue };
-      },
-      onSuccess: (data) => {
-        if (data[0].hidden) {
-          toast.success("Post hidden successfully.");
-        } else {
-          toast.success("Post unhidden successfully.");
-        }
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_HIDE,
-          hide: context?.previousValue ?? false,
-        });
+      dispatch({
+        type: ReducerAction.SET_HIDE,
+        hide: !state.isHidden,
+      });
 
-        console.error(error);
-        toast.error("Failed to hide the post. Please try again later.");
-      },
-    }),
-  );
+      return { previousValue };
+    },
+    onSuccess: (data) => {
+      if (data[0].hidden) {
+        toast.success("Post hidden successfully.");
+      } else {
+        toast.success("Post unhidden successfully.");
+      }
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_HIDE,
+        hide: context?.previousValue ?? false,
+      });
 
-  const setSpoiler = useMutation(
-    trpc.post.setPostSpoiler.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = post.spoiler;
+      console.error(error);
+      toast.error("Failed to hide the post. Please try again later.");
+    },
+  });
 
-        dispatch({
-          type: ReducerAction.SET_SPOILER,
-          spoiler: variables.spoiler,
-        });
+  const setSpoiler = useMutation({
+    mutationFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].spoiler.$patch({
+        param: { postId: state.id },
+        json: { spoiler: !state.spoiler },
+      });
 
-        return { previousValue };
-      },
-      onSuccess: (data) => {
-        if (data[0].spoiler) {
-          toast.success("Post has been marked as spoiler");
-        } else {
-          toast.success("Post has been un-marked as a spoiler");
-        }
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_SPOILER,
-          spoiler: context?.previousValue ?? false,
-        });
+      return res.json();
+    },
+    onMutate: () => {
+      const previousValue = state.spoiler;
 
-        console.error(error);
-        toast.error(
-          "Failed to toggle spoiler tag for the post. Please try again later.",
-        );
-      },
-    }),
-  );
+      dispatch({
+        type: ReducerAction.SET_SPOILER,
+        spoiler: !state.spoiler,
+      });
 
-  const setNSFW = useMutation(
-    trpc.post.setPostNSFW.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = post.nsfw;
+      return { previousValue };
+    },
+    onSuccess: (data) => {
+      if (data[0].spoiler) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_SPOILER,
+        spoiler: context?.previousValue ?? false,
+      });
 
-        dispatch({
-          type: ReducerAction.SET_NSFW,
-          nsfw: variables.nsfw,
-        });
+      console.error(error);
+      toast.error(
+        "Failed to toggle spoiler tag for the post. Please try again later.",
+      );
+    },
+  });
 
-        return { previousValue };
-      },
-      onSuccess: (data) => {
-        if (data[0].nsfw) {
-          toast.success("Post has been marked as spoiler");
-        } else {
-          toast.success("Post has been un-marked as a spoiler");
-        }
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_NSFW,
-          nsfw: context?.previousValue ?? false,
-        });
+  const setNSFW = useMutation({
+    mutationFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].nsfw.$patch({
+        param: { postId: state.id },
+        json: { nsfw: !state.nsfw },
+      });
 
-        console.error(error);
-        toast.error(
-          "Failed to toggle NSFW tag for the post. Please try again later.",
-        );
-      },
-    }),
-  );
+      return res.json();
+    },
+    onMutate: () => {
+      const previousValue = state.nsfw;
 
-  const isAuthor = currentUserId === post.authorId;
-  const isModerator = currentUserId === post.community.moderatorId;
+      dispatch({
+        type: ReducerAction.SET_NSFW,
+        nsfw: !state.nsfw,
+      });
+
+      return { previousValue };
+    },
+    onSuccess: (data) => {
+      if (data[0].nsfw) {
+        toast.success("Post has been marked as spoiler");
+      } else {
+        toast.success("Post has been un-marked as a spoiler");
+      }
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_NSFW,
+        nsfw: context?.previousValue ?? false,
+      });
+
+      console.error(error);
+      toast.error(
+        "Failed to toggle NSFW tag for the post. Please try again later.",
+      );
+    },
+  });
+
+  const isAuthor = currentUserId === state.authorId;
+  const isModerator = currentUserId === state.community.moderatorId;
 
   return (
     <AlertDialog>
@@ -195,16 +218,16 @@ export default function PostDropdown({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
-              savePost.mutate({ saved: !post.isSaved, postId: post.id });
+              savePost.mutate();
             }}
           >
-            {post.isSaved && (
+            {state.isSaved && (
               <>
                 <BookmarkCheck />
                 <span>Remove from saved</span>
               </>
             )}
-            {!post.isSaved && (
+            {!state.isSaved && (
               <>
                 <Bookmark />
                 <span>Save</span>
@@ -213,16 +236,16 @@ export default function PostDropdown({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              hidePost.mutate({ hidden: !post.isHidden, postId: post.id });
+              hidePost.mutate();
             }}
           >
-            {post.isHidden && (
+            {state.isHidden && (
               <>
                 <EyeOff />
                 <span>Remove from hidden</span>
               </>
             )}
-            {!post.isHidden && (
+            {!state.isHidden && (
               <>
                 <Eye />
                 <span>Hide</span>
@@ -230,7 +253,7 @@ export default function PostDropdown({
             )}
           </DropdownMenuItem>
 
-          {isAuthor && post.files.length === 0 && (
+          {isAuthor && state.files.length === 0 && (
             <DropdownMenuItem
               onClick={() => {
                 dispatch({ type: ReducerAction.TOGGLE_EDIT });
@@ -252,16 +275,16 @@ export default function PostDropdown({
 
               <DropdownMenuItem
                 onClick={() => {
-                  setSpoiler.mutate({ id: post.id, spoiler: !post.spoiler });
+                  setSpoiler.mutate();
                 }}
               >
-                {post.spoiler && (
+                {state.spoiler && (
                   <>
                     <AlertTriangle />
                     <span>Remove spoiler tag</span>
                   </>
                 )}
-                {!post.spoiler && (
+                {!state.spoiler && (
                   <>
                     <Triangle />
                     <span>Add spoiler tag</span>
@@ -270,16 +293,16 @@ export default function PostDropdown({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setNSFW.mutate({ id: post.id, nsfw: !post.nsfw });
+                  setNSFW.mutate();
                 }}
               >
-                {post.nsfw && (
+                {state.nsfw && (
                   <>
                     <ShieldX />
                     <span>Remove NSFW tag</span>
                   </>
                 )}
-                {!post.nsfw && (
+                {!state.nsfw && (
                   <>
                     <Shield />
                     <span>Add NSFW tag</span>

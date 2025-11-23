@@ -6,15 +6,20 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
-import { getQueryClient, trpc } from "@/trpc/server";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import shrek from "@public/shrek.svg";
 
 export default async function SubmitLayout(props: LayoutProps<"/submit">) {
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(
-    trpc.community.getMyCommunities.queryOptions(),
-  );
+  queryClient.prefetchQuery({
+    queryKey: ["communities", "joined", "submit"],
+    queryFn: async () => {
+      const res = await client.communities.joined.submit.$get();
+      return res.json();
+    },
+  });
 
   return (
     <div className="container flex grow items-start gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">

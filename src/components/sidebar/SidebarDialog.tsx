@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Camera, Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -34,8 +34,9 @@ import {
 } from "@/components/ui/form";
 import { Community } from "@/db/schema/communities";
 import { PostFileSchema } from "@/db/schema/posts";
+import { client } from "@/hono/client";
 import { useUploadThing } from "@/lib/uploadthing";
-import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
 import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import { Button } from "../ui/button";
@@ -195,8 +196,7 @@ export default function SidebarDialog({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -257,48 +257,62 @@ export default function SidebarDialog({
     },
   );
 
-  const createCommunity = useMutation(
-    trpc.community.createCommunity.mutationOptions({
-      onMutate: () => {
-        dispatch({ type: ReducerAction.START_LOADING });
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getModeratedCommunities.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getJoinedCommunities.queryKey(),
-        });
+  const createCommunity = useMutation({
+    mutationFn: async (
+      community: Pick<
+        Community,
+        | "name"
+        | "description"
+        | "icon"
+        | "iconPlaceholder"
+        | "banner"
+        | "bannerPlaceholder"
+      >,
+    ) => {
+      const res = await client.communities.$post({
+        json: community,
+      });
 
-        startTransition(() => {
-          router.replace(`/r/${data[0][0].name}`);
-          form.reset();
+      return res.json();
+    },
+    onMutate: () => {
+      dispatch({ type: ReducerAction.START_LOADING });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "moderated"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "joined"],
+      });
 
-          dispatch({
-            type: ReducerAction.SET_IS_OPEN,
-            isOpen: false,
-          });
+      startTransition(() => {
+        router.replace(`/r/${data[0][0].name}`);
+        form.reset();
+
+        dispatch({
+          type: ReducerAction.SET_IS_OPEN,
+          isOpen: false,
         });
-      },
-      onError: (error) => {
-        if (
-          error.message ===
-          'duplicate key value violates unique constraint "communities_name_unique"'
-        ) {
-          dispatch({
-            type: ReducerAction.SET_ERROR_MESSAGE,
-            errorMessage:
-              "Communtiy name is already taken. please try another.",
-          });
-        } else {
-          toast.error("Failed to create a community. Please try again later.");
-        }
-      },
-      onSettled: () => {
-        dispatch({ type: ReducerAction.STOP_LOADING });
-      },
-    }),
-  );
+      });
+    },
+    onError: (error) => {
+      if (
+        error.message ===
+        'duplicate key value violates unique constraint "communities_name_unique"'
+      ) {
+        dispatch({
+          type: ReducerAction.SET_ERROR_MESSAGE,
+          errorMessage: "Communtiy name is already taken. please try another.",
+        });
+      } else {
+        toast.error("Failed to create a community. Please try again later.");
+      }
+    },
+    onSettled: () => {
+      dispatch({ type: ReducerAction.STOP_LOADING });
+    },
+  });
 
   const isMutating =
     isPending ||

@@ -2,7 +2,7 @@ import * as z from "zod/mini";
 
 import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { PostSort } from "@/types/enums";
+import { PostFeed, PostSort } from "@/types/enums";
 
 export default async function CommunityPage(
   props: PageProps<"/r/[communityName]/[sort]">,
@@ -12,15 +12,14 @@ export default async function CommunityPage(
   const sort = z.enum(PostSort).parse(params.sort);
 
   return (
-    <FeedPostInfiniteQuery
+    <FeedPostInfiniteQuery<PostFeed.COMMUNITY>
       currentUserId={session && session.session.userId}
-      infiniteQueryOptions={{
-        procedure: "getCommunityPosts",
-        input: {
-          sort,
-          communityName: params.communityName,
-        },
+      params={{
+        feed: PostFeed.COMMUNITY,
+        queryKey: ["posts", PostFeed.COMMUNITY, params.communityName, sort],
+        communityName: params.communityName,
       }}
+      sort={sort}
     />
   );
 }

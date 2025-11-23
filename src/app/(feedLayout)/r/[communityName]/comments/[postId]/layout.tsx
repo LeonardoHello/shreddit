@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
-import { getQueryClient, trpc } from "@/trpc/server";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default async function PostLayout(
   props: LayoutProps<"/r/[communityName]/comments/[postId]">,
@@ -16,10 +18,26 @@ export default async function PostLayout(
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(trpc.post.getPost.queryOptions(params.postId));
-  void queryClient.prefetchQuery(
-    trpc.comment.getComments.queryOptions(params.postId),
-  );
+  queryClient.prefetchQuery({
+    queryKey: ["posts", params.postId],
+    queryFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].$get({
+        param: { postId: params.postId },
+      });
+
+      return res.json();
+    },
+  });
+  queryClient.prefetchQuery({
+    queryKey: ["posts", params.postId, "comments"],
+    queryFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].comments.$get({
+        param: { postId: params.postId },
+      });
+
+      return res.json();
+    },
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

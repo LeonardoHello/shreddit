@@ -2,11 +2,7 @@
 
 import { memo, useState } from "react";
 
-import {
-  useQuery,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import {
   DropdownMenu,
@@ -16,13 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
-
-const limit = 10;
 
 export default function SubmitCommunity({
   children,
@@ -31,16 +26,14 @@ export default function SubmitCommunity({
 }) {
   const [searchValue, setSearchValue] = useState("");
 
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
+  const queryClient = getQueryClient();
 
-  const { data: myCommunities } = useSuspenseQuery(
-    trpc.community.getMyCommunities.queryOptions(),
-  );
-
-  const searchCommunitiesQueryKey = trpc.community.searchCommunities.queryKey({
-    search: searchValue,
-    limit,
+  const { data: joinedCommunities } = useSuspenseQuery({
+    queryKey: ["communities", "joined", "submit"],
+    queryFn: async () => {
+      const res = await client.communities.joined.submit.$get();
+      return res.json();
+    },
   });
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +43,9 @@ export default function SubmitCommunity({
       "",
     );
 
-    queryClient.cancelQueries({ queryKey: searchCommunitiesQueryKey });
+    queryClient.cancelQueries({
+      queryKey: ["communities", "search", searchedValue],
+    });
 
     setSearchValue(searchedValue);
   };
@@ -91,7 +86,7 @@ export default function SubmitCommunity({
             <DropdownMenuLabel className="text-2xs text-muted-foreground uppercase">
               Your communities
             </DropdownMenuLabel>
-            {myCommunities.map((community) => (
+            {joinedCommunities.map((community) => (
               <DropdownMenuItem key={community.id} className="h-11" asChild>
                 <HoverPrefetchLink href={`/submit/r/${community.name}`}>
                   <CommunityIcon
@@ -121,14 +116,15 @@ export default function SubmitCommunity({
 
 const SubmitCommunityDropdown = memo(
   ({ searchValue }: { searchValue: string }) => {
-    const trpc = useTRPC();
-
-    const { data: searchedCommunities, isLoading } = useQuery(
-      trpc.community.searchCommunities.queryOptions({
-        search: searchValue,
-        limit,
-      }),
-    );
+    const { data: searchedCommunities, isLoading } = useQuery({
+      queryKey: ["communities", "search", searchValue],
+      queryFn: async () => {
+        const res = await client.communities.search.$get({
+          query: { search: searchValue, limit: "10" },
+        });
+        return res.json();
+      },
+    });
 
     return (
       <>

@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -20,8 +20,9 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import RTECommentButtons from "./RTECommentButtons";
@@ -70,31 +71,34 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
+  const queryClient = getQueryClient();
 
-  const createComment = useMutation(
-    trpc.comment.createComment.mutationOptions({
-      onMutate: () => {
-        editor.setEditable(false);
-      },
-      onSuccess: () => {
-        startTransition(() => {
-          queryClient.invalidateQueries({
-            queryKey: trpc.comment.getComments.queryKey(state.postId),
-          });
+  const createComment = useMutation({
+    mutationFn: async () => {
+      await client.comments.$post({
+        query: { postId: state.postId, parentCommentId: state.id },
+        json: { text: prettifyHTML(editor.getHTML()) },
+      });
+    },
+    onMutate: () => {
+      editor.setEditable(false);
+    },
+    onSuccess: () => {
+      startTransition(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["posts", state.postId, "comments"],
         });
+      });
 
-        dispatch({ type: ReducerAction.CANCEL_REPLY });
+      dispatch({ type: ReducerAction.CANCEL_REPLY });
 
-        toast.success("Reply successfully posted.");
-      },
-      onError: (error) => {
-        editor.setEditable(true);
-        toast.error(error.message);
-      },
-    }),
-  );
+      toast.success("Reply successfully posted.");
+    },
+    onError: (error) => {
+      editor.setEditable(true);
+      toast.error(error.message);
+    },
+  });
 
   const editorState = useEditorState({
     editor,
@@ -127,11 +131,7 @@ function ActionButtons({ editor }: { editor: Editor }) {
         disabled={isDisabled}
         onClick={() => {
           if (!isDisabled) {
-            createComment.mutate({
-              postId: state.postId,
-              parentCommentId: state.id,
-              text: prettifyHTML(editor.getHTML()),
-            });
+            createComment.mutate();
           }
         }}
         className="rounded-full"

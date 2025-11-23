@@ -4,7 +4,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import CommentContextProvider from "@/context/CommentContext";
 import { User } from "@/db/schema/users";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import Comment from "./Comment";
 import CommentSectionEmpty from "./CommentSectionEmpty";
 import CommentThread from "./CommentThread";
@@ -16,11 +17,16 @@ export default function CommentSection({
   currentUserId: User["id"] | null;
   postId: string;
 }) {
-  const trpc = useTRPC();
+  const { data: commentTree } = useSuspenseQuery({
+    queryKey: ["posts", postId, "comments"],
+    queryFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].comments.$get({
+        param: { postId },
+      });
 
-  const { data: commentTree } = useSuspenseQuery(
-    trpc.comment.getComments.queryOptions(postId),
-  );
+      return res.json();
+    },
+  });
 
   if (commentTree.length === 0) return <CommentSectionEmpty />;
 

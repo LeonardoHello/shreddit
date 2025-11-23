@@ -14,8 +14,8 @@ import {
   useRecentCommunityDispatchContext,
 } from "@/context/RecentCommunityContext";
 import { User } from "@/db/schema/users";
+import { client } from "@/hono/client";
 import useHydration from "@/hooks/useHydration";
-import { useTRPC } from "@/trpc/client";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -32,11 +32,16 @@ export default function CommunityHeader({
   currentUserId: User["id"] | null;
   communityName: string;
 }) {
-  const trpc = useTRPC();
+  const { data: community } = useSuspenseQuery({
+    queryKey: ["communities", communityName],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].$get({
+        param: { communityName },
+      });
 
-  const { data: community } = useSuspenseQuery(
-    trpc.community.getCommunityByName.queryOptions(communityName),
-  );
+      return res.json();
+    },
+  });
 
   if (!community) {
     notFound();

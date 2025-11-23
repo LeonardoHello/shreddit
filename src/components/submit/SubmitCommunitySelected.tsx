@@ -3,7 +3,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import CommunityIcon from "../community/CommunityIcon";
 
 export default function SubmitCommunitySelected({
@@ -11,11 +11,15 @@ export default function SubmitCommunitySelected({
 }: {
   communityName: string;
 }) {
-  const trpc = useTRPC();
-
-  const { data: selectedCommunity } = useSuspenseQuery(
-    trpc.community.getSelectedCommunity.queryOptions(communityName),
-  );
+  const { data: selectedCommunity } = useSuspenseQuery({
+    queryKey: ["communities", communityName, "submit"],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].submit.$get({
+        param: { communityName },
+      });
+      return res.json();
+    },
+  });
 
   if (!selectedCommunity)
     throw new Error("There was a problem with a community selection.");

@@ -2,7 +2,7 @@
 
 import { useTransition } from "react";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -16,8 +16,9 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import type { Post } from "@/db/schema/posts";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import RTECommentButtons from "./RTECommentButtons";
@@ -69,33 +70,36 @@ function ActionButtons({
 }) {
   const [isPending, startTransition] = useTransition();
 
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
-  const createComment = useMutation(
-    trpc.comment.createComment.mutationOptions({
-      onMutate: () => {
-        editor.setEditable(false);
-      },
-      onSuccess: () => {
-        startTransition(() => {
-          queryClient.invalidateQueries({
-            queryKey: trpc.comment.getComments.queryKey(postId),
-          });
+  const createComment = useMutation({
+    mutationFn: async () => {
+      await client.comments.$post({
+        query: { postId },
+        json: { text: prettifyHTML(editor.getHTML()) },
+      });
+    },
+    onMutate: () => {
+      editor.setEditable(false);
+    },
+    onSuccess: () => {
+      startTransition(() => {
+        queryClient.invalidateQueries({
+          queryKey: ["posts", postId, "comments"],
         });
+      });
 
-        editor.commands.clearContent();
+      editor.commands.clearContent();
 
-        toast.success("Comment successfully posted.");
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-      onSettled: () => {
-        editor.setEditable(true);
-      },
-    }),
-  );
+      toast.success("Comment successfully posted.");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      editor.setEditable(true);
+    },
+  });
 
   const editorState = useEditorState({
     editor,
@@ -127,11 +131,7 @@ function ActionButtons({
         disabled={isDisabled}
         onClick={() => {
           if (!isDisabled) {
-            createComment.mutate({
-              postId,
-              parentCommentId: null,
-              text: prettifyHTML(editor.getHTML()),
-            });
+            createComment.mutate();
           }
         }}
         className="rounded-full"

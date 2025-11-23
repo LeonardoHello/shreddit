@@ -1,7 +1,14 @@
-import { RouterOutput } from "@/trpc/routers/_app";
+import type { InferResponseType } from "hono";
+
+import type { client } from "@/hono/client";
+
+type ModeratedCommunites = InferResponseType<
+  typeof client.communities.moderated.$get,
+  200
+>;
 
 export default function sortSidebarCommunities(
-  communities: RouterOutput["community"]["getModeratedCommunities"],
+  communities: ModeratedCommunites,
 ) {
   return communities.sort((a, b) => {
     if (a.favorited && !b.favorited) return -1;

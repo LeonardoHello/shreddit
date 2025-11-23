@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
-import { getQueryClient, trpc } from "@/trpc/server";
-import { PostSort } from "@/types/enums";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { PostFeed, PostSort } from "@/types/enums";
 
 export default async function AllSortLayout(props: LayoutProps<"/all/[sort]">) {
   const params = await props.params;
@@ -15,9 +16,16 @@ export default async function AllSortLayout(props: LayoutProps<"/all/[sort]">) {
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchInfiniteQuery(
-    trpc.postFeed.getAllPosts.infiniteQueryOptions({ sort }),
-  );
+  queryClient.prefetchInfiniteQuery({
+    queryKey: ["posts", PostFeed.ALL, sort],
+    queryFn: async ({ pageParam }) => {
+      const res = await client.posts.all.$get({
+        query: { sort, cursor: pageParam },
+      });
+      return res.json();
+    },
+    initialPageParam: undefined,
+  });
 
   return (
     <div className="container flex grow gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">

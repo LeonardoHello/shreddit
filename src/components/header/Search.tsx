@@ -2,13 +2,14 @@
 
 import { memo, useRef, useState } from "react";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import * as motion from "motion/react-client";
 
+import { client } from "@/hono/client";
 import useDropdown from "@/hooks/useDropdown";
-import { useTRPC } from "@/trpc/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import defaultUserImage from "@public/defaultUserImage.png";
 import CommunityIcon from "../community/CommunityIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -18,19 +19,13 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import SearchSkeleton from "./SearchSkeleton";
 
-const limit = 4;
-
 export function Search() {
   const [searchedValue, setSearchedValue] = useState("");
   const ref = useRef<HTMLInputElement>(null);
 
   const { ref: dropdownRef, isOpen, setIsOpen } = useDropdown(ref);
 
-  const queryClient = useQueryClient();
-  const trpc = useTRPC();
-
-  const searchCommunitiesQueryKey = trpc.community.searchCommunities.queryKey();
-  const searchUsersQueryKey = trpc.user.searchUsers.queryKey();
+  const queryClient = getQueryClient();
 
   const onInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // replace every character except letters, numbers, underscores and dashes
@@ -40,7 +35,10 @@ export function Search() {
     );
 
     queryClient.cancelQueries({
-      queryKey: [searchCommunitiesQueryKey, searchUsersQueryKey],
+      queryKey: ["communities", "search", searchedValue],
+    });
+    queryClient.cancelQueries({
+      queryKey: ["users", "search", searchedValue],
     });
 
     setSearchedValue(searchedValue);
@@ -84,6 +82,8 @@ export function Search() {
   );
 }
 
+const limit = "4";
+
 const SearchDropdown = memo(
   ({
     searchedValue,
@@ -92,18 +92,26 @@ const SearchDropdown = memo(
     searchedValue: string;
     closeDropdown: () => void;
   }) => {
-    const trpc = useTRPC();
-
     const { data: searchedCommunities, isLoading: isLoadingCommunities } =
-      useQuery(
-        trpc.community.searchCommunities.queryOptions({
-          search: searchedValue,
-          limit,
-        }),
-      );
-    const { data: searchedUsers, isLoading: isLoadingUsers } = useQuery(
-      trpc.user.searchUsers.queryOptions(searchedValue),
-    );
+      useQuery({
+        queryKey: ["communities", "search", searchedValue],
+        queryFn: async () => {
+          const res = await client.communities.search.$get({
+            query: { search: searchedValue, limit },
+          });
+          return res.json();
+        },
+      });
+
+    const { data: searchedUsers, isLoading: isLoadingUsers } = useQuery({
+      queryKey: ["users", "search", searchedValue],
+      queryFn: async () => {
+        const res = await client.users.search.$get({
+          query: { search: searchedValue, limit },
+        });
+        return res.json();
+      },
+    });
 
     const isLoading = isLoadingCommunities || isLoadingUsers;
 
@@ -126,48 +134,50 @@ const SearchDropdown = memo(
       >
         {isLoading && <SearchSkeleton />}
 
-        {!isLoading && searchedCommunities?.length !== 0 && (
-          <div className="flex flex-col gap-1">
-            <div className="mx-4 text-sm font-medium">Communities</div>
-            {searchedCommunities?.map((community) => (
-              <Button
-                key={community.name}
-                variant={"ghost"}
-                asChild
-                className="h-12 justify-start"
-                onClick={closeDropdown}
-              >
-                <HoverPrefetchLink href={`/r/${community.name}`}>
-                  <CommunityIcon
-                    icon={community.icon}
-                    iconPlaceholder={community.iconPlaceholder}
-                    communtiyName={community.name}
-                    size={28}
-                    className="aspect-square rounded-full object-cover select-none"
-                  />
+        {!isLoading &&
+          searchedCommunities &&
+          searchedCommunities.length !== 0 && (
+            <div className="flex flex-col gap-1">
+              <div className="mx-4 text-sm font-medium">Communities</div>
+              {searchedCommunities.map((community) => (
+                <Button
+                  key={community.name}
+                  variant={"ghost"}
+                  asChild
+                  className="h-12 justify-start"
+                  onClick={closeDropdown}
+                >
+                  <HoverPrefetchLink href={`/r/${community.name}`}>
+                    <CommunityIcon
+                      icon={community.icon}
+                      iconPlaceholder={community.iconPlaceholder}
+                      communtiyName={community.name}
+                      size={28}
+                      className="aspect-square rounded-full object-cover select-none"
+                    />
 
-                  <div className="w-0 grow">
-                    <div className="truncate text-sm font-medium">
-                      r/{community.name}
+                    <div className="w-0 grow">
+                      <div className="truncate text-sm font-medium">
+                        r/{community.name}
+                      </div>
+                      <div className="text-muted-foreground truncate text-xs">
+                        {new Intl.NumberFormat("en-US", {
+                          notation: "compact",
+                          maximumFractionDigits: 1,
+                        }).format(community.memberCount)}{" "}
+                        {community.memberCount === 1 ? "member" : "members"}
+                      </div>
                     </div>
-                    <div className="text-muted-foreground truncate text-xs">
-                      {new Intl.NumberFormat("en-US", {
-                        notation: "compact",
-                        maximumFractionDigits: 1,
-                      }).format(community.memberCount)}{" "}
-                      {community.memberCount === 1 ? "member" : "members"}
-                    </div>
-                  </div>
-                </HoverPrefetchLink>
-              </Button>
-            ))}
-          </div>
-        )}
+                  </HoverPrefetchLink>
+                </Button>
+              ))}
+            </div>
+          )}
 
-        {!isLoading && searchedUsers?.length !== 0 && (
+        {!isLoading && searchedUsers && searchedUsers.length !== 0 && (
           <div className="flex flex-col gap-1">
             <div className="mx-4 text-sm font-medium">Users</div>
-            {searchedUsers?.map((user) => (
+            {searchedUsers.map((user) => (
               <Button
                 key={user.username}
                 variant={"ghost"}

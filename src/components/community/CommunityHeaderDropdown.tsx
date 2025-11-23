@@ -1,10 +1,6 @@
 import Link from "next/link";
 
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Ellipsis, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,7 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Community } from "@/db/schema/communities";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import { Dialog, DialogTrigger } from "../ui/dialog";
@@ -33,119 +31,145 @@ export default function CommunityHeaderDropdown({
   communityName: string;
   isCommunityModerator: boolean;
 }) {
-  const trpc = useTRPC();
+  const queryClient = getQueryClient();
 
-  const queryClient = useQueryClient();
+  const userToCommunityQueryKey = ["communities", communityName, "user"];
+  const joinedCommunitiesQueryKey = ["communities", "joined"];
 
-  const { data: userToCommunity } = useSuspenseQuery(
-    trpc.community.getUserToCommunity.queryOptions(communityName),
-  );
+  const { data: userToCommunity } = useSuspenseQuery({
+    queryKey: userToCommunityQueryKey,
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].user.$get({
+        param: { communityName },
+      });
 
-  const userToCommunityQueryKey =
-    trpc.community.getUserToCommunity.queryKey(communityName);
-  const joinedCommunitiesQueryKey =
-    trpc.community.getJoinedCommunities.queryKey();
+      return res.json();
+    },
+  });
 
-  const joinCommunity = useMutation(
-    trpc.community.toggleJoinCommunity.mutationOptions({
-      onMutate: (variables) => {
-        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+  const joinCommunity = useMutation({
+    mutationFn: async () => {
+      const res = await client.communities[`:communityId{${reg}}`].join.$patch({
+        param: { communityId },
+        json: { joined: !userToCommunity.joined },
+      });
+
+      return res.json();
+    },
+    onMutate: () => {
+      queryClient.setQueryData<typeof userToCommunity>(
+        userToCommunityQueryKey,
+        (updater) => {
           if (!updater) {
-            return { ...userToCommunity, joined: variables.joined };
+            return { ...userToCommunity, joined: !userToCommunity.joined };
           }
 
-          return { ...updater, joined: variables.joined };
-        });
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getCommunityByName.queryKey(communityName),
-        });
-        queryClient.invalidateQueries({
-          queryKey: joinedCommunitiesQueryKey,
-        });
+          return { ...updater, joined: !userToCommunity.joined };
+        },
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", communityName],
+      });
+      queryClient.invalidateQueries({
+        queryKey: joinedCommunitiesQueryKey,
+      });
 
-        if (data[0].joined) {
-          toast.success(`Joined r/${communityName}`);
-        } else {
-          toast.success(`Left r/${communityName}`);
+      if (data[0].joined) {
+        toast.success(`Joined r/${communityName}`);
+      } else {
+        toast.success(`Left r/${communityName}`);
+      }
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", communityName, "user"],
+      });
+
+      console.error(error);
+      toast.error("Failed to join the community. Please try again later.");
+    },
+  });
+
+  const favoriteCommunity = useMutation({
+    mutationFn: async () => {
+      const res = await client.communities[
+        `:communityId{${reg}}`
+      ].favorite.$patch({
+        param: { communityId },
+        json: { favorited: !userToCommunity.favorited },
+      });
+
+      return res.json();
+    },
+    onMutate: () => {
+      queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+        if (!updater) {
+          return { ...userToCommunity, favorited: !userToCommunity.favorited };
         }
-      },
-      onError: (error) => {
-        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
 
-        console.error(error);
-        toast.error("Failed to join the community. Please try again later.");
-      },
-    }),
-  );
+        return { ...updater, favorited: !userToCommunity.favorited };
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "moderated"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: joinedCommunitiesQueryKey,
+      });
 
-  const favoriteCommunity = useMutation(
-    trpc.community.toggleFavoriteCommunity.mutationOptions({
-      onMutate: (variables) => {
-        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
-          if (!updater) {
-            return { ...userToCommunity, favorited: variables.favorited };
-          }
+      if (data[0].favorited) {
+        toast.success(`Added r/${communityName} to favorites.`);
+      } else {
+        toast.success(`Removed r/${communityName} from favorites.`);
+      }
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
 
-          return { ...updater, favorited: variables.favorited };
-        });
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getModeratedCommunities.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: joinedCommunitiesQueryKey,
-        });
+      console.error(error);
+      toast.error("Failed to favorite the community. Please try again later.");
+    },
+  });
 
-        if (data[0].favorited) {
-          toast.success(`Added r/${communityName} to favorites.`);
-        } else {
-          toast.success(`Removed r/${communityName} from favorites.`);
+  const muteCommunity = useMutation({
+    mutationFn: async () => {
+      const res = await client.communities[`:communityId{${reg}}`].mute.$patch({
+        param: { communityId },
+        json: { muted: !userToCommunity.muted },
+      });
+
+      return res.json();
+    },
+    onMutate: () => {
+      queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
+        if (!updater) {
+          return { ...userToCommunity, muted: !userToCommunity.muted };
         }
-      },
-      onError: (error) => {
-        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
 
-        console.error(error);
-        toast.error(
-          "Failed to favorite the community. Please try again later.",
-        );
-      },
-    }),
-  );
+        return { ...updater, muted: !userToCommunity.muted };
+      });
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", "muted"],
+      });
 
-  const muteCommunity = useMutation(
-    trpc.community.toggleMuteCommunity.mutationOptions({
-      onMutate: (variables) => {
-        queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
-          if (!updater) {
-            return { ...userToCommunity, muted: variables.muted };
-          }
+      if (data[0].muted) {
+        toast.success(`Muted r/${communityName}.`);
+      } else {
+        toast.success(`Unmuted r/${communityName}.`);
+      }
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
 
-          return { ...updater, muted: variables.muted };
-        });
-      },
-      onSuccess: (data) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getMutedCommunities.queryKey(),
-        });
-
-        if (data[0].muted) {
-          toast.success(`Muted r/${communityName}.`);
-        } else {
-          toast.success(`Unmuted r/${communityName}.`);
-        }
-      },
-      onError: (error) => {
-        queryClient.invalidateQueries({ queryKey: userToCommunityQueryKey });
-
-        console.error(error);
-        toast.error("Failed to mute the community. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to mute the community. Please try again later.");
+    },
+  });
 
   return (
     <div className="flex items-center gap-3">
@@ -159,10 +183,7 @@ export default function CommunityHeaderDropdown({
       <Button
         variant={userToCommunity.joined ? "outline" : "default"}
         onClick={() => {
-          joinCommunity.mutate({
-            communityId,
-            joined: !userToCommunity.joined,
-          });
+          joinCommunity.mutate();
         }}
       >
         {userToCommunity.joined ? "Joined" : "Join"}
@@ -181,10 +202,7 @@ export default function CommunityHeaderDropdown({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  favoriteCommunity.mutate({
-                    communityId,
-                    favorited: !userToCommunity.favorited,
-                  });
+                  favoriteCommunity.mutate();
                 }}
               >
                 {userToCommunity.favorited
@@ -193,10 +211,7 @@ export default function CommunityHeaderDropdown({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  muteCommunity.mutate({
-                    communityId,
-                    muted: !userToCommunity.muted,
-                  });
+                  muteCommunity.mutate();
                 }}
               >
                 {userToCommunity.muted ? "Unmute" : "Mute"} r/

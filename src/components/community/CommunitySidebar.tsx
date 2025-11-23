@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Community } from "@/db/schema/communities";
 import { UserSchema } from "@/db/schema/users";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import defaultUserImage from "@public/defaultUserImage.png";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -67,11 +67,16 @@ function CommunitySidebarContent({
 }: {
   communityName: Community["name"];
 }) {
-  const trpc = useTRPC();
+  const { data: community } = useSuspenseQuery({
+    queryKey: ["communities", communityName],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].$get({
+        param: { communityName },
+      });
 
-  const { data: community } = useSuspenseQuery(
-    trpc.community.getCommunityByName.queryOptions(communityName),
-  );
+      return res.json();
+    },
+  });
 
   if (!community) {
     notFound();
@@ -83,16 +88,16 @@ function CommunitySidebarContent({
 
   return (
     <>
-      <h2 className="text-lg font-bold tracking-wide break-words">
+      <h2 className="text-lg font-bold tracking-wide wrap-break-word">
         r/{community.name}
       </h2>
 
       <div className="text-sm">
         {community.displayName && (
-          <h3 className="font-bold break-words">{community.displayName}</h3>
+          <h3 className="font-bold wrap-break-word">{community.displayName}</h3>
         )}
         {community.description && (
-          <p className="text-muted-foreground break-words">
+          <p className="text-muted-foreground wrap-break-word">
             {community.description}
           </p>
         )}

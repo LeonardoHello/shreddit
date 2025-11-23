@@ -4,7 +4,8 @@ import { useEffect, useReducer, useRef } from "react";
 import Image from "next/image";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import type { InferResponseType } from "hono/client";
 import { Camera, Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -32,16 +33,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Community } from "@/db/schema/communities";
+import type { Community } from "@/db/schema/communities";
 import { PostFileSchema } from "@/db/schema/posts";
+import { client } from "@/hono/client";
 import { useUploadThing } from "@/lib/uploadthing";
-import { useTRPC } from "@/trpc/client";
-import { RouterOutput } from "@/trpc/routers/_app";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
 import defaultCommunityIcon from "@public/defaultCommunityIcon.png";
 import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
 import { Textarea } from "../ui/textarea";
+
+type CommunityType = InferResponseType<
+  (typeof client.communities)[":communityName"]["$get"],
+  200
+>;
 
 type ReducerState = {
   communityIcon: {
@@ -140,7 +147,7 @@ const toastId = "loading_toast";
 export default function CommunityEditDialog({
   community,
 }: {
-  community: NonNullable<RouterOutput["community"]["getCommunityByName"]>;
+  community: CommunityType;
 }) {
   const iconInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -169,8 +176,7 @@ export default function CommunityEditDialog({
     }
   }, [state.communityIcon.file, state.communityBanner.file]);
 
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const queryClient = getQueryClient();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -227,55 +233,59 @@ export default function CommunityEditDialog({
     },
   );
 
-  const editCommunity = useMutation(
-    trpc.community.editCommunity.mutationOptions({
-      onMutate: (variables) => {
-        const { id, ...rest } = variables;
+  const editCommunity = useMutation({
+    mutationFn: async ({
+      id,
+      ...rest
+    }: Omit<Community, "createdAt" | "updatedAt" | "moderatorId" | "name">) => {
+      await client.communities[`:communityId{${reg}}`].$patch({
+        param: { communityId: id },
+        json: rest,
+      });
+    },
+    onMutate: (variables) => {
+      const { id, ...rest } = variables;
 
-        queryClient.setQueryData(
-          trpc.community.getCommunityByName.queryKey(community.name),
-          (updater) => {
-            if (!updater) {
-              return community;
-            }
+      queryClient.setQueryData(["communities", community.name], (updater) => {
+        if (!updater) {
+          return community;
+        }
 
-            return { ...updater, ...rest };
-          },
-        );
+        return { ...updater, ...rest };
+      });
 
-        dispatch({
-          type: ReducerAction.SELECT_ICON,
-          communityIcon: {
-            file: null,
-            url: rest.icon,
-            placeholder: rest.iconPlaceholder,
-          },
-        });
-        dispatch({
-          type: ReducerAction.SELECT_BANNER,
-          communityBanner: {
-            file: null,
-            url: rest.banner,
-            placeholder: rest.bannerPlaceholder,
-          },
-        });
-      },
-      onSuccess: () => {
-        toast.success("Community successfully edited");
-      },
-      onError: (error) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.community.getCommunityByName.queryKey(community.name),
-        });
+      dispatch({
+        type: ReducerAction.SELECT_ICON,
+        communityIcon: {
+          file: null,
+          url: rest.icon,
+          placeholder: rest.iconPlaceholder,
+        },
+      });
+      dispatch({
+        type: ReducerAction.SELECT_BANNER,
+        communityBanner: {
+          file: null,
+          url: rest.banner,
+          placeholder: rest.bannerPlaceholder,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Community successfully edited");
+    },
+    onError: (error) => {
+      queryClient.invalidateQueries({
+        queryKey: ["communities", community.name],
+      });
 
-        handleIconReset();
-        handleBannerReset();
+      handleIconReset();
+      handleBannerReset();
 
-        console.error(error);
-        toast.error("Failed to edit your community. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to edit your community. Please try again later.");
+    },
+  });
 
   const isMutating = isUploading || state.isLoading;
 

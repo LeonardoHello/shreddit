@@ -3,15 +3,18 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Shield } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavModerated() {
-  const trpc = useTRPC();
+  const { data: moderatedCommunities } = useSuspenseQuery({
+    queryKey: ["communities", "moderated"],
+    queryFn: async () => {
+      const res = await client.communities.moderated.$get();
 
-  const { data: moderatedCommunities } = useSuspenseQuery(
-    trpc.community.getModeratedCommunities.queryOptions(),
-  );
+      return res.json();
+    },
+  });
 
   return (
     <SidebarCollapsible

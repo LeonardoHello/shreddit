@@ -2,7 +2,7 @@ import * as z from "zod/mini";
 
 import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
-import { PostSort } from "@/types/enums";
+import { PostFeed, PostSort } from "@/types/enums";
 
 export default async function UserPage(
   props: PageProps<"/u/[username]/saved/[sort]">,
@@ -12,15 +12,14 @@ export default async function UserPage(
   const sort = z.enum(PostSort).parse(params.sort);
 
   return (
-    <FeedPostInfiniteQuery
+    <FeedPostInfiniteQuery<PostFeed.SAVED>
       currentUserId={session && session.session.userId}
-      infiniteQueryOptions={{
-        procedure: "getSavedPosts",
-        input: {
-          sort,
-          username: params.username,
-        },
+      params={{
+        feed: PostFeed.SAVED,
+        username: params.username,
+        queryKey: ["posts", PostFeed.SAVED, params.username, sort],
       }}
+      sort={sort}
     />
   );
 }

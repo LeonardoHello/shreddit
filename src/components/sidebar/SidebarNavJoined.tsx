@@ -3,15 +3,18 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavJoined() {
-  const trpc = useTRPC();
+  const { data: joinedCommunities } = useSuspenseQuery({
+    queryKey: ["communities", "joined"],
+    queryFn: async () => {
+      const res = await client.communities.joined.$get();
 
-  const { data: joinedCommunities } = useSuspenseQuery(
-    trpc.community.getJoinedCommunities.queryOptions(),
-  );
+      return await res.json();
+    },
+  });
 
   return (
     <SidebarCollapsible

@@ -17,7 +17,8 @@ import {
   usePostContext,
   usePostDispatchContext,
 } from "@/context/PostContext";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default function PostDeleteDialog({
   isPostPage,
@@ -29,28 +30,29 @@ export default function PostDeleteDialog({
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const trpc = useTRPC();
+  const deletePost = useMutation({
+    mutationFn: async () => {
+      await client.posts[`:postId{${reg}}`].$delete({
+        param: { postId: state.id },
+      });
+    },
+    onMutate: () => {
+      dispatch({ type: ReducerAction.DELETE });
+    },
+    onSuccess: () => {
+      if (isPostPage) {
+        router.replace("/");
+      }
 
-  const deletePost = useMutation(
-    trpc.post.deletePost.mutationOptions({
-      onMutate: () => {
-        dispatch({ type: ReducerAction.DELETE });
-      },
-      onSuccess: () => {
-        if (isPostPage) {
-          router.replace("/");
-        }
+      toast.success("Post deleted successfully.");
+    },
+    onError: (error) => {
+      dispatch({ type: ReducerAction.RESTORE });
 
-        toast.success("Post deleted successfully.");
-      },
-      onError: (error) => {
-        dispatch({ type: ReducerAction.RESTORE });
-
-        console.error(error);
-        toast.error("Failed to delete your post. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to delete your post. Please try again later.");
+    },
+  });
 
   return (
     <AlertDialogContent>
@@ -65,7 +67,7 @@ export default function PostDeleteDialog({
         <AlertDialogCancel>Cancel</AlertDialogCancel>
         <AlertDialogAction
           onClick={() => {
-            deletePost.mutate(state.id);
+            deletePost.mutate();
           }}
         >
           Delete

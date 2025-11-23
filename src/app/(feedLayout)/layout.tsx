@@ -9,7 +9,7 @@ import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
-import { TRPCReactProvider } from "@/trpc/client";
+import TanstackProvider from "@/tanstack-query/tanstackProvider";
 import { getSession } from "../actions";
 
 export const runtime = "edge";
@@ -34,7 +34,7 @@ export default async function FeedLayout(props: LayoutProps<"/">) {
         routerConfig={extractRouterConfig(ourFileRouter)}
       />
 
-      <TRPCReactProvider>
+      <TanstackProvider>
         <RecentCommunityContextProvider>
           <SidebarProvider>
             <AppSidebar />
@@ -45,7 +45,7 @@ export default async function FeedLayout(props: LayoutProps<"/">) {
             </SidebarInset>
           </SidebarProvider>
         </RecentCommunityContextProvider>
-      </TRPCReactProvider>
+      </TanstackProvider>
 
       <Toaster closeButton />
     </>

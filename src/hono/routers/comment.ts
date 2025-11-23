@@ -1,8 +1,8 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
-import z from "zod";
+import * as z from "zod/mini";
 
-import { comments, CommentSchema, UserToComment } from "@/db/schema/comments";
+import { comments, CommentSchema } from "@/db/schema/comments";
 import { communities, CommunitySchema } from "@/db/schema/communities";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory, mwAuthenticated } from "../init";
@@ -10,57 +10,20 @@ import { factory, mwAuthenticated } from "../init";
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const comment = factory
   .createApp()
-  .get(`/:postId{${reg}}`, async (c) => {
-    const postId = c.req.param("postId");
-
-    const data = await c.var.db.query.comments.findMany({
-      where: (comment, { eq }) => eq(comment.postId, postId),
-      with: {
-        author: true,
-        post: {
-          columns: { authorId: true, communityId: true },
-          with: { community: { columns: { moderatorId: true } } },
-        },
-      },
-      extras: (comment, { sql }) => ({
-        voteCount: sql<number>`
-          (
-            SELECT COALESCE(SUM(
-              CASE 
-                WHEN vote_status = 'upvoted' THEN 1
-                WHEN vote_status = 'downvoted' THEN -1
-                ELSE 0
-              END
-            ), 0)
-            FROM users_to_comments
-            WHERE users_to_comments.comment_id = ${comment.id}
-          )
-        `.as("vote_count"),
-        voteStatus: sql<UserToComment["voteStatus"] | null>`
-          (
-            SELECT vote_status
-            FROM users_to_comments
-            WHERE users_to_comments.comment_id = ${comment.id}
-              AND users_to_comments.user_id = ${c.var.currentUserId}
-          )
-        `.as("vote_status"),
-      }),
-      orderBy: (post, { desc }) => desc(post.createdAt),
-    });
-
-    return c.json(data, 200);
-  })
   .post(
     "/",
     validator("query", (value, c) => {
-      const parsed = CommentSchema.pick({
-        postId: true,
-        parentCommentId: true,
-      }).safeParse(value);
+      const parsed = z
+        .object({
+          postId: CommentSchema.shape.postId,
+          parentCommentId: z.optional(CommentSchema.shape.parentCommentId),
+        })
+        .safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid query parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -70,8 +33,9 @@ export const comment = factory
       const parsed = CommentSchema.pick({ text: true }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -104,7 +68,11 @@ export const comment = factory
       const parsed = CommentSchema.pick({ text: true }).safeParse(value);
 
       if (!parsed.success) {
-        return c.text(`400 Invalid json for ${parsed.error.name}`, 400);
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
+          400,
+        );
       }
       return parsed.data;
     }),
@@ -135,8 +103,9 @@ export const comment = factory
         .safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid query parameter for ${error.path}. ${error.message}`,
           400,
         );
       }

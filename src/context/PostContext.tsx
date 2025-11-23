@@ -2,10 +2,15 @@
 
 import { createContext, useContext, useReducer } from "react";
 
-import { RouterOutput } from "@/trpc/routers/_app";
+import type { InferResponseType } from "hono";
+
+import type { client } from "@/hono/client";
 import { calculateVotes } from "@/utils/calculateVotes";
 
-type Post = NonNullable<RouterOutput["post"]["getPost"]>;
+type Post = InferResponseType<
+  (typeof client.posts)[":postId{[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}}"]["$get"],
+  200
+>;
 
 type ReducerState = Post & {
   isEditing: boolean;

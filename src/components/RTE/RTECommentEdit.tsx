@@ -15,8 +15,9 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { prettifyHTML } from "@/utils/RTEprettifyHTML";
 import { Button } from "../ui/button";
 import RTECommentButtons from "./RTECommentButtons";
@@ -66,24 +67,26 @@ function ActionButtons({ editor }: { editor: Editor }) {
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const trpc = useTRPC();
-
-  const editComment = useMutation(
-    trpc.comment.editComment.mutationOptions({
-      onMutate: () => {
-        editor.setEditable(false);
-        dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });
-        dispatch({ type: ReducerAction.CANCEL_EDIT });
-      },
-      onSuccess: () => {
-        toast.success("Comment successfully edited.");
-      },
-      onError: (error) => {
-        editor.setEditable(true);
-        toast.error(error.message);
-      },
-    }),
-  );
+  const editComment = useMutation({
+    mutationFn: async () => {
+      await client.comments[`:commentId{${reg}}`].$patch({
+        param: { commentId: state.id },
+        json: { text: prettifyHTML(editor.getHTML()) },
+      });
+    },
+    onMutate: () => {
+      editor.setEditable(false);
+      dispatch({ type: ReducerAction.SET_TEXT, text: editor.getHTML() });
+      dispatch({ type: ReducerAction.CANCEL_EDIT });
+    },
+    onSuccess: () => {
+      toast.success("Comment successfully edited.");
+    },
+    onError: (error) => {
+      editor.setEditable(true);
+      toast.error(error.message);
+    },
+  });
 
   const editorState = useEditorState({
     editor,
@@ -113,10 +116,7 @@ function ActionButtons({ editor }: { editor: Editor }) {
         disabled={editorState.isEmpty}
         onClick={() => {
           if (!editorState.isEmpty) {
-            editComment.mutate({
-              id: state.id,
-              text: prettifyHTML(editor.getHTML()),
-            });
+            editComment.mutate();
           }
         }}
         className="rounded-full"

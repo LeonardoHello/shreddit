@@ -11,9 +11,11 @@ import {
   useCommentContext,
   useCommentDispatchContext,
 } from "@/context/CommentContext";
+import { UserToComment } from "@/db/schema/comments";
 import { User } from "@/db/schema/users";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { Button } from "../ui/button";
 
 export default function CommentVote({
@@ -26,31 +28,33 @@ export default function CommentVote({
   const state = useCommentContext();
   const dispatch = useCommentDispatchContext();
 
-  const trpc = useTRPC();
+  const voteComment = useMutation({
+    mutationFn: async (voteStatus: UserToComment["voteStatus"]) => {
+      await client.comments[`:commentId{${reg}}`].vote.$patch({
+        param: { commentId: state.id },
+        json: { voteStatus },
+      });
+    },
+    onMutate: (variables) => {
+      const previousValue = state.voteStatus;
 
-  const voteComment = useMutation(
-    trpc.comment.voteComment.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = state.voteStatus;
+      dispatch({
+        type: ReducerAction.SET_VOTE,
+        vote: variables,
+      });
 
-        dispatch({
-          type: ReducerAction.SET_VOTE,
-          vote: variables.voteStatus,
-        });
+      return { previousValue };
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_VOTE,
+        vote: context?.previousValue ?? "none",
+      });
 
-        return { previousValue };
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_VOTE,
-          vote: context?.previousValue ?? "none",
-        });
-
-        console.error(error);
-        toast.error("Failed to update your vote. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to update your vote. Please try again later.");
+    },
+  });
 
   const isUpvoted = state.voteStatus === "upvoted";
   const isDownvoted = state.voteStatus === "downvoted";
@@ -67,10 +71,7 @@ export default function CommentVote({
         className="size-8 rounded-full hover:text-rose-600"
         onClick={() => {
           if (currentUserId) {
-            voteComment.mutate({
-              commentId: state.id,
-              voteStatus: isUpvoted ? "none" : "upvoted",
-            });
+            voteComment.mutate(isUpvoted ? "none" : "upvoted");
           } else {
             router.push("/sign-in");
           }
@@ -96,10 +97,7 @@ export default function CommentVote({
         className="size-8 rounded-full hover:text-indigo-500"
         onClick={() => {
           if (currentUserId) {
-            voteComment.mutate({
-              commentId: state.id,
-              voteStatus: isDownvoted ? "none" : "downvoted",
-            });
+            voteComment.mutate(isDownvoted ? "none" : "downvoted");
           } else {
             router.push("/sign-in");
           }

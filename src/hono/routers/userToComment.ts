@@ -12,7 +12,11 @@ export const userToComment = factory.createApp().patch(
     }).safeParse(value);
 
     if (!parsed.success) {
-      return c.text("400 Invalid search json", 400);
+      const error = parsed.error._zod.def[0];
+      return c.text(
+        `400 Invalid json parameter for ${error.path}. ${error.message}`,
+        400,
+      );
     }
     return parsed.data;
   }),

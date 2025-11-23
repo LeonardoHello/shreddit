@@ -21,8 +21,9 @@ export const userToPost = factory
       }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -51,7 +52,11 @@ export const userToPost = factory
       const parsed = UserToPostSchema.pick({ saved: true }).safeParse(value);
 
       if (!parsed.success) {
-        return c.text("400 Invalid search json", 400);
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
+          400,
+        );
       }
       return parsed.data;
     }),
@@ -78,7 +83,11 @@ export const userToPost = factory
       const parsed = UserToPostSchema.pick({ hidden: true }).safeParse(value);
 
       if (!parsed.success) {
-        return c.text("400 Invalid search json", 400);
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
+          400,
+        );
       }
       return parsed.data;
     }),
@@ -105,8 +114,9 @@ export const userToPost = factory
       const parsed = PostSchema.pick({ spoiler: true }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -150,7 +160,11 @@ export const userToPost = factory
       const parsed = PostSchema.pick({ nsfw: true }).safeParse(value);
 
       if (!parsed.success) {
-        return c.text("400 Invalid search json", 400);
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
+          400,
+        );
       }
       return parsed.data;
     }),

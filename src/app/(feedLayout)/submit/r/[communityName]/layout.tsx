@@ -1,6 +1,7 @@
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { getQueryClient, trpc } from "@/trpc/server";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 
 export default async function CommunitySubmitLayout(
   props: LayoutProps<"/submit/r/[communityName]">,
@@ -9,9 +10,15 @@ export default async function CommunitySubmitLayout(
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery(
-    trpc.community.getSelectedCommunity.queryOptions(params.communityName),
-  );
+  queryClient.prefetchQuery({
+    queryKey: ["communities", params.communityName, "submit"],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].submit.$get({
+        param: { communityName: params.communityName },
+      });
+      return res.json();
+    },
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

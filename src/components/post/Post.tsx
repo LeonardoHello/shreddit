@@ -6,7 +6,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import PostContextProvider from "@/context/PostContext";
 import { User } from "@/db/schema/users";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import PostBody from "./PostBody";
 import PostFooter from "./PostFooter";
 import PostHeader from "./PostHeader";
@@ -18,11 +19,16 @@ export default function Post({
   currentUserId: User["id"] | null;
   postId: string;
 }) {
-  const trpc = useTRPC();
+  const { data: post } = useSuspenseQuery({
+    queryKey: ["posts", postId],
+    queryFn: async () => {
+      const res = await client.posts[`:postId{${reg}}`].$get({
+        param: { postId },
+      });
 
-  const { data: post } = useSuspenseQuery(
-    trpc.post.getPost.queryOptions(postId),
-  );
+      return res.json();
+    },
+  });
 
   if (!post) notFound();
 

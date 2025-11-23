@@ -15,8 +15,9 @@ export const feedSaved = factory.createApp().get(
     const parsed = PostCursorSchema.safeParse(value);
 
     if (!parsed.success) {
+      const error = parsed.error._zod.def[0];
       return c.text(
-        `400 Invalid query parameter for ${parsed.error.name}`,
+        `400 Invalid query parameter for ${error.path}. ${error.message}`,
         400,
       );
     }

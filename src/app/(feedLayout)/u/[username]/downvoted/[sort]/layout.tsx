@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
-import { getQueryClient, trpc } from "@/trpc/server";
-import { PostSort } from "@/types/enums";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
+import { PostFeed, PostSort } from "@/types/enums";
 
 export default async function UserDownvotedLayout(
   props: LayoutProps<"/u/[username]/downvoted/[sort]">,
@@ -17,12 +18,17 @@ export default async function UserDownvotedLayout(
 
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchInfiniteQuery(
-    trpc.postFeed.getDownvotedPosts.infiniteQueryOptions({
-      sort,
-      username: params.username,
-    }),
-  );
+  queryClient.prefetchInfiniteQuery({
+    queryKey: ["posts", PostFeed.DOWNVOTED, params.username, sort],
+    queryFn: async ({ pageParam }) => {
+      const res = await client.posts.users[":username"].downvoted.$get({
+        param: { username: params.username },
+        query: { sort, cursor: pageParam },
+      });
+      return res.json();
+    },
+    initialPageParam: undefined,
+  });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

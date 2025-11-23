@@ -3,7 +3,8 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSession } from "@/app/actions";
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
-import { getQueryClient, trpc } from "@/trpc/server";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 
 export default async function CommunityLayout(
   props: LayoutProps<"/r/[communityName]">,
@@ -13,14 +14,28 @@ export default async function CommunityLayout(
   const queryClient = getQueryClient();
 
   if (session) {
-    void queryClient.prefetchQuery(
-      trpc.community.getUserToCommunity.queryOptions(params.communityName),
-    );
+    queryClient.prefetchQuery({
+      queryKey: ["communities", params.communityName, "user"],
+      queryFn: async () => {
+        const res = await client.communities[":communityName"].user.$get({
+          param: { communityName: params.communityName },
+        });
+
+        return res.json();
+      },
+    });
   }
 
-  void queryClient.prefetchQuery(
-    trpc.community.getCommunityByName.queryOptions(params.communityName),
-  );
+  queryClient.prefetchQuery({
+    queryKey: ["communities", params.communityName],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].$get({
+        param: { communityName: params.communityName },
+      });
+
+      return res.json();
+    },
+  });
 
   return (
     <div className="container flex grow flex-col gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">

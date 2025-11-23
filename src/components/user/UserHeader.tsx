@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import defaultUserImage from "@public/defaultUserImage.png";
 import userBanner from "@public/userBanner.jpg";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -13,11 +13,15 @@ import UserNavigation from "./UserNavigation";
 import UserSidebar from "./UserSidebar";
 
 export default function UserHeader({ username }: { username: string }) {
-  const trpc = useTRPC();
-
-  const { data: user } = useSuspenseQuery(
-    trpc.user.getUserByName.queryOptions(username),
-  );
+  const { data: user } = useSuspenseQuery({
+    queryKey: ["users", username],
+    queryFn: async () => {
+      const res = await client.users[":username"].$get({
+        param: { username },
+      });
+      return res.json();
+    },
+  });
 
   if (!user) {
     notFound();

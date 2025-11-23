@@ -12,8 +12,9 @@ import {
   usePostDispatchContext,
 } from "@/context/PostContext";
 import { User } from "@/db/schema/users";
+import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
-import { useTRPC } from "@/trpc/client";
+import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { Button } from "../ui/button";
 
 export default function PostVote({
@@ -26,31 +27,33 @@ export default function PostVote({
   const state = usePostContext();
   const dispatch = usePostDispatchContext();
 
-  const trpc = useTRPC();
+  const votePost = useMutation({
+    mutationFn: async (voteStatus: NonNullable<typeof state.voteStatus>) => {
+      await client.posts[`:postId{${reg}}`].vote.$patch({
+        param: { postId: state.id },
+        json: { voteStatus },
+      });
+    },
+    onMutate: (variables) => {
+      const previousValue = state.voteStatus;
 
-  const votePost = useMutation(
-    trpc.post.votePost.mutationOptions({
-      onMutate: (variables) => {
-        const previousValue = state.voteStatus;
+      dispatch({
+        type: ReducerAction.SET_VOTE,
+        vote: variables,
+      });
 
-        dispatch({
-          type: ReducerAction.SET_VOTE,
-          vote: variables.voteStatus,
-        });
+      return { previousValue };
+    },
+    onError: (error, _variables, context) => {
+      dispatch({
+        type: ReducerAction.SET_VOTE,
+        vote: context?.previousValue ?? "none",
+      });
 
-        return { previousValue };
-      },
-      onError: (error, _variables, context) => {
-        dispatch({
-          type: ReducerAction.SET_VOTE,
-          vote: context?.previousValue ?? "none",
-        });
-
-        console.error(error);
-        toast.error("Failed to update your vote. Please try again later.");
-      },
-    }),
-  );
+      console.error(error);
+      toast.error("Failed to update your vote. Please try again later.");
+    },
+  });
 
   const isUpvoted = state.voteStatus === "upvoted";
   const isDownvoted = state.voteStatus === "downvoted";
@@ -74,10 +77,7 @@ export default function PostVote({
         })}
         onClick={() => {
           if (currentUserId) {
-            votePost.mutate({
-              postId: state.id,
-              voteStatus: isUpvoted ? "none" : "upvoted",
-            });
+            votePost.mutate(isUpvoted ? "none" : "upvoted");
           } else {
             router.push("/sign-in");
           }
@@ -107,10 +107,7 @@ export default function PostVote({
         })}
         onClick={() => {
           if (currentUserId) {
-            votePost.mutate({
-              postId: state.id,
-              voteStatus: isDownvoted ? "none" : "downvoted",
-            });
+            votePost.mutate(isDownvoted ? "none" : "downvoted");
           } else {
             router.push("/sign-in");
           }

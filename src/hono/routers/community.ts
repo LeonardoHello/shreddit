@@ -15,6 +15,63 @@ import { factory, mwAuthenticated } from "../init";
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const community = factory
   .createApp()
+  .get(
+    "/search",
+    validator("query", (value, c) => {
+      const parsed = z
+        .object({
+          search: z.string(),
+          limit: z.string(),
+        })
+        .safeParse(value);
+
+      if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid query parameter for ${error.path}. ${error.message}`,
+          400,
+        );
+      }
+
+      const transformed = z
+        .object({
+          search: z.string(),
+          limit: z.number().check(z.positive()),
+        })
+        .safeParse({ ...parsed.data, limit: Number(parsed.data.limit) });
+
+      if (!transformed.success) {
+        return c.text(
+          `400 Invalid query parameter for limit. Not of type number`,
+          400,
+        );
+      }
+
+      return transformed.data;
+    }),
+    async (c) => {
+      const query = c.req.valid("query");
+
+      const data = await c.var.db.query.communities.findMany({
+        limit: query.limit,
+        where: (community, { ilike }) =>
+          ilike(community.name, `%${query.search}%`),
+        columns: { id: true, name: true, icon: true, iconPlaceholder: true },
+        extras: (community, { sql }) => ({
+          memberCount: sql<number>`
+              (
+                SELECT COUNT(*) 
+                FROM users_to_communities 
+                WHERE users_to_communities.community_id = ${community.id} 
+                  AND users_to_communities.joined = true
+              )
+            `.as("member_count"),
+        }),
+      });
+
+      return c.json(data, 200);
+    },
+  )
   .get("/:communityName", async (c) => {
     const communityName = c.req.param("communityName");
 
@@ -64,47 +121,7 @@ export const community = factory
 
     return c.json(data, 200);
   })
-  .get(
-    "/search",
-    validator("query", (value, c) => {
-      const parsed = z
-        .object({
-          search: z.string(),
-          limit: z.optional(z.number().check(z.positive())),
-        })
-        .safeParse(value);
 
-      if (!parsed.success) {
-        return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
-          400,
-        );
-      }
-      return parsed.data;
-    }),
-    async (c) => {
-      const query = c.req.valid("query");
-
-      const data = await c.var.db.query.communities.findMany({
-        limit: query.limit,
-        where: (community, { ilike }) =>
-          ilike(community.name, `%${query.search}%`),
-        columns: { id: true, name: true, icon: true, iconPlaceholder: true },
-        extras: (community, { sql }) => ({
-          memberCount: sql<number>`
-              (
-                SELECT COUNT(*) 
-                FROM users_to_communities 
-                WHERE users_to_communities.community_id = ${community.id} 
-                  AND users_to_communities.joined = true
-              )
-            `.as("member_count"),
-        }),
-      });
-
-      return c.json(data[0], 201);
-    },
-  )
   .post(
     "/",
     validator("json", (value, c) => {
@@ -118,7 +135,11 @@ export const community = factory
       }).safeParse(value);
 
       if (!parsed.success) {
-        return c.text("400 Invalid search json", 400);
+        const error = parsed.error._zod.def[0];
+        return c.text(
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
+          400,
+        );
       }
       return parsed.data;
     }),
@@ -143,7 +164,7 @@ export const community = factory
         }),
       ]);
 
-      return c.json(data[0], 201);
+      return c.json(data, 201);
     },
   )
   .patch(
@@ -158,8 +179,9 @@ export const community = factory
       }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid query parameter for ${error.path}. ${error.message}`,
           400,
         );
       }

@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useTRPC } from "@/trpc/client";
+import { client } from "@/hono/client";
 import defaultUserImage from "@public/defaultUserImage.png";
 import CommunityIcon from "../community/CommunityIcon";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -65,11 +65,15 @@ export default function UserSidebar({
 }
 
 function UserSidebarContent({ username }: { username: string }) {
-  const trpc = useTRPC();
-
-  const { data: user } = useSuspenseQuery(
-    trpc.user.getUserByName.queryOptions(username),
-  );
+  const { data: user } = useSuspenseQuery({
+    queryKey: ["users", username],
+    queryFn: async () => {
+      const res = await client.users[":username"].$get({
+        param: { username },
+      });
+      return res.json();
+    },
+  });
 
   if (!user) {
     notFound();

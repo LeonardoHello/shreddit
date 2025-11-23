@@ -16,7 +16,8 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { getQueryClient, trpc } from "@/trpc/server";
+import { client } from "@/hono/client";
+import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import SidebarDialog from "./SidebarDialog";
 import SidebarLogo from "./SidebarLogo";
 import SidebarNavJoined from "./SidebarNavJoined";
@@ -32,15 +33,27 @@ export async function AppSidebar() {
   const queryClient = getQueryClient();
 
   if (session) {
-    void queryClient.prefetchQuery(
-      trpc.community.getModeratedCommunities.queryOptions(),
-    );
-    void queryClient.prefetchQuery(
-      trpc.community.getJoinedCommunities.queryOptions(),
-    );
-    void queryClient.prefetchQuery(
-      trpc.community.getMutedCommunities.queryOptions(),
-    );
+    queryClient.prefetchQuery({
+      queryKey: ["communities", "moderated"],
+      queryFn: async () => {
+        const res = await client.communities.moderated.$get();
+        return res.json();
+      },
+    });
+    queryClient.prefetchQuery({
+      queryKey: ["communities", "joined"],
+      queryFn: async () => {
+        const res = await client.communities.joined.$get();
+        return res.json();
+      },
+    });
+    queryClient.prefetchQuery({
+      queryKey: ["communities", "muted"],
+      queryFn: async () => {
+        const res = await client.communities.muted.$get();
+        return res.json();
+      },
+    });
   }
 
   return (

@@ -1,6 +1,6 @@
 import { SQL } from "drizzle-orm";
 import { validator } from "hono/validator";
-import z from "zod";
+import * as z from "zod/mini";
 
 import { usersToCommunities } from "@/db/schema/communities";
 import { usersToPosts } from "@/db/schema/posts";
@@ -21,8 +21,9 @@ export const feedAll = factory.createApp().get(
       .safeParse(value);
 
     if (!parsed.success) {
+      const error = parsed.error._zod.def[0];
       return c.text(
-        `400 Invalid query parameter for ${parsed.error.name}`,
+        `400 Invalid query parameter for ${error.path}. ${error.message}`,
         400,
       );
     }

@@ -3,6 +3,7 @@ import { validator } from "hono/validator";
 import { v4 as uuidv4 } from "uuid";
 import * as z from "zod/mini";
 
+import { UserToComment } from "@/db/schema/comments";
 import { communities } from "@/db/schema/communities";
 import {
   postFiles,
@@ -96,6 +97,46 @@ export const post = factory
 
     return c.json(data, 200);
   })
+  .get(`/:postId{${reg}}/comments`, async (c) => {
+    const postId = c.req.param("postId");
+
+    const data = await c.var.db.query.comments.findMany({
+      where: (comment, { eq }) => eq(comment.postId, postId),
+      with: {
+        author: true,
+        post: {
+          columns: { authorId: true, communityId: true },
+          with: { community: { columns: { moderatorId: true } } },
+        },
+      },
+      extras: (comment, { sql }) => ({
+        voteCount: sql<number>`
+            (
+              SELECT COALESCE(SUM(
+                CASE 
+                  WHEN vote_status = 'upvoted' THEN 1
+                  WHEN vote_status = 'downvoted' THEN -1
+                  ELSE 0
+                END
+              ), 0)
+              FROM users_to_comments
+              WHERE users_to_comments.comment_id = ${comment.id}
+            )
+          `.as("vote_count"),
+        voteStatus: sql<UserToComment["voteStatus"] | null>`
+            (
+              SELECT vote_status
+              FROM users_to_comments
+              WHERE users_to_comments.comment_id = ${comment.id}
+                AND users_to_comments.user_id = ${c.var.currentUserId}
+            )
+          `.as("vote_status"),
+      }),
+      orderBy: (post, { desc }) => desc(post.createdAt),
+    });
+
+    return c.json(data, 200);
+  })
   .post(
     "/",
     validator("json", (value, c) => {
@@ -120,8 +161,9 @@ export const post = factory
         .safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
@@ -168,8 +210,9 @@ export const post = factory
       const parsed = PostSchema.pick({ text: true }).safeParse(value);
 
       if (!parsed.success) {
+        const error = parsed.error._zod.def[0];
         return c.text(
-          `400 Invalid query parameter for ${parsed.error.name}`,
+          `400 Invalid json parameter for ${error.path}. ${error.message}`,
           400,
         );
       }
