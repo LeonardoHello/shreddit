@@ -19,9 +19,9 @@ export default async function UserHiddenLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.HIDDEN, params.username, sort],
+    queryKey: ["users", params.username, "posts", PostFeed.HIDDEN, sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.users[":username"].hidden.$get({
+      const res = await client.users[":username"].posts.hidden.$get({
         param: { username: params.username },
         query: { sort, cursor: pageParam },
       });

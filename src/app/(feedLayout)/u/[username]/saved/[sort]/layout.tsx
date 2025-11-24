@@ -19,9 +19,9 @@ export default async function UserSavedLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.SAVED, params.username, sort],
+    queryKey: ["users", params.username, "posts", PostFeed.SAVED, sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.users[":username"].saved.$get({
+      const res = await client.users[":username"].posts.saved.$get({
         param: { username: params.username },
         query: { sort, cursor: pageParam },
       });

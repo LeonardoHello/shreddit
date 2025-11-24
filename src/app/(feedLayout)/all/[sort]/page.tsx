@@ -11,8 +11,11 @@ export default async function AllSortPage(props: PageProps<"/all/[sort]">) {
 
   return (
     <FeedPostInfiniteQuery<PostFeed.ALL>
-      currentUserId={session && session.session.userId}
-      params={{ feed: PostFeed.ALL, queryKey: ["posts", PostFeed.ALL, sort] }}
+      params={{
+        feed: PostFeed.ALL,
+        currentUserId: session && session.session.userId,
+        queryKey: ["posts", sort],
+      }}
       sort={sort}
     />
   );

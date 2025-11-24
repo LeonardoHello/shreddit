@@ -15,7 +15,7 @@ export default function FeedPostHidden() {
 
   const hidePost = useMutation({
     mutationFn: async () => {
-      const res = await client.posts[`:postId{${reg}}`].hide.$patch({
+      const res = await client.users.me.posts[`:postId{${reg}}`].hide.$patch({
         param: { postId: state.id },
         json: { hidden: false },
       });

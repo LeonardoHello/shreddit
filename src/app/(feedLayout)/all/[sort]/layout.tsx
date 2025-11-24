@@ -5,7 +5,7 @@ import * as z from "zod/mini";
 
 import { client } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
-import { PostFeed, PostSort } from "@/types/enums";
+import { PostSort } from "@/types/enums";
 
 export default async function AllSortLayout(props: LayoutProps<"/all/[sort]">) {
   const params = await props.params;
@@ -17,9 +17,9 @@ export default async function AllSortLayout(props: LayoutProps<"/all/[sort]">) {
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.ALL, sort],
+    queryKey: ["posts", sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.all.$get({
+      const res = await client.posts.$get({
         query: { sort, cursor: pageParam },
       });
       return res.json();

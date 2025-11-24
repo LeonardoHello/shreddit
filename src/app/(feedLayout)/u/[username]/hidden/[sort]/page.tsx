@@ -13,11 +13,11 @@ export default async function UserPage(
 
   return (
     <FeedPostInfiniteQuery<PostFeed.HIDDEN>
-      currentUserId={session && session.session.userId}
       params={{
         feed: PostFeed.HIDDEN,
         username: params.username,
-        queryKey: ["posts", PostFeed.HIDDEN, params.username, sort],
+        currentUserId: session && session.session.userId,
+        queryKey: ["users", params.username, "posts", PostFeed.HIDDEN, sort],
       }}
       sort={sort}
     />

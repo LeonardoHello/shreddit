@@ -47,7 +47,7 @@ export default function PostDropdown({
 
   const savePost = useMutation({
     mutationFn: async () => {
-      const res = await client.posts[`:postId{${reg}}`].save.$patch({
+      const res = await client.users.me.posts[`:postId{${reg}}`].save.$patch({
         param: { postId: state.id },
         json: { saved: !state.isSaved },
       });
@@ -84,7 +84,7 @@ export default function PostDropdown({
 
   const hidePost = useMutation({
     mutationFn: async () => {
-      const res = await client.posts[`:postId{${reg}}`].hide.$patch({
+      const res = await client.users.me.posts[`:postId{${reg}}`].hide.$patch({
         param: { postId: state.id },
         json: { hidden: !state.isHidden },
       });
@@ -121,10 +121,12 @@ export default function PostDropdown({
 
   const setSpoiler = useMutation({
     mutationFn: async () => {
-      const res = await client.posts[`:postId{${reg}}`].spoiler.$patch({
-        param: { postId: state.id },
-        json: { spoiler: !state.spoiler },
-      });
+      const res = await client.users.me.posts[`:postId{${reg}}`].spoiler.$patch(
+        {
+          param: { postId: state.id },
+          json: { spoiler: !state.spoiler },
+        },
+      );
 
       return res.json();
     },
@@ -160,7 +162,7 @@ export default function PostDropdown({
 
   const setNSFW = useMutation({
     mutationFn: async () => {
-      const res = await client.posts[`:postId{${reg}}`].nsfw.$patch({
+      const res = await client.users.me.posts[`:postId{${reg}}`].nsfw.$patch({
         param: { postId: state.id },
         json: { nsfw: !state.nsfw },
       });

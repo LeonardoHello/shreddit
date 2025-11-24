@@ -5,7 +5,7 @@ import * as z from "zod/mini";
 
 import { client } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
-import { PostFeed, PostSort } from "@/types/enums";
+import { PostSort } from "@/types/enums";
 
 export default async function UserLayout(
   props: LayoutProps<"/u/[username]/[sort]">,
@@ -19,9 +19,9 @@ export default async function UserLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.USER, params.username, sort],
+    queryKey: ["users", params.username, "posts", sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.users[":username"].$get({
+      const res = await client.users[":username"].posts.$get({
         param: { username: params.username },
         query: { sort, cursor: pageParam },
       });

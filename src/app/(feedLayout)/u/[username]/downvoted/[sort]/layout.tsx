@@ -19,9 +19,9 @@ export default async function UserDownvotedLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.DOWNVOTED, params.username, sort],
+    queryKey: ["users", params.username, "posts", PostFeed.DOWNVOTED, sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.users[":username"].downvoted.$get({
+      const res = await client.users[":username"].posts.downvoted.$get({
         param: { username: params.username },
         query: { sort, cursor: pageParam },
       });

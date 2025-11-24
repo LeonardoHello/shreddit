@@ -3,14 +3,18 @@ import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
+import { getSession } from "@/app/actions";
 import { client } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
-import { PostFeed, PostSort } from "@/types/enums";
+import { PostSort } from "@/types/enums";
 
 export default async function HomeSortLayout(
   props: LayoutProps<"/home/[sort]">,
 ) {
-  const params = await props.params;
+  const [params, session] = await Promise.all([props.params, getSession()]);
+
+  if (!session) throw new Error("Could not load home page information.");
+
   const { data: sort, success } = z.enum(PostSort).safeParse(params.sort);
 
   if (!success) notFound();
@@ -18,10 +22,14 @@ export default async function HomeSortLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.HOME, sort],
+    queryKey: ["users", session.session.userId, "posts", sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.home.$get({
-        query: { sort, cursor: pageParam },
+      const res = await client.users.me.posts.$get({
+        query: {
+          sort,
+          currentUserId: session.session.userId,
+          cursor: pageParam,
+        },
       });
       return res.json();
     },

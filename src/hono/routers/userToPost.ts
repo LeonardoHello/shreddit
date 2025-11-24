@@ -8,11 +8,23 @@ import {
   usersToPosts,
   UserToPostSchema,
 } from "@/db/schema/posts";
+import { PostFeed } from "@/types/enums";
+import { feedHonoResponse, feedHonoValidation } from "@/utils/feedQueryOptions";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory } from "../init";
 
 export const userToPost = factory
   .createApp()
+  .get("/", feedHonoValidation, async (c) => {
+    const query = c.req.valid("query");
+
+    if (!query.currentUserId) return c.text("401 unauthorized", 401);
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.HOME,
+      currentUserId: query.currentUserId,
+    });
+  })
   .patch(
     `/:postId{${reg}}/vote`,
     validator("json", (value, c) => {

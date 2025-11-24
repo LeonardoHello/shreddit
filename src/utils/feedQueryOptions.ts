@@ -4,14 +4,21 @@ import { validator } from "hono/validator";
 import * as z from "zod/mini";
 
 import type drizzleDb from "@/db";
-import { usersToCommunities } from "@/db/schema/communities";
+import {
+  communities,
+  usersToCommunities,
+  type Community,
+} from "@/db/schema/communities";
 import { PostSchema, usersToPosts, UserToPost } from "@/db/schema/posts";
+import { users, type User } from "@/db/schema/users";
+import type { Env } from "@/hono/init";
 import type { UserId } from "@/lib/auth";
-import { PostSort } from "@/types/enums";
+import { PostFeed, PostSort } from "@/types/enums";
 import { getOneMonthAgo } from "./getOneMonthAgo";
 
 const PostCursorSchema = z.discriminatedUnion("sort", [
   z.object({
+    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.BEST),
     cursor: z.optional(
       z.object({
@@ -21,6 +28,7 @@ const PostCursorSchema = z.discriminatedUnion("sort", [
     ),
   }),
   z.object({
+    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.HOT),
     cursor: z.optional(
       z.object({
@@ -30,10 +38,12 @@ const PostCursorSchema = z.discriminatedUnion("sort", [
     ),
   }),
   z.object({
+    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.NEW),
     cursor: z.optional(PostSchema.pick({ id: true, createdAt: true })),
   }),
   z.object({
+    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.CONTROVERSIAL),
     cursor: z.optional(
       z.object({
@@ -61,6 +71,7 @@ function encodeCursor(cursor: object) {
 export const feedHonoValidation = validator("query", (value, c) => {
   const parsed = z
     .object({
+      currentUserId: z.nullish(z.string()),
       sort: z.enum(PostSort),
       cursor: z.nullish(z.string()),
     })
@@ -77,7 +88,7 @@ export const feedHonoValidation = validator("query", (value, c) => {
   const cursor = parsed.data.cursor;
 
   if (cursor === null || cursor === undefined) {
-    return { sort: parsed.data.sort, cursor };
+    return { ...parsed.data, cursor };
   }
 
   const decodedCursor = decodeCursor(cursor);
@@ -184,58 +195,235 @@ export const postInputConfig = (currentUserId: UserId) =>
     }),
   }) satisfies InputConfig;
 
+type FeedProps = {
+  [P in PostFeed]: P extends PostFeed.ALL
+    ? {
+        feed: P;
+      }
+    : P extends PostFeed.HOME
+      ? {
+          feed: P;
+          currentUserId: NonNullable<UserId>;
+        }
+      : P extends PostFeed.COMMUNITY
+        ? {
+            feed: P;
+            communityName: Community["name"];
+          }
+        : {
+            feed: P;
+            username: NonNullable<User["username"]>;
+          };
+}[PostFeed];
+
+type QueryProps =
+  | z.infer<typeof PostCursorSchema>
+  | { sort: PostSort; cursor: null | undefined };
+
 export const feedHonoResponse = async (
   c: Context,
-  query:
-    | z.infer<typeof PostCursorSchema>
-    | { sort: PostSort; cursor: null | undefined },
-  currentUserId: UserId,
-  db: typeof drizzleDb,
-  hideHidden: boolean,
-  hideMuted: boolean,
-  initialSQL?: SQL,
+  query: QueryProps,
+  variables: Env["Variables"],
+  feedProps: FeedProps,
 ) => {
+  const { currentUserId, db } = variables;
+
   const inputConfig = postInputConfig(currentUserId);
 
   const data = await db.query.posts.findMany({
     ...inputConfig,
     limit: 10,
-    where: (post, { and, or, eq, gt, lt, notExists, sql }) => {
-      const filters: (SQL | undefined)[] = [initialSQL];
+    where: (post, { and, or, eq, gt, lt, exists, notExists, sql }) => {
+      const filters: (SQL | undefined)[] = [];
 
-      if (currentUserId) {
-        if (hideHidden) {
-          filters.push(
-            notExists(
-              db
-                .select()
-                .from(usersToPosts)
-                .where(
-                  and(
-                    eq(usersToPosts.postId, post.id),
-                    eq(usersToPosts.userId, currentUserId),
-                    eq(usersToPosts.hidden, true),
-                  ),
+      const hideHidden = (currentUserId: NonNullable<UserId>) => {
+        filters.push(
+          notExists(
+            db
+              .select()
+              .from(usersToPosts)
+              .where(
+                and(
+                  eq(usersToPosts.postId, post.id),
+                  eq(usersToPosts.userId, currentUserId),
+                  eq(usersToPosts.hidden, true),
                 ),
-            ),
-          );
-        }
-        if (hideMuted) {
+              ),
+          ),
+        );
+      };
+      const hideMuted = (currentUserId: NonNullable<UserId>) => {
+        filters.push(
+          notExists(
+            db
+              .select()
+              .from(usersToCommunities)
+              .where(
+                and(
+                  eq(usersToCommunities.communityId, post.communityId),
+                  eq(usersToCommunities.userId, currentUserId),
+                  eq(usersToCommunities.muted, true),
+                ),
+              ),
+          ),
+        );
+      };
+
+      switch (feedProps.feed) {
+        case PostFeed.HOME:
+          if (currentUserId) {
+            hideHidden(currentUserId);
+            hideMuted(currentUserId);
+          }
           filters.push(
-            notExists(
+            exists(
               db
                 .select()
                 .from(usersToCommunities)
                 .where(
                   and(
+                    eq(usersToCommunities.userId, feedProps.currentUserId),
                     eq(usersToCommunities.communityId, post.communityId),
-                    eq(usersToCommunities.userId, currentUserId),
-                    eq(usersToCommunities.muted, true),
+                    eq(usersToCommunities.joined, true),
                   ),
                 ),
             ),
           );
-        }
+          break;
+
+        case PostFeed.COMMUNITY:
+          if (currentUserId) {
+            hideHidden(currentUserId);
+          }
+          filters.push(
+            exists(
+              db
+                .select({ id: communities.id })
+                .from(communities)
+                .where(
+                  and(
+                    eq(communities.id, post.communityId),
+                    eq(communities.name, feedProps.communityName),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        case PostFeed.USER:
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(users)
+                .where(
+                  and(
+                    eq(users.id, post.authorId),
+                    eq(users.username, feedProps.username),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        case PostFeed.UPVOTED:
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(usersToPosts)
+                .innerJoin(
+                  users,
+                  and(
+                    eq(users.id, usersToPosts.userId),
+                    eq(users.username, feedProps.username),
+                  ),
+                )
+                .where(
+                  and(
+                    eq(usersToPosts.postId, post.id),
+                    eq(usersToPosts.voteStatus, "upvoted"),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        case PostFeed.DOWNVOTED:
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(usersToPosts)
+                .innerJoin(
+                  users,
+                  and(
+                    eq(users.id, usersToPosts.userId),
+                    eq(users.username, feedProps.username),
+                  ),
+                )
+                .where(
+                  and(
+                    eq(usersToPosts.postId, post.id),
+                    eq(usersToPosts.voteStatus, "downvoted"),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        case PostFeed.SAVED:
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(usersToPosts)
+                .innerJoin(
+                  users,
+                  and(
+                    eq(users.id, usersToPosts.userId),
+                    eq(users.username, feedProps.username),
+                  ),
+                )
+                .where(
+                  and(
+                    eq(usersToPosts.postId, post.id),
+                    eq(usersToPosts.saved, true),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        case PostFeed.HIDDEN:
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(usersToPosts)
+                .innerJoin(
+                  users,
+                  and(
+                    eq(users.id, usersToPosts.userId),
+                    eq(users.username, feedProps.username),
+                  ),
+                )
+                .where(
+                  and(
+                    eq(usersToPosts.postId, post.id),
+                    eq(usersToPosts.hidden, true),
+                  ),
+                ),
+            ),
+          );
+          break;
+
+        default:
+          if (currentUserId) {
+            hideHidden(currentUserId);
+            hideMuted(currentUserId);
+          }
+          break;
       }
 
       if (query.sort === PostSort.HOT) {

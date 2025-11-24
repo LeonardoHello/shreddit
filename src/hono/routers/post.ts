@@ -11,13 +11,23 @@ import {
   posts,
   PostSchema,
 } from "@/db/schema/posts";
-import { postInputConfig } from "@/utils/feedQueryOptions";
+import { PostFeed } from "@/types/enums";
+import {
+  feedHonoResponse,
+  feedHonoValidation,
+  postInputConfig,
+} from "@/utils/feedQueryOptions";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory } from "../init";
 
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const post = factory
   .createApp()
+  .get("/", feedHonoValidation, async (c) => {
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, { feed: PostFeed.ALL });
+  })
   .get(`/:postId{${reg}}`, async (c) => {
     const postId = c.req.param("postId");
     const currentUserId = c.get("currentUserId");

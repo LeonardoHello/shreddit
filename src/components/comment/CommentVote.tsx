@@ -30,7 +30,7 @@ export default function CommentVote({
 
   const voteComment = useMutation({
     mutationFn: async (voteStatus: UserToComment["voteStatus"]) => {
-      await client.comments[`:commentId{${reg}}`].vote.$patch({
+      await client.users.me.comments[`:commentId{${reg}}`].vote.$patch({
         param: { commentId: state.id },
         json: { voteStatus },
       });

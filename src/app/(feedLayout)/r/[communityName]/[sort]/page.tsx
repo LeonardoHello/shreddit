@@ -13,11 +13,11 @@ export default async function CommunityPage(
 
   return (
     <FeedPostInfiniteQuery<PostFeed.COMMUNITY>
-      currentUserId={session && session.session.userId}
       params={{
         feed: PostFeed.COMMUNITY,
-        queryKey: ["posts", PostFeed.COMMUNITY, params.communityName, sort],
         communityName: params.communityName,
+        currentUserId: session && session.session.userId,
+        queryKey: ["communities", params.communityName, "posts", sort],
       }}
       sort={sort}
     />

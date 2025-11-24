@@ -8,6 +8,8 @@ import {
   CommunitySchema,
   usersToCommunities,
 } from "@/db/schema/communities";
+import { PostFeed } from "@/types/enums";
+import { feedHonoResponse, feedHonoValidation } from "@/utils/feedQueryOptions";
 import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory } from "../init";
@@ -132,6 +134,15 @@ export const community = factory
     });
 
     return c.json(data, 200);
+  })
+  .get("/:communityName/posts", feedHonoValidation, async (c) => {
+    const communityName = c.req.param("communityName");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.COMMUNITY,
+      communityName,
+    });
   })
   .post(
     "/",

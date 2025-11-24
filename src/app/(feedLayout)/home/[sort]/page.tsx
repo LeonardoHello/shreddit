@@ -13,8 +13,11 @@ export default async function HomeSortPage(props: PageProps<"/home/[sort]">) {
 
   return (
     <FeedPostInfiniteQuery<PostFeed.HOME>
-      currentUserId={session && session.session.userId}
-      params={{ feed: PostFeed.HOME, queryKey: ["posts", PostFeed.HOME, sort] }}
+      params={{
+        feed: PostFeed.HOME,
+        currentUserId: session.session.userId,
+        queryKey: ["users", session.session.userId, "posts", sort],
+      }}
       sort={sort}
     />
   );

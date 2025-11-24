@@ -1,6 +1,8 @@
 import { validator } from "hono/validator";
 import * as z from "zod/mini";
 
+import { PostFeed } from "@/types/enums";
+import { feedHonoResponse, feedHonoValidation } from "@/utils/feedQueryOptions";
 import { factory } from "../init";
 
 export const user = factory
@@ -145,4 +147,46 @@ export const user = factory
     });
 
     return c.json(user, 200);
+  })
+  .get("/:username/posts", feedHonoValidation, async (c) => {
+    const username = c.req.param("username");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, { feed: PostFeed.USER, username });
+  })
+  .get("/:username/posts/upvoted", feedHonoValidation, async (c) => {
+    const username = c.req.param("username");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.UPVOTED,
+      username,
+    });
+  })
+  .get("/:username/posts/downvoted", feedHonoValidation, async (c) => {
+    const username = c.req.param("username");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.DOWNVOTED,
+      username,
+    });
+  })
+  .get("/:username/posts/saved", feedHonoValidation, async (c) => {
+    const username = c.req.param("username");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.SAVED,
+      username,
+    });
+  })
+  .get("/:username/posts/hidden", feedHonoValidation, async (c) => {
+    const username = c.req.param("username");
+    const query = c.req.valid("query");
+
+    return feedHonoResponse(c, query, c.var, {
+      feed: PostFeed.HIDDEN,
+      username,
+    });
   });

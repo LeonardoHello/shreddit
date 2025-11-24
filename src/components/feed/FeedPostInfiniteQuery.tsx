@@ -8,6 +8,7 @@ import PostContextProvider from "@/context/PostContext";
 import type { Community } from "@/db/schema/communities";
 import type { User } from "@/db/schema/users";
 import { client } from "@/hono/client";
+import type { UserId } from "@/lib/auth";
 import { PostFeed, PostSort } from "@/types/enums";
 import FeedEmpty from "./FeedEmpty";
 import FeedPost from "./FeedPost";
@@ -16,29 +17,55 @@ import FeedSort from "./FeedSort";
 
 type InfiniteQueryParams<T extends PostFeed> = {
   [P in T]: P extends PostFeed.ALL
-    ? { feed: P; queryKey: ["posts", P, PostSort] }
+    ? {
+        feed: P;
+        currentUserId: UserId;
+        queryKey: ["posts", PostSort];
+      }
     : P extends PostFeed.HOME
-      ? { feed: P; queryKey: ["posts", P, PostSort] }
+      ? {
+          feed: P;
+          currentUserId: NonNullable<UserId>;
+          queryKey: ["users", NonNullable<UserId>, "posts", PostSort];
+        }
       : P extends PostFeed.COMMUNITY
         ? {
             feed: P;
-            queryKey: ["posts", P, Community["name"], PostSort];
+            currentUserId: UserId;
+            queryKey: ["communities", Community["name"], "posts", PostSort];
             communityName: Community["name"];
           }
-        : {
-            feed: P;
-            queryKey: ["posts", P, NonNullable<User["username"]>, PostSort];
-            username: NonNullable<User["username"]>;
-          };
+        : P extends PostFeed.USER
+          ? {
+              feed: P;
+              currentUserId: UserId;
+              queryKey: [
+                "users",
+                NonNullable<User["username"]>,
+                "posts",
+                PostSort,
+              ];
+              username: NonNullable<User["username"]>;
+            }
+          : {
+              feed: P;
+              currentUserId: UserId;
+              queryKey: [
+                "users",
+                NonNullable<User["username"]>,
+                "posts",
+                P,
+                PostSort,
+              ];
+              username: NonNullable<User["username"]>;
+            };
 }[T];
 
 export default function FeedPostInfiniteQuery<T extends PostFeed>({
-  currentUserId,
   params,
   sort,
   cursor,
 }: {
-  currentUserId: User["id"] | null;
   params: InfiniteQueryParams<T>;
   sort: PostSort;
   cursor?: string;
@@ -53,29 +80,33 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
       queryFn: async ({ pageParam }) => {
         switch (params.feed) {
           case PostFeed.HOME:
-            const homePosts = await client.posts.home.$get({
-              query: { sort, cursor: pageParam },
+            const homePosts = await client.users.me.posts.$get({
+              query: {
+                sort,
+                currentUserId: params.currentUserId,
+                cursor: pageParam,
+              },
             });
             return homePosts.json();
 
           case PostFeed.COMMUNITY:
-            const communityPosts = await client.posts.communities[
+            const communityPosts = await client.communities[
               ":communityName"
-            ].$get({
+            ].posts.$get({
               param: { communityName: params.communityName },
               query: { sort, cursor: pageParam },
             });
             return communityPosts.json();
 
           case PostFeed.USER:
-            const userPosts = await client.posts.users[":username"].$get({
+            const userPosts = await client.users[":username"].posts.$get({
               param: { username: params.username },
               query: { sort, cursor: pageParam },
             });
             return userPosts.json();
 
           case PostFeed.SAVED:
-            const savedPosts = await client.posts.users[":username"].saved.$get(
+            const savedPosts = await client.users[":username"].posts.saved.$get(
               {
                 param: { username: params.username },
                 query: { sort, cursor: pageParam },
@@ -84,27 +115,27 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
             return savedPosts.json();
 
           case PostFeed.HIDDEN:
-            const hiddenPosts = await client.posts.users[
+            const hiddenPosts = await client.users[
               ":username"
-            ].hidden.$get({
+            ].posts.hidden.$get({
               param: { username: params.username },
               query: { sort, cursor: pageParam },
             });
             return hiddenPosts.json();
 
           case PostFeed.UPVOTED:
-            const upvotedPosts = await client.posts.users[
+            const upvotedPosts = await client.users[
               ":username"
-            ].upvoted.$get({
+            ].posts.upvoted.$get({
               param: { username: params.username },
               query: { sort, cursor: pageParam },
             });
             return upvotedPosts.json();
 
           case PostFeed.DOWNVOTED:
-            const downvotedPosts = await client.posts.users[
+            const downvotedPosts = await client.users[
               ":username"
-            ].downvoted.$get({
+            ].posts.downvoted.$get({
               param: { username: params.username },
               query: { sort, cursor: pageParam },
             });
@@ -112,7 +143,7 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
 
           default:
           case PostFeed.ALL:
-            const allPosts = await client.posts.all.$get({
+            const allPosts = await client.posts.$get({
               query: { sort, cursor: pageParam },
             });
             return allPosts.json();
@@ -165,7 +196,7 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
             ].join("-")}
             post={post}
           >
-            <FeedPost currentUserId={currentUserId} />
+            <FeedPost currentUserId={params.currentUserId} />
           </PostContextProvider>
         )),
       )}

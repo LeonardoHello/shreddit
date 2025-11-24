@@ -5,7 +5,7 @@ import * as z from "zod/mini";
 
 import { client } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
-import { PostFeed, PostSort } from "@/types/enums";
+import { PostSort } from "@/types/enums";
 
 export default async function CommunityLayout(
   props: LayoutProps<"/r/[communityName]/[sort]">,
@@ -19,9 +19,9 @@ export default async function CommunityLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.COMMUNITY, params.communityName, sort],
+    queryKey: ["communities", params.communityName, "posts", sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.communities[":communityName"].$get({
+      const res = await client.communities[":communityName"].posts.$get({
         param: { communityName: params.communityName },
         query: { sort, cursor: pageParam },
       });

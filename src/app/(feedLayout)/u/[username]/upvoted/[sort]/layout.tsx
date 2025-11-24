@@ -19,9 +19,9 @@ export default async function UserUpvotedLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchInfiniteQuery({
-    queryKey: ["posts", PostFeed.UPVOTED, params.username, sort],
+    queryKey: ["users", params.username, "posts", PostFeed.UPVOTED, sort],
     queryFn: async ({ pageParam }) => {
-      const res = await client.posts.users[":username"].upvoted.$get({
+      const res = await client.users[":username"].posts.upvoted.$get({
         param: { username: params.username },
         query: { sort, cursor: pageParam },
       });

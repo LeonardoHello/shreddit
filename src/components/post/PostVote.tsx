@@ -29,7 +29,7 @@ export default function PostVote({
 
   const votePost = useMutation({
     mutationFn: async (voteStatus: NonNullable<typeof state.voteStatus>) => {
-      await client.posts[`:postId{${reg}}`].vote.$patch({
+      await client.users.me.posts[`:postId{${reg}}`].vote.$patch({
         param: { postId: state.id },
         json: { voteStatus },
       });
