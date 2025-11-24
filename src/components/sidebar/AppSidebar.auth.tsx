@@ -15,6 +15,7 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { client } from "@/hono/client";
+import { UserId } from "@/lib/auth";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import SidebarDialog from "./SidebarDialog";
 import SidebarLogo from "./SidebarLogo";
@@ -25,27 +26,37 @@ import SidebarNavMuted from "./SidebarNavMuted";
 import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
-export function AppSidebarAuth() {
+export async function AppSidebarAuth({
+  currentUserId,
+}: {
+  currentUserId: NonNullable<UserId>;
+}) {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ["users", "me", "communities", "moderated"],
+    queryKey: ["users", currentUserId, "communities", "moderated"],
     queryFn: async () => {
-      const res = await client.users.me.communities.moderated.$get();
+      const res = await client.users.me.communities.moderated.$get({
+        query: { currentUserId },
+      });
       return res.json();
     },
   });
   queryClient.prefetchQuery({
-    queryKey: ["users", "me", "communities", "joined"],
+    queryKey: ["users", currentUserId, "communities", "joined"],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.$get();
+      const res = await client.users.me.communities.joined.$get({
+        query: { currentUserId },
+      });
       return res.json();
     },
   });
   queryClient.prefetchQuery({
-    queryKey: ["users", "me", "communities", "muted"],
+    queryKey: ["users", currentUserId, "communities", "muted"],
     queryFn: async () => {
-      const res = await client.users.me.communities.muted.$get();
+      const res = await client.users.me.communities.muted.$get({
+        query: { currentUserId },
+      });
       return res.json();
     },
   });
@@ -71,15 +82,15 @@ export function AppSidebarAuth() {
 
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense fallback={<SidebarNavSkeleton itemCount={1} />}>
-            <SidebarNavModerated />
+            <SidebarNavModerated currentUserId={currentUserId} />
           </Suspense>
 
           <Suspense fallback={<SidebarNavSkeleton itemCount={4} />}>
-            <SidebarNavJoined />
+            <SidebarNavJoined currentUserId={currentUserId} />
           </Suspense>
 
           <Suspense fallback={<SidebarNavSkeleton itemCount={2} />}>
-            <SidebarNavMuted />
+            <SidebarNavMuted currentUserId={currentUserId} />
           </Suspense>
         </HydrationBoundary>
       </SidebarContent>
@@ -89,7 +100,7 @@ export function AppSidebarAuth() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarDialog>
+            <SidebarDialog currentUserId={currentUserId}>
               <SidebarMenuButton className="[&>svg]:size-7">
                 <Plus className="stroke-[1.25]" />
                 Create Community

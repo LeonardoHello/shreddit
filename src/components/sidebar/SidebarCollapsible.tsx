@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Community } from "@/db/schema/communities";
 import { client } from "@/hono/client";
+import type { UserId } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
@@ -43,12 +44,14 @@ type MutedCommunitiesType = InferResponseType<
 >;
 
 export default function SidebarCollapsible({
+  currentUserId,
   communities,
   defaultOpen = true,
   title,
   label,
   empty,
 }: {
+  currentUserId: NonNullable<UserId>;
   communities:
     | ModeratedCommunitiesType
     | JoinedCommunitiesType
@@ -65,6 +68,25 @@ export default function SidebarCollapsible({
   const queryClient = getQueryClient();
 
   const newDate = new Date().toISOString();
+
+  const moderatedCommunitiesQueryKey = [
+    "users",
+    currentUserId,
+    "communities",
+    "moderated",
+  ];
+  const joinedCommunitiesQueryKey = [
+    "users",
+    currentUserId,
+    "communities",
+    "joined",
+  ];
+  const mutedCommunitiesQueryKey = [
+    "users",
+    currentUserId,
+    "communities",
+    "muted",
+  ];
 
   const toggleFavorite = useMutation({
     mutationFn: async ({
@@ -87,7 +109,7 @@ export default function SidebarCollapsible({
       const { communityId, favorited } = variables;
 
       queryClient.setQueryData<ModeratedCommunitiesType>(
-        ["users", "me", "communities", "moderated"],
+        moderatedCommunitiesQueryKey,
         (updater) => {
           if (!updater) {
             return [];
@@ -103,7 +125,7 @@ export default function SidebarCollapsible({
       );
 
       queryClient.setQueryData<JoinedCommunitiesType>(
-        ["users", "me", "communities", "joined"],
+        joinedCommunitiesQueryKey,
         (updater) => {
           if (!updater) {
             return [];
@@ -119,7 +141,7 @@ export default function SidebarCollapsible({
       );
 
       queryClient.setQueryData<MutedCommunitiesType>(
-        ["users", "me", "communities", "muted"],
+        mutedCommunitiesQueryKey,
         (updater) => {
           if (!updater) {
             return [];
@@ -136,13 +158,13 @@ export default function SidebarCollapsible({
     },
     onError: (error) => {
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "moderated"],
+        queryKey: moderatedCommunitiesQueryKey,
       });
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "joined"],
+        queryKey: joinedCommunitiesQueryKey,
       });
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "muted"],
+        queryKey: mutedCommunitiesQueryKey,
       });
 
       console.error(error);

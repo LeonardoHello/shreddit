@@ -156,12 +156,16 @@ export default function CommunityHeader({
             }
           >
             <CommunityHeaderDropdown
+              currentUserId={currentUserId}
               communityId={community.id}
               communityName={communityName}
               isCommunityModerator={currentUserId === community.moderatorId}
             >
               <CommunityEditDialog community={community} />
-              <CommunityDeleteDialog communityId={community.id} />
+              <CommunityDeleteDialog
+                currentUserId={currentUserId}
+                communityId={community.id}
+              />
             </CommunityHeaderDropdown>
           </Suspense>
         )}

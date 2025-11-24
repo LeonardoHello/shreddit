@@ -13,6 +13,25 @@ export default async function CommunityLayout(
 
   const queryClient = getQueryClient();
 
+  if (session) {
+    queryClient.prefetchQuery({
+      queryKey: [
+        "users",
+        session.session.userId,
+        "communities",
+        params.communityName,
+      ],
+      queryFn: async () => {
+        const res = await client.users.me.communities[":communityName"].$get({
+          param: { communityName: params.communityName },
+          query: { currentUserId: session.session.userId },
+        });
+
+        return res.json();
+      },
+    });
+  }
+
   queryClient.prefetchQuery({
     queryKey: ["communities", params.communityName],
     queryFn: async () => {

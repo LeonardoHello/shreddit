@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+import { getSession } from "@/app/actions";
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
@@ -11,12 +12,26 @@ import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import shrek from "@public/shrek.svg";
 
 export default async function SubmitLayout(props: LayoutProps<"/submit">) {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("Unauthenticated");
+  }
+
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ["users", "me", "communities", "joined", "submit"],
+    queryKey: [
+      "users",
+      session.session.userId,
+      "communities",
+      "joined",
+      "submit",
+    ],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.submit.$get();
+      const res = await client.users.me.communities.joined.submit.$get({
+        query: { currentUserId: session.session.userId },
+      });
       return res.json();
     },
   });

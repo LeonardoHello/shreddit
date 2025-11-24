@@ -14,13 +14,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Community } from "@/db/schema/communities";
 import { client } from "@/hono/client";
+import type { UserId } from "@/lib/auth";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default function CommunityDeleteDialog({
   communityId,
+  currentUserId,
 }: {
   communityId: Community["id"];
+  currentUserId: NonNullable<UserId>;
 }) {
   const router = useRouter();
 
@@ -37,13 +40,13 @@ export default function CommunityDeleteDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "moderated"],
+        queryKey: ["users", currentUserId, "communities", "moderated"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "joined"],
+        queryKey: ["users", currentUserId, "communities", "joined"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["users", "me", "communities", "muted"],
+        queryKey: ["users", currentUserId, "communities", "muted"],
       });
 
       toast.success("Community deleted successfully.");

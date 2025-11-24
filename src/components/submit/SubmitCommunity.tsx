@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { client } from "@/hono/client";
+import type { UserId } from "@/lib/auth";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
@@ -21,17 +22,21 @@ import { Skeleton } from "../ui/skeleton";
 
 export default function SubmitCommunity({
   children,
+  currentUserId,
 }: {
   children: React.ReactNode;
+  currentUserId: NonNullable<UserId>;
 }) {
   const [searchValue, setSearchValue] = useState("");
 
   const queryClient = getQueryClient();
 
   const { data: joinedCommunities } = useSuspenseQuery({
-    queryKey: ["users", "me", "communities", "joined", "submit"],
+    queryKey: ["users", currentUserId, "communities", "joined", "submit"],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.submit.$get();
+      const res = await client.users.me.communities.joined.submit.$get({
+        query: { currentUserId },
+      });
       return res.json();
     },
   });
