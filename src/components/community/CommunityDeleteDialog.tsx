@@ -37,13 +37,13 @@ export default function CommunityDeleteDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["communities", "joined"],
+        queryKey: ["users", "me", "communities", "joined"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["communities", "muted"],
+        queryKey: ["users", "me", "communities", "muted"],
       });
 
       toast.success("Community deleted successfully.");

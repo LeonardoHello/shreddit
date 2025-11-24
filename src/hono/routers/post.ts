@@ -10,97 +10,33 @@ import {
   PostFileSchema,
   posts,
   PostSchema,
-  UserToPost,
 } from "@/db/schema/posts";
+import { postInputConfig } from "@/utils/feedQueryOptions";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const post = factory
   .createApp()
   .get(`/:postId{${reg}}`, async (c) => {
     const postId = c.req.param("postId");
+    const currentUserId = c.get("currentUserId");
+    const db = c.get("db");
 
-    const data = await c.var.db.query.posts.findFirst({
+    const inputConfig = postInputConfig(currentUserId);
+
+    const data = await db.query.posts.findFirst({
+      ...inputConfig,
       where: (post, { eq }) => eq(post.id, postId),
-      with: {
-        community: {
-          columns: {
-            name: true,
-            icon: true,
-            iconPlaceholder: true,
-            moderatorId: true,
-          },
-        },
-        author: { columns: { username: true, image: true } },
-        files: {
-          columns: { id: true, name: true, url: true, thumbHash: true },
-        },
-      },
-      extras: (post, { sql }) => ({
-        voteCount: sql<number>`
-          (
-            SELECT (
-              COALESCE(SUM(
-                CASE 
-                  WHEN vote_status = 'upvoted' THEN 1
-                  WHEN vote_status = 'downvoted' THEN -1
-                  ELSE 0
-                END
-              ), 0)
-            )::int
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-          )
-        `.as("vote_count"),
-        commentCount: sql<number>`
-          (
-            SELECT COUNT(*)::int
-            FROM comments
-            WHERE comments.post_id = ${post.id}
-          )
-        `.as("comment_count"),
-        isSaved: sql<UserToPost["saved"] | null>`
-          (
-            SELECT saved
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${c.var.currentUserId}
-          )
-        `.as("is_saved"),
-        isHidden: sql<UserToPost["hidden"] | null>`
-          (
-            SELECT hidden
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${c.var.currentUserId}
-          )
-        `.as("is_hidden"),
-        voteStatus: sql<UserToPost["voteStatus"] | null>`
-          (
-            SELECT vote_status
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${c.var.currentUserId}
-          )
-        `.as("vote_status"),
-        userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
-          (
-            SELECT updated_at
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${c.var.currentUserId}
-          )
-        `.as("user_to_post_updated_at"),
-      }),
     });
 
     return c.json(data, 200);
   })
   .get(`/:postId{${reg}}/comments`, async (c) => {
     const postId = c.req.param("postId");
+    const db = c.get("db");
 
-    const data = await c.var.db.query.comments.findMany({
+    const data = await db.query.comments.findMany({
       where: (comment, { eq }) => eq(comment.postId, postId),
       with: {
         author: true,
@@ -169,31 +105,35 @@ export const post = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const { files, ...post } = c.req.valid("json");
+      const db = c.get("db");
 
       let data;
 
       if (!files) {
-        data = await c.var.db
+        data = await db
           .insert(posts)
-          .values({ ...post, authorId: c.var.currentUserId })
+          .values({ ...post, authorId: currentUserId })
           .returning({ id: posts.id });
       } else {
         const postId = uuidv4();
 
-        data = await c.var.db.batch([
-          c.var.db
+        data = await db.batch([
+          db
             .insert(posts)
             .values({
               ...post,
               text: null,
               id: postId,
-              authorId: c.var.currentUserId,
+              authorId: currentUserId,
             })
             .returning({ id: posts.id }),
-          c.var.db
+          db
             .insert(postFiles)
             .values(files.map((file) => ({ ...file, postId }))),
         ]);
@@ -218,37 +158,44 @@ export const post = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      await c.var.db
+      await db
         .update(posts)
         .set({ ...json })
-        .where(
-          and(eq(posts.id, postId), eq(posts.authorId, c.var.currentUserId)),
-        );
+        .where(and(eq(posts.id, postId), eq(posts.authorId, currentUserId)));
 
       return c.status(204);
     },
   )
-  .delete(`/:postId{${reg}}`, mwAuthenticated, async (c) => {
-    const postId = c.req.param("postId");
+  .delete(`/:postId{${reg}}`, async (c) => {
+    const currentUserId = c.get("currentUserId");
 
-    await c.var.db.delete(posts).where(
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const postId = c.req.param("postId");
+    const db = c.get("db");
+
+    await db.delete(posts).where(
       and(
         eq(posts.id, postId),
         or(
-          eq(posts.authorId, c.var.currentUserId),
+          eq(posts.authorId, currentUserId),
           exists(
-            c.var.db
+            db
               .select({ moderatorId: communities.moderatorId })
               .from(communities)
               .where(
                 and(
                   eq(communities.id, posts.communityId),
-                  eq(communities.moderatorId, c.var.currentUserId),
+                  eq(communities.moderatorId, currentUserId),
                 ),
               ),
           ),

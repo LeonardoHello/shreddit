@@ -361,7 +361,7 @@ export default function AccountPage({
                   Member since{" "}
                   {new Date(createdAt).toLocaleString("en-DE", {
                     dateStyle: "full",
-                    timeStyle: "long",
+                    timeStyle: "medium",
                   })}
                 </p>
               </div>

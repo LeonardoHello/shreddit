@@ -8,10 +8,9 @@ import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavMuted() {
   const { data: mutedCommunities } = useSuspenseQuery({
-    queryKey: ["communities", "muted"],
+    queryKey: ["users", "me", "communities", "muted"],
     queryFn: async () => {
-      const res = await client.communities.muted.$get();
-
+      const res = await client.users.me.communities.muted.$get();
       return res.json();
     },
   });

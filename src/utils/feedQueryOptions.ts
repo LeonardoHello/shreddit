@@ -1,11 +1,12 @@
-import { sql, type SQL } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import type { Context } from "hono";
 import { validator } from "hono/validator";
 import * as z from "zod/mini";
 
+import type drizzleDb from "@/db";
 import { usersToCommunities } from "@/db/schema/communities";
 import { PostSchema, usersToPosts, UserToPost } from "@/db/schema/posts";
-import { Env } from "@/hono/init";
+import type { UserId } from "@/lib/auth";
 import { PostSort } from "@/types/enums";
 import { getOneMonthAgo } from "./getOneMonthAgo";
 
@@ -41,10 +42,6 @@ const PostCursorSchema = z.discriminatedUnion("sort", [
       }),
     ),
   }),
-  // z.object({
-  //   sort: z.enum(PostSort),
-  //   cursor: z.nullable(z.undefined()),
-  // }),
 ]);
 
 function decodeCursor(str: string) {
@@ -101,20 +98,12 @@ export const feedHonoValidation = validator("query", (value, c) => {
   return transformed.data;
 });
 
-export const feedHonoResponse = async (
-  c: Context,
-  variables: Env["Variables"],
-  query:
-    | z.infer<typeof PostCursorSchema>
-    | { sort: PostSort; cursor: null | undefined },
-  hideHidden: boolean,
-  hideMuted: boolean,
-  initialSQL?: SQL,
-) => {
-  const { db, currentUserId } = variables;
+type InputConfig = NonNullable<
+  Parameters<(typeof drizzleDb)["query"]["posts"]["findMany"]>[0]
+>;
 
-  const data = await db.query.posts.findMany({
-    limit: 10,
+export const postInputConfig = (currentUserId: UserId) =>
+  ({
     with: {
       community: {
         columns: {
@@ -129,7 +118,7 @@ export const feedHonoResponse = async (
         columns: { id: true, name: true, url: true, thumbHash: true },
       },
     },
-    extras: (post) => ({
+    extras: (post, { sql }) => ({
       voteCount: sql<number>`
           (
             SELECT (
@@ -152,51 +141,65 @@ export const feedHonoResponse = async (
             WHERE comments.post_id = ${post.id}
           )
         `.as("comment_count"),
-      isSaved: sql<UserToPost["saved"] | null>`
-          CASE
-            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
-            ELSE (
-              SELECT saved
-              FROM users_to_posts
-              WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${currentUserId}
-            )
-          END
-        `.as("is_saved"),
-      isHidden: sql<UserToPost["hidden"] | null>`
-          CASE
-            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
-            ELSE (
-              SELECT hidden
-              FROM users_to_posts
-              WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${currentUserId}
-            )
-          END
-        `.as("is_hidden"),
-      voteStatus: sql<UserToPost["voteStatus"] | null>`
-          CASE
-            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
-            ELSE (
-              SELECT vote_status
-              FROM users_to_posts
-              WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${currentUserId}
-            )
-          END
-        `.as("vote_status"),
-      userToPostUpdatedAt: sql<UserToPost["updatedAt"] | null>`
-          CASE
-            WHEN ${sql`${currentUserId}::text`} IS NULL THEN NULL
-            ELSE (
-              SELECT updated_at
-              FROM users_to_posts
-              WHERE users_to_posts.post_id = ${post.id}
-                AND users_to_posts.user_id = ${currentUserId}
-            )
-          END
-        `.as("user_to_post_updated_at"),
+      isSaved: currentUserId
+        ? sql<UserToPost["saved"]>`
+          (
+            SELECT saved
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${currentUserId}
+          )
+        `.as("is_saved")
+        : sql<null>`NULL`.as("is_saved"),
+      isHidden: currentUserId
+        ? sql<UserToPost["hidden"]>`
+          (
+            SELECT hidden
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${currentUserId}
+          )
+        `.as("is_hidden")
+        : sql<null>`NULL`.as("is_hidden"),
+      voteStatus: currentUserId
+        ? sql<UserToPost["voteStatus"]>`
+          (
+            SELECT vote_status
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${currentUserId}
+          )
+        `.as("vote_status")
+        : sql<null>`NULL`.as("vote_status"),
+      userToPostUpdatedAt: currentUserId
+        ? sql<UserToPost["updatedAt"]>`
+          (
+            SELECT updated_at
+            FROM users_to_posts
+            WHERE users_to_posts.post_id = ${post.id}
+              AND users_to_posts.user_id = ${currentUserId}
+          )
+        `.as("user_to_post_updated_at")
+        : sql<null>`NULL`.as("user_to_post_updated_at"),
     }),
+  }) satisfies InputConfig;
+
+export const feedHonoResponse = async (
+  c: Context,
+  query:
+    | z.infer<typeof PostCursorSchema>
+    | { sort: PostSort; cursor: null | undefined },
+  currentUserId: UserId,
+  db: typeof drizzleDb,
+  hideHidden: boolean,
+  hideMuted: boolean,
+  initialSQL?: SQL,
+) => {
+  const inputConfig = postInputConfig(currentUserId);
+
+  const data = await db.query.posts.findMany({
+    ...inputConfig,
+    limit: 10,
     where: (post, { and, or, eq, gt, lt, notExists, sql }) => {
       const filters: (SQL | undefined)[] = [initialSQL];
 
@@ -305,7 +308,7 @@ export const feedHonoResponse = async (
 
       return and(...filters);
     },
-    orderBy: (post, { desc }) => {
+    orderBy: (post, { desc, sql }) => {
       return {
         [PostSort.BEST]: [desc(sql`vote_count`), desc(post.id)],
         [PostSort.HOT]: [desc(sql`vote_count`), desc(post.id)],

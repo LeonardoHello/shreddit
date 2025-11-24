@@ -33,13 +33,13 @@ export default function CommunityHeaderDropdown({
 }) {
   const queryClient = getQueryClient();
 
-  const userToCommunityQueryKey = ["communities", communityName, "user"];
-  const joinedCommunitiesQueryKey = ["communities", "joined"];
+  const userToCommunityQueryKey = ["users", "me", "communities", communityName];
+  const joinedCommunitiesQueryKey = ["users", "me", "communities", "joined"];
 
   const { data: userToCommunity } = useSuspenseQuery({
     queryKey: userToCommunityQueryKey,
     queryFn: async () => {
-      const res = await client.communities[":communityName"].user.$get({
+      const res = await client.users.me.communities[":communityName"].$get({
         param: { communityName },
       });
 
@@ -49,7 +49,9 @@ export default function CommunityHeaderDropdown({
 
   const joinCommunity = useMutation({
     mutationFn: async () => {
-      const res = await client.communities[`:communityId{${reg}}`].join.$patch({
+      const res = await client.users.me.communities[
+        `:communityId{${reg}}`
+      ].join.$patch({
         param: { communityId },
         json: { joined: !userToCommunity.joined },
       });
@@ -84,7 +86,7 @@ export default function CommunityHeaderDropdown({
     },
     onError: (error) => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", communityName, "user"],
+        queryKey: ["users", "me", "communities", communityName],
       });
 
       console.error(error);
@@ -94,7 +96,7 @@ export default function CommunityHeaderDropdown({
 
   const favoriteCommunity = useMutation({
     mutationFn: async () => {
-      const res = await client.communities[
+      const res = await client.users.me.communities[
         `:communityId{${reg}}`
       ].favorite.$patch({
         param: { communityId },
@@ -114,7 +116,7 @@ export default function CommunityHeaderDropdown({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
       queryClient.invalidateQueries({
         queryKey: joinedCommunitiesQueryKey,
@@ -136,7 +138,9 @@ export default function CommunityHeaderDropdown({
 
   const muteCommunity = useMutation({
     mutationFn: async () => {
-      const res = await client.communities[`:communityId{${reg}}`].mute.$patch({
+      const res = await client.users.me.communities[
+        `:communityId{${reg}}`
+      ].mute.$patch({
         param: { communityId },
         json: { muted: !userToCommunity.muted },
       });
@@ -154,7 +158,7 @@ export default function CommunityHeaderDropdown({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", "muted"],
+        queryKey: ["users", "me", "communities", "muted"],
       });
 
       if (data[0].muted) {

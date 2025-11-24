@@ -10,11 +10,14 @@ export const feedUpvoted = factory
   .get("/:username/upvoted", feedHonoValidation, async (c) => {
     const username = c.req.param("username");
     const query = c.req.valid("query");
+    const currentUserId = c.get("currentUserId");
+    const db = c.get("db");
 
     return feedHonoResponse(
       c,
-      c.var,
       query,
+      currentUserId,
+      db,
       false,
       false,
       exists(

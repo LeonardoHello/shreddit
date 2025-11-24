@@ -41,8 +41,9 @@ export const user = factory
     }),
     async (c) => {
       const query = c.req.valid("query");
+      const db = c.get("db");
 
-      const data = await c.var.db.query.users.findMany({
+      const data = await db.query.users.findMany({
         limit: query.limit,
         columns: { username: true, image: true },
         where: (user, { ilike }) => ilike(user.username, `%${query.search}%`),
@@ -85,8 +86,9 @@ export const user = factory
   )
   .get("/:username", async (c) => {
     const username = c.req.param("username");
+    const db = c.get("db");
 
-    const user = await c.var.db.query.users.findFirst({
+    const user = await db.query.users.findFirst({
       where: (user, { eq }) => eq(user.username, username),
       with: {
         communities: {

@@ -1,10 +1,7 @@
-import { Suspense } from "react";
 import Link from "next/link";
 
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
-import { getSession } from "@/app/actions";
 import {
   Sidebar,
   SidebarContent,
@@ -16,51 +13,16 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { client } from "@/hono/client";
-import { getQueryClient } from "@/tanstack-query/getQueryClient";
-import SidebarDialog from "./SidebarDialog";
 import SidebarLogo from "./SidebarLogo";
-import SidebarNavJoined from "./SidebarNavJoined";
 import SidebarMenuMain from "./SidebarNavMain";
-import SidebarNavModerated from "./SidebarNavModerated";
-import SidebarNavMuted from "./SidebarNavMuted";
 import SidebarNavRecent from "./SidebarNavRecent";
-import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
-export async function AppSidebar() {
-  const session = await getSession();
-
-  const queryClient = getQueryClient();
-
-  if (session) {
-    queryClient.prefetchQuery({
-      queryKey: ["communities", "moderated"],
-      queryFn: async () => {
-        const res = await client.communities.moderated.$get();
-        return res.json();
-      },
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["communities", "joined"],
-      queryFn: async () => {
-        const res = await client.communities.joined.$get();
-        return res.json();
-      },
-    });
-    queryClient.prefetchQuery({
-      queryKey: ["communities", "muted"],
-      queryFn: async () => {
-        const res = await client.communities.muted.$get();
-        return res.json();
-      },
-    });
-  }
-
+export function AppSidebar() {
   return (
     <Sidebar className="z-20">
       <SidebarHeader>
         <SidebarLogo />
-        <SidebarMenuMain isSignedIn={!!session} />
+        <SidebarMenuMain isSignedIn={false} />
       </SidebarHeader>
 
       <SidebarSeparator />
@@ -74,22 +36,6 @@ export async function AppSidebar() {
         className="gap-0"
       >
         <SidebarNavRecent />
-
-        {session && (
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <Suspense fallback={<SidebarNavSkeleton itemCount={1} />}>
-              <SidebarNavModerated />
-            </Suspense>
-
-            <Suspense fallback={<SidebarNavSkeleton itemCount={4} />}>
-              <SidebarNavJoined />
-            </Suspense>
-
-            <Suspense fallback={<SidebarNavSkeleton itemCount={2} />}>
-              <SidebarNavMuted />
-            </Suspense>
-          </HydrationBoundary>
-        )}
       </SidebarContent>
 
       <SidebarSeparator />
@@ -97,22 +43,12 @@ export async function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            {session && (
-              <SidebarDialog>
-                <SidebarMenuButton className="[&>svg]:size-7">
-                  <Plus className="stroke-[1.25]" />
-                  Create Community
-                </SidebarMenuButton>
-              </SidebarDialog>
-            )}
-            {!session && (
-              <Link href={"/sign-in"}>
-                <SidebarMenuButton className="[&>svg]:size-7">
-                  <Plus className="stroke-[1.25]" />
-                  Create Community
-                </SidebarMenuButton>
-              </Link>
-            )}
+            <Link href={"/sign-in"}>
+              <SidebarMenuButton className="[&>svg]:size-7">
+                <Plus className="stroke-[1.25]" />
+                Create Community
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

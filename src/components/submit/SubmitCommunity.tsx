@@ -29,9 +29,9 @@ export default function SubmitCommunity({
   const queryClient = getQueryClient();
 
   const { data: joinedCommunities } = useSuspenseQuery({
-    queryKey: ["communities", "joined", "submit"],
+    queryKey: ["users", "me", "communities", "joined", "submit"],
     queryFn: async () => {
-      const res = await client.communities.joined.submit.$get();
+      const res = await client.users.me.communities.joined.submit.$get();
       return res.json();
     },
   });

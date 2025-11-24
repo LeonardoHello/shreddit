@@ -1,9 +1,9 @@
-import { createFactory, createMiddleware } from "hono/factory";
+import { createFactory } from "hono/factory";
 
 import db from "@/db";
 import { auth, type UserId } from "@/lib/auth";
 
-export type Env = {
+type Env = {
   Variables: {
     db: typeof db;
     currentUserId: UserId;
@@ -25,21 +25,3 @@ export const factory = createFactory<Env>({
     });
   },
 });
-
-type MiddlewareEnv = {
-  Variables: {
-    db: typeof db;
-    currentUserId: NonNullable<UserId>;
-  };
-};
-
-// Ensures the user is authenticated
-export const mwAuthenticated = createMiddleware<MiddlewareEnv>(
-  async (c, next) => {
-    const currentUserId = c.get("currentUserId");
-
-    if (!currentUserId) return c.text("unauthorized", 401);
-
-    await next();
-  },
-);

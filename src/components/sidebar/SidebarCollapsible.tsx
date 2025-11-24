@@ -30,13 +30,16 @@ import CommunityIcon from "../community/CommunityIcon";
 import { HoverPrefetchLink } from "../ui/hover-prefetch-link";
 
 type ModeratedCommunitiesType = InferResponseType<
-  typeof client.communities.moderated.$get
+  typeof client.users.me.communities.moderated.$get,
+  200
 >;
 type JoinedCommunitiesType = InferResponseType<
-  typeof client.communities.joined.$get
+  typeof client.users.me.communities.joined.$get,
+  200
 >;
 type MutedCommunitiesType = InferResponseType<
-  typeof client.communities.muted.$get
+  typeof client.users.me.communities.muted.$get,
+  200
 >;
 
 export default function SidebarCollapsible({
@@ -71,7 +74,7 @@ export default function SidebarCollapsible({
       communityId: Community["id"];
       favorited: boolean;
     }) => {
-      const res = await client.communities[
+      const res = await client.users.me.communities[
         `:communityId{${reg}}`
       ].favorite.$patch({
         param: { communityId },
@@ -84,7 +87,7 @@ export default function SidebarCollapsible({
       const { communityId, favorited } = variables;
 
       queryClient.setQueryData<ModeratedCommunitiesType>(
-        ["communities", "moderated"],
+        ["users", "me", "communities", "moderated"],
         (updater) => {
           if (!updater) {
             return [];
@@ -100,7 +103,7 @@ export default function SidebarCollapsible({
       );
 
       queryClient.setQueryData<JoinedCommunitiesType>(
-        ["communities", "joined"],
+        ["users", "me", "communities", "joined"],
         (updater) => {
           if (!updater) {
             return [];
@@ -116,7 +119,7 @@ export default function SidebarCollapsible({
       );
 
       queryClient.setQueryData<MutedCommunitiesType>(
-        ["communities", "muted"],
+        ["users", "me", "communities", "muted"],
         (updater) => {
           if (!updater) {
             return [];
@@ -133,10 +136,14 @@ export default function SidebarCollapsible({
     },
     onError: (error) => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
-      queryClient.invalidateQueries({ queryKey: ["communities", "joined"] });
-      queryClient.invalidateQueries({ queryKey: ["communities", "muted"] });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "me", "communities", "joined"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "me", "communities", "muted"],
+      });
 
       console.error(error);
       toast.error(

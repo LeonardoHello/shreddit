@@ -14,9 +14,9 @@ export default async function SubmitLayout(props: LayoutProps<"/submit">) {
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ["communities", "joined", "submit"],
+    queryKey: ["users", "me", "communities", "joined", "submit"],
     queryFn: async () => {
-      const res = await client.communities.joined.submit.$get();
+      const res = await client.users.me.communities.joined.submit.$get();
       return res.json();
     },
   });

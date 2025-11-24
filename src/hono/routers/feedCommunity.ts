@@ -10,15 +10,18 @@ export const feedCommunity = factory
   .get("/:communityName", feedHonoValidation, async (c) => {
     const communityName = c.req.param("communityName");
     const query = c.req.valid("query");
+    const currentUserId = c.get("currentUserId");
+    const db = c.get("db");
 
     return feedHonoResponse(
       c,
-      c.var,
       query,
+      currentUserId,
+      db,
       true,
       false,
       exists(
-        c.var.db
+        db
           .select({ id: communities.id })
           .from(communities)
           .where(

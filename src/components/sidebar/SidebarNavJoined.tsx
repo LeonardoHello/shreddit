@@ -8,11 +8,10 @@ import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavJoined() {
   const { data: joinedCommunities } = useSuspenseQuery({
-    queryKey: ["communities", "joined"],
+    queryKey: ["users", "me", "communities", "joined"],
     queryFn: async () => {
-      const res = await client.communities.joined.$get();
-
-      return await res.json();
+      const res = await client.users.me.communities.joined.$get();
+      return res.json();
     },
   });
 

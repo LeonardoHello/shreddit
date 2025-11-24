@@ -3,7 +3,7 @@ import type { InferResponseType } from "hono";
 import type { client } from "@/hono/client";
 
 type ModeratedCommunites = InferResponseType<
-  typeof client.communities.moderated.$get,
+  typeof client.users.me.communities.moderated.$get,
   200
 >;
 

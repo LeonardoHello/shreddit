@@ -5,7 +5,7 @@ import * as z from "zod/mini";
 import { comments, CommentSchema } from "@/db/schema/comments";
 import { communities, CommunitySchema } from "@/db/schema/communities";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const comment = factory
@@ -41,15 +41,19 @@ export const comment = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const query = c.req.valid("query");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .insert(comments)
         .values({
-          authorId: c.var.currentUserId,
+          authorId: currentUserId,
           ...query,
           ...json,
         })
@@ -76,19 +80,20 @@ export const comment = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const commentId = c.req.param("commentId");
       const query = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .update(comments)
         .set({ text: query.text, updatedAt: new Date().toISOString() })
         .where(
-          and(
-            eq(comments.id, commentId),
-            eq(comments.authorId, c.var.currentUserId),
-          ),
+          and(eq(comments.id, commentId), eq(comments.authorId, currentUserId)),
         )
         .returning();
 
@@ -111,26 +116,30 @@ export const comment = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const commentId = c.req.param("commentId");
       const query = c.req.valid("query");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .delete(comments)
         .where(
           and(
             eq(comments.id, commentId),
             or(
-              eq(comments.authorId, c.var.currentUserId),
+              eq(comments.authorId, currentUserId),
               exists(
-                c.var.db
+                db
                   .select({ id: communities.id })
                   .from(communities)
                   .where(
                     and(
                       eq(communities.id, query.communityId),
-                      eq(communities.moderatorId, c.var.currentUserId),
+                      eq(communities.moderatorId, currentUserId),
                     ),
                   ),
               ),

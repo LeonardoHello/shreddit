@@ -8,9 +8,9 @@ import SidebarCollapsible from "./SidebarCollapsible";
 
 export default function SidebarNavModerated() {
   const { data: moderatedCommunities } = useSuspenseQuery({
-    queryKey: ["communities", "moderated"],
+    queryKey: ["users", "me", "communities", "moderated"],
     queryFn: async () => {
-      const res = await client.communities.moderated.$get();
+      const res = await client.users.me.communities.moderated.$get();
 
       return res.json();
     },

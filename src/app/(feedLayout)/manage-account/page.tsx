@@ -28,9 +28,11 @@ export default async function ManageAccountPage() {
     account.providerId,
   );
 
+  const createdAt = z.parse(UserSchema.shape.createdAt, session.user.createdAt);
+
   return (
     <AccountPage
-      createdAt={session.user.createdAt.toISOString()}
+      createdAt={createdAt}
       name={session.user.name}
       image={session.user.image}
       username={username}

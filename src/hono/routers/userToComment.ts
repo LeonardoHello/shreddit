@@ -2,7 +2,7 @@ import { validator } from "hono/validator";
 
 import { usersToComments, UserToCommentSchema } from "@/db/schema/comments";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 export const userToComment = factory.createApp().patch(
   `/:commentId{${reg}}/vote`,
@@ -20,14 +20,18 @@ export const userToComment = factory.createApp().patch(
     }
     return parsed.data;
   }),
-  mwAuthenticated,
   async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
     const commentId = c.req.param("commentId");
     const json = c.req.valid("json");
+    const db = c.get("db");
 
-    await c.var.db
+    await db
       .insert(usersToComments)
-      .values({ commentId, userId: c.var.currentUserId, ...json })
+      .values({ commentId, userId: currentUserId, ...json })
       .onConflictDoUpdate({
         target: [usersToComments.userId, usersToComments.commentId],
         set: { voteStatus: json.voteStatus },

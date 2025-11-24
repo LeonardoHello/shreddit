@@ -6,15 +6,21 @@ import {
   UserToCommunitySchema,
 } from "@/db/schema/communities";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 export const userToCommunity = factory
   .createApp()
-  .get("/joined", mwAuthenticated, async (c) => {
-    const data = await c.var.db.query.usersToCommunities.findMany({
+  .get("/joined", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const db = c.get("db");
+
+    const data = await db.query.usersToCommunities.findMany({
       where: (userToCommunity, { and, eq }) =>
         and(
-          eq(userToCommunity.userId, c.var.currentUserId),
+          eq(userToCommunity.userId, currentUserId),
           eq(userToCommunity.joined, true),
         ),
       columns: { favorited: true, favoritedAt: true },
@@ -27,17 +33,23 @@ export const userToCommunity = factory
 
     return c.json(data, 200);
   })
-  .get("/joined/submit", mwAuthenticated, async (c) => {
-    const data = await c.var.db.query.communities.findMany({
+  .get("/joined/submit", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const db = c.get("db");
+
+    const data = await db.query.communities.findMany({
       where: (community, { and, eq, exists }) =>
         exists(
-          c.var.db
+          db
             .select()
             .from(usersToCommunities)
             .where(
               and(
                 eq(usersToCommunities.communityId, community.id),
-                eq(usersToCommunities.userId, c.var.currentUserId),
+                eq(usersToCommunities.userId, currentUserId),
                 eq(usersToCommunities.joined, true),
               ),
             ),
@@ -57,16 +69,22 @@ export const userToCommunity = factory
 
     return c.json(data, 200);
   })
-  .get("/moderated", mwAuthenticated, async (c) => {
-    const data = await c.var.db.query.usersToCommunities.findMany({
+  .get("/moderated", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const db = c.get("db");
+
+    const data = await db.query.usersToCommunities.findMany({
       where: (userToCommunity, { and, eq, exists }) =>
         exists(
-          c.var.db
+          db
             .select({ id: communities.id })
             .from(communities)
             .where(
               and(
-                eq(communities.moderatorId, c.var.currentUserId),
+                eq(communities.moderatorId, currentUserId),
                 eq(communities.moderatorId, userToCommunity.userId),
                 eq(communities.id, userToCommunity.communityId),
               ),
@@ -82,11 +100,17 @@ export const userToCommunity = factory
 
     return c.json(data, 200);
   })
-  .get("/muted", mwAuthenticated, async (c) => {
-    const data = await c.var.db.query.usersToCommunities.findMany({
+  .get("/muted", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const db = c.get("db");
+
+    const data = await db.query.usersToCommunities.findMany({
       where: (userToCommunity, { and, eq }) =>
         and(
-          eq(userToCommunity.userId, c.var.currentUserId),
+          eq(userToCommunity.userId, currentUserId),
           eq(userToCommunity.muted, true),
         ),
       columns: { favorited: true, favoritedAt: true },
@@ -99,15 +123,20 @@ export const userToCommunity = factory
 
     return c.json(data, 200);
   })
-  .get("/:communityName/user", mwAuthenticated, async (c) => {
-    const communityName = c.req.param("communityName");
+  .get("/:communityName", async (c) => {
+    const currentUserId = c.get("currentUserId");
 
-    const data = await c.var.db.query.usersToCommunities.findFirst({
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const communityName = c.req.param("communityName");
+    const db = c.get("db");
+
+    const data = await db.query.usersToCommunities.findFirst({
       where: (userToCommunity, { and, eq, exists }) =>
         and(
-          eq(userToCommunity.userId, c.var.currentUserId),
+          eq(userToCommunity.userId, currentUserId),
           exists(
-            c.var.db
+            db
               .select({ id: communities.id })
               .from(communities)
               .where(
@@ -139,18 +168,23 @@ export const userToCommunity = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
+
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
       const newDate = new Date().toISOString();
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToCommunities)
         .values({
           communityId,
-          userId: c.var.currentUserId,
+          userId: currentUserId,
           favoritedAt: newDate,
         })
         .onConflictDoUpdate({
@@ -178,18 +212,22 @@ export const userToCommunity = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
       const newDate = new Date().toISOString();
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToCommunities)
         .values({
           communityId,
-          userId: c.var.currentUserId,
+          userId: currentUserId,
           joinedAt: newDate,
         })
         .onConflictDoUpdate({
@@ -217,16 +255,21 @@ export const userToCommunity = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
+
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToCommunities)
         .values({
           communityId,
-          userId: c.var.currentUserId,
+          userId: currentUserId,
         })
         .onConflictDoUpdate({
           target: [usersToCommunities.userId, usersToCommunities.communityId],

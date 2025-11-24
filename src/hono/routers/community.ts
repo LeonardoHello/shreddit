@@ -10,7 +10,7 @@ import {
 } from "@/db/schema/communities";
 import { getOneMonthAgo } from "@/utils/getOneMonthAgo";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 // eslint-disable-next-line drizzle/enforce-delete-with-where
 export const community = factory
@@ -51,8 +51,9 @@ export const community = factory
     }),
     async (c) => {
       const query = c.req.valid("query");
+      const db = c.get("db");
 
-      const data = await c.var.db.query.communities.findMany({
+      const data = await db.query.communities.findMany({
         limit: query.limit,
         where: (community, { ilike }) =>
           ilike(community.name, `%${query.search}%`),
@@ -74,8 +75,9 @@ export const community = factory
   )
   .get("/:communityName", async (c) => {
     const communityName = c.req.param("communityName");
+    const db = c.get("db");
 
-    const data = await c.var.db.query.communities.findFirst({
+    const data = await db.query.communities.findFirst({
       where: (community, { eq }) => eq(community.name, communityName),
       with: { moderator: true },
       extras: (community, { sql }) => ({
@@ -101,27 +103,36 @@ export const community = factory
 
     return c.json(data, 200);
   })
-  .get("/:communityName/icon", mwAuthenticated, async (c) => {
-    const communityName = c.req.param("communityName");
+  .get("/:communityName/icon", async (c) => {
+    const currentUserId = c.get("currentUserId");
 
-    const data = await c.var.db.query.communities.findFirst({
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const communityName = c.req.param("communityName");
+    const db = c.get("db");
+
+    const data = await db.query.communities.findFirst({
+      where: (community, { eq }) => eq(community.name, communityName),
+      columns: { icon: true },
+    });
+
+    return c.json(data, 200);
+  })
+  .get("/:communityName/submit", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const communityName = c.req.param("communityName");
+    const db = c.get("db");
+
+    const data = await db.query.communities.findFirst({
       where: (community, { eq }) => eq(community.name, communityName),
       columns: { id: true, name: true, icon: true, iconPlaceholder: true },
     });
 
     return c.json(data, 200);
   })
-  .get("/:communityName/submit", mwAuthenticated, async (c) => {
-    const communityName = c.req.param("communityName");
-
-    const data = await c.var.db.query.communities.findFirst({
-      where: (community, { eq }) => eq(community.name, communityName),
-      columns: { id: true, name: true, icon: true, iconPlaceholder: true },
-    });
-
-    return c.json(data, 200);
-  })
-
   .post(
     "/",
     validator("json", (value, c) => {
@@ -143,23 +154,27 @@ export const community = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const json = c.req.valid("json");
+      const db = c.get("db");
 
       const communityId = uuidv4();
 
-      const data = await c.var.db.batch([
-        c.var.db
+      const data = await db.batch([
+        db
           .insert(communities)
           .values({
             id: communityId,
-            moderatorId: c.var.currentUserId,
+            moderatorId: currentUserId,
             ...json,
           })
           .returning({ name: communities.name }),
-        c.var.db.insert(usersToCommunities).values({
-          userId: c.var.currentUserId,
+        db.insert(usersToCommunities).values({
+          userId: currentUserId,
           communityId,
         }),
       ]);
@@ -187,17 +202,21 @@ export const community = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const communityId = c.req.param("communityId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      await c.var.db
+      await db
         .update(communities)
         .set({ ...json })
         .where(
           and(
-            eq(communities.moderatorId, c.var.currentUserId),
+            eq(communities.moderatorId, currentUserId),
             eq(communities.id, communityId),
           ),
         );
@@ -205,14 +224,19 @@ export const community = factory
       return c.status(204);
     },
   )
-  .delete(`/:communityId{${reg}}`, mwAuthenticated, async (c) => {
-    const communityId = c.req.param("communityId");
+  .delete(`/:communityId{${reg}}`, async (c) => {
+    const currentUserId = c.get("currentUserId");
 
-    await c.var.db
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const communityId = c.req.param("communityId");
+    const db = c.get("db");
+
+    await db
       .delete(communities)
       .where(
         and(
-          eq(communities.moderatorId, c.var.currentUserId),
+          eq(communities.moderatorId, currentUserId),
           eq(communities.id, communityId),
         ),
       );

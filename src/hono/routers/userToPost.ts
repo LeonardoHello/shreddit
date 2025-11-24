@@ -9,7 +9,7 @@ import {
   UserToPostSchema,
 } from "@/db/schema/posts";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
-import { factory, mwAuthenticated } from "../init";
+import { factory } from "../init";
 
 export const userToPost = factory
   .createApp()
@@ -29,14 +29,18 @@ export const userToPost = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToPosts)
-        .values({ postId, userId: c.var.currentUserId, ...json })
+        .values({ postId, userId: currentUserId, ...json })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { voteStatus: json.voteStatus },
@@ -60,14 +64,18 @@ export const userToPost = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToPosts)
-        .values({ postId, userId: c.var.currentUserId, ...json })
+        .values({ postId, userId: currentUserId, ...json })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { saved: json.saved },
@@ -91,14 +99,18 @@ export const userToPost = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .insert(usersToPosts)
-        .values({ postId, userId: c.var.currentUserId, ...json })
+        .values({ postId, userId: currentUserId, ...json })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { hidden: json.hidden },
@@ -122,27 +134,31 @@ export const userToPost = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .update(posts)
         .set({ spoiler: json.spoiler, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, postId),
             or(
-              eq(posts.authorId, c.var.currentUserId),
+              eq(posts.authorId, currentUserId),
               exists(
-                c.var.db
+                db
                   .select({ moderatorId: communities.moderatorId })
                   .from(communities)
                   .where(
                     and(
                       eq(communities.id, posts.communityId),
-                      eq(communities.moderatorId, c.var.currentUserId),
+                      eq(communities.moderatorId, currentUserId),
                     ),
                   ),
               ),
@@ -168,27 +184,31 @@ export const userToPost = factory
       }
       return parsed.data;
     }),
-    mwAuthenticated,
     async (c) => {
+      const currentUserId = c.get("currentUserId");
+
+      if (!currentUserId) return c.text("401 unauthorized", 401);
+
       const postId = c.req.param("postId");
       const json = c.req.valid("json");
+      const db = c.get("db");
 
-      const data = await c.var.db
+      const data = await db
         .update(posts)
         .set({ nsfw: json.nsfw, updatedAt: new Date().toISOString() })
         .where(
           and(
             eq(posts.id, postId),
             or(
-              eq(posts.authorId, c.var.currentUserId),
+              eq(posts.authorId, currentUserId),
               exists(
-                c.var.db
+                db
                   .select({ moderatorId: communities.moderatorId })
                   .from(communities)
                   .where(
                     and(
                       eq(communities.id, posts.communityId),
-                      eq(communities.moderatorId, c.var.currentUserId),
+                      eq(communities.moderatorId, currentUserId),
                     ),
                   ),
               ),

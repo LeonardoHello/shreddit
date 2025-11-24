@@ -280,10 +280,10 @@ export default function SidebarDialog({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["communities", "joined"],
+        queryKey: ["users", "me", "communities", "joined"],
       });
 
       startTransition(() => {
