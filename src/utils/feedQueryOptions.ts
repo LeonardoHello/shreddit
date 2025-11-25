@@ -18,7 +18,6 @@ import { getOneMonthAgo } from "./getOneMonthAgo";
 
 const PostCursorSchema = z.discriminatedUnion("sort", [
   z.object({
-    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.BEST),
     cursor: z.optional(
       z.object({
@@ -28,7 +27,6 @@ const PostCursorSchema = z.discriminatedUnion("sort", [
     ),
   }),
   z.object({
-    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.HOT),
     cursor: z.optional(
       z.object({
@@ -38,12 +36,10 @@ const PostCursorSchema = z.discriminatedUnion("sort", [
     ),
   }),
   z.object({
-    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.NEW),
     cursor: z.optional(PostSchema.pick({ id: true, createdAt: true })),
   }),
   z.object({
-    currentUserId: z.nullish(z.string()),
     sort: z.literal(PostSort.CONTROVERSIAL),
     cursor: z.optional(
       z.object({
@@ -71,7 +67,6 @@ function encodeCursor(cursor: object) {
 export const feedHonoValidation = validator("query", (value, c) => {
   const parsed = z
     .object({
-      currentUserId: z.nullish(z.string()),
       sort: z.enum(PostSort),
       cursor: z.nullish(z.string()),
     })
@@ -139,8 +134,8 @@ export const postInputConfig = (currentUserId: UserId) =>
                   WHEN vote_status = 'downvoted' THEN -1
                   ELSE 0
                 END
-              ), 0)
-            )::int
+              ), 0)::int
+            )
             FROM users_to_posts
             WHERE users_to_posts.post_id = ${post.id}
           )
@@ -203,7 +198,6 @@ type FeedProps = {
     : P extends PostFeed.HOME
       ? {
           feed: P;
-          currentUserId: NonNullable<UserId>;
         }
       : P extends PostFeed.COMMUNITY
         ? {
@@ -221,12 +215,12 @@ type QueryProps =
   | { sort: PostSort; cursor: null | undefined };
 
 export const feedHonoResponse = async (
-  c: Context,
+  c: Context<Env>,
   query: QueryProps,
-  variables: Env["Variables"],
   feedProps: FeedProps,
 ) => {
-  const { currentUserId, db } = variables;
+  const currentUserId = c.get("currentUserId");
+  const db = c.get("db");
 
   const inputConfig = postInputConfig(currentUserId);
 
@@ -236,9 +230,8 @@ export const feedHonoResponse = async (
     where: (post, { and, or, eq, gt, lt, exists, notExists, sql }) => {
       const filters: (SQL | undefined)[] = [];
 
-      const hideHidden = (currentUserId: NonNullable<UserId>) => {
-        filters.push(
-          notExists(
+      const hideHidden = currentUserId
+        ? notExists(
             db
               .select()
               .from(usersToPosts)
@@ -249,12 +242,11 @@ export const feedHonoResponse = async (
                   eq(usersToPosts.hidden, true),
                 ),
               ),
-          ),
-        );
-      };
-      const hideMuted = (currentUserId: NonNullable<UserId>) => {
-        filters.push(
-          notExists(
+          )
+        : undefined;
+
+      const hideMuted = currentUserId
+        ? notExists(
             db
               .select()
               .from(usersToCommunities)
@@ -265,37 +257,34 @@ export const feedHonoResponse = async (
                   eq(usersToCommunities.muted, true),
                 ),
               ),
-          ),
-        );
-      };
+          )
+        : undefined;
 
       switch (feedProps.feed) {
         case PostFeed.HOME:
           if (currentUserId) {
-            hideHidden(currentUserId);
-            hideMuted(currentUserId);
-          }
-          filters.push(
-            exists(
-              db
-                .select()
-                .from(usersToCommunities)
-                .where(
-                  and(
-                    eq(usersToCommunities.userId, feedProps.currentUserId),
-                    eq(usersToCommunities.communityId, post.communityId),
-                    eq(usersToCommunities.joined, true),
+            filters.push(
+              hideHidden,
+              hideMuted,
+              exists(
+                db
+                  .select()
+                  .from(usersToCommunities)
+                  .where(
+                    and(
+                      eq(usersToCommunities.userId, currentUserId),
+                      eq(usersToCommunities.communityId, post.communityId),
+                      eq(usersToCommunities.joined, true),
+                    ),
                   ),
-                ),
-            ),
-          );
+              ),
+            );
+          }
           break;
 
         case PostFeed.COMMUNITY:
-          if (currentUserId) {
-            hideHidden(currentUserId);
-          }
           filters.push(
+            hideHidden,
             exists(
               db
                 .select({ id: communities.id })
@@ -419,10 +408,7 @@ export const feedHonoResponse = async (
           break;
 
         default:
-          if (currentUserId) {
-            hideHidden(currentUserId);
-            hideMuted(currentUserId);
-          }
+          filters.push(hideHidden, hideMuted);
           break;
       }
 

@@ -4,27 +4,19 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Shield } from "lucide-react";
 
 import { client } from "@/hono/client";
-import type { UserId } from "@/lib/auth";
 import SidebarCollapsible from "./SidebarCollapsible";
 
-export default function SidebarNavModerated({
-  currentUserId,
-}: {
-  currentUserId: NonNullable<UserId>;
-}) {
+export default function SidebarNavModerated() {
   const { data: moderatedCommunities } = useSuspenseQuery({
-    queryKey: ["users", currentUserId, "communities", "moderated"],
+    queryKey: ["users", "me", "communities", "moderated"],
     queryFn: async () => {
-      const res = await client.users.me.communities.moderated.$get({
-        query: { currentUserId },
-      });
+      const res = await client.users.me.communities.moderated.$get();
       return res.json();
     },
   });
 
   return (
     <SidebarCollapsible
-      currentUserId={currentUserId}
       communities={moderatedCommunities}
       title="Communities you moderate or created"
       label="moderated"

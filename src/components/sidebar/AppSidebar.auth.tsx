@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { headers } from "next/headers";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -14,8 +15,7 @@ import {
   SidebarRail,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { client } from "@/hono/client";
-import { UserId } from "@/lib/auth";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import SidebarDialog from "./SidebarDialog";
 import SidebarLogo from "./SidebarLogo";
@@ -26,37 +26,29 @@ import SidebarNavMuted from "./SidebarNavMuted";
 import SidebarNavRecent from "./SidebarNavRecent";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
 
-export async function AppSidebarAuth({
-  currentUserId,
-}: {
-  currentUserId: NonNullable<UserId>;
-}) {
+export async function AppSidebarAuth() {
   const queryClient = getQueryClient();
 
+  const client = createClient(await headers());
+
   queryClient.prefetchQuery({
-    queryKey: ["users", currentUserId, "communities", "moderated"],
+    queryKey: ["users", "me", "communities", "moderated"],
     queryFn: async () => {
-      const res = await client.users.me.communities.moderated.$get({
-        query: { currentUserId },
-      });
+      const res = await client.users.me.communities.moderated.$get();
       return res.json();
     },
   });
   queryClient.prefetchQuery({
-    queryKey: ["users", currentUserId, "communities", "joined"],
+    queryKey: ["users", "me", "communities", "joined"],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.$get({
-        query: { currentUserId },
-      });
+      const res = await client.users.me.communities.joined.$get();
       return res.json();
     },
   });
   queryClient.prefetchQuery({
-    queryKey: ["users", currentUserId, "communities", "muted"],
+    queryKey: ["users", "me", "communities", "muted"],
     queryFn: async () => {
-      const res = await client.users.me.communities.muted.$get({
-        query: { currentUserId },
-      });
+      const res = await client.users.me.communities.muted.$get();
       return res.json();
     },
   });
@@ -82,15 +74,15 @@ export async function AppSidebarAuth({
 
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Suspense fallback={<SidebarNavSkeleton itemCount={1} />}>
-            <SidebarNavModerated currentUserId={currentUserId} />
+            <SidebarNavModerated />
           </Suspense>
 
           <Suspense fallback={<SidebarNavSkeleton itemCount={4} />}>
-            <SidebarNavJoined currentUserId={currentUserId} />
+            <SidebarNavJoined />
           </Suspense>
 
           <Suspense fallback={<SidebarNavSkeleton itemCount={2} />}>
-            <SidebarNavMuted currentUserId={currentUserId} />
+            <SidebarNavMuted />
           </Suspense>
         </HydrationBoundary>
       </SidebarContent>
@@ -100,7 +92,7 @@ export async function AppSidebarAuth({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarDialog currentUserId={currentUserId}>
+            <SidebarDialog>
               <SidebarMenuButton className="[&>svg]:size-7">
                 <Plus className="stroke-[1.25]" />
                 Create Community

@@ -1,21 +1,23 @@
+import { headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import * as z from "zod/mini";
 
-import { client } from "@/hono/client";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 
 export default async function PostLayout(
   props: LayoutProps<"/r/[communityName]/comments/[postId]">,
 ) {
-  const params = await props.params;
+  const [params, headers] = await Promise.all([props.params, nextHeaders()]);
 
   const { success } = z.uuid().safeParse(params.postId);
 
   if (!success) notFound();
 
+  const client = createClient(headers);
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({

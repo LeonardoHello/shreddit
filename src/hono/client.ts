@@ -12,8 +12,9 @@ export type Client = ReturnType<typeof hc<typeof app>>;
 export const hcWithType = (...args: Parameters<typeof hc>): Client =>
   hc<typeof app>(...args);
 
-export const client = hcWithType(getUrl(), {
-  init: {
-    credentials: "include",
-  },
-}).api;
+export const createClient = (headers?: Headers) =>
+  hcWithType(getUrl(), {
+    headers: headers ? Object.fromEntries(headers.entries()) : undefined,
+  }).api;
+
+export const client = createClient();

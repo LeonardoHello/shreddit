@@ -152,13 +152,13 @@ export const user = factory
     const username = c.req.param("username");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, { feed: PostFeed.USER, username });
+    return feedHonoResponse(c, query, { feed: PostFeed.USER, username });
   })
   .get("/:username/posts/upvoted", feedHonoValidation, async (c) => {
     const username = c.req.param("username");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, {
+    return feedHonoResponse(c, query, {
       feed: PostFeed.UPVOTED,
       username,
     });
@@ -167,7 +167,7 @@ export const user = factory
     const username = c.req.param("username");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, {
+    return feedHonoResponse(c, query, {
       feed: PostFeed.DOWNVOTED,
       username,
     });
@@ -176,7 +176,7 @@ export const user = factory
     const username = c.req.param("username");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, {
+    return feedHonoResponse(c, query, {
       feed: PostFeed.SAVED,
       username,
     });
@@ -185,7 +185,7 @@ export const user = factory
     const username = c.req.param("username");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, {
+    return feedHonoResponse(c, query, {
       feed: PostFeed.HIDDEN,
       username,
     });

@@ -1,20 +1,13 @@
 import { ChevronDown, CircleDashed } from "lucide-react";
 
-import { getSession } from "@/app/actions";
 import SubmitButtonFake from "@/components/submit/SubmitButtonFake";
 import SubmitCommunity from "@/components/submit/SubmitCommunity";
 import { Button } from "@/components/ui/button";
 
-export default async function SubmitPage() {
-  const session = await getSession();
-
-  if (!session) {
-    throw new Error("Unauthenticated");
-  }
-
+export default function SubmitPage() {
   return (
     <>
-      <SubmitCommunity currentUserId={session.session.userId}>
+      <SubmitCommunity>
         <Button variant={"outline"} className="border-border h-10 w-60 sm:w-72">
           <CircleDashed className="text-muted-foreground size-6" />
           <span>Choose a community</span>

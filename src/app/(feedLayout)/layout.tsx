@@ -38,11 +38,7 @@ export default async function FeedLayout(props: LayoutProps<"/">) {
       <TanstackProvider>
         <RecentCommunityContextProvider>
           <SidebarProvider>
-            {session ? (
-              <AppSidebarAuth currentUserId={session.session.userId} />
-            ) : (
-              <AppSidebar />
-            )}
+            {session ? <AppSidebarAuth /> : <AppSidebar />}
 
             <SidebarInset>
               <Header />

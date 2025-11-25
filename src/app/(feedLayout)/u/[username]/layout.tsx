@@ -1,13 +1,16 @@
+import { headers as nextHeaders } from "next/headers";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import UserHeader from "@/components/user/UserHeader";
 import UserSidebar from "@/components/user/UserSidebar";
-import { client } from "@/hono/client";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 
 export default async function UserLayout(props: LayoutProps<"/u/[username]">) {
-  const params = await props.params;
+  const [params, headers] = await Promise.all([props.params, nextHeaders()]);
 
+  const client = createClient(headers);
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({

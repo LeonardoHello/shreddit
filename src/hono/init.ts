@@ -15,6 +15,7 @@ export const factory = createFactory<Env>({
     app.use(async (c, next) => {
       c.set("db", db);
       const session = await auth.api.getSession({ headers: c.req.raw.headers });
+
       if (!session) {
         c.set("currentUserId", null);
         await next();

@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Community } from "@/db/schema/communities";
 import { client } from "@/hono/client";
-import type { UserId } from "@/lib/auth";
 import { cn } from "@/lib/cn";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
@@ -44,14 +43,12 @@ type MutedCommunitiesType = InferResponseType<
 >;
 
 export default function SidebarCollapsible({
-  currentUserId,
   communities,
   defaultOpen = true,
   title,
   label,
   empty,
 }: {
-  currentUserId: NonNullable<UserId>;
   communities:
     | ModeratedCommunitiesType
     | JoinedCommunitiesType
@@ -71,22 +68,12 @@ export default function SidebarCollapsible({
 
   const moderatedCommunitiesQueryKey = [
     "users",
-    currentUserId,
+    "me",
     "communities",
     "moderated",
   ];
-  const joinedCommunitiesQueryKey = [
-    "users",
-    currentUserId,
-    "communities",
-    "joined",
-  ];
-  const mutedCommunitiesQueryKey = [
-    "users",
-    currentUserId,
-    "communities",
-    "muted",
-  ];
+  const joinedCommunitiesQueryKey = ["users", "me", "communities", "joined"];
+  const mutedCommunitiesQueryKey = ["users", "me", "communities", "muted"];
 
   const toggleFavorite = useMutation({
     mutationFn: async ({

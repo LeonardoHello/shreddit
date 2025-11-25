@@ -26,7 +26,7 @@ type InfiniteQueryParams<T extends PostFeed> = {
       ? {
           feed: P;
           currentUserId: NonNullable<UserId>;
-          queryKey: ["users", NonNullable<UserId>, "posts", PostSort];
+          queryKey: ["users", "me", "posts", PostSort];
         }
       : P extends PostFeed.COMMUNITY
         ? {
@@ -81,11 +81,7 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
         switch (params.feed) {
           case PostFeed.HOME:
             const homePosts = await client.users.me.posts.$get({
-              query: {
-                sort,
-                currentUserId: params.currentUserId,
-                cursor: pageParam,
-              },
+              query: { sort, cursor: pageParam },
             });
             return homePosts.json();
 

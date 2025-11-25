@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Community } from "@/db/schema/communities";
 import { client } from "@/hono/client";
-import type { UserId } from "@/lib/auth";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { AlertDialog, AlertDialogTrigger } from "../ui/alert-dialog";
@@ -23,38 +22,25 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 
 export default function CommunityHeaderDropdown({
   children,
-  currentUserId,
   communityId,
   communityName,
   isCommunityModerator,
 }: {
   children: React.ReactNode;
-  currentUserId: NonNullable<UserId>;
   communityId: Community["id"];
   communityName: string;
   isCommunityModerator: boolean;
 }) {
   const queryClient = getQueryClient();
 
-  const userToCommunityQueryKey = [
-    "users",
-    currentUserId,
-    "communities",
-    communityName,
-  ];
-  const joinedCommunitiesQueryKey = [
-    "users",
-    currentUserId,
-    "communities",
-    "joined",
-  ];
+  const userToCommunityQueryKey = ["users", "me", "communities", communityName];
+  const joinedCommunitiesQueryKey = ["users", "me", "communities", "joined"];
 
   const { data: userToCommunity } = useSuspenseQuery({
     queryKey: userToCommunityQueryKey,
     queryFn: async () => {
       const res = await client.users.me.communities[":communityName"].$get({
         param: { communityName },
-        query: { currentUserId },
       });
 
       return res.json();
@@ -130,7 +116,7 @@ export default function CommunityHeaderDropdown({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["users", currentUserId, "communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
       queryClient.invalidateQueries({
         queryKey: joinedCommunitiesQueryKey,
@@ -172,7 +158,7 @@ export default function CommunityHeaderDropdown({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["users", currentUserId, "communities", "muted"],
+        queryKey: ["users", "me", "communities", "muted"],
       });
 
       if (data[0].muted) {

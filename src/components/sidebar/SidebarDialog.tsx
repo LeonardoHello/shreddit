@@ -35,7 +35,6 @@ import {
 import type { Community } from "@/db/schema/communities";
 import { PostFileSchema } from "@/db/schema/posts";
 import { client } from "@/hono/client";
-import type { UserId } from "@/lib/auth";
 import { useUploadThing } from "@/lib/uploadthing";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import defaultCommunityBanner from "@public/defaultCommunityBanner.jpg";
@@ -181,10 +180,8 @@ const toastId = "loading_toast";
 
 export default function SidebarDialog({
   children,
-  currentUserId,
 }: {
   children: React.ReactNode;
-  currentUserId: NonNullable<UserId>;
 }) {
   const iconInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -283,10 +280,10 @@ export default function SidebarDialog({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ["users", currentUserId, "communities", "moderated"],
+        queryKey: ["users", "me", "communities", "moderated"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["users", currentUserId, "communities", "joined"],
+        queryKey: ["users", "me", "communities", "joined"],
       });
 
       startTransition(() => {

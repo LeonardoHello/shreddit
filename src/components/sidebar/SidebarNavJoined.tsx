@@ -4,27 +4,19 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 
 import { client } from "@/hono/client";
-import type { UserId } from "@/lib/auth";
 import SidebarCollapsible from "./SidebarCollapsible";
 
-export default function SidebarNavJoined({
-  currentUserId,
-}: {
-  currentUserId: NonNullable<UserId>;
-}) {
+export default function SidebarNavJoined() {
   const { data: joinedCommunities } = useSuspenseQuery({
-    queryKey: ["users", currentUserId, "communities", "joined"],
+    queryKey: ["users", "me", "communities", "joined"],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.$get({
-        query: { currentUserId },
-      });
+      const res = await client.users.me.communities.joined.$get();
       return res.json();
     },
   });
 
   return (
     <SidebarCollapsible
-      currentUserId={currentUserId}
       communities={joinedCommunities}
       title="Communities you're a member of"
       label="joined"

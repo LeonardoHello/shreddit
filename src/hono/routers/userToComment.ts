@@ -37,6 +37,6 @@ export const userToComment = factory.createApp().patch(
         set: { voteStatus: json.voteStatus },
       });
 
-    return c.status(204);
+    return c.text("success", 200);
   },
 );

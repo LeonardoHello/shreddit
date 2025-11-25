@@ -139,7 +139,7 @@ export const community = factory
     const communityName = c.req.param("communityName");
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, {
+    return feedHonoResponse(c, query, {
       feed: PostFeed.COMMUNITY,
       communityName,
     });
@@ -232,7 +232,7 @@ export const community = factory
           ),
         );
 
-      return c.status(204);
+      return c.text("success", 200);
     },
   )
   .delete(`/:communityId{${reg}}`, async (c) => {
@@ -252,5 +252,5 @@ export const community = factory
         ),
       );
 
-    return c.status(204);
+    return c.text("success", 200);
   });

@@ -1,3 +1,4 @@
+import { headers as nextHeaders } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -7,31 +8,24 @@ import { getSession } from "@/app/actions";
 import SubmitForm from "@/components/submit/SubmitForm";
 import { Separator } from "@/components/ui/separator";
 import SubmitContextProvider from "@/context/SubmitContext";
-import { client } from "@/hono/client";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 import shrek from "@public/shrek.svg";
 
 export default async function SubmitLayout(props: LayoutProps<"/submit">) {
-  const session = await getSession();
+  const [headers, session] = await Promise.all([nextHeaders(), getSession()]);
 
   if (!session) {
-    throw new Error("Unauthenticated");
+    throw new Error("401 unauthenticated");
   }
 
+  const client = createClient(headers);
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: [
-      "users",
-      session.session.userId,
-      "communities",
-      "joined",
-      "submit",
-    ],
+    queryKey: ["users", "me", "communities", "joined", "submit"],
     queryFn: async () => {
-      const res = await client.users.me.communities.joined.submit.$get({
-        query: { currentUserId: session.session.userId },
-      });
+      const res = await client.users.me.communities.joined.submit.$get();
       return res.json();
     },
   });

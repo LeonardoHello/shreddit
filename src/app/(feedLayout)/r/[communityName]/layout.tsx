@@ -1,30 +1,31 @@
+import { headers as nextHeaders } from "next/headers";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 import { getSession } from "@/app/actions";
 import CommunityHeader from "@/components/community/CommunityHeader";
 import CommunitySidebar from "@/components/community/CommunitySidebar";
-import { client } from "@/hono/client";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 
 export default async function CommunityLayout(
   props: LayoutProps<"/r/[communityName]">,
 ) {
-  const [params, session] = await Promise.all([props.params, getSession()]);
+  const [params, headers, session] = await Promise.all([
+    props.params,
+    nextHeaders(),
+    getSession(),
+  ]);
 
+  const client = createClient(headers);
   const queryClient = getQueryClient();
 
   if (session) {
     queryClient.prefetchQuery({
-      queryKey: [
-        "users",
-        session.session.userId,
-        "communities",
-        params.communityName,
-      ],
+      queryKey: ["users", "me", "communities", params.communityName],
       queryFn: async () => {
         const res = await client.users.me.communities[":communityName"].$get({
           param: { communityName: params.communityName },
-          query: { currentUserId: session.session.userId },
         });
 
         return res.json();

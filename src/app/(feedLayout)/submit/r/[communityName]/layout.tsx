@@ -1,13 +1,16 @@
+import { headers as nextHeaders } from "next/headers";
+
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { client } from "@/hono/client";
+import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
 
 export default async function CommunitySubmitLayout(
   props: LayoutProps<"/submit/r/[communityName]">,
 ) {
-  const params = await props.params;
+  const [params, headers] = await Promise.all([props.params, nextHeaders()]);
 
+  const client = createClient(headers);
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({

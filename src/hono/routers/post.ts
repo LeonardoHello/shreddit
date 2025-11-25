@@ -26,7 +26,7 @@ export const post = factory
   .get("/", feedHonoValidation, async (c) => {
     const query = c.req.valid("query");
 
-    return feedHonoResponse(c, query, c.var, { feed: PostFeed.ALL });
+    return feedHonoResponse(c, query, { feed: PostFeed.ALL });
   })
   .get(`/:postId{${reg}}`, async (c) => {
     const postId = c.req.param("postId");
@@ -64,7 +64,7 @@ export const post = factory
                   WHEN vote_status = 'downvoted' THEN -1
                   ELSE 0
                 END
-              ), 0)
+              ), 0)::int
               FROM users_to_comments
               WHERE users_to_comments.comment_id = ${comment.id}
             )
@@ -182,7 +182,7 @@ export const post = factory
         .set({ ...json })
         .where(and(eq(posts.id, postId), eq(posts.authorId, currentUserId)));
 
-      return c.status(204);
+      c.text("success", 200);
     },
   )
   .delete(`/:postId{${reg}}`, async (c) => {
@@ -213,5 +213,5 @@ export const post = factory
       ),
     );
 
-    return c.status(204);
+    return c.text("success", 200);
   });

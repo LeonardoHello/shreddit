@@ -16,14 +16,13 @@ import { factory } from "../init";
 export const userToPost = factory
   .createApp()
   .get("/", feedHonoValidation, async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
     const query = c.req.valid("query");
 
-    if (!query.currentUserId) return c.text("401 unauthorized", 401);
-
-    return feedHonoResponse(c, query, c.var, {
-      feed: PostFeed.HOME,
-      currentUserId: query.currentUserId,
-    });
+    return feedHonoResponse(c, query, { feed: PostFeed.HOME });
   })
   .patch(
     `/:postId{${reg}}/vote`,
@@ -50,16 +49,15 @@ export const userToPost = factory
       const json = c.req.valid("json");
       const db = c.get("db");
 
-      const data = await db
+      await db
         .insert(usersToPosts)
         .values({ postId, userId: currentUserId, ...json })
         .onConflictDoUpdate({
           target: [usersToPosts.userId, usersToPosts.postId],
           set: { voteStatus: json.voteStatus },
-        })
-        .returning();
+        });
 
-      return c.json(data, 200);
+      return c.text("success", 200);
     },
   )
   .patch(
