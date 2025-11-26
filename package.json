@@ -54,7 +54,6 @@
     "tailwindcss-animate": "^1.0.7",
     "thumbhash": "^0.1.1",
     "uploadthing": "^7.7.3",
-    "uuid": "^13.0.0",
     "valibot": "^1.2.0"
   },
   "devDependencies": {

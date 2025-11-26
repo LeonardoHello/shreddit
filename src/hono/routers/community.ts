@@ -1,6 +1,5 @@
 import { and, eq } from "drizzle-orm";
 import { validator } from "hono/validator";
-import { v4 as uuidv4 } from "uuid";
 import * as v from "valibot";
 
 import {
@@ -171,7 +170,7 @@ export const community = factory
       const json = c.req.valid("json");
       const db = c.get("db");
 
-      const communityId = uuidv4();
+      const communityId = crypto.randomUUID();
 
       const data = await db.batch([
         db

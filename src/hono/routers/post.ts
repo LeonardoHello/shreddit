@@ -1,6 +1,5 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
-import { v4 as uuidv4 } from "uuid";
 import * as v from "valibot";
 
 import { UserToComment } from "@/db/schema/comments";
@@ -122,7 +121,7 @@ export const post = factory
           .values({ ...post, authorId: currentUserId })
           .returning({ id: posts.id });
       } else {
-        const postId = uuidv4();
+        const postId = crypto.randomUUID();
 
         data = await db.batch([
           db
