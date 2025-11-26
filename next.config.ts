@@ -11,6 +11,28 @@ const routeHasAuthCookie: RouteHas = {
 // TODO: create proxy file for rewriting u/:userId and r/:communityId dynamic routes to their respective names
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  experimental: {
+    optimizePackageImports: [
+      "@radix-ui/react-alert-dialog",
+      "@radix-ui/react-avatar",
+      "@radix-ui/react-collapsible",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-label",
+      "@radix-ui/react-popover",
+      "@radix-ui/react-progress",
+      "@radix-ui/react-separator",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-toggle",
+      "@radix-ui/react-toggle-group",
+      "@radix-ui/react-tooltip",
+
+      "@tiptap/extensions",
+      "@tiptap/react",
+      "@tiptap/starter-kit",
+    ],
+  },
   images: {
     remotePatterns: [
       new URL("https://img.clerk.com"),
