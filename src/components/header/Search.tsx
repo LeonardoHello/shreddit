@@ -1,11 +1,11 @@
 "use client";
 
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
-import { AnimatePresence } from "motion/react";
-import * as motion from "motion/react-client";
+import { AnimatePresence, usePresence } from "motion/react";
+import { useAnimate } from "motion/react-mini";
 
 import { client } from "@/hono/client";
 import useDropdown from "@/hooks/useDropdown";
@@ -73,6 +73,7 @@ export function Search() {
       <AnimatePresence>
         {isOpen && searchedValue.length !== 0 && (
           <SearchDropdown
+            key={"dialog"}
             searchedValue={searchedValue}
             closeDropdown={closeDropdown}
           />
@@ -92,6 +93,38 @@ const SearchDropdown = memo(
     searchedValue: string;
     closeDropdown: () => void;
   }) => {
+    const [isPresent, safeToRemove] = usePresence();
+    const [scope, animate] = useAnimate();
+
+    useEffect(() => {
+      if (isPresent) {
+        const enterAnimation = async () => {
+          await animate(
+            scope.current,
+            { opacity: 1, scale: 1 },
+            {
+              duration: 0.15,
+            },
+          );
+        };
+        enterAnimation();
+      } else {
+        const exitAnimation = async () => {
+          await animate(
+            scope.current,
+            { opacity: 0, scale: 0.93 },
+            {
+              duration: 0.15,
+            },
+          );
+
+          safeToRemove();
+        };
+
+        exitAnimation();
+      }
+    }, [animate, isPresent, safeToRemove, scope]);
+
     const { data: searchedCommunities, isLoading: isLoadingCommunities } =
       useQuery({
         queryKey: ["communities", "search", searchedValue],
@@ -116,16 +149,11 @@ const SearchDropdown = memo(
     const isLoading = isLoadingCommunities || isLoadingUsers;
 
     return (
-      <motion.div
-        key="box"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{
-          duration: 0.2,
-          scale: { type: "spring", visualDuration: 0.2, bounce: 0.4 },
-        }}
+      <div
+        ref={scope}
         style={{
+          opacity: 0,
+          scale: 0.93,
           scrollbarWidth: "thin",
           colorScheme: "dark",
           scrollbarColor: "hsl(var(--muted-foreground)/.4) transparent",
@@ -209,7 +237,7 @@ const SearchDropdown = memo(
             ))}
           </div>
         )}
-      </motion.div>
+      </div>
     );
   },
 );
