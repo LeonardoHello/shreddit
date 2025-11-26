@@ -30,7 +30,6 @@ const nextConfig: NextConfig = {
 
       "@tiptap/extensions",
       "@tiptap/react",
-      "@tiptap/starter-kit",
     ],
   },
   images: {

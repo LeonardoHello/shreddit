@@ -5,7 +5,6 @@ import {
   isServer,
   QueryClient,
 } from "@tanstack/react-query";
-import SuperJSON from "superjson";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -13,9 +12,6 @@ function makeQueryClient() {
       queries: {
         refetchOnWindowFocus: false,
         retry: 1,
-      },
-      hydrate: {
-        deserializeData: SuperJSON.deserialize,
       },
       dehydrate: {
         // include pending queries in dehydration
@@ -30,7 +26,6 @@ function makeQueryClient() {
           // with better digests.
           return false;
         },
-        serializeData: SuperJSON.serialize,
       },
     },
   });

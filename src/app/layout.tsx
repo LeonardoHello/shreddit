@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Reddit_Sans } from "next/font/google";
 
-import { Analytics } from "@vercel/analytics/next";
-
 import "./globals.css";
 
 const reddit_sans = Reddit_Sans({
@@ -22,7 +20,6 @@ export default function RootLayout(props: LayoutProps<"/">) {
       <body className={`${reddit_sans.className} dark antialiased`}>
         {props.children}
         {props.auth}
-        <Analytics />
       </body>
     </html>
   );
