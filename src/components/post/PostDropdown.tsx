@@ -65,7 +65,6 @@ export default function PostDropdown({
       return { previousValue };
     },
     onSuccess: (data) => {
-      console.log(`onMutate --> ${data[0].saved}`);
       if (data[0].saved) {
         toast.success("Post saved successfully.");
       } else {
