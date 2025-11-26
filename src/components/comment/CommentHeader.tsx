@@ -44,7 +44,7 @@ export default function CommentHeader() {
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
         {username.success ? (
           <HoverPrefetchLink
-            href={`/u/${username}`}
+            href={`/u/${username.output}`}
             className="font-extrabold break-all hover:underline"
           >
             {username.output}
