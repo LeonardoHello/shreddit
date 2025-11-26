@@ -1,4 +1,4 @@
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { getSession } from "@/app/actions";
 import FeedPostInfiniteQuery from "@/components/feed/FeedPostInfiniteQuery";
@@ -9,7 +9,7 @@ export default async function HomeSortPage(props: PageProps<"/home/[sort]">) {
 
   if (!session) throw new Error("Could not load home page information.");
 
-  const sort = z.enum(PostSort).parse(params.sort);
+  const sort = v.parse(v.enum(PostSort), params.sort);
 
   return (
     <FeedPostInfiniteQuery<PostFeed.HOME>

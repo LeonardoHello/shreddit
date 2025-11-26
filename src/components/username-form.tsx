@@ -4,10 +4,10 @@ import { useState, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Info, Loader2, LogOut } from "lucide-react";
 import { useForm } from "react-hook-form";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,20 +43,29 @@ import { authClient } from "@/lib/auth-client";
 import defaultUserImage from "@public/defaultUserImage.png";
 import shrek from "@public/shrek.svg";
 
-const formSchema = z.object({
-  username: z.string().check(
-    z.minLength(3, { message: "Username must be at least 3 characters long" }),
-    z.maxLength(21, { message: "Username must be at most 21 characters long" }),
-    z.regex(/^[a-zA-Z0-9_.]+$/, {
-      message:
-        "Username can only contain alphanumeric characters, underscores, and dots",
-    }),
-    z.trim(),
+const nameMinLength = 3;
+const nameMaxLength = 21;
+
+const formSchema = v.object({
+  username: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(
+      nameMinLength,
+      `Username must be at least ${nameMinLength} characters long`,
+    ),
+    v.maxLength(
+      nameMaxLength,
+      `Username must be at most ${nameMaxLength} characters long`,
+    ),
+    v.regex(
+      /^[a-zA-Z0-9_.]+$/,
+      "Username can only contain alphanumeric characters, underscores, and dots",
+    ),
   ),
 });
 
-const description =
-  "Username must be 3-21 characters long and contain only alphanumeric characters, underscores, and dots.";
+const description = `Username must be ${nameMinLength}-${nameMaxLength} characters long and contain only alphanumeric characters, underscores, and dots.`;
 
 export default function UsernameForm({
   userName,
@@ -72,15 +81,15 @@ export default function UsernameForm({
   const [isLoading, setIsLoading] = useState(false);
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<v.InferInput<typeof formSchema>>({
+    resolver: valibotResolver(formSchema),
     defaultValues: {
       username: "",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: v.InferInput<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 

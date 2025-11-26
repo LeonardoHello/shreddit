@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { validator } from "hono/validator";
 import { v4 as uuidv4 } from "uuid";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import {
   communities,
@@ -20,36 +20,33 @@ export const community = factory
   .get(
     "/search",
     validator("query", (value, c) => {
-      const parsed = z
-        .object({
-          search: z.string(),
-          limit: z.string(),
-        })
-        .safeParse(value);
+      const parsed = v.safeParse(
+        v.object({
+          search: v.string(),
+          limit: v.string(),
+        }),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid query parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
 
-      const transformed = z
-        .object({
-          search: z.string(),
-          limit: z.number().check(z.positive()),
-        })
-        .safeParse({ ...parsed.data, limit: Number(parsed.data.limit) });
+      const transformed = v.safeParse(
+        v.object({
+          search: v.string(),
+          limit: v.pipe(v.number(), v.integer(), v.gtValue(0)),
+        }),
+        { ...parsed.output, limit: Number(parsed.output.limit) },
+      );
 
       if (!transformed.success) {
-        return c.text(
-          `400 Invalid query parameter for limit. Not of type number`,
-          400,
-        );
+        const error = transformed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
 
-      return transformed.data;
+      return transformed.output;
     }),
     async (c) => {
       const query = c.req.valid("query");
@@ -147,23 +144,24 @@ export const community = factory
   .post(
     "/",
     validator("json", (value, c) => {
-      const parsed = CommunitySchema.pick({
-        name: true,
-        description: true,
-        icon: true,
-        iconPlaceholder: true,
-        banner: true,
-        bannerPlaceholder: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.pick(CommunitySchema, [
+          "name",
+          "description",
+          "icon",
+          "iconPlaceholder",
+          "banner",
+          "bannerPlaceholder",
+        ]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -196,22 +194,23 @@ export const community = factory
   .patch(
     `/:communityId{${reg}}`,
     validator("json", (value, c) => {
-      const parsed = CommunitySchema.omit({
-        id: true,
-        updatedAt: true,
-        createdAt: true,
-        name: true,
-        moderatorId: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.omit(CommunitySchema, [
+          "id",
+          "updatedAt",
+          "createdAt",
+          "name",
+          "moderatorId",
+        ]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid query parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");

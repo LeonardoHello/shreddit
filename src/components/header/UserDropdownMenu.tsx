@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { LogOut, User, UserCog } from "lucide-react";
+import * as v from "valibot";
 
 import {
   DropdownMenu,
@@ -30,7 +31,7 @@ export default function UserDropdownMenu({
 }) {
   const router = useRouter();
 
-  const parsedUsername = UserSchema.shape.username.unwrap().parse(username);
+  const parsedUsername = v.parse(UserSchema.entries.username.wrapped, username);
 
   return (
     <DropdownMenu>

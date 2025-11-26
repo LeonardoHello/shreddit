@@ -1,4 +1,5 @@
 import { validator } from "hono/validator";
+import * as v from "valibot";
 
 import {
   communities,
@@ -173,18 +174,17 @@ export const userToCommunity = factory
   .patch(
     `/:communityId{${reg}}/favorite`,
     validator("json", (value, c) => {
-      const parsed = UserToCommunitySchema.pick({
-        favorited: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.pick(UserToCommunitySchema, ["favorited"]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -216,18 +216,17 @@ export const userToCommunity = factory
   .patch(
     `/:communityId{${reg}}/join`,
     validator("json", (value, c) => {
-      const parsed = UserToCommunitySchema.pick({
-        joined: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.pick(UserToCommunitySchema, ["joined"]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -259,18 +258,17 @@ export const userToCommunity = factory
   .patch(
     `/:communityId{${reg}}/mute`,
     validator("json", (value, c) => {
-      const parsed = UserToCommunitySchema.pick({
-        muted: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.pick(UserToCommunitySchema, ["muted"]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
 
     async (c) => {

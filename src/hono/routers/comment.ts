@@ -1,6 +1,6 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { comments, CommentSchema } from "@/db/schema/comments";
 import { communities, CommunitySchema } from "@/db/schema/communities";
@@ -13,33 +13,30 @@ export const comment = factory
   .post(
     "/",
     validator("query", (value, c) => {
-      const parsed = z
-        .object({
-          postId: CommentSchema.shape.postId,
-          parentCommentId: z.optional(CommentSchema.shape.parentCommentId),
-        })
-        .safeParse(value);
+      const parsed = v.safeParse(
+        v.object({
+          postId: CommentSchema.entries.postId,
+          parentCommentId: v.optional(CommentSchema.entries.parentCommentId),
+        }),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid query parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     validator("json", (value, c) => {
-      const parsed = CommentSchema.pick({ text: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(CommentSchema, ["text"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -69,16 +66,14 @@ export const comment = factory
   .patch(
     `/:commentId{${reg}}`,
     validator("json", (value, c) => {
-      const parsed = CommentSchema.pick({ text: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(CommentSchema, ["text"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -103,18 +98,19 @@ export const comment = factory
   .delete(
     `/:commentId{${reg}}`,
     validator("query", (value, c) => {
-      const parsed = z
-        .object({ communityId: CommunitySchema.shape.id.check(z.uuidv4()) })
-        .safeParse(value);
+      const parsed = v.safeParse(
+        v.object({
+          communityId: v.pipe(CommunitySchema.entries.id, v.uuid()),
+        }),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid query parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");

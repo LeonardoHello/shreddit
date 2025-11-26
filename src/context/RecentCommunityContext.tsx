@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useReducer } from "react";
 
+import * as v from "valibot";
+
 import { Community, CommunitySchema } from "@/db/schema/communities";
 
 type RecentCommunity = Pick<
@@ -43,22 +45,18 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
           return { ...state, isLoading: false };
         }
 
-        const parsed = JSON.parse(saved);
+        const parsed = v.safeParse(
+          v.array(
+            v.pick(CommunitySchema, ["id", "name", "icon", "iconPlaceholder"]),
+          ),
+          JSON.parse(saved),
+        );
 
-        const { data, error } = CommunitySchema.pick({
-          id: true,
-          name: true,
-          icon: true,
-          iconPlaceholder: true,
-        })
-          .array()
-          .safeParse(parsed);
-
-        if (error) {
+        if (!parsed.success) {
           return { ...state, isLoading: false };
         }
 
-        return { communities: data, isLoading: false };
+        return { communities: parsed.output, isLoading: false };
       } catch (error) {
         console.error("Failed to get recent communities:", error);
         return { ...state, isLoading: false };

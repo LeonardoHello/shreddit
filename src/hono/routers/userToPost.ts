@@ -1,5 +1,6 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
+import * as v from "valibot";
 
 import { communities } from "@/db/schema/communities";
 import {
@@ -27,18 +28,17 @@ export const userToPost = factory
   .patch(
     `/:postId{${reg}}/vote`,
     validator("json", (value, c) => {
-      const parsed = UserToPostSchema.pick({
-        voteStatus: true,
-      }).safeParse(value);
+      const parsed = v.safeParse(
+        v.pick(UserToPostSchema, ["voteStatus"]),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -63,16 +63,14 @@ export const userToPost = factory
   .patch(
     `/:postId{${reg}}/save`,
     validator("json", (value, c) => {
-      const parsed = UserToPostSchema.pick({ saved: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(UserToPostSchema, ["saved"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -98,16 +96,14 @@ export const userToPost = factory
   .patch(
     `/:postId{${reg}}/hide`,
     validator("json", (value, c) => {
-      const parsed = UserToPostSchema.pick({ hidden: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(UserToPostSchema, ["hidden"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -133,16 +129,14 @@ export const userToPost = factory
   .patch(
     `/:postId{${reg}}/spoiler`,
     validator("json", (value, c) => {
-      const parsed = PostSchema.pick({ spoiler: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(PostSchema, ["spoiler"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -183,16 +177,14 @@ export const userToPost = factory
   .patch(
     `/:postId{${reg}}/nsfw`,
     validator("json", (value, c) => {
-      const parsed = PostSchema.pick({ nsfw: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(PostSchema, ["nsfw"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");

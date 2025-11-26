@@ -37,8 +37,8 @@ export default function Error({
         </h1>
 
         <p className="text-muted-foreground mt-6 leading-7 font-semibold sm:text-lg">
-          An unexpected error occurred while processing your request. Please try
-          again later.
+          An error occurred while processing your request. Please try again
+          later.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6">

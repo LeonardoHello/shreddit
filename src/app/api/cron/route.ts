@@ -60,5 +60,5 @@ export async function GET() {
 
   await utapi.deleteFiles(filesToDelete);
 
-  return new Response("", { status: 200 });
+  return Response.json({ message: "sucess" }, { status: 200 });
 }

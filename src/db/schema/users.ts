@@ -1,6 +1,6 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
 import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { createSelectSchema } from "drizzle-zod";
+import { createSelectSchema } from "drizzle-valibot";
 
 import { comments, usersToComments } from "./comments";
 import { communities, usersToCommunities } from "./communities";

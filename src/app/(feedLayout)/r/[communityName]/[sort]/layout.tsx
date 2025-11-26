@@ -2,7 +2,7 @@ import { headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
@@ -13,7 +13,7 @@ export default async function CommunityLayout(
 ) {
   const [params, headers] = await Promise.all([props.params, nextHeaders()]);
 
-  const { data: sort, success } = z.enum(PostSort).safeParse(params.sort);
+  const { output: sort, success } = v.safeParse(v.enum(PostSort), params.sort);
 
   if (!success) notFound();
 

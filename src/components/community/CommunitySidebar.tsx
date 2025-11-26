@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CakeSlice, Globe, Info } from "lucide-react";
+import * as v from "valibot";
 
 import {
   Dialog,
@@ -82,9 +83,10 @@ function CommunitySidebarContent({
     notFound();
   }
 
-  const { success, data: username } = UserSchema.shape.username
-    .unwrap()
-    .safeParse(community.moderator.username);
+  const { output: username, success } = v.safeParse(
+    UserSchema.entries.username.wrapped,
+    community.moderator.username,
+  );
 
   return (
     <>

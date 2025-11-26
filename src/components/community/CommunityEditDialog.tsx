@@ -3,7 +3,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import Image from "next/image";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useMutation } from "@tanstack/react-query";
 import type { InferResponseType } from "hono/client";
 import { Camera, Loader2, X } from "lucide-react";
@@ -13,7 +13,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -123,19 +123,31 @@ const displayNameMaxLength = 100;
 const memberNicknameMaxLength = 21;
 const descriptionMaxLength = 500;
 
-const fileSchema = PostFileSchema.pick({
-  key: true,
-  url: true,
-  name: true,
-  thumbHash: true,
-}).array();
-
-const formSchema = z.object({
-  displayName: z.string().check(z.maxLength(displayNameMaxLength), z.trim()),
-  memberNickname: z
-    .string()
-    .check(z.maxLength(memberNicknameMaxLength), z.trim()),
-  description: z.string().check(z.maxLength(descriptionMaxLength), z.trim()),
+const formSchema = v.object({
+  displayName: v.pipe(
+    v.string(),
+    v.trim(),
+    v.maxLength(
+      displayNameMaxLength,
+      `Display name must be ${displayNameMaxLength} characters or less.`,
+    ),
+  ),
+  memberNickname: v.pipe(
+    v.string(),
+    v.trim(),
+    v.maxLength(
+      memberNicknameMaxLength,
+      `Nickname must be ${memberNicknameMaxLength} characters or less.`,
+    ),
+  ),
+  description: v.pipe(
+    v.string(),
+    v.trim(),
+    v.maxLength(
+      descriptionMaxLength,
+      `Description must be ${descriptionMaxLength} characters or less.`,
+    ),
+  ),
 });
 
 // file size limit in MB
@@ -179,8 +191,8 @@ export default function CommunityEditDialog({
   const queryClient = getQueryClient();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<v.InferInput<typeof formSchema>>({
+    resolver: valibotResolver(formSchema),
     defaultValues: {
       displayName: community.displayName ?? "",
       description: community.description ?? "",
@@ -290,7 +302,7 @@ export default function CommunityEditDialog({
   const isMutating = isUploading || state.isLoading;
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: v.InferInput<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     if (isMutating) {
@@ -332,10 +344,17 @@ export default function CommunityEditDialog({
 
       const data = await response.json();
 
-      const { data: parsedFiles, error } = fileSchema.safeParse(data);
+      const {
+        output: parsedFiles,
+        success,
+        issues,
+      } = v.safeParse(
+        v.array(v.pick(PostFileSchema, ["key", "url", "name", "thumbHash"])),
+        data,
+      );
 
-      if (error) {
-        toast.error(error.message);
+      if (!success) {
+        toast.error(issues[0].message);
         dispatch({ type: ReducerAction.STOP_LOADING });
 
         return;

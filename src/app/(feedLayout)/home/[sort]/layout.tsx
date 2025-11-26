@@ -2,7 +2,7 @@ import { headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { getSession } from "@/app/actions";
 import { createClient } from "@/hono/client";
@@ -20,7 +20,7 @@ export default async function HomeSortLayout(
 
   if (!session) throw new Error("401 unauthenticated");
 
-  const { data: sort, success } = z.enum(PostSort).safeParse(params.sort);
+  const { output: sort, success } = v.safeParse(v.enum(PostSort), params.sort);
 
   if (!success) notFound();
 

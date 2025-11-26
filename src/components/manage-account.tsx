@@ -3,7 +3,7 @@
 import { createElement, useReducer, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Camera, Info, Loader2, Lock, Mail, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,7 +11,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { deleteAccount } from "@/app/actions";
 import {
@@ -57,22 +57,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { User } from "@/db/schema/users";
+import type { User } from "@/db/schema/users";
 import { authClient } from "@/lib/auth-client";
 import { useUploadThing } from "@/lib/uploadthing";
 import defaultUserImage from "@public/defaultUserImage.png";
 import { DiscordIcon, GithubIcon, GoogleIcon } from "./social-icons";
 import { Progress } from "./ui/progress";
 
-const formSchema = z.object({
-  username: z.string().check(
-    z.minLength(3, { message: "Username must be at least 3 characters long" }),
-    z.maxLength(21, { message: "Username must be at most 21 characters long" }),
-    z.regex(/^[a-zA-Z0-9_.]+$/, {
-      message:
-        "Username can only contain alphanumeric characters, underscores, and dots",
-    }),
-    z.trim(),
+const nameMinLength = 3;
+const nameMaxLength = 21;
+
+const formSchema = v.object({
+  username: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(
+      nameMinLength,
+      `Username must be at least ${nameMinLength} characters long`,
+    ),
+    v.maxLength(
+      nameMaxLength,
+      `Username must be at most ${nameMaxLength} characters long`,
+    ),
+    v.regex(
+      /^[a-zA-Z0-9_.]+$/,
+      "Username can only contain alphanumeric characters, underscores, and dots",
+    ),
   ),
 });
 
@@ -149,12 +159,11 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
 
 const toastId = "loading_toast";
 
-const description =
-  "Username must be 3-21 characters long and contain only alphanumeric characters, underscores, and dots.";
-
 // file size limit in MB
 const maxFileSize = 4;
 const maxFileSizeInBytes = maxFileSize * 1024 * 1024; // convert to bytes
+
+const description = `Username must be ${nameMinLength}-${nameMaxLength} characters long and contain only alphanumeric characters, underscores, and dots.`;
 
 export default function AccountPage({
   name,
@@ -181,8 +190,8 @@ export default function AccountPage({
   const [isPending, startTransition] = useTransition();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<v.InferInput<typeof formSchema>>({
+    resolver: valibotResolver(formSchema),
     defaultValues: {
       username,
     },
@@ -235,7 +244,7 @@ export default function AccountPage({
     isPending || isUploading || state.isLoading || form.formState.isSubmitting;
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: v.InferInput<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 

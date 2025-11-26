@@ -1,7 +1,7 @@
 import type { SQL } from "drizzle-orm";
 import type { Context } from "hono";
 import { validator } from "hono/validator";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import type drizzleDb from "@/db";
 import {
@@ -16,35 +16,35 @@ import type { UserId } from "@/lib/auth";
 import { PostFeed, PostSort } from "@/types/enums";
 import { getOneMonthAgo } from "./getOneMonthAgo";
 
-const PostCursorSchema = z.discriminatedUnion("sort", [
-  z.object({
-    sort: z.literal(PostSort.BEST),
-    cursor: z.optional(
-      z.object({
-        id: PostSchema.shape.id,
-        voteCount: z.number(),
+const PostCursorSchema = v.variant("sort", [
+  v.object({
+    sort: v.literal(PostSort.BEST),
+    cursor: v.optional(
+      v.object({
+        id: PostSchema.entries.id,
+        voteCount: v.number(),
       }),
     ),
   }),
-  z.object({
-    sort: z.literal(PostSort.HOT),
-    cursor: z.optional(
-      z.object({
-        id: PostSchema.shape.id,
-        voteCount: z.number(),
+  v.object({
+    sort: v.literal(PostSort.HOT),
+    cursor: v.optional(
+      v.object({
+        id: PostSchema.entries.id,
+        voteCount: v.number(),
       }),
     ),
   }),
-  z.object({
-    sort: z.literal(PostSort.NEW),
-    cursor: z.optional(PostSchema.pick({ id: true, createdAt: true })),
+  v.object({
+    sort: v.literal(PostSort.NEW),
+    cursor: v.optional(v.pick(PostSchema, ["id", "createdAt"])),
   }),
-  z.object({
-    sort: z.literal(PostSort.CONTROVERSIAL),
-    cursor: z.optional(
-      z.object({
-        id: PostSchema.shape.id,
-        commentCount: z.number(),
+  v.object({
+    sort: v.literal(PostSort.CONTROVERSIAL),
+    cursor: v.optional(
+      v.object({
+        id: PostSchema.entries.id,
+        commentCount: v.number(),
       }),
     ),
   }),
@@ -65,25 +65,23 @@ function encodeCursor(cursor: object) {
 }
 
 export const feedHonoValidation = validator("query", (value, c) => {
-  const parsed = z
-    .object({
-      sort: z.enum(PostSort),
-      cursor: z.nullish(z.string()),
-    })
-    .safeParse(value);
+  const parsed = v.safeParse(
+    v.object({
+      sort: v.enum(PostSort),
+      cursor: v.nullish(v.string()),
+    }),
+    value,
+  );
 
   if (!parsed.success) {
-    const error = parsed.error._zod.def[0];
-    return c.text(
-      `400 Invalid query parameter for ${error.path}. ${error.message}`,
-      400,
-    );
+    const error = parsed.issues[0];
+    return c.text(`400 ${error.message}`, 400);
   }
 
-  const cursor = parsed.data.cursor;
+  const cursor = parsed.output.cursor;
 
   if (cursor === null || cursor === undefined) {
-    return { ...parsed.data, cursor };
+    return { ...parsed.output, cursor };
   }
 
   const decodedCursor = decodeCursor(cursor);
@@ -92,16 +90,17 @@ export const feedHonoValidation = validator("query", (value, c) => {
     return c.text("400 Invalid pagination cursor format", 400);
   }
 
-  const transformed = PostCursorSchema.safeParse({
-    sort: parsed.data.sort,
+  const transformed = v.safeParse(PostCursorSchema, {
+    sort: parsed.output.sort,
     cursor: decodedCursor,
   });
 
   if (!transformed.success) {
-    return c.text("400 Invalid query parameter for cursor", 400);
+    const error = transformed.issues[0];
+    return c.text(`400 ${error.message}`, 400);
   }
 
-  return transformed.data;
+  return transformed.output;
 });
 
 type InputConfig = NonNullable<
@@ -211,7 +210,7 @@ type FeedProps = {
 }[PostFeed];
 
 type QueryProps =
-  | z.infer<typeof PostCursorSchema>
+  | v.InferInput<typeof PostCursorSchema>
   | { sort: PostSort; cursor: null | undefined };
 
 export const feedHonoResponse = async (

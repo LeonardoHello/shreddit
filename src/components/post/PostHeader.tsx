@@ -2,6 +2,8 @@
 
 import { useParams } from "next/navigation";
 
+import * as v from "valibot";
+
 import { usePostContext } from "@/context/PostContext";
 import type { Post } from "@/db/schema/posts";
 import { UserSchema, type User } from "@/db/schema/users";
@@ -24,9 +26,10 @@ export default function PostHeader({
   const state = usePostContext();
   const hydrated = useHydration();
 
-  const { success, data: username } = UserSchema.shape.username
-    .unwrap()
-    .safeParse(state.author.username);
+  const { output: username, success } = v.safeParse(
+    UserSchema.entries.username.wrapped,
+    state.author.username,
+  );
 
   return (
     <div className="flex items-center justify-between gap-2">

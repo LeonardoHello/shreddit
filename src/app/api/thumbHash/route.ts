@@ -1,19 +1,16 @@
-import { NextResponse } from "next/server";
-
 import sharp from "sharp";
 import * as thumbhash from "thumbhash";
+import * as v from "valibot";
 
 import { PostFileSchema } from "@/db/schema/posts";
 
-const postFileSchema = PostFileSchema.pick({
-  key: true,
-  url: true,
-  name: true,
-}).array();
-
 export async function POST(req: Request) {
   const input = await req.json();
-  const parsedInput = postFileSchema.parse(input);
+
+  const parsedInput = v.parse(
+    v.array(v.pick(PostFileSchema, ["key", "url", "name"])),
+    input,
+  );
 
   const thumbHashes = await Promise.all(
     parsedInput.map(async (file) => {
@@ -43,5 +40,5 @@ export async function POST(req: Request) {
     }),
   );
 
-  return NextResponse.json(thumbHashes, { status: 200 });
+  return Response.json(thumbHashes, { status: 200 });
 }

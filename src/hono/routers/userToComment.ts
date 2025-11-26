@@ -1,4 +1,5 @@
 import { validator } from "hono/validator";
+import * as v from "valibot";
 
 import { usersToComments, UserToCommentSchema } from "@/db/schema/comments";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
@@ -7,18 +8,17 @@ import { factory } from "../init";
 export const userToComment = factory.createApp().patch(
   `/:commentId{${reg}}/vote`,
   validator("json", (value, c) => {
-    const parsed = UserToCommentSchema.pick({
-      voteStatus: true,
-    }).safeParse(value);
+    const parsed = v.safeParse(
+      v.pick(UserToCommentSchema, ["voteStatus"]),
+      value,
+    );
 
     if (!parsed.success) {
-      const error = parsed.error._zod.def[0];
-      return c.text(
-        `400 Invalid json parameter for ${error.path}. ${error.message}`,
-        400,
-      );
+      const error = parsed.issues[0];
+      return c.text(`400 ${error.message}`, 400);
     }
-    return parsed.data;
+
+    return parsed.output;
   }),
   async (c) => {
     const currentUserId = c.get("currentUserId");

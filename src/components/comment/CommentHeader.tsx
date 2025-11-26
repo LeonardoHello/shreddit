@@ -1,3 +1,5 @@
+import * as v from "valibot";
+
 import { useCommentContext } from "@/context/CommentContext";
 import type { Comment } from "@/db/schema/comments";
 import { UserSchema } from "@/db/schema/users";
@@ -11,18 +13,22 @@ export default function CommentHeader() {
   const hydrated = useHydration();
   const state = useCommentContext();
 
-  const { success, data: username } = UserSchema.shape.username
-    .unwrap()
-    .safeParse(state.author.username);
+  const username = v.safeParse(
+    UserSchema.entries.username.wrapped,
+    state.author.username,
+  );
 
   return (
     <div className="flex items-center gap-2">
-      {success ? (
-        <HoverPrefetchLink href={`/u/${username}`} className="rounded-full">
+      {username.success ? (
+        <HoverPrefetchLink
+          href={`/u/${username.output}`}
+          className="rounded-full"
+        >
           <Avatar className="size-7">
             <AvatarImage src={state.author.image ?? defaultUserImage.src} />
             <AvatarFallback className="uppercase">
-              {username.slice(0, 2)}
+              {username.output.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
         </HoverPrefetchLink>
@@ -36,12 +42,12 @@ export default function CommentHeader() {
       )}
 
       <div className="text-muted-foreground flex items-center gap-1 text-xs">
-        {success ? (
+        {username.success ? (
           <HoverPrefetchLink
             href={`/u/${username}`}
             className="font-extrabold break-all hover:underline"
           >
-            {username}
+            {username.output}
           </HoverPrefetchLink>
         ) : (
           <div className="font-extrabold break-all hover:underline">

@@ -1,7 +1,7 @@
 import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
 import { v4 as uuidv4 } from "uuid";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { UserToComment } from "@/db/schema/comments";
 import { communities } from "@/db/schema/communities";
@@ -86,34 +86,25 @@ export const post = factory
   .post(
     "/",
     validator("json", (value, c) => {
-      const parsed = PostSchema.omit({
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        authorId: true,
-      })
-        .and(
-          z.object({
-            files: z.optional(
-              PostFileSchema.pick({
-                key: true,
-                url: true,
-                name: true,
-                thumbHash: true,
-              }).array(),
+      const parsed = v.safeParse(
+        v.object({
+          ...v.omit(PostSchema, ["id", "createdAt", "updatedAt", "authorId"])
+            .entries,
+          files: v.optional(
+            v.array(
+              v.pick(PostFileSchema, ["key", "url", "name", "thumbHash"]),
             ),
-          }),
-        )
-        .safeParse(value);
+          ),
+        }),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");
@@ -157,16 +148,14 @@ export const post = factory
   .patch(
     `/:postId{${reg}}`,
     validator("json", (value, c) => {
-      const parsed = PostSchema.pick({ text: true }).safeParse(value);
+      const parsed = v.safeParse(v.pick(PostSchema, ["text"]), value);
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid json parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
-      return parsed.data;
+
+      return parsed.output;
     }),
     async (c) => {
       const currentUserId = c.get("currentUserId");

@@ -1,5 +1,5 @@
 import { validator } from "hono/validator";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { PostFeed } from "@/types/enums";
 import { feedHonoResponse, feedHonoValidation } from "@/utils/feedQueryOptions";
@@ -10,36 +10,33 @@ export const user = factory
   .get(
     "/search",
     validator("query", (value, c) => {
-      const parsed = z
-        .object({
-          search: z.string(),
-          limit: z.string(),
-        })
-        .safeParse(value);
+      const parsed = v.safeParse(
+        v.object({
+          search: v.string(),
+          limit: v.string(),
+        }),
+        value,
+      );
 
       if (!parsed.success) {
-        const error = parsed.error._zod.def[0];
-        return c.text(
-          `400 Invalid query parameter for ${error.path}. ${error.message}`,
-          400,
-        );
+        const error = parsed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
 
-      const transformed = z
-        .object({
-          search: z.string(),
-          limit: z.number().check(z.positive()),
-        })
-        .safeParse({ ...parsed.data, limit: Number(parsed.data.limit) });
+      const transformed = v.safeParse(
+        v.object({
+          search: v.string(),
+          limit: v.pipe(v.number(), v.integer(), v.gtValue(0)),
+        }),
+        { ...parsed.output, limit: Number(parsed.output.limit) },
+      );
 
       if (!transformed.success) {
-        return c.text(
-          `400 Invalid query parameter for limit. Not of type number`,
-          400,
-        );
+        const error = transformed.issues[0];
+        return c.text(`400 ${error.message}`, 400);
       }
 
-      return transformed.data;
+      return transformed.output;
     }),
     async (c) => {
       const query = c.req.valid("query");

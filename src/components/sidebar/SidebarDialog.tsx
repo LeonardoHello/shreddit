@@ -4,7 +4,7 @@ import { useReducer, useRef, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import { zodResolver } from "@hookform/resolvers/zod";
+import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useMutation } from "@tanstack/react-query";
 import { Camera, Loader2, X } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import {
   generateMimeTypes,
   generatePermittedFileTypes,
 } from "uploadthing/client";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import {
   Dialog,
@@ -49,31 +49,30 @@ const nameMinLength = 3;
 const nameMaxLength = 21;
 const descriptionMaxLength = 500;
 
-const fileSchema = PostFileSchema.pick({
-  key: true,
-  url: true,
-  name: true,
-  thumbHash: true,
-}).array();
-
-const formSchema = z.object({
-  name: z.string().check(
-    z.minLength(nameMinLength, {
-      message: "Please lengthen this text to 3 characters or more",
-    }),
-    z.maxLength(nameMaxLength, {
-      message: "Please shorten this text to 21 characters or less",
-    }),
-    z.regex(/^[a-zA-Z0-9_]+$/, {
-      message: "Only letters, numbers and underscore are allowed",
-    }),
-    z.trim(),
+const formSchema = v.object({
+  name: v.pipe(
+    v.string(),
+    v.trim(),
+    v.minLength(
+      nameMinLength,
+      `Please lengthen this text to ${nameMinLength} characters or more`,
+    ),
+    v.maxLength(
+      nameMaxLength,
+      `Please shorten this text to ${nameMaxLength} characters or less`,
+    ),
+    v.regex(
+      /^[a-zA-Z0-9_]+$/,
+      "Only letters, numbers and underscore are allowed",
+    ),
   ),
-  description: z.string().check(
-    z.maxLength(descriptionMaxLength, {
-      message: "Description is too long, shorten it to 300 characters or less",
-    }),
-    z.trim(),
+  description: v.pipe(
+    v.string(),
+    v.trim(),
+    v.maxLength(
+      descriptionMaxLength,
+      "Description is too long, shorten it to 300 characters or less",
+    ),
   ),
 });
 
@@ -199,8 +198,8 @@ export default function SidebarDialog({
   const queryClient = getQueryClient();
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<v.InferInput<typeof formSchema>>({
+    resolver: valibotResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -322,7 +321,7 @@ export default function SidebarDialog({
     state.isLoading;
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: v.InferInput<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
@@ -365,10 +364,17 @@ export default function SidebarDialog({
 
       const data = await response.json();
 
-      const { data: parsedFiles, error } = fileSchema.safeParse(data);
+      const {
+        output: parsedFiles,
+        success,
+        issues,
+      } = v.safeParse(
+        v.array(v.pick(PostFileSchema, ["key", "url", "name", "thumbHash"])),
+        data,
+      );
 
-      if (error) {
-        toast.error(error.message);
+      if (!success) {
+        toast.error(issues[0].message);
         dispatch({ type: ReducerAction.STOP_LOADING });
 
         return;

@@ -2,7 +2,7 @@ import { headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { createClient } from "@/hono/client";
 import { getQueryClient } from "@/tanstack-query/getQueryClient";
@@ -13,7 +13,10 @@ export default async function PostLayout(
 ) {
   const [params, headers] = await Promise.all([props.params, nextHeaders()]);
 
-  const { success } = z.uuid().safeParse(params.postId);
+  const { output: postId, success } = v.safeParse(
+    v.pipe(v.string(), v.uuid()),
+    params.postId,
+  );
 
   if (!success) notFound();
 
@@ -21,20 +24,20 @@ export default async function PostLayout(
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
-    queryKey: ["posts", params.postId],
+    queryKey: ["posts", postId],
     queryFn: async () => {
       const res = await client.posts[`:postId{${reg}}`].$get({
-        param: { postId: params.postId },
+        param: { postId },
       });
 
       return res.json();
     },
   });
   queryClient.prefetchQuery({
-    queryKey: ["posts", params.postId, "comments"],
+    queryKey: ["posts", postId, "comments"],
     queryFn: async () => {
       const res = await client.posts[`:postId{${reg}}`].comments.$get({
-        param: { postId: params.postId },
+        param: { postId },
       });
 
       return res.json();

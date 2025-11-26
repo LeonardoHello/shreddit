@@ -6,6 +6,7 @@ import { notFound, useRouter } from "next/navigation";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import * as v from "valibot";
 
 import {
   ReducerAction,
@@ -18,13 +19,6 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { PostType } from "@/types/enums";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
-
-const postFileSchema = PostFileSchema.pick({
-  key: true,
-  url: true,
-  name: true,
-  thumbHash: true,
-}).array();
 
 const toastId = "loading_toast";
 
@@ -161,17 +155,20 @@ export default function SubmitButton({
 
       const data = await response.json();
 
-      const parsedFiles = postFileSchema.safeParse(data);
+      const parsedFiles = v.safeParse(
+        v.array(v.pick(PostFileSchema, ["key", "url", "name", "thumbHash"])),
+        data,
+      );
 
-      if (parsedFiles.error) {
-        toast.error(parsedFiles.error.message);
+      if (!parsedFiles.success) {
+        toast.error(parsedFiles.issues[0].message);
         dispatch({ type: ReducerAction.STOP_LOADING });
 
         return;
       }
 
       // text is set to null
-      createPost.mutate(parsedFiles.data);
+      createPost.mutate(parsedFiles.output);
     }
   };
 

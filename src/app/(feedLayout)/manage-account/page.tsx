@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import * as z from "zod/mini";
+import * as v from "valibot";
 
 import { getSession } from "@/app/actions";
 import AccountPage from "@/components/manage-account";
@@ -18,17 +18,20 @@ export default async function ManageAccountPage() {
     redirect("/");
   }
 
-  const username = z.parse(
-    UserSchema.shape.username.unwrap(),
+  const username = v.parse(
+    UserSchema.entries.username.wrapped,
     session.user.username,
   );
 
-  const { data: provider } = z.safeParse(
-    z.enum(["google", "github", "discord"]),
+  const provider = v.safeParse(
+    v.picklist(["google", "github", "discord"]),
     account.providerId,
   );
 
-  const createdAt = z.parse(UserSchema.shape.createdAt, session.user.createdAt);
+  const createdAt = v.parse(
+    UserSchema.entries.createdAt,
+    session.user.createdAt,
+  );
 
   return (
     <AccountPage
@@ -37,7 +40,7 @@ export default async function ManageAccountPage() {
       image={session.user.image}
       username={username}
       email={session.user.email}
-      provider={provider}
+      provider={provider.success ? provider.output : undefined}
     />
   );
 }
