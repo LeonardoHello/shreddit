@@ -46,25 +46,26 @@ export default function PostDropdown({
   const dispatch = usePostDispatchContext();
 
   const savePost = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (saved: NonNullable<typeof state.isSaved>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].save.$patch({
         param: { postId: state.id },
-        json: { saved: !state.isSaved },
+        json: { saved },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       const previousValue = state.isSaved;
 
       dispatch({
         type: ReducerAction.SET_SAVE,
-        save: !state.isSaved,
+        save: variables,
       });
 
       return { previousValue };
     },
     onSuccess: (data) => {
+      console.log(`onMutate --> ${data[0].saved}`);
       if (data[0].saved) {
         toast.success("Post saved successfully.");
       } else {
@@ -83,20 +84,20 @@ export default function PostDropdown({
   });
 
   const hidePost = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (hidden: NonNullable<typeof state.isHidden>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].hide.$patch({
         param: { postId: state.id },
-        json: { hidden: !state.isHidden },
+        json: { hidden },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       const previousValue = state.isHidden;
 
       dispatch({
         type: ReducerAction.SET_HIDE,
-        hide: !state.isHidden,
+        hide: variables,
       });
 
       return { previousValue };
@@ -120,22 +121,22 @@ export default function PostDropdown({
   });
 
   const setSpoiler = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (spoiler: NonNullable<typeof state.spoiler>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].spoiler.$patch(
         {
           param: { postId: state.id },
-          json: { spoiler: !state.spoiler },
+          json: { spoiler },
         },
       );
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       const previousValue = state.spoiler;
 
       dispatch({
         type: ReducerAction.SET_SPOILER,
-        spoiler: !state.spoiler,
+        spoiler: variables,
       });
 
       return { previousValue };
@@ -161,29 +162,29 @@ export default function PostDropdown({
   });
 
   const setNSFW = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (nsfw: NonNullable<typeof state.nsfw>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].nsfw.$patch({
         param: { postId: state.id },
-        json: { nsfw: !state.nsfw },
+        json: { nsfw },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       const previousValue = state.nsfw;
 
       dispatch({
         type: ReducerAction.SET_NSFW,
-        nsfw: !state.nsfw,
+        nsfw: variables,
       });
 
       return { previousValue };
     },
     onSuccess: (data) => {
       if (data[0].nsfw) {
-        toast.success("Post has been marked as spoiler");
+        toast.success("Post has been marked as NSFW");
       } else {
-        toast.success("Post has been un-marked as a spoiler");
+        toast.success("Post has been un-marked as a NSFW");
       }
     },
     onError: (error, _variables, context) => {
@@ -220,7 +221,7 @@ export default function PostDropdown({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
-              savePost.mutate();
+              savePost.mutate(!state.isSaved);
             }}
           >
             {state.isSaved && (
@@ -238,7 +239,7 @@ export default function PostDropdown({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              hidePost.mutate();
+              hidePost.mutate(!state.isHidden);
             }}
           >
             {state.isHidden && (
@@ -277,7 +278,7 @@ export default function PostDropdown({
 
               <DropdownMenuItem
                 onClick={() => {
-                  setSpoiler.mutate();
+                  setSpoiler.mutate(!state.spoiler);
                 }}
               >
                 {state.spoiler && (
@@ -295,7 +296,7 @@ export default function PostDropdown({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setNSFW.mutate();
+                  setNSFW.mutate(!state.nsfw);
                 }}
               >
                 {state.nsfw && (

@@ -50,25 +50,25 @@ export default function CommunityHeaderDropdown({
   });
 
   const joinCommunity = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (joined: NonNullable<typeof userToCommunity.joined>) => {
       const res = await client.users.me.communities[
         `:communityId{${reg}}`
       ].join.$patch({
         param: { communityId },
-        json: { joined: !userToCommunity.joined },
+        json: { joined },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       queryClient.setQueryData<typeof userToCommunity>(
         userToCommunityQueryKey,
         (updater) => {
           if (!updater) {
-            return { ...userToCommunity, joined: !userToCommunity.joined };
+            return { ...userToCommunity, variables };
           }
 
-          return { ...updater, joined: !userToCommunity.joined };
+          return { ...updater, variables };
         },
       );
     },
@@ -97,23 +97,25 @@ export default function CommunityHeaderDropdown({
   });
 
   const favoriteCommunity = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (
+      favorited: NonNullable<typeof userToCommunity.favorited>,
+    ) => {
       const res = await client.users.me.communities[
         `:communityId{${reg}}`
       ].favorite.$patch({
         param: { communityId },
-        json: { favorited: !userToCommunity.favorited },
+        json: { favorited },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
         if (!updater) {
-          return { ...userToCommunity, favorited: !userToCommunity.favorited };
+          return { ...userToCommunity, variables };
         }
 
-        return { ...updater, favorited: !userToCommunity.favorited };
+        return { ...updater, variables };
       });
     },
     onSuccess: (data) => {
@@ -139,23 +141,23 @@ export default function CommunityHeaderDropdown({
   });
 
   const muteCommunity = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (muted: NonNullable<typeof userToCommunity.muted>) => {
       const res = await client.users.me.communities[
         `:communityId{${reg}}`
       ].mute.$patch({
         param: { communityId },
-        json: { muted: !userToCommunity.muted },
+        json: { muted },
       });
 
       return res.json();
     },
-    onMutate: () => {
+    onMutate: (variables) => {
       queryClient.setQueryData(userToCommunityQueryKey, (updater) => {
         if (!updater) {
-          return { ...userToCommunity, muted: !userToCommunity.muted };
+          return { ...userToCommunity, variables };
         }
 
-        return { ...updater, muted: !userToCommunity.muted };
+        return { ...updater, variables };
       });
     },
     onSuccess: (data) => {
@@ -189,7 +191,7 @@ export default function CommunityHeaderDropdown({
       <Button
         variant={userToCommunity.joined ? "outline" : "default"}
         onClick={() => {
-          joinCommunity.mutate();
+          joinCommunity.mutate(!userToCommunity.joined);
         }}
       >
         {userToCommunity.joined ? "Joined" : "Join"}
@@ -208,7 +210,7 @@ export default function CommunityHeaderDropdown({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => {
-                  favoriteCommunity.mutate();
+                  favoriteCommunity.mutate(!userToCommunity.favorited);
                 }}
               >
                 {userToCommunity.favorited
@@ -217,7 +219,7 @@ export default function CommunityHeaderDropdown({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  muteCommunity.mutate();
+                  muteCommunity.mutate(!userToCommunity.muted);
                 }}
               >
                 {userToCommunity.muted ? "Unmute" : "Mute"} r/
