@@ -1,9 +1,6 @@
-"use client";
-
 import Image from "next/image";
 
-import { DiscordIcon, GithubIcon, GoogleIcon } from "@/components/social-icons";
-import { Button } from "@/components/ui/button";
+import SignInButtons from "@/components/sign-in-buttons";
 import {
   Card,
   CardContent,
@@ -11,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
 import shrek from "@public/shrek.svg";
 
 export default function SignInPage() {
@@ -26,44 +22,7 @@ export default function SignInPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap justify-center gap-4">
-          <Button
-            className="w-full sm:w-auto"
-            variant={"outline"}
-            onClick={async () => {
-              await authClient.signIn.social({
-                provider: "google",
-              });
-            }}
-          >
-            <GoogleIcon className="fill-foreground size-6" />
-            Google
-          </Button>
-
-          <Button
-            className="w-full sm:w-auto"
-            variant={"outline"}
-            onClick={async () => {
-              await authClient.signIn.social({
-                provider: "github",
-              });
-            }}
-          >
-            <GithubIcon className="fill-foreground size-6" />
-            Github
-          </Button>
-
-          <Button
-            className="w-full sm:w-auto"
-            variant={"outline"}
-            onClick={async () => {
-              await authClient.signIn.social({
-                provider: "discord",
-              });
-            }}
-          >
-            <DiscordIcon className="fill-foreground size-6" />
-            Discord
-          </Button>
+          <SignInButtons />
         </CardContent>
       </Card>
     </div>
