@@ -32,6 +32,7 @@ export default function SubmitCommunity({
     queryKey: ["users", "me", "communities", "joined", "submit"],
     queryFn: async () => {
       const res = await client.users.me.communities.joined.submit.$get();
+
       return res.json();
     },
   });

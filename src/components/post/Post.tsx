@@ -26,11 +26,15 @@ export default function Post({
         param: { postId },
       });
 
-      return res.json();
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
-
-  if (!post) notFound();
 
   return (
     <PostContextProvider

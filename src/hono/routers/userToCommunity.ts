@@ -166,10 +166,7 @@ export const userToCommunity = factory
       columns: { favorited: true, muted: true, joined: true },
     });
 
-    return c.json(
-      data ?? { favorited: false, joined: false, muted: false },
-      200,
-    );
+    return c.json(data ?? null, 200);
   })
   .patch(
     `/:communityId{${reg}}/favorite`,

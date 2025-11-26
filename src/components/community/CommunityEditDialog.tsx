@@ -45,9 +45,8 @@ import { Label } from "../ui/label";
 import { Progress } from "../ui/progress";
 import { Textarea } from "../ui/textarea";
 
-type CommunityType = InferResponseType<
-  (typeof client.communities)[":communityName"]["$get"],
-  200
+type CommunityType = NonNullable<
+  InferResponseType<(typeof client.communities)[":communityName"]["$get"], 200>
 >;
 
 type ReducerState = {

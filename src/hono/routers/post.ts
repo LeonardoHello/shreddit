@@ -40,7 +40,7 @@ export const post = factory
       where: (post, { eq }) => eq(post.id, postId),
     });
 
-    return c.json(data, 200);
+    return c.json(data ?? null, 200);
   })
   .get(`/:postId{${reg}}/comments`, async (c) => {
     const postId = c.req.param("postId");

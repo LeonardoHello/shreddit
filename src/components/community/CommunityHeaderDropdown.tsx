@@ -43,7 +43,9 @@ export default function CommunityHeaderDropdown({
         param: { communityName },
       });
 
-      return res.json();
+      const data = await res.json();
+
+      return data ?? { favorited: false, joined: false, muted: false };
     },
   });
 

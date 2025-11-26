@@ -39,13 +39,15 @@ export default function CommunityHeader({
         param: { communityName },
       });
 
-      return res.json();
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
-
-  if (!community) {
-    notFound();
-  }
 
   const dispatch = useRecentCommunityDispatchContext();
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { notFound } from "next/navigation";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
 
@@ -17,12 +19,16 @@ export default function SubmitCommunitySelected({
       const res = await client.communities[":communityName"].submit.$get({
         param: { communityName },
       });
-      return res.json();
+
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
-
-  if (!selectedCommunity)
-    throw new Error("There was a problem with a community selection.");
 
   return (
     <>

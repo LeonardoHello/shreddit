@@ -1,4 +1,5 @@
 import { headers as nextHeaders } from "next/headers";
+import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -19,7 +20,14 @@ export default async function CommunitySubmitLayout(
       const res = await client.communities[":communityName"].submit.$get({
         param: { communityName: params.communityName },
       });
-      return res.json();
+
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
 

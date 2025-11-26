@@ -30,7 +30,13 @@ export default async function PostLayout(
         param: { postId },
       });
 
-      return res.json();
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
   queryClient.prefetchQuery({

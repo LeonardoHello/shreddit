@@ -26,6 +26,7 @@ export default async function SubmitLayout(props: LayoutProps<"/submit">) {
     queryKey: ["users", "me", "communities", "joined", "submit"],
     queryFn: async () => {
       const res = await client.users.me.communities.joined.submit.$get();
+
       return res.json();
     },
   });

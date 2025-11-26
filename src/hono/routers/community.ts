@@ -100,23 +100,23 @@ export const community = factory
       }),
     });
 
-    return c.json(data, 200);
+    return c.json(data ?? null, 200);
   })
-  .get("/:communityName/icon", async (c) => {
-    const currentUserId = c.get("currentUserId");
+  // .get("/:communityName/icon", async (c) => {
+  //   const currentUserId = c.get("currentUserId");
 
-    if (!currentUserId) return c.text("401 unauthorized", 401);
+  //   if (!currentUserId) return c.text("401 unauthorized", 401);
 
-    const communityName = c.req.param("communityName");
-    const db = c.get("db");
+  //   const communityName = c.req.param("communityName");
+  //   const db = c.get("db");
 
-    const data = await db.query.communities.findFirst({
-      where: (community, { eq }) => eq(community.name, communityName),
-      columns: { icon: true },
-    });
+  //   const data = await db.query.communities.findFirst({
+  //     where: (community, { eq }) => eq(community.name, communityName),
+  //     columns: { icon: true },
+  //   });
 
-    return c.json(data, 200);
-  })
+  //   return c.json(data ?? null, 200);
+  // })
   .get("/:communityName/submit", async (c) => {
     const currentUserId = c.get("currentUserId");
 
@@ -130,7 +130,7 @@ export const community = factory
       columns: { id: true, name: true, icon: true, iconPlaceholder: true },
     });
 
-    return c.json(data, 200);
+    return c.json(data ?? null, 200);
   })
   .get("/:communityName/posts", feedHonoValidation, async (c) => {
     const communityName = c.req.param("communityName");

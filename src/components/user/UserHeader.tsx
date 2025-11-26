@@ -19,13 +19,16 @@ export default function UserHeader({ username }: { username: string }) {
       const res = await client.users[":username"].$get({
         param: { username },
       });
-      return res.json();
+
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
-
-  if (!user) {
-    notFound();
-  }
 
   return (
     <div className="bg-card flex flex-col rounded-lg border">

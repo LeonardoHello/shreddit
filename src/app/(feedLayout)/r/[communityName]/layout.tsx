@@ -1,4 +1,5 @@
 import { headers as nextHeaders } from "next/headers";
+import { notFound } from "next/navigation";
 
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -20,6 +21,23 @@ export default async function CommunityLayout(
   const client = createClient(headers);
   const queryClient = getQueryClient();
 
+  queryClient.prefetchQuery({
+    queryKey: ["communities", params.communityName],
+    queryFn: async () => {
+      const res = await client.communities[":communityName"].$get({
+        param: { communityName: params.communityName },
+      });
+
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
+    },
+  });
+
   if (session) {
     queryClient.prefetchQuery({
       queryKey: ["users", "me", "communities", params.communityName],
@@ -28,21 +46,12 @@ export default async function CommunityLayout(
           param: { communityName: params.communityName },
         });
 
-        return res.json();
+        const data = await res.json();
+
+        return data ?? { favorited: false, joined: false, muted: false };
       },
     });
   }
-
-  queryClient.prefetchQuery({
-    queryKey: ["communities", params.communityName],
-    queryFn: async () => {
-      const res = await client.communities[":communityName"].$get({
-        param: { communityName: params.communityName },
-      });
-
-      return res.json();
-    },
-  });
 
   return (
     <div className="container flex grow flex-col gap-4 p-2 pb-6 lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">

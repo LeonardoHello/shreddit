@@ -33,13 +33,16 @@ export default function SubmitButton({
       const res = await client.communities[":communityName"].submit.$get({
         param: { communityName },
       });
-      return res.json();
+
+      const data = await res.json();
+
+      if (!data) {
+        notFound();
+      }
+
+      return data;
     },
   });
-
-  if (!selectedCommunity) {
-    notFound();
-  }
 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

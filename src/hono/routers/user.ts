@@ -87,7 +87,7 @@ export const user = factory
     const username = c.req.param("username");
     const db = c.get("db");
 
-    const user = await db.query.users.findFirst({
+    const data = await db.query.users.findFirst({
       where: (user, { eq }) => eq(user.username, username),
       with: {
         communities: {
@@ -143,7 +143,7 @@ export const user = factory
       }),
     });
 
-    return c.json(user, 200);
+    return c.json(data ?? null, 200);
   })
   .get("/:username/posts", feedHonoValidation, async (c) => {
     const username = c.req.param("username");
