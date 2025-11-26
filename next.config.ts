@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { RouteHas } from "next/dist/lib/load-custom-routes";
+import type { RouteHas } from "next/dist/lib/load-custom-routes";
 
 import { PostSort } from "@/types/enums";
 
@@ -8,7 +8,7 @@ const routeHasAuthCookie: RouteHas = {
   key: "__Secure-better-auth.session_token",
 };
 
-// TODO: create proxy file for rewriting u/:username and r/:communityName dynamic routes to display IDs
+// TODO: create proxy file for rewriting u/:userId and r/:communityId dynamic routes to their respective names
 const nextConfig: NextConfig = {
   reactCompiler: true,
   images: {

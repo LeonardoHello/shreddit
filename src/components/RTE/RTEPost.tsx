@@ -2,9 +2,8 @@
 
 import { useCallback } from "react";
 
-import ExtensionBubbleMenu from "@tiptap/extension-bubble-menu";
 import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
+import { Placeholder } from "@tiptap/extensions";
 import { EditorContent, useEditor } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -32,7 +31,6 @@ import RTESkeleton from "./RTESkeleton";
 
 const extensions = [
   StarterKit,
-  ExtensionBubbleMenu,
   Image.configure({ inline: true }),
   Placeholder.configure({
     placeholder: "Text",

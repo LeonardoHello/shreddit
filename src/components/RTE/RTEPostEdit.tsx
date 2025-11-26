@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { useMutation } from "@tanstack/react-query";
 import Image from "@tiptap/extension-image";
-import Placeholder from "@tiptap/extension-placeholder";
+import { Placeholder } from "@tiptap/extensions";
 import { Editor, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDropzone } from "@uploadthing/react";

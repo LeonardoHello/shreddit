@@ -3,8 +3,7 @@
 import { useTransition } from "react";
 
 import { useMutation } from "@tanstack/react-query";
-import CharacterCount from "@tiptap/extension-character-count";
-import Placeholder from "@tiptap/extension-placeholder";
+import { CharacterCount, Placeholder } from "@tiptap/extensions";
 import {
   EditorContent,
   useEditor,

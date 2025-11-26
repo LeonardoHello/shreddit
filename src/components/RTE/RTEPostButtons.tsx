@@ -1,4 +1,5 @@
-import { BubbleMenu, Editor, FloatingMenu } from "@tiptap/react";
+import type { Editor } from "@tiptap/react";
+import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";
 
 import { Separator } from "../ui/separator";
 import RTEMarkButtons from "./RTEMarks";
@@ -23,7 +24,6 @@ export default function RTEPostButtons({
       <FloatingMenu
         editor={editor}
         className="bg-card flex items-center gap-2 overflow-x-auto rounded-lg border p-1 sm:hidden"
-        tippyOptions={{ maxWidth: 200 }}
       >
         <RTENodeButtons editor={editor} />
         <Separator
