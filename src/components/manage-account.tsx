@@ -13,7 +13,6 @@ import {
 } from "uploadthing/client";
 import * as v from "valibot";
 
-import { deleteAccount } from "@/app/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +57,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { User } from "@/db/schema/users";
+import { client } from "@/hono/client";
 import { authClient } from "@/lib/auth-client";
 import { useUploadThing } from "@/lib/uploadthing";
 import defaultUserImage from "@public/defaultUserImage.png";
@@ -299,15 +299,23 @@ export default function AccountPage({
   };
 
   const handleDeleteAccount = async () => {
-    // Handle account deletion logic here
-    const response = await deleteAccount();
+    const res = await client.users.me.$delete();
 
-    if (response.error) {
-      toast.error(response.message);
-    } else {
-      toast.success(response.message);
-      router.refresh();
+    if (!res.ok) {
+      if (res.status === 401) {
+        const message = await res.text();
+        throw new Error(message);
+      }
+      const message = await res.text();
+
+      toast.error(message);
+      return;
     }
+
+    const message = await res.text();
+
+    toast.success(message);
+    router.refresh();
   };
 
   const providerIcon = {

@@ -1,10 +1,14 @@
+import { eq } from "drizzle-orm";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 
+import { users } from "@/db/schema/users";
+import { auth } from "@/lib/auth";
 import { PostFeed } from "@/types/enums";
 import { feedHonoResponse, feedHonoValidation } from "@/utils/feedQueryOptions";
 import { factory } from "../init";
 
+// eslint-disable-next-line drizzle/enforce-delete-with-where
 export const user = factory
   .createApp()
   .get(
@@ -186,4 +190,19 @@ export const user = factory
       feed: PostFeed.HIDDEN,
       username,
     });
+  })
+  .delete("/me", async (c) => {
+    const currentUserId = c.get("currentUserId");
+
+    if (!currentUserId) return c.text("401 unauthorized", 401);
+
+    const signedOut = await auth.api.signOut({ headers: c.req.raw.headers });
+
+    if (!signedOut.success) return c.text("failed deleting your account", 400);
+
+    const db = c.get("db");
+
+    await db.delete(users).where(eq(users.id, currentUserId));
+
+    return c.text("Your account has been successfully deleted", 200);
   });
