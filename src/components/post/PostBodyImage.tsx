@@ -1,43 +1,97 @@
+import { useState } from "react";
 import Image from "next/image";
 
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import * as thumbhash from "thumbhash";
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { usePostContext } from "@/context/PostContext";
+import { cn } from "@/lib/cn";
 import { ArrElement } from "@/types/helpers";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 export default function PostBodyImage({ isUnsafe }: { isUnsafe: boolean }) {
   const post = usePostContext();
 
-  if (post.files.length === 1) {
-    const file = post.files[0];
+  const files = post.files;
+
+  if (files.length === 1) {
+    const file = files[0];
 
     return <PostImage file={file} isUnsafe={isUnsafe} />;
   }
 
+  return <PostImageList files={files} isUnsafe={isUnsafe} />;
+}
+
+function PostImageList({
+  files,
+  isUnsafe,
+}: {
+  files: ReturnType<typeof usePostContext>["files"];
+  isUnsafe: boolean;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(1);
+
   return (
-    <Carousel>
-      <CarouselContent className="gap-4">
-        {post.files.map((image) => (
-          <CarouselItem key={image.id}>
-            <PostImage file={image} isUnsafe={isUnsafe} />
-          </CarouselItem>
+    <div className="relative flex flex-col justify-center overflow-hidden">
+      <div className="flex items-center">
+        {files.map((file, i) => (
+          <div
+            key={file.id}
+            className={cn("min-w-full", {
+              "order-first": currentIndex === i + 1,
+            })}
+          >
+            <PostImage file={file} isUnsafe={isUnsafe} />
+          </div>
         ))}
-      </CarouselContent>
+      </div>
       {!isUnsafe && (
         <>
-          <CarouselPrevious />
-          <CarouselNext />
+          <Badge className="absolute top-4 right-4 transition-opacity hover:opacity-60">
+            {currentIndex}/{files.length}
+          </Badge>
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute left-4 rounded-full"
+            onClick={(e) => {
+              e.stopPropagation();
+
+              setCurrentIndex((prev) => {
+                if (prev === 1) {
+                  return files.length;
+                }
+
+                return prev - 1;
+              });
+            }}
+          >
+            <ArrowLeft />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-4 rounded-full"
+            onClick={(e) => {
+              e.stopPropagation();
+
+              setCurrentIndex((prev) => {
+                if (prev === files.length) {
+                  return 1;
+                }
+
+                return prev + 1;
+              });
+            }}
+          >
+            <ArrowRight />
+          </Button>
         </>
       )}
-    </Carousel>
+    </div>
   );
 }
 
