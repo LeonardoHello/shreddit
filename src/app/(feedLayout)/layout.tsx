@@ -13,9 +13,6 @@ import RecentCommunityContextProvider from "@/context/RecentCommunityContext";
 import TanstackProvider from "@/tanstack-query/tanstackProvider";
 import { getSession } from "../actions";
 
-export const preferredRegion = ["fra1"];
-export const runtime = "edge";
-
 export default async function FeedLayout(props: LayoutProps<"/">) {
   const session = await getSession();
 
