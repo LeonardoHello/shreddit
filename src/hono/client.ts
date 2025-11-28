@@ -3,6 +3,7 @@ import { hc } from "hono/client";
 import { app } from "./routers/_app";
 
 function getUrl() {
+  if (typeof window !== "undefined") return "";
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/`;
   return "http://localhost:3000/";
 }
