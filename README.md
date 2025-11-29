@@ -1,64 +1,85 @@
-# Shreddit - A Modern Social Media Platform
+# Shreddit
 
-## Project Description
+**A modern, high-performance social media platform built with the latest web technologies.**
 
-Shreddit is a full-stack social media platform inspired by Reddit, designed to provide users with a seamless experience in creating communities, sharing content, and engaging in discussions. The platform is built with cutting-edge web technologies, ensuring a responsive and interactive user interface.
+Shreddit is a full-stack application inspired by Reddit, engineered to demonstrate **end-to-end type safety**, **scalable architecture**, and **optimal user experience**. It leverages the power of Next.js 16 and React 19, backed by a robust Hono API and Drizzle ORM.
 
-## Technologies Used
+## 🚀 Key Features & Technical Highlights
 
-- **Frontend:**  
-  - Developed with **React 19** and **Next.js 15**, utilizing server-side rendering, dynamic routing, and client/server components for optimal performance and SEO.
-  - Implemented responsive, accessible UIs using **Tailwind CSS** and **shadcn/ui** components, ensuring seamless experiences across devices.
-  - Built advanced navigation features, including a collapsible, mobile-friendly sidebar and real-time search with instant feedback.
-  - Integrated **TipTap** rich text editor for posts and comments, supporting image uploads and custom formatting.
-  - Used **motion/react** for smooth UI animations and transitions.
+### Core Architecture
 
-- **Type Safety & Code Quality:**  
-  - Enforced strict type safety with **TypeScript** and **Zod** schemas for runtime validation.
-  - Maintained code quality with **ESLint** configurations and consistent formatting via **Prettier**.
+- **Next.js 16 & React 19**: Utilizes the latest React Server Components (RSC) and Server Actions for a hybrid rendering strategy that maximizes performance and SEO.
+- **Hono (RPC)**: Implements a lightweight, edge-compatible API layer. The client-server communication is fully typed via Hono's RPC client, ensuring that API contract changes are instantly reflected in the frontend.
+- **Drizzle ORM**: A modern TypeScript ORM that allows for type-safe SQL queries. The database schema is modularized and strictly typed, preventing runtime data errors.
+- **Valibot**: Replaces Zod for schema validation to reduce bundle size. Valibot's tree-shakeable architecture ensures that only the validators used are included in the final build.
 
-- **State Management & Context:**  
-  - Designed robust context providers for post submission, recent communities, and sidebar state, using React Context with useReducer and custom hooks.
-  - Leveraged **React Query** for data fetching, caching, and optimistic UI updates, including infinite scrolling and skeleton loading states.
+### Design Patterns & Code Quality
 
-- **Backend & API Layer:**  
-  - Architected a type-safe API using **tRPC**, enabling seamless client-server communication.
-  - Modeled data with **Drizzle ORM**, writing complex SQL queries for feeds, user actions, and community management.
-  - Implemented authentication and user management with **Better-Auth**, supporting OAuth providers (Google, GitHub, Discord) and secure session handling.
+- **End-to-End Type Safety**: From the database schema (Drizzle) to the API validation (Valibot) and the client-side consumption (Hono Client), data flows through the application with strict type guarantees.
+- **Modular Domain-Driven Structure**: The codebase is organized by domain (e.g., `routers/post.ts`, `schema/posts.ts`), making it easy to scale and maintain.
+- **Optimistic UI Updates**: Leverages **React Query** to provide instant user feedback for actions like voting and commenting, synchronizing with the server in the background.
 
-- **File Uploads & Media:**  
-  - Integrated **UploadThing** for image uploads, including client-side dropzones and progress feedback.
-  - Utilized **Thumbhash** for lightweight image placeholders, improving perceived performance.
+### UI/UX
 
-- **UX & Error Handling:**  
-  - Provided user-friendly error messages and recovery options.
-  - Used **Sonner** for toast notifications and feedback.
-  - Designed loading skeletons for all major flows.
+- **Tailwind CSS v4**: Styled with the latest version of Tailwind for a utility-first, performant design system.
+- **Shadcn/ui**: Implements accessible, reusable components based on Radix UI.
+- **Rich Interaction**: Features a custom TipTap editor for rich text posts, drag-and-drop image uploads via UploadThing, and smooth animations with Motion (formerly Framer Motion).
+- **Performance**: Images use **Thumbhash** for immediate, blur-up loading placeholders, significantly improving perceived performance.
 
-- **Other Features:**  
-  - Scheduled cron jobs for filesystem cleanup.
-  - Implemented community moderation, favoriting, muting, and joining features.
-  - Supported infinite feeds for posts, upvoted, saved, and hidden content.
-  - Adhered to best practices for accessibility, performance, and maintainability.
+## 🛠️ Tech Stack
 
-# Usage
+| Category       | Technology                         |
+| -------------- | ---------------------------------- |
+| **Framework**  | Next.js 16 (App Router), React 19  |
+| **Language**   | TypeScript                         |
+| **API**        | Hono (RPC), React Query            |
+| **Database**   | PostgreSQL (Neon), Drizzle ORM     |
+| **Validation** | Valibot                            |
+| **Styling**    | Tailwind CSS v4, shadcn/ui, Motion |
+| **Auth**       | Better-Auth (OAuth + Sessions)     |
+| **Media**      | UploadThing, Sharp, Thumbhash      |
+
+## 📦 Usage
 
 **To run Shreddit locally:**
 
-1. Clone the repository: `git clone https://github.com/LeonardoHello/shreddit.git`
-2. Install dependencies: `pnpm i`
-3. Add environment variables inside the `.env.local` file:
-   ```plaintext
-   DATABASE_URL=
-   UPLOADTHING_TOKEN=
-   BETTER_AUTH_SECRET=
-   BETTER_AUTH_URL=
-   GOOGLE_CLIENT_ID=
-   GOOGLE_CLIENT_SECRET=
-   GITHUB_CLIENT_ID=
-   GITHUB_CLIENT_SECRET=
-   DISCORD_CLIENT_ID=
-   DISCORD_CLIENT_SECRET=
-   ```
-4. Run drizzle schema migration: `pnpm push` [source](https://orm.drizzle.team/docs/migrations)
-5. Run the development server: `pnpm dev`
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/LeonardoHello/shreddit.git
+    cd shreddit
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    pnpm i
+    ```
+
+3.  **Configure Environment:**
+    Create a `.env.local` file in the root directory and add the following variables:
+
+    ```env
+    DATABASE_URL=postgresql://...
+    UPLOADTHING_TOKEN=...
+    BETTER_AUTH_SECRET=...
+    BETTER_AUTH_URL=http://localhost:3000
+    GOOGLE_CLIENT_ID=...
+    GOOGLE_CLIENT_SECRET=...
+    GITHUB_CLIENT_ID=...
+    GITHUB_CLIENT_SECRET=...
+    DISCORD_CLIENT_ID=...
+    DISCORD_CLIENT_SECRET=...
+    ```
+
+4.  **Database Migration:**
+    Push the Drizzle schema to your database:
+
+    ```bash
+    pnpm push
+    ```
+
+5.  **Start Development Server:**
+    ```bash
+    pnpm dev
+    ```
