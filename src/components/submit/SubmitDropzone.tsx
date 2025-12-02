@@ -1,16 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import Image from "next/image";
 
 import { useDropzone } from "@uploadthing/react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CloudUpload,
-  ImagePlus,
-  Trash,
-} from "lucide-react";
+import { CloudUpload, ImagePlus, Trash } from "lucide-react";
 import { toast } from "sonner";
 import {
   generateClientDropzoneAccept,
@@ -19,11 +13,18 @@ import {
 } from "uploadthing/client";
 
 import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
   ReducerAction,
   useSubmitContext,
   useSubmitDispatchContext,
+  type ReducerState,
 } from "@/context/SubmitContext";
-import { cn } from "@/lib/cn";
 import { getRouteConfig } from "@/lib/uploadthing";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -56,7 +57,7 @@ export default function SubmitDropzone() {
       dispatch({
         type: ReducerAction.SET_FILES,
         selectedFiles: filteredFiles.map((file) => ({
-          file,
+          file: file,
           url: URL.createObjectURL(file),
         })),
       });
@@ -71,21 +72,8 @@ export default function SubmitDropzone() {
     ),
   });
 
-  if (state.selectedFiles.length === 1) {
-    const file = state.selectedFiles[0];
-    return (
-      <div className="group">
-        <SelectedImage url={file.url} name={file.file.name} />
-      </div>
-    );
-  }
-
-  if (state.selectedFiles.length > 1) {
-    return (
-      <div className="group">
-        <SelectedImageList files={state.selectedFiles} />
-      </div>
-    );
+  if (state.selectedFiles.length > 0) {
+    return <SelectedImageCarousel files={state.selectedFiles} />;
   }
 
   return (
@@ -106,80 +94,52 @@ export default function SubmitDropzone() {
   );
 }
 
-function SelectedImageList({
+function SelectedImageCarousel({
   files,
 }: {
-  files: ReturnType<typeof useSubmitContext>["selectedFiles"];
+  files: ReducerState["selectedFiles"];
 }) {
-  const [currentIndex, setCurrentIndex] = useState(1);
+  if (files.length === 1) {
+    const file = files[0];
+
+    return (
+      <div className="group">
+        <SelectedImage url={file.url} name={file.file.name} />
+      </div>
+    );
+  }
 
   return (
-    <div className="relative flex flex-col justify-center overflow-hidden">
-      <div className="flex items-center">
+    <Carousel opts={{ duration: 0, watchDrag: false }}>
+      <CarouselContent className="group gap-4">
         {files.map((file, i) => {
           return (
-            <div
-              key={file.url}
-              className={cn("min-w-full", {
-                "order-first": currentIndex === i + 1,
-              })}
-            >
-              <SelectedImage url={file.url} name={file.file.name} />
-            </div>
+            <CarouselItem key={file.url}>
+              <SelectedImage
+                url={file.url}
+                name={file.file.name}
+                index={i + 1}
+              />
+            </CarouselItem>
           );
         })}
-      </div>
+      </CarouselContent>
 
-      <Badge
-        variant={files.length > 12 ? "destructive" : "default"}
-        className="absolute top-4 right-4 transition-opacity hover:opacity-60"
-      >
-        {currentIndex > files.length ? 1 : currentIndex}/{files.length}
-      </Badge>
-      <Button
-        variant="outline"
-        size="icon"
-        className="absolute left-4 rounded-full"
-        onClick={(e) => {
-          e.stopPropagation();
-
-          setCurrentIndex((prev) => {
-            if (prev === 1) {
-              return files.length;
-            }
-
-            return prev - 1;
-          });
-        }}
-      >
-        <ArrowLeft />
-      </Button>
-
-      <Button
-        variant="outline"
-        size="icon"
-        className="absolute right-4 rounded-full"
-        onClick={(e) => {
-          e.stopPropagation();
-
-          setCurrentIndex((prev) => {
-            if (prev === files.length) {
-              return 1;
-            } else if (prev > files.length) {
-              return 2;
-            }
-
-            return prev + 1;
-          });
-        }}
-      >
-        <ArrowRight />
-      </Button>
-    </div>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
   );
 }
 
-function SelectedImage({ url, name }: { url: string; name: File["name"] }) {
+function SelectedImage({
+  url,
+  name,
+  index,
+}: {
+  url: string;
+  name: File["name"];
+  index?: number;
+}) {
   const state = useSubmitContext();
   const dispatch = useSubmitDispatchContext();
 
@@ -207,7 +167,7 @@ function SelectedImage({ url, name }: { url: string; name: File["name"] }) {
     dispatch({
       type: ReducerAction.ADD_FILES,
       selectedFiles: filteredFiles.map((file) => ({
-        file,
+        file: file,
         url: URL.createObjectURL(file),
       })),
     });
@@ -277,6 +237,17 @@ function SelectedImage({ url, name }: { url: string; name: File["name"] }) {
         >
           <Trash />
         </Button>
+
+        {index !== undefined && (
+          <Badge
+            variant={
+              state.selectedFiles.length > 12 ? "destructive" : "default"
+            }
+            className="absolute top-6 right-6 z-10 gap-0"
+          >
+            {index}/{state.selectedFiles.length}
+          </Badge>
+        )}
       </div>
     </div>
   );

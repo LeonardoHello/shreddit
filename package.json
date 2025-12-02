@@ -40,6 +40,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.7",
     "drizzle-valibot": "^0.4.2",
+    "embla-carousel-react": "^8.5.2",
     "hono": "^4.10.4",
     "lucide-react": "^0.486.0",
     "motion": "^12.4.2",
