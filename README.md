@@ -9,7 +9,7 @@ Shreddit is a full-stack application inspired by Reddit, engineered to demonstra
 ### Core Architecture
 
 - **Next.js 16 & React 19**: Utilizes the latest React Server Components (RSC) and Server Actions for a hybrid rendering strategy that maximizes performance and SEO.
-- **Hono (RPC)**: Implements a lightweight, edge-compatible API layer. The client-server communication is fully typed via Hono's RPC client, ensuring that API contract changes are instantly reflected in the frontend.
+- **Hono (+RPC)**: Implements a lightweight, edge-compatible API layer. The client-server communication is fully typed via Hono's RPC client, ensuring that API contract changes are instantly reflected in the frontend.
 - **Drizzle ORM**: A modern TypeScript ORM that allows for type-safe SQL queries. The database schema is modularized and strictly typed, preventing runtime data errors.
 - **Valibot**: Replaces Zod for schema validation to reduce bundle size. Valibot's tree-shakeable architecture ensures that only the validators used are included in the final build.
 
