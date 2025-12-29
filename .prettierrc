@@ -15,6 +15,15 @@
     "^(@|@public)(/.*)$",
     "^[.]"
   ],
+  "overrides": [
+    {
+      "files": ["*.jsonc"],
+      "options": {
+        "parser": "json",
+        "trailingComma": "none"
+      }
+    }
+  ],
   "singleQuote": false,
   "trailingComma": "all",
   "useTabs": false,
