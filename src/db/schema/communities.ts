@@ -1,6 +1,7 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
 import {
   boolean,
+  index,
   pgTable,
   primaryKey,
   text,
@@ -59,7 +60,14 @@ export const usersToCommunities = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (t) => [primaryKey({ columns: [t.userId, t.communityId] })],
+  (t) => [
+    primaryKey({ columns: [t.userId, t.communityId] }),
+    // Index for checking if a user has joined a specific community
+    index("utc_user_joined_idx").on(t.userId, t.communityId, t.joined),
+
+    // Index for filtering out muted communities
+    index("utc_user_muted_idx").on(t.userId, t.communityId, t.muted),
+  ],
 );
 
 export const usersToCommunitiesRelations = relations(
