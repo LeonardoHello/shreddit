@@ -17,7 +17,7 @@ export default function Loading() {
           quality={1}
           alt="shrek icon"
           className="size-10"
-          priority
+          preload
         />
 
         <Button variant="outline" disabled>

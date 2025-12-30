@@ -194,7 +194,7 @@ function SelectedImage({
         <Image
           src={url}
           alt={name}
-          priority
+          preload
           quality={100}
           fill
           sizes="(max-width: 640px) 90vw, (max-width: 768px) 570px, (max-width: 1024px) 698px, (max-width: 1280px) 618px, (max-width: 1536px) 586px, 674px"

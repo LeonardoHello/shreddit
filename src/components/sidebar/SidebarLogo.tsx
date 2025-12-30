@@ -29,11 +29,11 @@ export default function SidebarLogo() {
           }}
         >
           <HoverPrefetchLink href="/">
-            <Image src={shrek} alt="logo" priority className="size-10" />
+            <Image src={shrek} alt="logo" preload className="size-10" />
             <Image
               src={shrekText}
               alt="logo text"
-              priority
+              preload
               className="h-full w-auto"
             />
           </HoverPrefetchLink>
