@@ -208,8 +208,8 @@ export const feedHonoResponse = async (
                   .from(usersToCommunities)
                   .where(
                     and(
-                      eq(usersToCommunities.communityId, post.communityId),
                       eq(usersToCommunities.userId, currentUserId),
+                      eq(usersToCommunities.communityId, post.communityId),
                       eq(usersToCommunities.joined, true),
                     ),
                   ),
