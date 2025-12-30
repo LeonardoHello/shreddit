@@ -1,5 +1,6 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
 import {
+  integer,
   pgTable,
   primaryKey,
   text,
@@ -19,6 +20,7 @@ export const comments = pgTable("comments", {
   parentCommentId: uuid().references((): AnyPgColumn => comments.id, {
     onDelete: "cascade",
   }),
+  voteCount: integer().notNull().default(0),
   authorId: text()
     .references(() => users.id, {
       onDelete: "cascade",

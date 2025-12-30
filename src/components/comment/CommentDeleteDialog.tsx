@@ -25,7 +25,11 @@ export default function CommentDeleteDialog() {
       const deleteComment = await client.comments[`:commentId{${reg}}`].$delete(
         {
           param: { commentId: state.id },
-          query: { communityId: state.post.communityId },
+          query: {
+            postId: state.postId,
+            communityId: state.post.communityId,
+          },
+          json: { commentCount: Math.max(state.post.commentCount - 1, 0) },
         },
       );
       return deleteComment.json();

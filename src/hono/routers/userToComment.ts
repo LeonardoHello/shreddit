@@ -1,7 +1,12 @@
+import { eq } from "drizzle-orm";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 
-import { usersToComments, UserToCommentSchema } from "@/db/schema/comments";
+import {
+  comments,
+  usersToComments,
+  UserToCommentSchema,
+} from "@/db/schema/comments";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory } from "../init";
 
@@ -9,7 +14,10 @@ export const userToComment = factory.createApp().patch(
   `/:commentId{${reg}}/vote`,
   validator("json", (value, c) => {
     const parsed = v.safeParse(
-      v.pick(UserToCommentSchema, ["voteStatus"]),
+      v.object({
+        voteStatus: UserToCommentSchema.entries.voteStatus,
+        voteCount: v.pipe(v.number(), v.integer()),
+      }),
       value,
     );
 
@@ -26,16 +34,19 @@ export const userToComment = factory.createApp().patch(
     if (!currentUserId) return c.text("401 unauthorized", 401);
 
     const commentId = c.req.param("commentId");
-    const json = c.req.valid("json");
+    const { voteStatus, voteCount } = c.req.valid("json");
     const db = c.get("db");
 
-    await db
-      .insert(usersToComments)
-      .values({ commentId, userId: currentUserId, ...json })
-      .onConflictDoUpdate({
-        target: [usersToComments.userId, usersToComments.commentId],
-        set: { voteStatus: json.voteStatus },
-      });
+    await db.batch([
+      db
+        .insert(usersToComments)
+        .values({ commentId, userId: currentUserId, voteStatus })
+        .onConflictDoUpdate({
+          target: [usersToComments.userId, usersToComments.commentId],
+          set: { voteStatus },
+        }),
+      db.update(comments).set({ voteCount }).where(eq(comments.id, commentId)),
+    ]);
 
     return c.text("success", 200);
   },

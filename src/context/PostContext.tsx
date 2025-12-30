@@ -5,7 +5,7 @@ import { createContext, useContext, useReducer } from "react";
 import type { InferResponseType } from "hono";
 
 import type { client } from "@/hono/client";
-import { calculateVotes } from "@/utils/calculateVotes";
+import { voteStatusDelta } from "@/utils/voteStatusDelta";
 
 type Post = NonNullable<
   InferResponseType<
@@ -51,11 +51,11 @@ type ReducerActionType =
     }
   | {
       type: typeof ReducerAction.SET_SAVE;
-      save: ReducerState["isSaved"];
+      save: ReducerState["saved"];
     }
   | {
       type: typeof ReducerAction.SET_HIDE;
-      hide: ReducerState["isHidden"];
+      hide: ReducerState["hidden"];
     }
   | {
       type: typeof ReducerAction.SET_SPOILER;
@@ -84,18 +84,19 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
       return {
         ...state,
         voteStatus: action.vote,
-        voteCount: calculateVotes({
-          voteCount: state.voteCount,
-          voteStatus: state.voteStatus ?? "none",
-          newVoteStatus: action.vote ?? "none",
-        }),
+        voteCount:
+          state.voteCount +
+          voteStatusDelta({
+            oldStatus: state.voteStatus ?? "none",
+            newStatus: action.vote ?? "none",
+          }),
       };
 
     case ReducerAction.SET_SAVE:
-      return { ...state, isSaved: action.save };
+      return { ...state, saved: action.save };
 
     case ReducerAction.SET_HIDE:
-      return { ...state, isHidden: action.hide };
+      return { ...state, hidden: action.hide };
 
     case ReducerAction.SET_SPOILER:
       return { ...state, spoiler: action.spoiler };

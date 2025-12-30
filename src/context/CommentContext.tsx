@@ -6,7 +6,7 @@ import type { InferResponseType } from "hono/client";
 
 import type { client } from "@/hono/client";
 import { ArrElement } from "@/types/helpers";
-import { calculateVotes } from "@/utils/calculateVotes";
+import { voteStatusDelta } from "@/utils/voteStatusDelta";
 
 type Comment = ArrElement<
   InferResponseType<
@@ -52,11 +52,12 @@ function reducer(state: ReducerState, action: ReducerActionType): ReducerState {
       return {
         ...state,
         voteStatus: action.vote,
-        voteCount: calculateVotes({
-          voteCount: state.voteCount,
-          voteStatus: state.voteStatus ?? "none",
-          newVoteStatus: action.vote ?? "none",
-        }),
+        voteCount:
+          state.voteCount +
+          voteStatusDelta({
+            oldStatus: state.voteStatus ?? "none",
+            newStatus: action.vote ?? "none",
+          }),
       };
 
     case ReducerAction.TOGGLE_EDIT:

@@ -1,4 +1,4 @@
-import type { SQL } from "drizzle-orm";
+import { type SQL } from "drizzle-orm";
 import type { Context } from "hono";
 import { validator } from "hono/validator";
 import * as v from "valibot";
@@ -9,7 +9,7 @@ import {
   usersToCommunities,
   type Community,
 } from "@/db/schema/communities";
-import { PostSchema, usersToPosts, UserToPost } from "@/db/schema/posts";
+import { PostSchema, usersToPosts } from "@/db/schema/posts";
 import { users, type User } from "@/db/schema/users";
 import type { Env } from "@/hono/init";
 import type { UserId } from "@/lib/auth";
@@ -107,87 +107,26 @@ type InputConfig = NonNullable<
   Parameters<(typeof drizzleDb)["query"]["posts"]["findMany"]>[0]
 >;
 
-export const postInputConfig = (currentUserId: UserId) =>
+export const postWithInput = (currentUserId: UserId) =>
   ({
-    with: {
-      community: {
-        columns: {
-          name: true,
-          icon: true,
-          iconPlaceholder: true,
-          moderatorId: true,
-        },
-      },
-      author: { columns: { username: true, image: true } },
-      files: {
-        columns: { id: true, name: true, url: true, thumbHash: true },
+    community: {
+      columns: {
+        name: true,
+        icon: true,
+        iconPlaceholder: true,
+        moderatorId: true,
       },
     },
-    extras: (post, { sql }) => ({
-      voteCount: sql<number>`
-          (
-            SELECT (
-              COALESCE(SUM(
-                CASE 
-                  WHEN vote_status = 'upvoted' THEN 1
-                  WHEN vote_status = 'downvoted' THEN -1
-                  ELSE 0
-                END
-              ), 0)::int
-            )
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-          )
-        `.as("vote_count"),
-      commentCount: sql<number>`
-          (
-            SELECT COUNT(*)::int
-            FROM comments
-            WHERE comments.post_id = ${post.id}
-          )
-        `.as("comment_count"),
-      isSaved: currentUserId
-        ? sql<UserToPost["saved"]>`
-          (
-            SELECT saved
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${currentUserId}
-          )
-        `.as("is_saved")
-        : sql<null>`NULL`.as("is_saved"),
-      isHidden: currentUserId
-        ? sql<UserToPost["hidden"]>`
-          (
-            SELECT hidden
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${currentUserId}
-          )
-        `.as("is_hidden")
-        : sql<null>`NULL`.as("is_hidden"),
-      voteStatus: currentUserId
-        ? sql<UserToPost["voteStatus"]>`
-          (
-            SELECT vote_status
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${currentUserId}
-          )
-        `.as("vote_status")
-        : sql<null>`NULL`.as("vote_status"),
-      userToPostUpdatedAt: currentUserId
-        ? sql<UserToPost["updatedAt"]>`
-          (
-            SELECT updated_at
-            FROM users_to_posts
-            WHERE users_to_posts.post_id = ${post.id}
-              AND users_to_posts.user_id = ${currentUserId}
-          )
-        `.as("user_to_post_updated_at")
-        : sql<null>`NULL`.as("user_to_post_updated_at"),
-    }),
-  }) satisfies InputConfig;
+    author: { columns: { username: true, image: true } },
+    files: {
+      columns: { id: true, name: true, url: true, thumbHash: true },
+    },
+    usersToPosts: {
+      columns: { createdAt: false, userId: false, postId: false },
+      where: (userToPost, { eq }) => eq(userToPost.userId, currentUserId ?? ""),
+      limit: 1,
+    },
+  }) satisfies InputConfig["with"];
 
 type FeedProps = {
   [P in PostFeed]: P extends PostFeed.ALL
@@ -221,12 +160,10 @@ export const feedHonoResponse = async (
   const currentUserId = c.get("currentUserId");
   const db = c.get("db");
 
-  const inputConfig = postInputConfig(currentUserId);
-
   const data = await db.query.posts.findMany({
-    ...inputConfig,
+    with: postWithInput(currentUserId),
     limit: 10,
-    where: (post, { and, or, eq, gt, lt, exists, notExists, sql }) => {
+    where: (post, { and, or, eq, gt, lt, exists, notExists }) => {
       const filters: (SQL | undefined)[] = [];
 
       const hideHidden = currentUserId
@@ -430,19 +367,11 @@ export const feedHonoResponse = async (
             break;
 
           case PostSort.CONTROVERSIAL:
-            const commentCountSql = sql<number>`
-                  (
-                    SELECT COUNT(*)::int
-                    FROM comments
-                    WHERE comments.post_id = ${post.id}
-                  )
-                `;
-
             filters.push(
               or(
-                lt(commentCountSql, query.cursor.commentCount),
+                lt(post.commentCount, query.cursor.commentCount),
                 and(
-                  eq(commentCountSql, query.cursor.commentCount),
+                  eq(post.commentCount, query.cursor.commentCount),
                   lt(post.id, query.cursor.id),
                 ),
               ),
@@ -450,27 +379,11 @@ export const feedHonoResponse = async (
             break;
 
           default:
-            const voteCountSql = sql<number>`
-                  (
-                    SELECT (
-                        COALESCE(SUM(
-                            CASE 
-                                WHEN vote_status = 'upvoted' THEN 1
-                                WHEN vote_status = 'downvoted' THEN -1
-                                ELSE 0
-                            END
-                        ), 0)
-                    )::int
-                    FROM users_to_posts
-                    WHERE users_to_posts.post_id = ${post.id}
-                  )
-                `;
-
             filters.push(
               or(
-                lt(voteCountSql, query.cursor.voteCount),
+                lt(post.voteCount, query.cursor.voteCount),
                 and(
-                  eq(voteCountSql, query.cursor.voteCount),
+                  eq(post.voteCount, query.cursor.voteCount),
                   lt(post.id, query.cursor.id),
                 ),
               ),
@@ -481,23 +394,35 @@ export const feedHonoResponse = async (
 
       return and(...filters);
     },
-    orderBy: (post, { desc, sql }) => {
+    orderBy: (post, { desc }) => {
       return {
-        [PostSort.BEST]: [desc(sql`vote_count`), desc(post.id)],
-        [PostSort.HOT]: [desc(sql`vote_count`), desc(post.id)],
+        [PostSort.BEST]: [desc(post.voteCount), desc(post.id)],
+        [PostSort.HOT]: [desc(post.voteCount), desc(post.id)],
         [PostSort.NEW]: [desc(post.createdAt), desc(post.id)],
-        [PostSort.CONTROVERSIAL]: [desc(sql`comment_count`), desc(post.id)],
+        [PostSort.CONTROVERSIAL]: [desc(post.commentCount), desc(post.id)],
       }[query.sort];
     },
   });
 
   let nextCursor = null;
 
-  if (data.length !== 10) {
-    return c.json({ posts: data, nextCursor }, 200);
+  const posts = data.map(({ usersToPosts, ...rest }) => {
+    const userRel = usersToPosts[0] || {};
+
+    return {
+      ...rest,
+      userToPostUpdatedAt: userRel.updatedAt ?? null,
+      voteStatus: userRel.voteStatus ?? null,
+      saved: userRel.saved ?? null,
+      hidden: userRel.hidden ?? null,
+    };
+  });
+
+  if (posts.length !== 10) {
+    return c.json({ posts, nextCursor }, 200);
   }
 
-  const { id, createdAt, commentCount, voteCount } = data[data.length - 1];
+  const { id, createdAt, commentCount, voteCount } = posts[posts.length - 1];
 
   switch (query.sort) {
     case PostSort.NEW:
@@ -513,5 +438,5 @@ export const feedHonoResponse = async (
       break;
   }
 
-  return c.json({ posts: data, nextCursor }, 200);
+  return c.json({ posts, nextCursor }, 200);
 };

@@ -23,7 +23,7 @@ export default function FeedPostHidden() {
       return res.json();
     },
     onMutate: () => {
-      const previousValue = state.isHidden;
+      const previousValue = state.hidden;
 
       dispatch({
         type: ReducerAction.SET_HIDE,

@@ -46,7 +46,7 @@ export default function PostDropdown({
   const dispatch = usePostDispatchContext();
 
   const savePost = useMutation({
-    mutationFn: async (saved: NonNullable<typeof state.isSaved>) => {
+    mutationFn: async (saved: NonNullable<typeof state.saved>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].save.$patch({
         param: { postId: state.id },
         json: { saved },
@@ -55,7 +55,7 @@ export default function PostDropdown({
       return res.json();
     },
     onMutate: (variables) => {
-      const previousValue = state.isSaved;
+      const previousValue = state.saved;
 
       dispatch({
         type: ReducerAction.SET_SAVE,
@@ -83,7 +83,7 @@ export default function PostDropdown({
   });
 
   const hidePost = useMutation({
-    mutationFn: async (hidden: NonNullable<typeof state.isHidden>) => {
+    mutationFn: async (hidden: NonNullable<typeof state.hidden>) => {
       const res = await client.users.me.posts[`:postId{${reg}}`].hide.$patch({
         param: { postId: state.id },
         json: { hidden },
@@ -92,7 +92,7 @@ export default function PostDropdown({
       return res.json();
     },
     onMutate: (variables) => {
-      const previousValue = state.isHidden;
+      const previousValue = state.hidden;
 
       dispatch({
         type: ReducerAction.SET_HIDE,
@@ -220,16 +220,16 @@ export default function PostDropdown({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
-              savePost.mutate(!state.isSaved);
+              savePost.mutate(!state.saved);
             }}
           >
-            {state.isSaved && (
+            {state.saved && (
               <>
                 <BookmarkCheck />
                 <span>Remove from saved</span>
               </>
             )}
-            {!state.isSaved && (
+            {!state.saved && (
               <>
                 <Bookmark />
                 <span>Save</span>
@@ -238,16 +238,16 @@ export default function PostDropdown({
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              hidePost.mutate(!state.isHidden);
+              hidePost.mutate(!state.hidden);
             }}
           >
-            {state.isHidden && (
+            {state.hidden && (
               <>
                 <EyeOff />
                 <span>Remove from hidden</span>
               </>
             )}
-            {!state.isHidden && (
+            {!state.hidden && (
               <>
                 <Eye />
                 <span>Hide</span>

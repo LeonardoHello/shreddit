@@ -2,7 +2,6 @@ import { and, eq, exists, or } from "drizzle-orm";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 
-import { UserToComment } from "@/db/schema/comments";
 import { communities } from "@/db/schema/communities";
 import {
   postFiles,
@@ -14,7 +13,7 @@ import { PostFeed } from "@/types/enums";
 import {
   feedHonoResponse,
   feedHonoValidation,
-  postInputConfig,
+  postWithInput,
 } from "@/utils/feedQueryOptions";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
 import { factory } from "../init";
@@ -32,17 +31,31 @@ export const post = factory
     const currentUserId = c.get("currentUserId");
     const db = c.get("db");
 
-    const inputConfig = postInputConfig(currentUserId);
-
     const data = await db.query.posts.findFirst({
-      ...inputConfig,
+      with: postWithInput(currentUserId),
       where: (post, { eq }) => eq(post.id, postId),
     });
 
-    return c.json(data ?? null, 200);
+    if (data === undefined) {
+      return c.json(null, 200);
+    }
+
+    const { usersToPosts, ...rest } = data;
+    const userRel = usersToPosts[0] || {};
+
+    const posts = {
+      ...rest,
+      userToPostUpdatedAt: userRel.updatedAt ?? null,
+      voteStatus: userRel.voteStatus ?? null,
+      saved: userRel.saved ?? null,
+      hidden: userRel.hidden ?? null,
+    };
+
+    return c.json(posts, 200);
   })
   .get(`/:postId{${reg}}/comments`, async (c) => {
     const postId = c.req.param("postId");
+    const currentUserId = c.get("currentUserId");
     const db = c.get("db");
 
     const data = await db.query.comments.findMany({
@@ -50,45 +63,43 @@ export const post = factory
       with: {
         author: true,
         post: {
-          columns: { authorId: true, communityId: true },
+          columns: { authorId: true, communityId: true, commentCount: true },
           with: { community: { columns: { moderatorId: true } } },
         },
+        usersToComments: {
+          columns: { voteStatus: true },
+          where: (userToComment, { eq }) =>
+            eq(userToComment.userId, currentUserId ?? ""),
+          limit: 1,
+        },
       },
-      extras: (comment, { sql }) => ({
-        voteCount: sql<number>`
-            (
-              SELECT COALESCE(SUM(
-                CASE 
-                  WHEN vote_status = 'upvoted' THEN 1
-                  WHEN vote_status = 'downvoted' THEN -1
-                  ELSE 0
-                END
-              ), 0)::int
-              FROM users_to_comments
-              WHERE users_to_comments.comment_id = ${comment.id}
-            )
-          `.as("vote_count"),
-        voteStatus: sql<UserToComment["voteStatus"] | null>`
-            (
-              SELECT vote_status
-              FROM users_to_comments
-              WHERE users_to_comments.comment_id = ${comment.id}
-                AND users_to_comments.user_id = ${c.var.currentUserId}
-            )
-          `.as("vote_status"),
-      }),
       orderBy: (post, { desc }) => desc(post.createdAt),
     });
 
-    return c.json(data, 200);
+    const comments = data.map(({ usersToComments, ...rest }) => {
+      const userRel = usersToComments[0] || {};
+
+      return {
+        ...rest,
+        voteStatus: userRel.voteStatus ?? null,
+      };
+    });
+
+    return c.json(comments, 200);
   })
   .post(
     "/",
     validator("json", (value, c) => {
       const parsed = v.safeParse(
         v.object({
-          ...v.omit(PostSchema, ["id", "createdAt", "updatedAt", "authorId"])
-            .entries,
+          ...v.omit(PostSchema, [
+            "id",
+            "createdAt",
+            "updatedAt",
+            "authorId",
+            "voteCount",
+            "commentCount",
+          ]).entries,
           files: v.optional(
             v.array(
               v.pick(PostFileSchema, ["key", "url", "name", "thumbHash"]),

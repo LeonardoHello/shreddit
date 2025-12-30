@@ -27,7 +27,7 @@ export default function FeedPost({
   }
 
   // don't hide posts on user filter feed
-  if (state.isHidden && !pathname.startsWith("/u/")) {
+  if (state.hidden && !pathname.startsWith("/u/")) {
     return <FeedPostHidden />;
   }
 

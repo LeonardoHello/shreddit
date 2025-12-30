@@ -75,7 +75,9 @@ function ActionButtons({
     mutationFn: async () => {
       await client.comments.$post({
         query: { postId },
-        json: { text: prettifyHTML(editor.getHTML()) },
+        json: {
+          text: prettifyHTML(editor.getHTML()),
+        },
       });
     },
     onMutate: () => {

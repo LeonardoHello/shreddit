@@ -27,3 +27,9 @@ export enum PostFeed {
   SAVED = "saved",
   HIDDEN = "hidden",
 }
+
+export enum VoteStatusDelta {
+  UPVOTED = 1,
+  DOWNVOTED = -1,
+  NONE = 0,
+}

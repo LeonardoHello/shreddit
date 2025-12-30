@@ -15,6 +15,7 @@ import { User } from "@/db/schema/users";
 import { client } from "@/hono/client";
 import { cn } from "@/lib/cn";
 import { uuidv4PathRegex as reg } from "@/utils/hono";
+import { voteStatusDelta } from "@/utils/voteStatusDelta";
 import { Button } from "../ui/button";
 
 export default function PostVote({
@@ -29,9 +30,14 @@ export default function PostVote({
 
   const votePost = useMutation({
     mutationFn: async (voteStatus: NonNullable<typeof state.voteStatus>) => {
+      const statusDelta = voteStatusDelta({
+        oldStatus: state.voteStatus,
+        newStatus: voteStatus,
+      });
+
       await client.users.me.posts[`:postId{${reg}}`].vote.$patch({
         param: { postId: state.id },
-        json: { voteStatus },
+        json: { voteStatus, voteCount: state.voteCount + statusDelta },
       });
     },
     onMutate: (variables) => {

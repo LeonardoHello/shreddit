@@ -1,5 +1,12 @@
 import { relations, type InferSelectModel } from "drizzle-orm";
-import { boolean, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  primaryKey,
+  text,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createSelectSchema } from "drizzle-valibot";
 
 import { timestamps, uploadthingFile } from "../helpers";
@@ -15,6 +22,8 @@ export const posts = pgTable("posts", {
   text: text(),
   nsfw: boolean().notNull().default(false),
   spoiler: boolean().notNull().default(false),
+  voteCount: integer().notNull().default(0),
+  commentCount: integer().notNull().default(0),
   authorId: text()
     .references(() => users.id, {
       onDelete: "cascade",
