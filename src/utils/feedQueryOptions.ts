@@ -48,6 +48,10 @@ const PostCursorSchema = v.variant("sort", [
       }),
     ),
   }),
+  v.object({
+    sort: v.enum(PostSort),
+    cursor: v.optional(v.string()),
+  }),
 ]);
 
 function decodeCursor(str: string) {
@@ -352,7 +356,7 @@ export const feedHonoResponse = async (
         filters.push(gt(post.createdAt, getOneMonthAgo()));
       }
 
-      if (query.cursor) {
+      if (query.cursor && typeof query.cursor !== "string") {
         switch (query.sort) {
           case PostSort.NEW:
             filters.push(
