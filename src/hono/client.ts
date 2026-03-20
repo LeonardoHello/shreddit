@@ -18,4 +18,4 @@ export const createClient = (headers?: Headers) =>
     headers: headers ? Object.fromEntries(headers.entries()) : undefined,
   }).api;
 
-export const client = createClient();
+export const client = hcWithType(getUrl()).api;

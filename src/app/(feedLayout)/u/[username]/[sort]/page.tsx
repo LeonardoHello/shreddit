@@ -17,7 +17,6 @@ export default async function UserPage(
         feed: PostFeed.USER,
         username: params.username,
         currentUserId: session && session.session.userId,
-        queryKey: ["users", params.username, "posts", sort],
       }}
       sort={sort}
     />

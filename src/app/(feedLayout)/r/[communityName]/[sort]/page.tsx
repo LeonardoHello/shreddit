@@ -17,7 +17,6 @@ export default async function CommunityPage(
         feed: PostFeed.COMMUNITY,
         communityName: params.communityName,
         currentUserId: session && session.session.userId,
-        queryKey: ["communities", params.communityName, "posts", sort],
       }}
       sort={sort}
     />

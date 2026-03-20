@@ -16,7 +16,6 @@ export default async function HomeSortPage(props: PageProps<"/home/[sort]">) {
       params={{
         feed: PostFeed.HOME,
         currentUserId: session.session.userId,
-        queryKey: ["users", "me", "posts", sort],
       }}
       sort={sort}
     />

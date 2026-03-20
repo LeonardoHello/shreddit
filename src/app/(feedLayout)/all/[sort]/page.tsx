@@ -14,7 +14,6 @@ export default async function AllSortPage(props: PageProps<"/all/[sort]">) {
       params={{
         feed: PostFeed.ALL,
         currentUserId: session && session.session.userId,
-        queryKey: ["posts", sort],
       }}
       sort={sort}
     />

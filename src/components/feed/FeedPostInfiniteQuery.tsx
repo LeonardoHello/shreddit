@@ -20,45 +20,23 @@ type InfiniteQueryParams<T extends PostFeed> = {
     ? {
         feed: P;
         currentUserId: UserId;
-        queryKey: ["posts", PostSort];
       }
     : P extends PostFeed.HOME
       ? {
           feed: P;
           currentUserId: NonNullable<UserId>;
-          queryKey: ["users", "me", "posts", PostSort];
         }
       : P extends PostFeed.COMMUNITY
         ? {
             feed: P;
             currentUserId: UserId;
-            queryKey: ["communities", Community["name"], "posts", PostSort];
             communityName: Community["name"];
           }
-        : P extends PostFeed.USER
-          ? {
-              feed: P;
-              currentUserId: UserId;
-              queryKey: [
-                "users",
-                NonNullable<User["username"]>,
-                "posts",
-                PostSort,
-              ];
-              username: NonNullable<User["username"]>;
-            }
-          : {
-              feed: P;
-              currentUserId: UserId;
-              queryKey: [
-                "users",
-                NonNullable<User["username"]>,
-                "posts",
-                P,
-                PostSort,
-              ];
-              username: NonNullable<User["username"]>;
-            };
+        : {
+            feed: P;
+            currentUserId: UserId;
+            username: NonNullable<User["username"]>;
+          };
 }[T];
 
 export default function FeedPostInfiniteQuery<T extends PostFeed>({
@@ -72,7 +50,16 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { queryKey } = params;
+  const queryKey =
+    params.feed === PostFeed.ALL
+      ? ["posts", sort]
+      : params.feed === PostFeed.HOME
+        ? ["users", "me", "posts", sort]
+        : params.feed === PostFeed.COMMUNITY
+          ? ["communities", params.communityName, "posts", sort]
+          : params.feed === PostFeed.USER
+            ? ["users", params.username, "posts", sort]
+            : ["users", params.username, "posts", params.feed, sort];
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery({
@@ -198,7 +185,7 @@ export default function FeedPostInfiniteQuery<T extends PostFeed>({
       )}
       {isFetchingNextPage && <FeedPostInfiniteQuerySkeleton withoutButton />}
 
-      <div ref={ref} className="sr-only bottom-0 h-[550px]" />
+      <div ref={ref} className="sr-only bottom-0 h-137.5" />
     </div>
   );
 }
